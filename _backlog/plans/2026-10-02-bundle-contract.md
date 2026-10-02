@@ -59,7 +59,10 @@ subagent 生命周期事件 task_started/running/completed 落账到哪类）在
    thread_id、deerflow pin commit 与 **owner PID**（entry 进程模型：create 前台进程，
    2026-10-02 定案）记进 state.json。
 2. **普通状态机**（domain + engine 层纯函数）：v1 动作集 start/status/cancel/**refine（仅
-   方向文本形态——砍 v2 的 continuation 双形态/replay receipts/crash-window 恢复例外）**；
+   方向文本形态——砍 v2 的 continuation 双形态/replay receipts/crash-window 恢复例外）**
+   ——refine 的 CLI 镜像已定（entry 决策 1：`refine <id> "方向文本"`，2026-10-02；
+   实现倾向同 thread 续跑，checkpoint 连续性让模型看到上一代报告；generation 上限
+   继承 v2 纪律）；
    状态 active/completed/cancelled/failed-resume（v2 的 suspended/blocked 随 HITL 暂缓砍）。
    state.json 单一真相 + revision CAS + 目录 lease (dev,ino) 活性重验——v2 最硬可继承资产，
    **拿得过来，保留**。澄清自动续答（2026-10-02，承接 wiring plan 决策 8）：**不是新

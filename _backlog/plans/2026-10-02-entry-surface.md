@@ -4,8 +4,8 @@
 
 ## 背景 / 现状
 
-裁决：**最小 CLI**——五子命令承载生命周期动作与观察面（refine 的 CLI 入口待裁决，见
-打磨线索①）。**debugger 为用户一级硬需求**（v2 之痛：
+裁决：**最小 CLI**——六子命令镜像状态机动作集与观察面（refine 入口 2026-10-02 定案
+补齐，见决策 1）。**debugger 为用户一级硬需求**（v2 之痛：
 可调试性糟糕 → 工具堆失控；v3 必须根治）。元原则：v2 剧场（12 子命令/TUI 三形态/调试工作台/
 9 runbook/双凭证路线）整体不抄——阶梯概念留精神、砍厚度。证据底座：
 `_reference/v2-harness-app-shape.md`（剧场全貌）、`deerflow-runtime-and-persistence.md` §5
@@ -14,8 +14,9 @@ wiring plan 背景节，先序于本 plan 一切裁决。
 
 ## 决策 / 方案
 
-1. **五子命令 CLI**（工具入口形态随 change 细化——`python -m` 或独立脚本；运行进程
-   模型 = 前台单进程 + 文件交互，见决策 6）：
+1. **六子命令 CLI**（2026-10-02 定案补 refine 入口，CLI 镜像状态机动作集；工具入口形态
+   随 change 细化——`python -m` 或独立脚本；运行进程模型 = 前台单进程 + 文件交互，
+   见决策 6）：
    - `create "研究问题…"` → 建 Bundle + **前台发起并默认本终端直播**（wiring plan 的
      embedded client，单泵三汇见决策 6）
    - `status <id>` → 状态 + journal 摘要 + **owner PID 活性检查**（PID 死而状态 active
@@ -24,6 +25,9 @@ wiring plan 背景节，先序于本 plan 一切裁决。
      journal 投影；工具级粒度，人话摘要层无感）
    - `cancel <id>` → 写取消标记（状态机转移请求），create 进程的泵协作检查 → 优雅终止
      ——复用 v2 外部取消纪律
+   - `refine <id> "方向文本"` → 同一 bundle generation+1 重跑（**一个动词一个动作**，
+     可审计好学；实现倾向方向文本 + 同 thread 续跑——checkpoint 连续性让模型看得到
+     上一代报告；generation 上限继承 v2 纪律，随 change 验证）
    - `inspect <id>` → 验收后看报告/证据/**全程回放**
    外加 make 环境目标（install/verify/fixture 演跑）。
 2. **watch = 渲染器，不是调试器**：消费 stream 事件流（messages-tuple 的 token/工具调用、
@@ -53,9 +57,8 @@ wiring plan 背景节，先序于本 plan 一切裁决。
 
 ## 打磨线索（2026-10-02 系统审计登记，随本 plan 打磨轮逐个过）
 
-① **refine 的 CLI 入口裁决**：bundle-contract 决策 2 的 v1 动作集含 refine，本 plan 五子
-命令无其入口——补第六子命令/参数形态，或明确 v1 状态机支持而 CLI 延后（后者须答
-「谁触发」）。
+① ~~**refine 的 CLI 入口裁决**~~ 已关闭（2026-10-02 用户定案：补第六子命令
+`refine <id> "方向文本"`，CLI 镜像状态机动作集，见决策 1）。
 ② ~~**watch 对齐**~~ 已关闭（2026-10-02 随进程模型定案，见决策 6：渲染器共享双数据源，
 续答轮显式渲染）。
 ③ **inspect 回放复用内建机器**：`client.get_thread()` / `CheckpointStateAccessor` 已
