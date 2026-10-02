@@ -27,7 +27,7 @@
 | [2026-10-02-bundle-contract.md](2026-10-02-bundle-contract.md) | Run Bundle 合同：目录契约（checkpoint 内嵌）+ 普通状态机 + 三层观察（debugger 硬需求）+ 验收收口最小版；产品第一 change 候选 |
 | [2026-10-02-entry-surface.md](2026-10-02-entry-surface.md) | 入口面：五子命令 CLI + watch 渲染器 + inspect 回放 + 两级阶梯；依赖前两份的合同 |
 
-**Next available plan ID: CLS-001**（移入 `_closed_plans/` 时分配）
+**Next available plan ID: CLS-004**（移入 `_closed_plans/` 时分配）
 
 ## 已归档（移至 `_done/_closed_plans/`）
 
