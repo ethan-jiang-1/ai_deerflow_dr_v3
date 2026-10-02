@@ -44,7 +44,7 @@ harness at `../deerflow/backend/packages/harness` (already declared in
 | Need | Start here |
 | --- | --- |
 | Scope, layers, and boundaries | [`AGENTS.md`](AGENTS.md) |
-| Why v3 exists and what the harness keeps vs. delegates | [v3 direction note](AGENTS.md#v3-方向与-v2-的分野) + the boundary plan above |
+| Why v3 exists and what the harness keeps vs. delegates | [v3 direction note](AGENTS.md) + the boundary plan above |
 | Runtime and authority boundaries | [`docs/runtime-architecture.md`](docs/runtime-architecture.md) |
 | Local commands and profiles | [`docs/local-operations.md`](docs/local-operations.md) |
 | How to prove a change | [`docs/testing-and-evaluation.md`](docs/testing-and-evaluation.md) |

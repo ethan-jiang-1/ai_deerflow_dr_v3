@@ -30,11 +30,11 @@ Five mechanical doc-layer rules plus one backlog navigation rule:
    recorded next to the entry.
 
 A docs-layer document is a Markdown document under ``deep_research_harness/docs/``
-— the top-level ``docs/*.md`` documents, the ``docs/runbooks/*.md`` operator
-runbooks, the ``docs/evidence/*.md`` frozen evaluation evidence, and the
-``docs/adr/*.md`` decision records. Non-Markdown files under
-that tree are out of scope. The scope is an explicit enumeration: adding a docs
-document without registering it here turns rule 4 red on the next run.
+— the top-level ``docs/*.md`` documents, plus any sublayer the enumeration
+declares (operator runbooks, frozen evidence, decision records). Non-Markdown
+files under that tree are out of scope. The scope is an explicit enumeration:
+adding a docs document without registering it here turns rule 4 red on the next
+run.
 
 This checker is self-contained and standalone: it is NOT aggregated into
 ``check_project_gate.py`` (PRS-009 owns the six-component closeout) and is NOT
@@ -88,59 +88,12 @@ DOC_BUDGETS: dict[str, int] = {
 }
 DOC_LAYER_DOCS: tuple[str, ...] = (
     # docs/ top-level markdown documents.
+    # v3 skeleton inventory: the doc layer grows with its owning changes; every
+    # docs/**/*.md on disk must be listed here and every entry must exist.
     "deep_research_harness/docs/README.md",
-    "deep_research_harness/docs/cognitive-evaluation-suite.md",
-    "deep_research_harness/docs/deep-research-topology.md",
-    "deep_research_harness/docs/deerflow-contract.md",
     "deep_research_harness/docs/local-operations.md",
-    "deep_research_harness/docs/regression-descent.md",
-    "deep_research_harness/docs/run-lifecycle-walkthrough.md",
     "deep_research_harness/docs/runtime-architecture.md",
     "deep_research_harness/docs/testing-and-evaluation.md",
-    # docs/evidence/ frozen point-in-time evaluation evidence (never edited to
-    # track current behavior; cited as historical proof). release-attestation-2026-07-17.json
-    # shares this tree but is non-markdown and therefore outside the checker scope.
-    "deep_research_harness/docs/evidence/live-evaluation-baseline-2026-07-17.md",
-    # docs/runbooks/ operator runbooks and their index.
-    "deep_research_harness/docs/runbooks/README.md",
-    "deep_research_harness/docs/runbooks/runbook-001-easiest-fixture-graph.md",
-    "deep_research_harness/docs/runbooks/runbook-002-easy-scripted-real.md",
-    "deep_research_harness/docs/runbooks/runbook-003-medium-real-auto.md",
-    "deep_research_harness/docs/runbooks/runbook-004-hard-real-auto.md",
-    "deep_research_harness/docs/runbooks/runbook-010-tui-auto.md",
-    "deep_research_harness/docs/runbooks/runbook-020-tui-manual.md",
-    "deep_research_harness/docs/runbooks/runbook-030-debugger.md",
-    "deep_research_harness/docs/runbooks/runbook-031-debugger-embedded.md",
-    # docs/adr/ decision records and their index.
-    "deep_research_harness/docs/adr/0001-real-smoke-test-completes-a-bounded-research-outcome.md",
-    "deep_research_harness/docs/adr/0002-tui-is-the-primary-user-interface.md",
-    "deep_research_harness/docs/adr/0003-deployment-owns-research-service-configuration.md",
-    "deep_research_harness/docs/adr/0004-system-owns-routine-research-recovery.md",
-    "deep_research_harness/docs/adr/0005-every-new-research-has-a-lightweight-confirmation.md",
-    "deep_research_harness/docs/adr/0006-layered-support-disclosure.md",
-    "deep_research_harness/docs/adr/0007-primary-user-research-sessions-are-durable.md",
-    "deep_research_harness/docs/adr/0008-start-with-a-local-first-tui.md",
-    "deep_research_harness/docs/adr/0009-research-completes-with-an-interpretable-report.md",
-    "deep_research_harness/docs/adr/0010-completed-reports-remain-portable-in-local-first.md",
-    "deep_research_harness/docs/adr/0011-node-cognitive-control-is-a-first-class-program.md",
-    "deep_research_harness/docs/adr/0012-node-control-contract-precedes-implementation.md",
-    "deep_research_harness/docs/adr/0013-cognitive-evaluations-live-outside-pytest.md",
-    "deep_research_harness/docs/adr/0014-cognitive-evaluations-have-four-honest-outcomes.md",
-    "deep_research_harness/docs/adr/0015-runner-and-evaluator-are-separate-programs.md",
-    "deep_research_harness/docs/adr/0016-evaluation-agent-is-review-only.md",
-    "deep_research_harness/docs/adr/0017-node-runs-lead-flow-runs.md",
-    "deep_research_harness/docs/adr/0018-evaluation-runs-use-fresh-isolated-bundles.md",
-    "deep_research_harness/docs/adr/0019-keep-v1-evaluation-review-simple.md",
-    "deep_research_harness/docs/adr/0020-runner-executes-once.md",
-    "deep_research_harness/docs/adr/0021-runner-cases-and-bundles-have-explicit-observations.md",
-    "deep_research_harness/docs/adr/0022-people-initiate-evaluation-review.md",
-    "deep_research_harness/docs/adr/0023-reviews-are-separate-immutable-records.md",
-    "deep_research_harness/docs/adr/0024-review-records-are-traceable.md",
-    "deep_research_harness/docs/adr/0025-rubrics-are-case-specific-review-authorities.md",
-    "deep_research_harness/docs/adr/0026-evaluation-control-and-run-data-are-separate.md",
-    "deep_research_harness/docs/adr/0027-model-led-research-confirmation-uses-deterministic-fact-admission.md",
-    "deep_research_harness/docs/adr/0028-deep-research-harness-is-the-downstream-module-root.md",
-    "deep_research_harness/docs/adr/README.md",
 )
 
 ADR_FILE_RE = re.compile(r"^\d{4}-.*\.md$")
@@ -166,6 +119,10 @@ def _indexed_ids(index: Path) -> set[str]:
 
 
 def _rule_adr_index(root: Path) -> list[str]:
+    if not (root / ADR_DIR).is_dir():
+        # v3 skeleton: the ADR layer does not exist yet; the rule engages as
+        # soon as docs/adr/ is created (with or without its index).
+        return []
     index = root / ADR_INDEX
     if not index.is_file():
         return [f"ADR index missing: {ADR_INDEX.as_posix()}"]
@@ -337,11 +294,9 @@ def _self_test() -> list[str]:
             write_doc(rel, f"# T\n\n[self]({name})\n")
             if ADR_FILE_RE.match(name):
                 adr_ids.append(name[:4])
-        index_rows = "".join(f"| {adr_id} | a | current |\n" for adr_id in sorted(adr_ids))
-        write_doc(
-            ADR_INDEX.as_posix(),
-            "# ADR Index\n\n| 编号 | 一句话 | 生命周期 |\n|---|---|---|\n" + index_rows,
-        )
+        # The clean fixture builds the ADR layer only when the registered scope
+        # declares it; with no ``docs/adr/`` entry the directory stays absent and
+        # ``_rule_adr_index`` is dormant by its dir-existence guard.
 
         # Backlog fixture: every declared `_` directory exists and is named in
         # the backlog README, so the clean fixture satisfies the backlog rule.
@@ -357,12 +312,15 @@ def _self_test() -> list[str]:
             errors.append("self-test: clean fixture must have zero violations")
 
         # Rule 1 negative: orphan index entry (lists an absent ADR id).
+        # Fabricate a minimal ADR layer to engage the dir-existence guard.
+        write_doc(
+            ADR_INDEX.as_posix(),
+            "# ADR Index\n\n| 编号 | 一句话 | 生命周期 |\n|---|---|---|\n",
+        )
         index = base / ADR_INDEX
-        original_index = index.read_text(encoding="utf-8")
-        index.write_text(original_index + "| 9999 | b | current |\n", encoding="utf-8")
+        index.write_text(index.read_text(encoding="utf-8") + "| 9999 | b | current |\n", encoding="utf-8")
         if not any("9999" in v for v in _rule_adr_index(base)):
             errors.append("self-test: ADR index orphan not detected")
-        index.write_text(original_index, encoding="utf-8")
 
         # Rule 2 negative (entry-chain): broken relative link.
         write_doc("deep_research_harness/README.md", "# T\n\nsee [gone.md](gone.md)\n")
@@ -383,7 +341,7 @@ def _self_test() -> list[str]:
             errors.append("self-test: docs-layer broken link not detected")
 
         # Rule 3 negative (docs-layer): missing trailing newline.
-        write_doc("deep_research_harness/docs/regression-descent.md", "# no newline")
+        write_doc("deep_research_harness/docs/testing-and-evaluation.md", "# no newline")
         if not any(
             "docs-layer document missing trailing newline" in v
             for v in _rule_encoding_newline(base)
@@ -391,7 +349,7 @@ def _self_test() -> list[str]:
             errors.append("self-test: docs-layer missing trailing newline not detected")
 
         # Rule 3 negative (docs-layer): non-UTF-8 bytes.
-        bad = base / "deep_research_harness/docs/cognitive-evaluation-suite.md"
+        bad = base / "deep_research_harness/docs/runtime-architecture.md"
         bad.write_bytes(b"\xff\xfe binary")
         if not any(
             "non-UTF-8 docs-layer document" in v

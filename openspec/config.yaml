@@ -26,7 +26,8 @@ context: |
   ## Test Evidence
 
   For a test-bearing change, use `openspec/governance/test-evidence-policy.md`.
-  The `evaluation-hardening` capability owns its behavior; select the lowest
+  The test-evidence owning capability (to be established by a v3 governance
+  change) owns its behavior; select the lowest
   responsible deterministic seam instead of copying test policy into the proposal.
 
   ## Start A Local Change

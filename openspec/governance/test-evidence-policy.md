@@ -1,18 +1,17 @@
 # Test Evidence Governance Policy
 
 This directory is a project extension to OpenSpec. OpenSpec does not load it
-implicitly, so `openspec/config.yaml` and `deep_research_harness/AGENTS.md` retain short
-bootstrap pointers to this policy and the owning specification.
+implicitly, so `openspec/config.yaml` retains a short bootstrap pointer to this
+policy and the owning specification; the harness guide stays free of that
+dependency by design.
 
 ## Authority
 
 | Surface | Authority |
 |---|---|
-| `openspec/specs/evaluation-hardening/spec.md` | Approved normative test-evidence semantics |
-| One active owning `evaluation-hardening` delta | Pending normative modifications during review and apply |
+| The test-evidence owning capability's main spec (to be established by a v3 governance change; until then this policy defines process only, never normative semantics) | Approved normative test-evidence semantics |
+| One active owning delta of that capability | Pending normative modifications during review and apply |
 | Test-owned evidence, scenario, incident, node, fault, and discovery registries | Exact enumerable evidence metadata |
-| `deep_research_harness/tests/assets/requirement_evidence.py` | Typed smallest-sufficient requirement impacts and escalation rationale |
-| `deep_research_harness/scripts/check_test_assets.py` and agent tests | Executable collection, joins, validation, and detector smoke coverage |
 | `openspec/config.yaml` and human-authored `deep_research_harness/AGENTS.md` text | Authoring bootstrap, navigation, commands, and concise operational guidance |
 | Archived change artifacts | Historical context only |
 
@@ -24,7 +23,7 @@ substitute for the behavioral evidence of collected tests.
 
 ## Lifecycle
 
-The main `evaluation-hardening` spec remains the authority for approved
+The owning capability's main spec remains the authority for approved
 behavior while one active owning delta describes pending modifications. During
 apply, implementation and evidence assets conform to that reviewed delta.
 Archive or an explicit spec sync promotes the accepted delta into the main
@@ -36,7 +35,7 @@ and are not required to discover the current contract.
 A change that adds or modifies test-evidence semantics or executable assets
 must:
 
-1. update the owning `evaluation-hardening` delta when normative behavior
+1. update the owning test-evidence delta when normative behavior
    changes;
 2. identify the evidence class and lowest responsible production seam using
    the owning spec, and justify escalation to persisted trace replay, live
