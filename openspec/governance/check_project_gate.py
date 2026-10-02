@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""OpenSpec root governance gate — orchestration-only aggregate over the six
+"""OpenSpec root governance gate — orchestration-only aggregate over the
 registered component checkers.
 
 This script owns NO rule semantics. Every semantic check lives in a component
@@ -10,7 +10,7 @@ headers, requirement titles, or the registry, and it never writes anything.
 
 Phases:
 
-- `closeout` — runs the six default component checkers from the repository
+- `closeout` — runs every registered component checker from the repository
   root, runs ALL of them even when one fails, and exits 0 only when every
   component exits 0. Fails closed on a missing/empty checker inventory, a
   missing checker file, or an unreadable registry.
@@ -47,6 +47,7 @@ CHECKER_NAMES: tuple[str, ...] = (
     "check_change_guidance.py",
     "check_project_req_coverage.py",
     "check_harness_dependency_direction.py",
+    "check_ci_governance.py",
     "check_proof_receipts.py",
 )
 REGISTRY_RELATIVE = Path("openspec") / "governance" / "req-registry.yaml"

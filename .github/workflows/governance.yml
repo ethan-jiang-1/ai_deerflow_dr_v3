@@ -1,0 +1,51 @@
+name: Governance Gate
+
+# Single job on purpose: the exhaustive governance set stays in one
+# deterministic job (no matrix, no split). The ci-governance checker pins
+# every declaration below, so this workflow cannot drift silently.
+on:
+  push:
+    paths:
+      - "openspec/**"
+      - "deep_research_harness/**"
+      - ".github/workflows/governance.yml"
+      - ".githooks/**"
+  pull_request:
+    paths:
+      - "openspec/**"
+      - "deep_research_harness/**"
+      - ".github/workflows/governance.yml"
+      - ".githooks/**"
+
+permissions:
+  contents: read
+
+jobs:
+  governance:
+    runs-on: ubuntu-latest
+    steps:
+      # submodules: true is load-bearing — the architecture checker validates
+      # the nested gitlink HEAD and porcelain state (v2 lesson: CI died at
+      # checkout until this was audited).
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # Pinned to the generation-aligned version (same as .agents/skills
+      # frontmatter); the gate's strict-validation owner needs this CLI.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Pin the OpenSpec CLI
+        run: npm install -g @fission-ai/openspec@1.13.1
+      - name: Governance unittest suite
+        run: python3 -m unittest discover -s openspec/tests/governance -q
+      - name: Aggregate closeout gate
+        run: python3 openspec/governance/check_project_gate.py --phase closeout
+      - name: Document hygiene
+        run: python3 openspec/governance/check_doc_hygiene.py
+      - name: Harness verify
+        run: UV_OFFLINE=1 make verify
+        working-directory: deep_research_harness

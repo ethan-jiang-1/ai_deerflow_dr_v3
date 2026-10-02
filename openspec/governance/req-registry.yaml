@@ -26,3 +26,7 @@
 # 各 capability 的 owning spec 由 v3 自己的首批 change 建立。
 
 PRS-001: project-structure — v3 仓库骨架的结构合同：治理清单、import 分层、节点语法、submodule 锚
+
+# ---- add-ci-governance 登记（2026-10-02）--------------------------------------
+# CI 门禁与本地 hook 的接受路径合同（owning delta: openspec/changes/add-ci-governance）。
+CIG-001: ci-governance — CI 门禁与本地 hook 的接受路径合同：单 job CI 全量治理套件、hook 只跑便宜高置信检查、声明自身被机器校验

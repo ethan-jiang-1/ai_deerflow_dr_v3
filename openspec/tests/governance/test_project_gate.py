@@ -72,6 +72,7 @@ def _make_repo(tmp: Path) -> Path:
         "check_change_guidance.py",
         "check_project_req_coverage.py",
         "check_harness_dependency_direction.py",
+        "check_ci_governance.py",
         "check_proof_receipts.py",
     ):
         source = GOVERNANCE_DIR / name
@@ -333,7 +334,7 @@ class ReqsPlanningModeTest(unittest.TestCase):
 
 
 class GateCloseoutTest(unittest.TestCase):
-    def test_closeout_runs_all_seven_and_propagates_failures_with_explicit_cwd(self) -> None:
+    def test_closeout_runs_all_eight_and_propagates_failures_with_explicit_cwd(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = _make_repo(Path(td))
             gate = _load_gate()
@@ -355,6 +356,7 @@ class GateCloseoutTest(unittest.TestCase):
                 "check_change_guidance.py",
                 "check_project_req_coverage.py",
                 "check_harness_dependency_direction.py",
+                "check_ci_governance.py",
                 "check_proof_receipts.py",
             ):
                 self.assertIn(expected, names, f"{expected} must be invoked")

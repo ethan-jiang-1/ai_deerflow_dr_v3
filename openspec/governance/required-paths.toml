@@ -88,6 +88,15 @@ files = [
   "profiles/.gitignore",
   "profiles/README.md",
 ]
+
+[paths.CIG-001]
+# CI 门禁与本地 hook 的接受路径文件（owner: ci-governance capability）。
+files = [
+  ".github/workflows/governance.yml",
+  ".githooks/pre-commit",
+  "openspec/governance/check_ci_governance.py",
+  "openspec/tests/governance/test_ci_governance.py",
+]
 directories = [
   ".agents/skills",
   "_backlog/bugs",

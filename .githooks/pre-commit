@@ -1,0 +1,10 @@
+#!/bin/sh
+# Cheap high-confidence pre-commit checks only.
+# Tests, snapshots, type analysis, and builds belong to CI — never here.
+# The ci-governance spec pins this exact command set; the ci-governance
+# checker rejects any undeclared line, so edit the owning change, not just
+# this file.
+set -e
+cd "$(git rev-parse --show-toplevel)"
+git diff --cached --check
+python3 openspec/governance/check_doc_hygiene.py

@@ -1,10 +1,10 @@
 schema_version = 1
 contract = "project-structure"
-# v3 骨架期：唯一 requirement 是结构清单锚本身。specs 为空（从头搭），
-# PRS-001 暂以 registered 状态停在 req-registry；首个治理 change 将建立
-# project-structure 的 owning spec，把它提升为 alive。参见
-# _backlog/plans/2026-10-02-digest-deerflow-native-deep-research.md 的落地关联。
-requirement_ids = ["PRS-001"]
+# requirement_ids = 结构清单里 [paths.<ID>] 分组的 owner 全集（须先在
+# req-registry 注册）。PRS-001 = 结构合同锚（owning spec 已由 change
+# establish-project-structure 建立）；CIG-001 = CI/hook 接受路径文件的
+# owner（随 add-ci-governance 登记）。
+requirement_ids = ["PRS-001", "CIG-001"]
 
 [upstream_gitlink]
 path = "deerflow"
