@@ -14,9 +14,10 @@
 
 1. **目录契约**（抄 v2 可继承部分，路径常量集中一个纯 domain 模块）：
    `scopes/{bucket}/{bundle_id}/` + 子树 request/work/evidence/final/diagnostics +
-   `state.json` + **`checkpoint.sqlite`**（AsyncSqliteSaver 直连，无 64KiB bound 包装、
-   无 legacy 校验子系统；打开失败 fail-loud → failed-resume 降级）。thread_id 与 deerflow
-   pin commit 记进 state.json。
+   `state.json` + **`checkpoint.sqlite`**（**sync SqliteSaver 直连**——embedded client
+   为同步驱动，async saver 不匹配，修正依据见 wiring plan 决策 1 修正注（2026-10-02）；
+   无 64KiB bound 包装、无 legacy 校验子系统；打开失败 fail-loud → failed-resume 降级）。
+   thread_id 与 deerflow pin commit 记进 state.json。
 2. **普通状态机**（domain + engine 层纯函数）：v1 动作集 start/status/cancel/**refine（仅
    方向文本形态——砍 v2 的 continuation 双形态/replay receipts/crash-window 恢复例外）**；
    状态 active/completed/cancelled/failed-resume（v2 的 suspended/blocked 随 HITL 暂缓砍）。
