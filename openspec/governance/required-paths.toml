@@ -21,7 +21,7 @@ files = [
   "_backlog/.gitignore",
   "_backlog/README.md",
   "_backlog/bugs/README.md",
-  "_backlog/plans/2026-10-02-digest-deerflow-native-deep-research.md",
+  "_backlog/_done/_closed_plans/2026-10-02-digest-deerflow-native-deep-research.md",
   "_backlog/plans/README.md",
   "_backlog/_done/README.md",
   "_backlog/_done/_closed_plans/README.md",
