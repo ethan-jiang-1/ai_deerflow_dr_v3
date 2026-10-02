@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Validate the permanent project-structure registry without external packages.
 
-"""
+
+@impl PRS-001"""
 
 from __future__ import annotations
 

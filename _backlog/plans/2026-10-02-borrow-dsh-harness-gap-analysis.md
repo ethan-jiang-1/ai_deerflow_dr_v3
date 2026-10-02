@@ -155,3 +155,23 @@ boundary plan 的「治理门禁干跑全绿」是预演；正式切片 = 拿一
 | 产品映射表 | change ②（run-bundle 合同）与 ④（接线）的 design 输入 | 对应 change 启动时 |
 
 结论被上述 change 吸收后，本 plan 关闭，`git mv` 至 `_done/_closed_plans/`。
+
+## E 项落地记录：change ① 垂直切片五行走查（2026-10-02，closeout 时点）
+
+以 establish-project-structure 为首笔走完整闭环的真实变更，按 FAQ Phase 1 第二步行查：
+
+| 问 | 答案 | 证据状态 |
+|----|------|---------|
+| (a) 用户可观察结果（两行） | closeout 聚合门禁 exit 0（此前三红同根：reqs/architecture/req_coverage 全指向 PRS-001 无 owning spec）；`openspec list --specs` 报告 project-structure 有 owning main spec | 文件可指：gate 回执 + specs/ 目录 |
+| (b) 不靠作者本人能找到 owner 吗 | 能：三红 checker 在 gate 输出里**自报名字**（自诊断）；根 AGENTS.md → governance README「何时读」表 → registry/manifest/checker，三跳定位，零猜测 | 链路各文件可指 |
+| (c) 持久取舍记在哪、哪些豁免 | design.md 决策 1–6（尤其决策 6：apply 期手工建 main spec，因 native archive 丢 `> req:`/`> structure:` 头行——/tmp 三配置实验回执）；注解本身无持久取舍，按豁免判据免记 | design.md 可指 |
+| (d) 哪项证据会在旧行为上变红 | 三红是本会话**实测的活回执**（change 目录建立前直测 exit 1）；治理测试套件含负例控制，证明 checker 能红 | 会话回执 + unittest 套件 |
+| (e) 逐步证据状态 | 每步都是命令回执（退出码直测）或可指文件；无一步依赖口头声称 | tasks.md 各验证命令 |
+
+**三清单**（切片产出）：
+
+- **打不开的链接**：无——doc hygiene（链接校验）exit 0。
+- **要靠猜的 owner**：无——但有一处**险情**：canonical policy 名是 `deerflow-downstream-boundary`，交接文档误记为 profile 名 `deerflow-downstream`；plan gate 的 `triggered_policy_unknown` 错误自报精确要求，机器纠正而非靠猜——「规则可执行」立场救了一命（B 项的又一实证）。
+- **没证据的声称**：无——唯一非声称物是 `make verify` 响亮占位（自我声明"verifies NOTHING"，是诚实的非声称）。
+
+**走查结论**：闭环走通；E 项完成。十维中「变更闭环」维从 7 升至 9（差 CI 未接，即 A 项）。
