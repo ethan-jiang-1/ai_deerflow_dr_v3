@@ -40,7 +40,10 @@ fixture/replay 确定性）；② 施工队自评不可信（专检必须是代�
 ——system prompt 与组装后可见工具清单不落盘，回放重建得了对话、重建不了「模型当时看到
 什么」（接受 + 成文能力边界 vs provider 层 RecordingModel 捕获，两选一）；③ inspect 增
 一页「验收结论 + 证据链」人话质量报告（交付给不懂 AI 的接手人）；④ RT10 检查注册处
-——validator/gate/contract test/make verify 的单一清单面。
+——validator/gate/contract test/make verify 的单一清单面。⑤ **子树差异说明**：v2 七子树
+（含 synthesis/review）→ v3 五子树——synthesis（跨题综合）与 review（报告计划）随研究
+本体交框架而砍；其产物去向（最终报告草稿、验收记录的物理位置：final/ vs evidence/ vs
+diagnostics/）在本 plan 的 change 定稿时成文。
 
 ## 决策 / 方案
 
@@ -54,9 +57,10 @@ fixture/replay 确定性）；② 施工队自评不可信（专检必须是代�
    方向文本形态——砍 v2 的 continuation 双形态/replay receipts/crash-window 恢复例外）**；
    状态 active/completed/cancelled/failed-resume（v2 的 suspended/blocked 随 HITL 暂缓砍）。
    state.json 单一真相 + revision CAS + 目录 lease (dev,ino) 活性重验——v2 最硬可继承资产，
-   **拿得过来，保留**。澄清自动续答转移（2026-10-02，承接 wiring plan 决策 8）：active
-   --检测到未应答 ask_clarification--> auto_proceed（有界 N=2，续答轮经 embedded client
-   同 thread 续跑）；耗尽 → failed-resume，未回答的问题原文落 diagnostics。
+   **拿得过来，保留**。澄清自动续答（2026-10-02，承接 wiring plan 决策 8）：**不是新
+   状态**——active 内的有界循环（检测到未应答 ask_clarification → 经 embedded client
+   同 thread 发续答轮，计数 auto_proceed_count 记入 state.json，上限 N=2）；耗尽 →
+   failed-resume（终态），未回答的问题原文落 diagnostics。
 3. **三层观察**（debugger 硬需求）：journal（diagnostics/，有界保留 + 优先级驱逐 +
    admission anchor 永不驱逐——v2「诚实有界」哲学保留；**复用 v2 的 model_tool 类别、
    换数据源**（v2 由节点桥接事件发射；v3 改由 stream 工具调用事件落账，类别本身不是

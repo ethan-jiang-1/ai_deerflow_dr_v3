@@ -20,16 +20,22 @@ v2 拿得过来就拿，拿不过来就算了。证据底座：`_reference/deerf
 
 ## 决策 / 方案
 
-1. **embedded 接线**（runtime 层）：`DeerFlowClient` 封装——构造参数全集（model_name /
-   subagent_enabled=True / available_skills〔构造期参数，不能 per-call 切换〕/
-   checkpointer=Bundle 的 **sync SqliteSaver** / config_path〔决策 6：显式传 base 或
-   fixture〕/ environment〔tracing 标签，见决策 7②〕/ middlewares〔逃生口，注入语义见
-   决策 4〕）；stream 事件流消费入口。**「三消费者」定义（2026-10-02 定）**：同一条
+1. **embedded 接线**（runtime 层）：`DeerFlowClient` 封装——构造参数全集（10 个：
+   config_path〔决策 6：显式传 base 或 fixture〕/ checkpointer=Bundle 的 **sync
+   SqliteSaver** / model_name〔取自 .env 模型 selector〕/ thinking_enabled〔默认 True
+   保持〕/ subagent_enabled=True / plan_mode〔默认 False；开的话 TodoList 经 values
+   快照提供计划可见性——watch 直播是否受益，首笔 change 实测后定〕/ agent_name〔None，
+   不用 custom agent〕/ available_skills〔构造期参数，不能 per-call 切换；取值 None=全部
+   vs 限定研究 skill 集——影响 prompt 面大小，随首笔 change 定〕/ middlewares〔逃生口，
+   注入语义见决策 4〕/ environment〔tracing 标签，见决策 7②〕）；stream 事件流消费
+   入口。**「三消费者」定义（2026-10-02 定）**：同一条
    embedded stream 的三个消费方——① watch 渲染器（直播展示，entry-surface 承载）、
    ② journal 落账器（model_tool 事件写 diagnostics，bundle-contract 承载）、③ 状态机
    终态检测器（终态判定：正常完成 / 澄清中断〔决策 8 检测谓词〕/ stop_reason 识别，
    wiring+bundle 联合承载）。与观察「三层」（watch/journal/checkpoint 回放）是两个
-   概念——回放不消费实时流。
+   概念——回放不消费实时流。〔注意：①watch 的实际数据源——同进程直连 vs journal
+   tail——随 entry 打磨线索⑦（运行进程模型）裁决；若走后者，①的消费对象改为 journal
+   投影。〕
    （2026-10-02 修正：原写 AsyncSqliteSaver——client.stream() 是同步驱动（内部
    `agent.stream()`，docstring 明言不做 asyncio 桥接），LangGraph async-only saver 只实现
    异步接口；框架自己的同步工厂即配 SqliteSaver（`runtime/checkpointer/provider.py:120`）。
@@ -52,7 +58,8 @@ v2 拿得过来就拿，拿不过来就算了。证据底座：`_reference/deerf
    **无错误隔离**（一个抛异常后续全跳过）——逃生口中间件必须自防异常。**默认值矩阵**
    （base config 写旋钮时的基线）：默认/强制已开 = 输入消毒、远程内容消毒（web 结果
    中性化）、ToolErrorHandling、LLMErrorHandling（含断路器 5 次/60s）、loop_detection、
-   read_before_write、verification.receipts；默认关 = summarization（决策 6 已定显式开）、
+   read_before_write、verification.receipts、token_usage（用量归并）、safety_finish_reason
+   （终态安全标记）；默认关 = summarization（决策 6 已定显式开）、
    lead 级 token_budget（v1 保持默认关——subagent 级 token 预算默认已开，1M/2M 档够用；
    证据说话再开）、tool_progress、guardrails、authorization。
 5. **(b) 层旋钮声明**（agents 层）：研究 subagent 类型定义 + 预算参数——**物理落点 =

@@ -50,9 +50,16 @@ bundle 打磨线索②（回放重建得了对话、重建不了「模型当时�
 ④ **两级阶梯落地形态** = wiring 决策 6 的 checked-in fixture config（`use:` 类路径缝，
 零凭证跑完整真实 client 链路）。
 ⑤ **EV2 负例控制机制级化**：验收条款（决策 5）的「红绿测试」落为「引入违规→看红→还原
-→看绿并记录」+ gate smoke 元测试形态（「从不红的守卫≈不存在」）。
+→看绿并记录」+ gate smoke 元测试形态（「从不红的守卫≈不存在」）；排障演练的 CI 化形态
+= record/replay golden（录一次真实排障、永久零凭证回放，验形状漂移）。
 ⑥ **inspect 质量报告面**（联动 bundle 打磨线索③）：一页「验收结论 + 证据链」人话呈现，
 交付给不懂 AI 的接手人。
+⑦ **运行进程模型（本 plan 最大未决建筑问题，2026-10-02 第三遍审计新登记）**：embedded
+stream 是**单生成器、单进程**——五子命令的跨进程语义未定：create 前台跑还是后台 worker？
+watch 从另一终端如何拿到实时数据（同进程 attach 不存在；候选 = journal tail 近实时渲染）？
+cancel 跨进程如何到达 in-process run（候选 = 状态标记 + 泵协作检查）？wiring 层需要
+「单泵 fan-out」设计（一次迭代、三汇分发：journal 落账 / 终态检测 / 直播渲染）——
+「三消费者」定义（wiring 决策 1）中 watch 的数据源随本条裁决可能改为 journal 投影。
 
 ## 落地关联
 
