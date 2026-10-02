@@ -18,7 +18,7 @@
 | `check_project_req_coverage.py` | 应用 requirement 是否有测试证据、OpenSpec 治理 requirement 是否有执行脚本证据？ | 测试或治理脚本 docstring |
 | `check_harness_dependency_direction.py` | Harness 是否反向依赖 OpenSpec？ | 脚本 docstring |
 | `check_ci_governance.py` | CI 工作流与本地 hook 的声明是否漂移（触发器、路径过滤、pinned 工具链、canonical 命令、hook 命令集）？ | 脚本 docstring（`@impl CIG-001`） |
-| `check_doc_hygiene.py` | 文档层（ADR 索引↔目录 / 入口链与 docs 层的相对链接 / 编码换行 / docs 层范围完整性 / `_backlog` 的 `_` 目录命名约定）是否漂移？ | 脚本 docstring（standalone，非 gate 组件、非 `make verify` 目标） |
+| `check_doc_hygiene.py` | 文档层（ADR 索引↔目录 / 入口链与 docs 层的相对链接 / 编码换行 / docs 层范围完整性 / `_backlog` 的 `_` 目录命名约定 / **入口层字符预算闸**——受管常驻文件的声明上限，超限与缺失响亮报错，只降不升棘轮）是否漂移？ | 脚本 docstring（standalone，非 gate 组件、非 `make verify` 目标；已进 CI canonical 序列；`@impl DOB-001`） |
 | `test-evidence-policy.md` | 测试证据的 authority、lifecycle、synchronized-change？ | [test-evidence-policy.md](test-evidence-policy.md)；批准语义由测试证据的 owning main spec 拥有（随 v3 首批治理 change 建立） |
 | `change-guidance/README.md` | 先按什么原则、再选哪个 policy？ | [change-guidance/README.md](../change-guidance/README.md) |
 

@@ -2,6 +2,8 @@
 """Validate the dev-harness doc layer without external packages.
 
 
+@impl DOB-001
+
 Five mechanical doc-layer rules plus one backlog navigation rule:
 
 1. ADR index <-> directory consistency: every ``NNNN-*.md`` in
@@ -77,14 +79,18 @@ ENTRY_DOCS: tuple[str, ...] = (
 # lowering one is always allowed; raising one requires a one-line justification
 # recorded next to the entry below.
 DOC_BUDGETS: dict[str, int] = {
-    # Root resident instructions (2526 chars at adoption, 2026-09-27).
-    "AGENTS.md": 2900,
+    # Root resident instructions (2323 chars at adoption, 2026-10-02).
+    "AGENTS.md": 2500,
     # Root Claude entry stub; must stay a thin AGENTS.md import, never a copy.
     "CLAUDE.md": 400,
-    # Module change map incl. generated structure block (7335 chars at adoption).
-    "deep_research_harness/AGENTS.md": 8200,
+    # Module change map incl. generated structure block (6922 chars post-D, 2026-10-02).
+    "deep_research_harness/AGENTS.md": 7000,
     # Module Claude entry stub (253 chars at adoption).
     "deep_research_harness/CLAUDE.md": 400,
+    # The largest resident-injection layer (12237 chars at adoption, 2026-10-02):
+    # config.yaml is injected into every OpenSpec instruction path; the ceiling is
+    # deliberately tight against the measured size to stop silent growth.
+    "openspec/config.yaml": 12500,
 }
 DOC_LAYER_DOCS: tuple[str, ...] = (
     # docs/ top-level markdown documents.
@@ -241,13 +247,17 @@ def _rule_doc_budgets(root: Path) -> list[str]:
     The resident layer is what an agent host loads every session; its size is
     the denominator of every prompt, so each listed file gets a character
     ceiling. Counts use ``len`` of the decoded text so CJK documents are
-    measured honestly. Missing files are the link rule's report, not this one's.
+    measured honestly. A managed file that is missing fails here as a missing
+    managed path — the link rule does not cover the root instruction files,
+    so this rule owns that failure itself (the inherited skip closed a silent
+    gap where deleting a managed file produced no violation).
     """
     problems: list[str] = []
     for rel, ceiling in DOC_BUDGETS.items():
         doc = root / rel
         if not doc.is_file():
-            continue  # missing document already reported by the link rule
+            problems.append(f"missing managed budget path: {rel}")
+            continue
         text, decode_problem = _read_utf8(doc)
         if text is None:
             problems.append(f"non-UTF-8 resident document, budget not checked: {rel}")
@@ -307,6 +317,12 @@ def _self_test() -> list[str]:
         write_doc((BACKLOG_ROOT / "README.md").as_posix(), backlog_readme_body)
         for name in BACKLOG_UNDERSCORE_DIRS:
             (backlog / name).mkdir(parents=True, exist_ok=True)
+
+        # Budget-managed files not on the entry chain get minimal stubs so the
+        # clean fixture satisfies the budget rule (missing managed paths fail).
+        for rel in DOC_BUDGETS:
+            if not (base / rel).is_file():
+                write_doc(rel, "# T\n")
 
         if violations(base):
             errors.append("self-test: clean fixture must have zero violations")
@@ -380,6 +396,13 @@ def _self_test() -> list[str]:
         if not any("over character budget" in v for v in _rule_doc_budgets(base)):
             errors.append("self-test: over-budget resident document not detected")
         write_doc("AGENTS.md", "# T\n\n[self](AGENTS.md)\n")
+
+        # Rule 6 negative: managed budget path goes missing (deleted managed
+        # file must fail loudly — the inherited skip let it pass silently).
+        (base / "CLAUDE.md").unlink()
+        if not any("missing managed budget path" in v for v in _rule_doc_budgets(base)):
+            errors.append("self-test: missing managed budget path not detected")
+        write_doc("CLAUDE.md", "# T\n")
 
     return errors
 

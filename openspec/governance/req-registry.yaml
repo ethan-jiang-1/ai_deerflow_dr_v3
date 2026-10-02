@@ -30,3 +30,7 @@ PRS-001: project-structure — v3 仓库骨架的结构合同：治理清单、i
 # ---- add-ci-governance 登记（2026-10-02）--------------------------------------
 # CI 门禁与本地 hook 的接受路径合同（owning delta: openspec/changes/add-ci-governance）。
 CIG-001: ci-governance — CI 门禁与本地 hook 的接受路径合同：单 job CI 全量治理套件、hook 只跑便宜高置信检查、声明自身被机器校验
+
+# ---- add-doc-budget-gate 登记（2026-10-02）------------------------------------
+# 入口层预算闸（owning delta: openspec/changes/add-doc-budget-gate）。
+DOB-001: doc-budgets — 入口层字符预算闸：受管常驻文件的声明上限、超限与缺失响亮报错、只降不升棘轮

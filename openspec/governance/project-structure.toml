@@ -3,8 +3,10 @@ contract = "project-structure"
 # requirement_ids = 结构清单里 [paths.<ID>] 分组的 owner 全集（须先在
 # req-registry 注册）。PRS-001 = 结构合同锚（owning spec 已由 change
 # establish-project-structure 建立）；CIG-001 = CI/hook 接受路径文件的
-# owner（随 add-ci-governance 登记）。
-requirement_ids = ["PRS-001", "CIG-001"]
+# owner（随 add-ci-governance 登记）；DOB-001 = 入口层预算闸的 owner
+#（随 add-doc-budget-gate 登记，无新增结构路径——预算表在 doc-hygiene
+# checker 内声明）。
+requirement_ids = ["PRS-001", "CIG-001", "DOB-001"]
 
 [upstream_gitlink]
 path = "deerflow"

@@ -85,7 +85,10 @@ cognition is not causal. Do not invent a capability, prompt, or repair loop.
   content authorities. A guide, summary, or diagnostic is not a second authority.
 - Keep blocking I/O off the async event loop.
 - Keep application tests and build commands independently runnable from this directory.
-- Do not add nested `AGENTS.md` files or copy this guide into `CLAUDE.md`.
+- Do not add nested `AGENTS.md` files or copy this guide into `CLAUDE.md`. The
+  prohibition prevents subtree entries created for their own sake; a sublayer that
+  accumulates three or more standing rules only that layer needs re-opens the
+  subtree-entry question through its owning change.
 
 ## Verification
 
