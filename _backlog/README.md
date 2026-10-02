@@ -98,9 +98,8 @@ _backlog/
 - **一次放行一把**：buffer 不是先进先出队列；按优先级每次只放行一个 change，做完再放下一把
   （当前主线见 [`plans/2026-10-02-digest-deerflow-native-deep-research.md`](plans/2026-10-02-digest-deerflow-native-deep-research.md)）。
 - **机器检查的位置**：入线前无门禁（buffer 允许半成品、允许推敲）；入线后由治理 checker 套件 +
-  closeout gate 兜底；穷举项收编进 CI 挂账中（见
-  [`plans/2026-10-02-borrow-dsh-harness-gap-analysis.md`](plans/2026-10-02-borrow-dsh-harness-gap-analysis.md)
-  的 A 项）。
+  closeout gate 兜底，push/PR 由 CI 单 job 运行 canonical 序列（已随 add-ci-governance 落地，
+  详见 [`openspec/governance/README.md`](../openspec/governance/README.md)）。
 
 ---
 
