@@ -1,9 +1,9 @@
 # _done — 已完成/暂停的归档记录
 
-> 最后更新: 2026-10-02（首份 plan 关闭：CLS-001） | `_backlog/_done/` — 已完成内容与明确暂停项的归档根目录。
+> 最后更新: 2026-10-02（DSH 借鉴 plan 关闭：CLS-002） | `_backlog/_done/` — 已完成内容与明确暂停项的归档根目录。
 > **`_done/` = 归档工作件，coding agent 默认忽略，除非显式点名要读**（`_` 前缀的两类语义见 [`../README.md`](../README.md)）。
 >
-> 状态总览和查阅指南在本文件。当前该做什么、执行顺序 → 见 [`../plans/2026-10-02-borrow-dsh-harness-gap-analysis.md`](../plans/2026-10-02-borrow-dsh-harness-gap-analysis.md) 的落地关联表（硬化批 A–F 队列）。
+> 状态总览和查阅指南在本文件。当前该做什么、执行顺序 → 见 [`../plans/2026-10-02-digest-deerflow-native-deep-research.md`](../plans/2026-10-02-digest-deerflow-native-deep-research.md)（goal 队列第 3 项：决策/方案四问 → change ② 消化）。
 
 ## 目录
 
@@ -25,7 +25,7 @@ _done/
 | 归档目录 | 数量 | Next ID |
 |---------|------|---------|
 | `_fixed_bugs/` | 0 | BUG-001 |
-| `_closed_plans/` | 1 | CLS-002 |
+| `_closed_plans/` | 2 | CLS-003 |
 
 ### ⏸ SUSPENDED（明确暂停）
 
@@ -41,7 +41,7 @@ _Closed plan count follows the indexed CLS records; each future move increments 
 ## 快速查阅指南
 
 ### 想看"现在该做什么"
-→ [`../plans/2026-10-02-borrow-dsh-harness-gap-analysis.md`](../plans/2026-10-02-borrow-dsh-harness-gap-analysis.md) 的落地关联表。
+→ [`../plans/2026-10-02-digest-deerflow-native-deep-research.md`](../plans/2026-10-02-digest-deerflow-native-deep-research.md)（goal 队列第 3 项）。
 
 ### 想看 _backlog 的规矩
 → [`../README.md`](../README.md) — 三套搬迁 ritual（todo / bug / plan）+ 铁律 + 外部文件地图。
