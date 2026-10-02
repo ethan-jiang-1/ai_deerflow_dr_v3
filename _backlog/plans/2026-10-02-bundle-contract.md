@@ -58,8 +58,9 @@ fixture/replay 确定性）；② 施工队自评不可信（专检必须是代�
    --检测到未应答 ask_clarification--> auto_proceed（有界 N=2，续答轮经 embedded client
    同 thread 续跑）；耗尽 → failed-resume，未回答的问题原文落 diagnostics。
 3. **三层观察**（debugger 硬需求）：journal（diagnostics/，有界保留 + 优先级驱逐 +
-   admission anchor 永不驱逐——v2「诚实有界」哲学保留；**新增 model_tool 类别落账**
-   stream 的工具调用事件；修复 v2 O(n²) 整写 → 真 append + 周期 compaction）；watch 与
+   admission anchor 永不驱逐——v2「诚实有界」哲学保留；**复用 v2 的 model_tool 类别、
+   换数据源**（v2 由节点桥接事件发射；v3 改由 stream 工具调用事件落账，类别本身不是
+   新增）；修复 v2 O(n²) 整写 → 真 append + 周期 compaction）；watch 与
    checkpoint 回放的渲染在 entry-surface plan。
 4. **验收收口最小版**（engine 层）：纯函数 validator（写前跑）+ hash 链 ledger
    （evidence/submissions.jsonl，单一 commit owner，admit/reject/replay 三分）+ gate
@@ -69,7 +70,8 @@ fixture/replay 确定性）；② 施工队自评不可信（专检必须是代�
    v2 反模式清单（不复活/不静默迁移/不 second authority）全数继承。
 6. **显式组成**：fixture/mixed/all_real 状态记进 state.json；v3 的 fixture 替换层 =
    **provider 层**（模型/搜索工具后端），非 v2 的节点适配器层（研究本体已交框架）——
-   形态随本 plan 的 change 细化。
+   形态 = wiring plan 决策 6 的 checked-in fixture config（`use:` 类路径缝，2026-10-02
+   定案）。
 
 ## 风险 / 取舍
 

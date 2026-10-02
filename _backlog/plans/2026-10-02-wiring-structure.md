@@ -20,9 +20,16 @@ v2 拿得过来就拿，拿不过来就算了。证据底座：`_reference/deerf
 
 ## 决策 / 方案
 
-1. **embedded 接线**（runtime 层）：`DeerFlowClient` 封装——构造参数（model_name /
-   subagent_enabled=True / available_skills / checkpointer=Bundle 的 **sync SqliteSaver**）；
-   stream 事件流消费入口（三消费者分发给 bundle-contract 与 entry-surface plan）。
+1. **embedded 接线**（runtime 层）：`DeerFlowClient` 封装——构造参数全集（model_name /
+   subagent_enabled=True / available_skills〔构造期参数，不能 per-call 切换〕/
+   checkpointer=Bundle 的 **sync SqliteSaver** / config_path〔决策 6：显式传 base 或
+   fixture〕/ environment〔tracing 标签，见决策 7②〕/ middlewares〔逃生口，注入语义见
+   决策 4〕）；stream 事件流消费入口。**「三消费者」定义（2026-10-02 定）**：同一条
+   embedded stream 的三个消费方——① watch 渲染器（直播展示，entry-surface 承载）、
+   ② journal 落账器（model_tool 事件写 diagnostics，bundle-contract 承载）、③ 状态机
+   终态检测器（终态判定：正常完成 / 澄清中断〔决策 8 检测谓词〕/ stop_reason 识别，
+   wiring+bundle 联合承载）。与观察「三层」（watch/journal/checkpoint 回放）是两个
+   概念——回放不消费实时流。
    （2026-10-02 修正：原写 AsyncSqliteSaver——client.stream() 是同步驱动（内部
    `agent.stream()`，docstring 明言不做 asyncio 桥接），LangGraph async-only saver 只实现
    异步接口；框架自己的同步工厂即配 SqliteSaver（`runtime/checkpointer/provider.py:120`）。
@@ -106,6 +113,8 @@ v2 拿得过来就拿，拿不过来就算了。证据底座：`_reference/deerf
   测试红 = 有意识更新镜像。
 - [撤 graph 层与治理预声明冲突] → 预留合同从未被用，撤除无既成现实可破坏；改动随本 plan 的
   change 一起走。
+- [终态检测误判（漏检澄清 → run 假完成）] → 检测谓词纯函数 + 红绿测试钉死；journal 记录
+  终态判定依据；status 面展示判定原因——误判本身可见（透明准绳）。
 
 ## 落地关联
 

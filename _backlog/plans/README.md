@@ -1,6 +1,6 @@
 # Plans — plan/分析文档索引
 
-> 最后更新: 2026-10-02（digest 边界 plan 关闭：CLS-003；三份衍生 plan 入列成为活跃主线） | `_backlog/plans/` — 活跃 plan 在此（顶层），
+> 最后更新: 2026-10-02（三份衍生 plan 本轮打磨：wiring 完成〔saver/配置面/澄清处置定案，UNVERIFIED 全关〕；bundle 增质量控制映射节；entry 登记打磨线索） | `_backlog/plans/` — 活跃 plan 在此（顶层），
 > 完成的普通 plan 移入 [`../_done/_closed_plans/`](../_done/_closed_plans/)。
 >
 > **plan 没有编号，文件名即标识。完成后文件名不变，位置即状态。**
@@ -23,9 +23,9 @@
 
 | Plan | 一句话 |
 |------|--------|
-| [2026-10-02-wiring-structure.md](2026-10-02-wiring-structure.md) | 接线与结构定案：embedded DeerFlowClient + 契约镜像层（用户硬要求）+ 撤 graph 语法 + middleware 只配置；含两项 UNVERIFIED 验证 |
-| [2026-10-02-bundle-contract.md](2026-10-02-bundle-contract.md) | Run Bundle 合同：目录契约（checkpoint 内嵌）+ 普通状态机 + 三层观察（debugger 硬需求）+ 验收收口最小版；产品第一 change 候选 |
-| [2026-10-02-entry-surface.md](2026-10-02-entry-surface.md) | 入口面：五子命令 CLI + watch 渲染器 + inspect 回放 + 两级阶梯；依赖前两份的合同 |
+| [2026-10-02-wiring-structure.md](2026-10-02-wiring-structure.md) | 接线与结构定案：embedded client（sync saver / 配置面 base+fixture / 澄清自动续答定案）+ 契约镜像层 + 撤 graph 语法 + middleware 只配置；两项 UNVERIFIED 均已关闭 |
+| [2026-10-02-bundle-contract.md](2026-10-02-bundle-contract.md) | Run Bundle 合同：目录契约（checkpoint 内嵌 sync saver）+ 普通状态机（含澄清续答转移）+ 三层观察（debugger 硬需求）+ 验收收口最小版 + 质量控制映射（设计理由节，含四条打磨线索）；产品第一 change 候选 |
+| [2026-10-02-entry-surface.md](2026-10-02-entry-surface.md) | 入口面：五子命令 CLI + watch 渲染器 + inspect 回放 + 两级阶梯；依赖前两份合同；六条打磨线索在文内待过（refine 入口裁决居首） |
 
 **Next available plan ID: CLS-004**（移入 `_closed_plans/` 时分配）
 
