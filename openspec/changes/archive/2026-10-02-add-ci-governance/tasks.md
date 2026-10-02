@@ -73,6 +73,12 @@
 - [x] 3.5 Update `openspec/governance/README.md`: eighth component checker row and
       command, the canonical CI sequence, and the hook activation one-liner. Verify:
       `python3 openspec/governance/check_doc_hygiene.py` exits 0.
+- [x] 3.6 Create the main spec `openspec/specs/ci-governance/spec.md` during apply (not by
+      archive): native archive copies Purpose and Requirements but drops the `> req:` header
+      line, leaving the post-archive requirement checkers red — the lesson recorded in
+      change establish-project-structure's design decision 6, re-applied here. Verify:
+      `python3 openspec/governance/check_project_reqs.py` exits 0 with CIG-001 alive in the
+      main spec.
 
 ## 4. Local rehearsal and full verification (every exit code measured directly)
 

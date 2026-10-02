@@ -147,8 +147,8 @@ boundary plan 的「治理门禁干跑全绿」是预演；正式切片 = 拿一
 
 | 缺口 | 挂载点 | 时机 |
 |------|--------|------|
-| A（CI + hook） | 独立治理 change（建议紧随 change ①，或并入） | 最早 |
-| E（垂直切片） | change ① 的 closeout 任务 | change ① 落地时 |
+| ~~A（CI + hook）~~ ✅ 已吸收 | `add-ci-governance`（已 archive 2026-10-02）：单 job CI + 版本化 hook + 第八组件漂移守卫 + manifest/registry 全接线；GitHub Actions 实际执行 UNVERIFIED（首次 push 为活控制） | 完成 |
+| E（垂直切片） | change ① 的 closeout 任务 | 完成（见 E 项落地记录） |
 | B/F（负知识 owner + 取代纪律 + 豁免判据） | change-practice.md 的 owning 治理 change | 与 A 同批或紧随 |
 | C（入口预算闸） | check_doc_hygiene 的 owning 治理 change | A 之后 |
 | D（补理由一行） | 任意触碰 `deep_research_harness/AGENTS.md` 的 change 顺带 | 下次触碰时 |
