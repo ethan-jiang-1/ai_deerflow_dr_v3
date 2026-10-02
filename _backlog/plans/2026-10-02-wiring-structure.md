@@ -54,7 +54,8 @@ v2 拿得过来就拿，拿不过来就算了。证据底座：`_reference/deerf
    add-doc-budget-gate）。
 4. **middleware 只配置**：用框架现成实现（错误处理/输入消毒/compaction/循环熔断/token
    预算/委派限额——旋钮表引 `_reference/deerflow-cognition-engine.md` §6）；逃生口：
-   真需要框架没有的行为时写标准 AgentMiddleware 插头，不碰框架。**注入语义（2026-10-02
+   真需要框架没有的行为时写标准 AgentMiddleware 插头，不碰框架（**首个具体用途 =
+   bundle 决策 3 的装配快照捕获**——首轮 hook 记 system prompt，2026-10-02 定）。**注入语义（2026-10-02
    digest 补课）**：client 的 `middlewares=[...]` 参数是**插入**（lead 链 #32 槽位，
    SafetyFinishReason/Clarification 之前），不是接管，无移除内置项的机制；middleware 间
    **无错误隔离**（一个抛异常后续全跳过）——逃生口中间件必须自防异常。**默认值矩阵**

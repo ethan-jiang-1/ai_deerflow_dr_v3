@@ -1,6 +1,6 @@
 # Plans — plan/分析文档索引
 
-> 最后更新: 2026-10-02（三份衍生 plan 本轮打磨：wiring 完成〔saver/配置面/澄清处置定案，UNVERIFIED 全关〕；bundle 增质量控制映射节；entry 登记打磨线索） | `_backlog/plans/` — 活跃 plan 在此（顶层），
+> 最后更新: 2026-10-02（三份衍生 plan 打磨全部完成：七项用户裁决落定〔saver sync/配置面/澄清处置/三准绳+QC映射/进程模型/refine入口/装配快照〕，UNVERIFIED 全关，打磨线索全关闭——全部经用户拍板，待统一放行进 OpenSpec） | `_backlog/plans/` — 活跃 plan 在此（顶层），
 > 完成的普通 plan 移入 [`../_done/_closed_plans/`](../_done/_closed_plans/)。
 >
 > **plan 没有编号，文件名即标识。完成后文件名不变，位置即状态。**

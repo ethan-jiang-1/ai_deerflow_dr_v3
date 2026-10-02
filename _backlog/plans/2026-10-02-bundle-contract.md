@@ -28,7 +28,7 @@
 | 关键工序影像记录 | checkpoint 回放 + 装配快照（决策 3，盲区已补） |
 | 不合格品显式处置（返工/让步/报废，无静默通过） | admit/reject/replay 三分；删除即永久（决策 5）；fail-loud→failed-resume；返工 = refine（v1 砍 in-place repair = 只留「重新施工」砍「现场返修」） |
 | 质量追溯（每批材料可溯） | hash 链 ledger + 消息 provenance 戳 + thread_id/pin 入 state.json |
-| 竣工资料移交 | inspect 质量报告面（打磨线索③） |
+| 竣工资料移交 | inspect 质量报告页（entry 决策 3，事后三面之一） |
 | 质量事故 → 规范更新（PDCA） | postmortem + `@impl BUG-0xx` 原位注解（v2 先例）+ 账本 ritual |
 
 LLM workflow 比施工**多**出的三个质量控制维度：① 非确定性管理（「混凝土」每批不同 →
