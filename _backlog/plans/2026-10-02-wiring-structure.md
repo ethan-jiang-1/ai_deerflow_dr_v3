@@ -32,10 +32,37 @@ v2 拿得过来就拿，拿不过来就算了。证据底座：`_reference/deerf
    add-doc-budget-gate）。
 4. **middleware 只配置**：用框架现成实现（错误处理/输入消毒/compaction/循环熔断/token
    预算/委派限额——旋钮表引 `_reference/deerflow-cognition-engine.md` §6）；逃生口：
-   真需要框架没有的行为时写标准 AgentMiddleware 插头，不碰框架。
-5. **(b) 层旋钮声明**（agents 层）：研究 subagent 类型定义 + 预算参数；**一层深度自校验**
-   （框架 schema 不强制 disallowed_tools 含 task——harness 必须断言，C 线警告）。
-6. **凭证单路线**：embedded `.env`（模型 selector + key + TAVILY_API_KEY），不做 profile 体系。
+   真需要框架没有的行为时写标准 AgentMiddleware 插头，不碰框架。**注入语义（2026-10-02
+   digest 补课）**：client 的 `middlewares=[...]` 参数是**插入**（lead 链 #32 槽位，
+   SafetyFinishReason/Clarification 之前），不是接管，无移除内置项的机制；middleware 间
+   **无错误隔离**（一个抛异常后续全跳过）——逃生口中间件必须自防异常。**默认值矩阵**
+   （base config 写旋钮时的基线）：默认/强制已开 = 输入消毒、远程内容消毒（web 结果
+   中性化）、ToolErrorHandling、LLMErrorHandling（含断路器 5 次/60s）、loop_detection、
+   read_before_write、verification.receipts；默认关 = summarization（决策 6 已定显式开）、
+   lead 级 token_budget（v1 保持默认关——subagent 级 token 预算默认已开，1M/2M 档够用；
+   证据说话再开）、tool_progress、guardrails、authorization。
+5. **(b) 层旋钮声明**（agents 层）：研究 subagent 类型定义 + 预算参数——**物理落点 =
+   deerflow config.yaml 的 `subagents.custom_agents.<name>` + `subagents.agents.<name>`
+   段**（即决策 6 的 base config，不是代码）；**一层深度自校验**（框架 schema 不强制
+   disallowed_tools 含 task——harness 必须断言，C 线警告）。
+6. **配置面设计**（2026-10-02 定案，用户拍板选项 A；取代原「凭证单路线」表述）：
+   - **三个 config 面，命名区分死**：`openspec/config.yaml`（治理上下文，≤12500 字符
+     预算闸）/ harness `.env`（秘密）/ **deerflow config.yaml**（框架装配面：models /
+     tools / sandbox / `subagents.*` / summarization 等旋钮）。「config.yaml」一词在本仓
+     一律带前缀使用。
+   - **harness 持有两份 checked-in 配置**：`base`（real 跑）与 `fixture`（零凭证演跑）；
+     构造 client 时**显式传 `config_path`** 二选一（框架会从 cwd / `DEER_FLOW_PROJECT_ROOT`
+     自动发现 config.yaml——必须杜绝误拾）。生效配置即 checked-in 文件，「实际生效的是
+     什么」永远可答（digest harness/09 的 ST3/RT1 判据，连 dump 机制都不需要）。
+   - **形状与秘密分离**：config.yaml 持形状，`api_key: $VAR` 引用 `.env`（框架 `$VAR` →
+     `os.getenv`）；`.env`（模型 selector + key + TAVILY_API_KEY）由 harness 入口层在
+     构造 client 前装载进进程环境。不做 profile 体系（原裁决保持）。
+   - **fixture 档 = 框架自己的 `use:` 类路径缝**：fixture config 的 `models[].use` /
+     `tools[].use` 指向假模型（FakeToolCallingModel 式）/ 假 web_search 类路径——零凭证
+     跑完整真实 client 链路（供 entry-surface 两级阶梯消费）。
+   - **base config 必须显式开 `summarization.enabled: true`**：pydantic 层默认关、上游
+     example 模板写 true，两处默认态不一致——以我们自己的 checked-in 文件为准（长跑
+     deep research 需要 compaction 保护，这不是可选项）。
 7. **UNVERIFIED 验证项**（入线前必须落实）：① ask_clarification 在我们 run 里的处置
    （禁用可配置性 or 超时默认继续——HITL 暂缓裁决的尾巴）；② ~~Langfuse/tracing 在
    embedded 模式下是否可用~~ **已关闭（2026-10-02，digest+源码双证）**：可用——
