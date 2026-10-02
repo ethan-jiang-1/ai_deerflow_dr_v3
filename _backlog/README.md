@@ -51,7 +51,7 @@ _backlog/
 
 > 📖 **想看全局状态、历史决策、查阅指南** → [`_done/README.md`](_done/README.md)
 >
-> 📖 **想看当前该做什么、依赖关系、执行顺序** → [`plans/2026-10-02-digest-deerflow-native-deep-research.md`](plans/2026-10-02-digest-deerflow-native-deep-research.md)（goal 队列第 3 项：决策/方案四问 → change ② 消化）
+> 📖 **想看当前该做什么、依赖关系、执行顺序** → 三份衍生 plan（[`wiring-structure`](plans/2026-10-02-wiring-structure.md) / [`bundle-contract`](plans/2026-10-02-bundle-contract.md) / [`entry-surface`](plans/2026-10-02-entry-surface.md)）（各自经用户拍板后才入线；HITL 闸门继承）
 
 ---
 
@@ -96,7 +96,7 @@ _backlog/
 - **plan 记思考，change 记契约**：同一事实只住一处——plan 的「落地关联」与 change 的 Focus
   Card 互链（引用，不复制正文）。
 - **一次放行一把**：buffer 不是先进先出队列；按优先级每次只放行一个 change，做完再放下一把
-  （当前主线见 [`plans/2026-10-02-digest-deerflow-native-deep-research.md`](plans/2026-10-02-digest-deerflow-native-deep-research.md)）。
+  （当前主线见 三份衍生 plan（[`wiring-structure`](plans/2026-10-02-wiring-structure.md) / [`bundle-contract`](plans/2026-10-02-bundle-contract.md) / [`entry-surface`](plans/2026-10-02-entry-surface.md)））。
 - **机器检查的位置**：入线前无门禁（buffer 允许半成品、允许推敲）；入线后由治理 checker 套件 +
   closeout gate 兜底，push/PR 由 CI 单 job 运行 canonical 序列（已随 add-ci-governance 落地，
   详见 [`openspec/governance/README.md`](../openspec/governance/README.md)）。

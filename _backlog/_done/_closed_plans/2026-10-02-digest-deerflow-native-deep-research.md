@@ -79,6 +79,26 @@ mixed，零凭据可跑）；可观察可操作（bundle 检查、事件日志�
 全部交给框架。change ② 承载 Q1 的「留」清单与 Q3 的记录边界/恢复语义；change ③ 承载显式组成
 （Q4 fixture 行）；change ④ 承载接线与契约测试锚（Q2 的 (b) 层参数随接线声明）。
 
+### 推敲修订（2026-10-02，六裁决 + 元原则，一对一推敲定案）
+
+四问答案经六项裁决逐条修订（推敲过程在会话，此处只落结论）：
+
+| # | 问题 | 裁决 | 对四问的修订 |
+|---|------|------|--------------|
+| 1 | 接线路 | **embedded DeerFlowClient** | Q2 (c) 层驱动形态定案；Gateway 留作演进路径 |
+| 2 | checkpoint 归属 | **Bundle 内，精简实现** | Q3 修订：v2 式内嵌保留（用户拍板——生命周期易管理），砍 bound/legacy 子系统，fail-loud→failed-resume |
+| 3 | 外层编排 | **普通状态机** | Q1/Q2 修订：(c) 层非 LangGraph 图——v2 静态图范式彻底退役，graph 层与 NODE_SPEC 语法撤 |
+| 4 | 入口面 | **最小 CLI + watch 三消费者** | Q1「可观察可操作」重定义：watch 直播/journal 时间线/checkpoint 回放三层，**debugger 为一级硬需求** |
+| 5 | middleware | **只配置不编写** | Q1 修订：harness 不复制 agent-loop 宿主行为——「run/evidence harness 消费 agent-loop harness」再定位 |
+| 6 | HITL | **暂缓** | Q1 修订：v1 run 全自动；ask_clarification 处置为 wiring 验证项 |
+
+**元原则**（贯穿后续全部工作）：能借 DeerFlow 多少就借多少；v2 拿得过来就拿，拿不过来就算了；
+一切向简单倾斜。**契约镜像层**（用户要求）：借力的每个 DeerFlow 接口形状在自己源码树里有
+typed 拷贝 + contract test 锁漂移（实现不拷贝，一个事实一个家）。
+
+**裁决的完整承载**：三份衍生 plan（wiring-structure / bundle-contract / entry-surface）各自
+携带其范围内的决策全文；本 plan 的使命（消化原生能力 + 划定边界 + 拆解）就此完成。
+
 ## 风险 / 取舍
 
 - [动态委派难以做确定性准入] → harness 边界只承诺"提议进入 Bundle 前过确定性验收"，不承诺研究过程每步可控；接受过程黑盒度上升。
@@ -96,6 +116,20 @@ mixed，零凭据可跑）；可观察可操作（bundle 检查、事件日志�
 推敲清楚之前不进入 openspec pipeline。** 推敲产物按需衍生多份 `_backlog/plans/` 里的
 plan（证据底座见 `_reference/` 六份调查材料），每份衍生 plan 各自成熟、各自经用户
 拍板后才入线成 change。change ① 已于 2026-10-02 走完闭环（establish-project-structure）。
+
+### 关闭记录（2026-10-02）
+
+四问修订完成（推敲修订节）、衍生 plan 拆解落账（三份，见下）、落地关联更新（本节）——
+关闭条件全部达成。独有内容按吸收义务由三份衍生 plan 全量携带：
+
+- [`2026-10-02-wiring-structure.md`](2026-10-02-wiring-structure.md)：embedded 接线、
+  契约镜像层、结构定案（撤 graph 语法）、middleware 只配置、(b) 层旋钮、单凭证路线
+- [`2026-10-02-bundle-contract.md`](2026-10-02-bundle-contract.md)：目录契约（checkpoint
+  内嵌）、普通状态机、三层观察、验收收口最小版、删除语义、显式组成
+- [`2026-10-02-entry-surface.md`](2026-10-02-entry-surface.md)：五子命令 CLI、watch
+  渲染器、inspect 回放、两级阶梯、debugger 硬需求验收条款
+
+本 plan 关闭为 CLS-003。三份衍生 plan 是新的活跃主线，各自经用户拍板后才入线。
 
 ### Change ①（project-structure 转正）的实测清单（2026-10-02 干跑全绿验证）
 

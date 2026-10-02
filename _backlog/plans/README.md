@@ -1,6 +1,6 @@
 # Plans — plan/分析文档索引
 
-> 最后更新: 2026-10-02（DSH 借鉴 plan 关闭：CLS-002，A–F 全吸收；当前主线移交 digest 边界 plan） | `_backlog/plans/` — 活跃 plan 在此（顶层），
+> 最后更新: 2026-10-02（digest 边界 plan 关闭：CLS-003；三份衍生 plan 入列成为活跃主线） | `_backlog/plans/` — 活跃 plan 在此（顶层），
 > 完成的普通 plan 移入 [`../_done/_closed_plans/`](../_done/_closed_plans/)。
 >
 > **plan 没有编号，文件名即标识。完成后文件名不变，位置即状态。**
@@ -23,7 +23,9 @@
 
 | Plan | 一句话 |
 |------|--------|
-| [2026-10-02-digest-deerflow-native-deep-research.md](2026-10-02-digest-deerflow-native-deep-research.md) | 消化 DeerFlow v2.1.0 原生 Deep Research 能力，划定 v3 harness 的职责边界；**当前主线**（决策/方案四问待填，goal 队列第 3 项：change ② 消化四问） |
+| [2026-10-02-wiring-structure.md](2026-10-02-wiring-structure.md) | 接线与结构定案：embedded DeerFlowClient + 契约镜像层（用户硬要求）+ 撤 graph 语法 + middleware 只配置；含两项 UNVERIFIED 验证 |
+| [2026-10-02-bundle-contract.md](2026-10-02-bundle-contract.md) | Run Bundle 合同：目录契约（checkpoint 内嵌）+ 普通状态机 + 三层观察（debugger 硬需求）+ 验收收口最小版；产品第一 change 候选 |
+| [2026-10-02-entry-surface.md](2026-10-02-entry-surface.md) | 入口面：五子命令 CLI + watch 渲染器 + inspect 回放 + 两级阶梯；依赖前两份的合同 |
 
 **Next available plan ID: CLS-001**（移入 `_closed_plans/` 时分配）
 
@@ -33,6 +35,7 @@
 |------|--------|----------|
 | CLS-001 execution-roadmap | establish-project-structure（已 archive） | 2026-10-02 |
 | CLS-002 borrow-dsh-harness-gap-analysis | add-ci-governance + harden-change-practice-guidance + add-doc-budget-gate（均已 archive） | 2026-10-02 |
+| CLS-003 digest-deerflow-native-deep-research | 六裁决推敲定案 + 三份衍生 plan（wiring-structure / bundle-contract / entry-surface）拆解落账 | 2026-10-02 |
 
 ---
 

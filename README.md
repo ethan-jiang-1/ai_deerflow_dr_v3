@@ -17,7 +17,7 @@
 DeerFlow 是宿主运行时，**不 import 本包**；触达方式（反射工具 / controller skill / 或更薄的接线）由首个 change 定义。
 
 > **当前状态：骨架。** 目录结构、治理机器、账本 ritual 已就位；`openspec/specs/` 为空，应用代码为壳。
-> 一切实现从下一个 change 开始——第一站：[`_backlog/plans/2026-10-02-digest-deerflow-native-deep-research.md`](_backlog/plans/2026-10-02-digest-deerflow-native-deep-research.md)。
+> 边界已定（六裁决，见 `_done/_closed_plans/` 的 digest plan 修订节）；实现从三份衍生 plan 各自经用户拍板后的 change 开始——入口：[`_backlog/plans/README.md`](_backlog/plans/README.md)。
 
 ## 布局
 

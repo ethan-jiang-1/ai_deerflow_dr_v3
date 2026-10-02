@@ -18,5 +18,5 @@ responsibility, host integration, and change governance do not blur together.
 ## Reading order for a fresh agent
 
 1. [AGENTS.md](AGENTS.md) — scope and boundaries.
-2. [_backlog/plans/2026-10-02-digest-deerflow-native-deep-research.md](_backlog/plans/2026-10-02-digest-deerflow-native-deep-research.md) — the v3 front door: how this rewrite leverages DeerFlow's native deep research capability, and the open boundary questions. (骨架期占位；首个 walkthrough 落地后替换为本产品的 run lifecycle 前门。)
+2. [_backlog/plans/README.md](_backlog/plans/README.md) — the active plan list. The three derived plans (wiring-structure / bundle-contract / entry-surface) carry the settled boundary decisions; each enters the OpenSpec pipeline only after explicit user approval.
 3. The three context files below — dictionaries, read on demand.

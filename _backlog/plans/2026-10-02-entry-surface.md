@@ -1,0 +1,41 @@
+# Plan: 入口面（entry-surface）
+
+> 类型: 设计 | 更新: 2026-10-02 | 来源: digest 边界 plan 六裁决推敲（裁决 #4 + debugger 硬需求）
+
+## 背景 / 现状
+
+裁决：**最小 CLI**，五子命令与生命周期动作一一对应。**debugger 为用户一级硬需求**（v2 之痛：
+可调试性糟糕 → 工具堆失控；v3 必须根治）。元原则：v2 剧场（12 子命令/TUI 三形态/调试工作台/
+9 runbook/双凭证路线）整体不抄——阶梯概念留精神、砍厚度。证据底座：
+`_reference/v2-harness-app-shape.md`（剧场全貌）、`deerflow-runtime-and-persistence.md` §5
+（事件清单）。
+
+## 决策 / 方案
+
+1. **五子命令 CLI**（工具入口形态随 change 细化——`python -m` 或独立脚本）：
+   - `create "研究问题…"` → 建 Bundle + 发起（wiring plan 的 embedded client）
+   - `status <id>` → 状态 + journal 摘要
+   - `watch <id>` → **直播渲染器**（见下）
+   - `cancel <id>`
+   - `inspect <id>` → 验收后看报告/证据/**全程回放**
+   外加 make 环境目标（install/verify/fixture 演跑）。
+2. **watch = 渲染器，不是调试器**：消费 stream 事件流（messages-tuple 的 token/工具调用、
+   custom 的 subagent 生命周期、values 快照、end 用量）三消费者设计之一；**默认人话摘要，
+   `--verbose` 切原始事件**。单向观察（HITL 暂缓，与 6/6 裁决自洽）。
+3. **inspect 的两层事后排障**：journal 时间线（谁何时 admit/reject）+ **checkpoint 全程回放**
+   （从 checkpoint.sqlite 重渲染完整消息历史/工具调用——debugger 硬需求的第三层）。
+4. **两级阶梯**：fixture 演跑（零凭证，provider 替换）→ real 跑；不做 001-031 八级。
+5. **验收标准（硬需求落条款）**：三层观察（watch 直播/journal 时间线/checkpoint 回放）
+   第一天全部可用且好用——每层的红绿测试 + 一次真实排障演练作为 closeout 证据。
+
+## 风险 / 取舍
+
+- [渲染器的实时性] → stream 天生直播（B 线事实），渲染器是纯展示组件，复杂度低；
+  性能风险可忽略。
+- [checkpoint 回放依赖框架格式] → 与 bundle-contract 的 fail-loud 语义共用；回放失败
+  如实报，不静默。
+
+## 落地关联
+
+成熟后**经用户拍板**入线（HITL 闸门）。依赖 wiring-structure（client 封装）与
+bundle-contract（journal/checkpoint）先定合同；CLI 壳本身薄，随其后。
