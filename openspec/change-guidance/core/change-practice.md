@@ -30,6 +30,26 @@ Use a planted invalid input for a deterministic validator and the narrowest real
 handoff for a cross-boundary fact. A failed migration stays active for repair,
 rollback, or explicit re-scope; it never silently narrows the approved outcome.
 
+## Decision Records And Supersession
+
+A change's design document carries an `## Alternatives` section whenever real
+alternatives were considered and rejected: each rejected alternative appears with the
+reason it lost. When none existed, the section states `none: <rationale>` explicitly.
+This section is the process-layer home for negative knowledge — it travels with the
+change and lands in the archive, so a later session reads the rejection instead of
+re-proposing it.
+
+The exemption criterion: mechanical or local edits are exempt from decision records;
+diff size is not an exemption reason — the absence of a durable tradeoff is. A local
+fix does not qualify merely because its implementation is small, and a substantive
+change does not qualify merely because it is large.
+
+Supersession: reversing an earlier decision adds a new record that cross-links the old
+one; it never rewrites the old record in place. Full replacement first absorbs every
+unique rationale, alternative, consequence, and verification gap from the record it
+replaces. Archived records are frozen snapshots — cite them as history, never as
+current authority.
+
 ## Delivery Evidence
 
 Evidence is only as good as its freshness: once the line, file, or surface changes,
