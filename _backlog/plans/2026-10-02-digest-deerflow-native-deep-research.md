@@ -29,3 +29,20 @@ v3 骨架已立（本仓库）：`deep_research_harness/` + `deerflow/`（submod
 ## 落地关联
 
 结论成型后拆成 v3 的**首批 OpenSpec change**（候选顺序：① project-structure / 治理清单落地；② run-bundle 生命周期合同；③ 显式组成与 fixture 隔离；④ harness ↔ 原生能力接线）。change 命名与 requirement ID 从零分配，不沿用 v2 的 57 个 spec。
+
+### Change ①（project-structure 转正）的实测清单（2026-10-02 干跑全绿验证）
+
+在 /tmp 副本上按下列步骤做了一次完整干跑，治理门禁 7/7 全绿（exit 0）：
+
+1. 新建 `openspec/specs/project-structure/spec.md`：`> req: PRS-001` 行 + 恰好一行
+   `> structure: openspec/governance/project-structure.toml` + `### Requirement:` 与
+   `#### Scenario:` 结构。
+2. 在 owning 治理脚本（check_project_architecture.py）的模块 docstring 里加
+   `@impl PRS-001`——req_coverage 要求每个治理 requirement 有脚本证据注解。
+3. **术语红线**（check_project_specs 的 ACTIVE_TERMINOLOGY_RULES，扫描 specs +
+   harness AGENTS/README + 未来 SKILL/SOUL）：禁止 "skeleton"、"change NNN"、
+   "full-fake"、"later wave" 等历史性/临时性措辞。因此 harness 两份权威文档已改用
+   "pre-implementation" 措辞；spec 正文同样不得出现。
+4. `src_fixtures/` 空壳已从骨架撤下（manifest 声明 fixture 段即要求非空
+   production_contracts，v3 尚无）；它随 change ③（显式组成）连目录带
+   `[package].fixture_root` + `[fixture_imports]` 一并进入。

@@ -4,7 +4,7 @@ This independent Python project is the downstream **Deep Research Harness** for 
 2.1. It is a *runtime harness*, not a single question-to-report pipeline: it is the stable
 execution and control environment that creates, drives, and disposes of research runs.
 
-**v3 rewrite, skeleton stage.** The philosophy carries over from v2; the implementation
+**v3 rewrite, pre-implementation.** The philosophy carries over from v2; the implementation
 route is inverted: the research cognition engine is DeerFlow's native deep research
 capability (lead agent + `deep-research` skill + subagent delegation), and this harness
 keeps the deterministic, inspectable parts:
@@ -18,7 +18,7 @@ keeps the deterministic, inspectable parts:
 - **Models propose, code disposes.** Candidate work, evidence, and routes are admitted
   only by deterministic owners (validators, ledger, gates, graph).
 
-> Skeleton notice: none of the above is implemented yet. The specification tree is
+> Status notice: none of the above is implemented yet. The specification tree is
 > intentionally empty; every capability grows from a v3 change, starting from the
 > boundary plan at `_backlog/plans/2026-10-02-digest-deerflow-native-deep-research.md`
 > in the repository root.
@@ -31,8 +31,8 @@ commitment; v3 surfaces are decided by the boundary plan and its changes.
 ## Quick Start
 
 ```bash
-make install    # skeleton stub (announces that nothing is installed yet)
-make verify     # skeleton stub (announces that nothing is verified yet)
+make install    # pre-implementation stub (announces that nothing is installed yet)
+make verify     # pre-implementation stub (announces that nothing is verified yet)
 ```
 
 Requirements once implementation lands: Python 3.12+, `uv`, and the sibling DeerFlow

@@ -89,7 +89,7 @@ cognition is not causal. Do not invent a capability, prompt, or repair loop.
 
 ## Verification
 
-Skeleton stage: `make install` and `make verify` are loud stubs that carry no
+Pre-implementation state: `make install` and `make verify` are loud stubs that carry no
 verification promise. The first test-bearing change replaces them and this section
 names the narrowest relevant test command per lane.
 
