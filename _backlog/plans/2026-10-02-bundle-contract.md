@@ -56,7 +56,8 @@ subagent 生命周期事件 task_started/running/completed 落账到哪类）在
    `state.json` + **`checkpoint.sqlite`**（**sync SqliteSaver 直连**——embedded client
    为同步驱动，async saver 不匹配，修正依据见 wiring plan 决策 1 修正注（2026-10-02）；
    无 64KiB bound 包装、无 legacy 校验子系统；打开失败 fail-loud → failed-resume 降级）。
-   thread_id 与 deerflow pin commit 记进 state.json。
+   thread_id、deerflow pin commit 与 **owner PID**（entry 进程模型：create 前台进程，
+   2026-10-02 定案）记进 state.json。
 2. **普通状态机**（domain + engine 层纯函数）：v1 动作集 start/status/cancel/**refine（仅
    方向文本形态——砍 v2 的 continuation 双形态/replay receipts/crash-window 恢复例外）**；
    状态 active/completed/cancelled/failed-resume（v2 的 suspended/blocked 随 HITL 暂缓砍）。
@@ -64,7 +65,9 @@ subagent 生命周期事件 task_started/running/completed 落账到哪类）在
    **拿得过来，保留**。澄清自动续答（2026-10-02，承接 wiring plan 决策 8）：**不是新
    状态**——active 内的有界循环（检测到未应答 ask_clarification → 经 embedded client
    同 thread 发续答轮，计数 auto_proceed_count 记入 state.json，上限 N=2）；耗尽 →
-   failed-resume（终态），未回答的问题原文落 diagnostics。
+   failed-resume（终态），未回答的问题原文落 diagnostics。**崩溃检测转移**（2026-10-02，
+   随 entry 进程模型定案）：status 发现 owner PID 已死而状态仍 active → failed-resume
+   （fail-loud，不装活）——活性检查在 status 动作里做，不引入常驻监控。
 3. **三层观察**（debugger 硬需求）：journal（diagnostics/，有界保留 + 优先级驱逐 +
    admission anchor 永不驱逐——v2「诚实有界」哲学保留；**复用 v2 的 model_tool 类别、
    换数据源**（v2 由节点桥接事件发射；v3 改由 stream 工具调用事件落账，类别本身不是

@@ -14,11 +14,16 @@ wiring plan 背景节，先序于本 plan 一切裁决。
 
 ## 决策 / 方案
 
-1. **五子命令 CLI**（工具入口形态随 change 细化——`python -m` 或独立脚本）：
-   - `create "研究问题…"` → 建 Bundle + 发起（wiring plan 的 embedded client）
-   - `status <id>` → 状态 + journal 摘要
-   - `watch <id>` → **直播渲染器**（见下）
-   - `cancel <id>`
+1. **五子命令 CLI**（工具入口形态随 change 细化——`python -m` 或独立脚本；运行进程
+   模型 = 前台单进程 + 文件交互，见决策 6）：
+   - `create "研究问题…"` → 建 Bundle + **前台发起并默认本终端直播**（wiring plan 的
+     embedded client，单泵三汇见决策 6）
+   - `status <id>` → 状态 + journal 摘要 + **owner PID 活性检查**（PID 死而状态 active
+     → failed-resume，fail-loud 不装活）
+   - `watch <id>` → **journal tail 近实时渲染**（与 create 共享同一渲染器，数据源 =
+     journal 投影；工具级粒度，人话摘要层无感）
+   - `cancel <id>` → 写取消标记（状态机转移请求），create 进程的泵协作检查 → 优雅终止
+     ——复用 v2 外部取消纪律
    - `inspect <id>` → 验收后看报告/证据/**全程回放**
    外加 make 环境目标（install/verify/fixture 演跑）。
 2. **watch = 渲染器，不是调试器**：消费 stream 事件流（messages-tuple 的 token/工具调用、
@@ -29,6 +34,15 @@ wiring plan 背景节，先序于本 plan 一切裁决。
 4. **两级阶梯**：fixture 演跑（零凭证，provider 替换）→ real 跑；不做 001-031 八级。
 5. **验收标准（硬需求落条款）**：三层观察（watch 直播/journal 时间线/checkpoint 回放）
    第一天全部可用且好用——每层的红绿测试 + 一次真实排障演练作为 closeout 证据。
+6. **运行进程模型（2026-10-02 用户定案选项 A；关闭打磨线索⑦②）**：run 活在 create 的
+   前台进程——**单泵三汇**（一次 stream 迭代分发三汇：本终端渲染 / journal 落账 / 终态
+   检测——wiring「三消费者」在泵层原样成立）；`watch <id>` attach = journal tail（渲染器
+   共享、数据源切换）；`cancel` = 状态标记 + 泵协作检查；崩溃检测 = owner PID 记入
+   state.json（bundle plan）+ status 活性检查。**零新增传输机制**——journal 一个介质
+   两用（直播载体 + 时间线，正是三层观察里 journal 的双重身份）；`nohup create &` +
+   `watch <id>` 免费获得后台形态，不建后台 worker 路线。续答轮（wiring 决策 8）在两种
+   数据源下都渲染为显式事件。弃选：后台 worker（进程管理新机器、发起终端失直播，违背
+   透明准绳）、砍独立 watch attach（违背裁决 #4 的五子命令形态）。
 
 ## 风险 / 取舍
 
@@ -42,8 +56,8 @@ wiring plan 背景节，先序于本 plan 一切裁决。
 ① **refine 的 CLI 入口裁决**：bundle-contract 决策 2 的 v1 动作集含 refine，本 plan 五子
 命令无其入口——补第六子命令/参数形态，或明确 v1 状态机支持而 CLI 延后（后者须答
 「谁触发」）。
-② **watch 对齐**：消费 wiring 决策 8 的续答轮显式事件；「三消费者」定义对齐 wiring
-决策 1（watch 是其一）。
+② ~~**watch 对齐**~~ 已关闭（2026-10-02 随进程模型定案，见决策 6：渲染器共享双数据源，
+续答轮显式渲染）。
 ③ **inspect 回放复用内建机器**：`client.get_thread()` / `CheckpointStateAccessor` 已
 提供 checkpoint 历史量化 + 消息序列化——不自造 sqlite 解析；RT2/RT7 影像盲区裁决联动
 bundle 打磨线索②（回放重建得了对话、重建不了「模型当时看到什么」）。
@@ -54,12 +68,8 @@ bundle 打磨线索②（回放重建得了对话、重建不了「模型当时�
 = record/replay golden（录一次真实排障、永久零凭证回放，验形状漂移）。
 ⑥ **inspect 质量报告面**（联动 bundle 打磨线索③）：一页「验收结论 + 证据链」人话呈现，
 交付给不懂 AI 的接手人。
-⑦ **运行进程模型（本 plan 最大未决建筑问题，2026-10-02 第三遍审计新登记）**：embedded
-stream 是**单生成器、单进程**——五子命令的跨进程语义未定：create 前台跑还是后台 worker？
-watch 从另一终端如何拿到实时数据（同进程 attach 不存在；候选 = journal tail 近实时渲染）？
-cancel 跨进程如何到达 in-process run（候选 = 状态标记 + 泵协作检查）？wiring 层需要
-「单泵 fan-out」设计（一次迭代、三汇分发：journal 落账 / 终态检测 / 直播渲染）——
-「三消费者」定义（wiring 决策 1）中 watch 的数据源随本条裁决可能改为 journal 投影。
+⑦ ~~**运行进程模型**~~ 已关闭（2026-10-02 用户定案选项 A，见决策 6：前台单泵三汇 +
+journal tail attach + 状态标记取消 + PID 活性检测）。
 
 ## 落地关联
 

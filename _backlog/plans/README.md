@@ -25,7 +25,7 @@
 |------|--------|
 | [2026-10-02-wiring-structure.md](2026-10-02-wiring-structure.md) | 接线与结构定案：embedded client（sync saver / 配置面 base+fixture / 澄清自动续答定案）+ 契约镜像层 + 撤 graph 语法 + middleware 只配置；两项 UNVERIFIED 均已关闭 |
 | [2026-10-02-bundle-contract.md](2026-10-02-bundle-contract.md) | Run Bundle 合同：目录契约（checkpoint 内嵌 sync saver）+ 普通状态机（含澄清续答转移）+ 三层观察（debugger 硬需求）+ 验收收口最小版 + 质量控制映射（设计理由节，含六条打磨线索）；产品第一 change 候选 |
-| [2026-10-02-entry-surface.md](2026-10-02-entry-surface.md) | 入口面：五子命令 CLI + watch 渲染器 + inspect 回放 + 两级阶梯；依赖前两份合同；七条打磨线索在文内待过（refine 入口与运行进程模型居首） |
+| [2026-10-02-entry-surface.md](2026-10-02-entry-surface.md) | 入口面：五子命令 CLI（运行进程模型已定案：前台单泵三汇 + journal tail attach）+ watch 渲染器 + inspect 回放 + 两级阶梯；依赖前两份合同；五条打磨线索在文内待过（refine 入口居首） |
 
 **Next available plan ID: CLS-004**（移入 `_closed_plans/` 时分配）
 

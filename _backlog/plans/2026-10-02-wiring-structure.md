@@ -35,9 +35,9 @@ v2 拿得过来就拿，拿不过来就算了。证据底座：`_reference/deerf
    ② journal 落账器（model_tool 事件写 diagnostics，bundle-contract 承载）、③ 状态机
    终态检测器（终态判定：正常完成 / 澄清中断〔决策 8 检测谓词〕/ stop_reason 识别，
    wiring+bundle 联合承载）。与观察「三层」（watch/journal/checkpoint 回放）是两个
-   概念——回放不消费实时流。〔注意：①watch 的实际数据源——同进程直连 vs journal
-   tail——随 entry 打磨线索⑦（运行进程模型）裁决；若走后者，①的消费对象改为 journal
-   投影。〕
+   概念——回放不消费实时流。〔已收口（2026-10-02，entry 进程模型定案选项 A）：三汇在
+   泵层成立——①= create 本终端渲染；`watch <id>` attach 走 journal tail（渲染器共享、
+   数据源不同），不改变本定义。〕
    （2026-10-02 修正：原写 AsyncSqliteSaver——client.stream() 是同步驱动（内部
    `agent.stream()`，docstring 明言不做 asyncio 桥接），LangGraph async-only saver 只实现
    异步接口；框架自己的同步工厂即配 SqliteSaver（`runtime/checkpointer/provider.py:120`）。
