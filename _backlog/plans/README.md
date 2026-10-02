@@ -1,6 +1,6 @@
 # Plans — plan/分析文档索引
 
-> 最后更新: 2026-10-02（新增 execution-roadmap 排产 plan；plan 文件名强制日期前缀） | `_backlog/plans/` — 活跃 plan 在此（顶层），
+> 最后更新: 2026-10-02（execution-roadmap 关闭：CLS-001；当前主线移交 DSH 借鉴 plan） | `_backlog/plans/` — 活跃 plan 在此（顶层），
 > 完成的普通 plan 移入 [`../_done/_closed_plans/`](../_done/_closed_plans/)。
 >
 > **plan 没有编号，文件名即标识。完成后文件名不变，位置即状态。**
@@ -24,8 +24,7 @@
 | Plan | 一句话 |
 |------|--------|
 | [2026-10-02-digest-deerflow-native-deep-research.md](2026-10-02-digest-deerflow-native-deep-research.md) | 消化 DeerFlow v2.1.0 原生 Deep Research 能力，划定 v3 harness 的职责边界，产出首个 change 方向 |
-| [2026-10-02-borrow-dsh-harness-gap-analysis.md](2026-10-02-borrow-dsh-harness-gap-analysis.md) | 借鉴 DSH harness 思想的十维差距分析：开发 harness 六缺口（A–F）+ 产品 harness 设计映射 |
-| [2026-10-02-execution-roadmap.md](2026-10-02-execution-roadmap.md) | 执行排产：当前放行的一把（change ① 重做 propose → apply 闭环）+ 后续队列 |
+| [2026-10-02-borrow-dsh-harness-gap-analysis.md](2026-10-02-borrow-dsh-harness-gap-analysis.md) | 借鉴 DSH harness 思想的十维差距分析：开发 harness 六缺口（A–F）+ 产品 harness 设计映射；**当前主线**（E 已落地，A–F 硬化批待入线） |
 
 **Next available plan ID: CLS-001**（移入 `_closed_plans/` 时分配）
 
@@ -33,6 +32,7 @@
 
 | Plan | Change | 归档日期 |
 |------|--------|----------|
+| CLS-001 execution-roadmap | establish-project-structure（已 archive） | 2026-10-02 |
 
 ---
 

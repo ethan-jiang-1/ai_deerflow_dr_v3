@@ -1,6 +1,6 @@
 # Closed Plans Index — 已完成 plan 归档
 
-> 最后更新: 2026-10-02（仓库起骨架日，空表） | `_backlog/_done/_closed_plans/` — 已完成 plan 的归档目录。
+> 最后更新: 2026-10-02（首份 plan 关闭：CLS-001 execution-roadmap） | `_backlog/_done/_closed_plans/` — 已完成 plan 的归档目录。
 > 接收来自 [`../../plans/`](../../plans/) 的 plan。`_` 前缀 = coding agent 默认忽略。
 >
 > **plan 完成后文件名不变，位置即状态。** 移入时分配 `CLS-NNN` 序号（Closed），按完成时间递增。
@@ -19,5 +19,6 @@ plan 完成后从 `_backlog/plans/` 通过 `git mv` 移入本目录：
 
 | ID | Date | File | Summary |
 |----|------|------|---------|
+| CLS-001 | 2026-10-02 | [2026-10-02-execution-roadmap.md](2026-10-02-execution-roadmap.md) | 排产 plan：change establish-project-structure 闭环（propose → polish → apply → 门禁全绿 → archive），13/13 任务完成 |
 
-**Next available plan ID: CLS-001**
+**Next available plan ID: CLS-002**

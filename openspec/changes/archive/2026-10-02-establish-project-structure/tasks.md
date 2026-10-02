@@ -71,7 +71,7 @@
 - [x] 5.1 Closeout review: compare the proposal's Change Focus against the actual tasks,
       delivered diff, and evidence; every actionable finding becomes an unchecked task here
       or an explicitly approved re-scope; no silent narrowing of the approved outcome.
-- [ ] 5.2 After explicit user approval, archive via `openspec archive establish-project-structure`;
+- [x] 5.2 After explicit user approval, archive via `openspec archive establish-project-structure`;
       confirm archive reports the main spec as already in sync (no requirement duplication),
       then re-run `python3 openspec/governance/check_project_gate.py --phase closeout` (exit 0)
       and `openspec list --specs` reporting `project-structure`, and close the roadmap

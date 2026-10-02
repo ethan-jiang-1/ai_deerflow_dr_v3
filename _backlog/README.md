@@ -51,7 +51,7 @@ _backlog/
 
 > 📖 **想看全局状态、历史决策、查阅指南** → [`_done/README.md`](_done/README.md)
 >
-> 📖 **想看当前该做什么、依赖关系、执行顺序** → [`plans/2026-10-02-execution-roadmap.md`](plans/2026-10-02-execution-roadmap.md)
+> 📖 **想看当前该做什么、依赖关系、执行顺序** → [`plans/2026-10-02-borrow-dsh-harness-gap-analysis.md`](plans/2026-10-02-borrow-dsh-harness-gap-analysis.md) 的落地关联表（硬化批 A–F 队列）
 
 ---
 
@@ -96,7 +96,8 @@ _backlog/
 - **plan 记思考，change 记契约**：同一事实只住一处——plan 的「落地关联」与 change 的 Focus
   Card 互链（引用，不复制正文）。
 - **一次放行一把**：buffer 不是先进先出队列；按优先级每次只放行一个 change，做完再放下一把
-  （当前主线见 [`plans/2026-10-02-execution-roadmap.md`](plans/2026-10-02-execution-roadmap.md)）。
+  （当前主线见 [`plans/2026-10-02-borrow-dsh-harness-gap-analysis.md`](plans/2026-10-02-borrow-dsh-harness-gap-analysis.md)
+  的落地关联表）。
 - **机器检查的位置**：入线前无门禁（buffer 允许半成品、允许推敲）；入线后由治理 checker 套件 +
   closeout gate 兜底；穷举项收编进 CI 挂账中（见
   [`plans/2026-10-02-borrow-dsh-harness-gap-analysis.md`](plans/2026-10-02-borrow-dsh-harness-gap-analysis.md)
