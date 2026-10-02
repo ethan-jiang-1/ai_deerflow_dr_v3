@@ -7,7 +7,7 @@
 | `deep_research_harness/` | ★ **你的应用**（`src/deerflow_deep_research`、`scripts`、`tests`、`docs`） | 改代码、写测试、跑它——几乎所有工作在这里 |
 | `deerflow/` | 被 leverage 的框架（submodule 锁 `ceebf97f` = 上游 v2.1.0） | **只 import，绝不修改、不为排查翻它内部**；理解框架读它的只读指引 `deerflow/AGENTS.md` 与 `deerflow/backend/AGENTS.md` |
 | `openspec/` | 设计与准入（specs / changes / governance / change-guidance） | 契约与规范写这里 |
-| `_backlog/` | 任务账本（bugs / plans / todos） | 追踪；搬迁按 ritual |
+| `_backlog/` | 任务账本（plans / bugs 两类） | 追踪；搬迁按 ritual |
 
 ## 去哪里找规则（渐进披露——根目录只路由，不堆细节）
 

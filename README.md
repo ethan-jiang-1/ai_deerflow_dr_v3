@@ -25,7 +25,7 @@ DeerFlow 是宿主运行时，**不 import 本包**；触达方式（反射工�
 deep_research_harness/    ★ 你的应用（deep research runtime，基于 deerflow 的 API 构建）
 deerflow/                 被 leverage 的框架（submodule 锁 commit `ceebf97f`，ethan 分支，= 上游 v2.1.0；只读）
 openspec/                 设计规格（openspec CLI 管理；specs 从零开始，changes/ 为空）
-_backlog/                 任务账本（bugs / plans / todos + _done 归档 + _reference 分析）
+_backlog/                 任务账本（plans / bugs 两类 + _done 归档 + _reference 分析）
 .agents/skills/           openspec 技能（Codex 通用入口，项目自有）
 （grillme 技能集由全局 ~/.claude/skills、~/.agents/skills 提供）
 ```
