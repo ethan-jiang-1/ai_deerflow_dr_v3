@@ -11,6 +11,13 @@ v2 拿得过来就拿，拿不过来就算了。证据底座：`_reference/deerf
 （接线路事实）、`deerflow-cognition-engine.md`（旋钮表）、`deerflow-harness-architecture.md`
 （结构标本）。
 
+**项目级准绳（2026-10-02 用户确立，先序于一切技术裁决）**：① 这是一个研究与练习项目，
+工程化渐进推进——**透明可见、可调试优先**于机制精巧与省轮次；② 最终交付给不懂 AI 的
+人——workflow 质量必须让非 AI 接手者可依赖（宁可响亮失败、不可安静烂掉；一切失败路径
+人话可读）；③ 项目的研究本体 = **「带质量控制的 agentic workflow 研发怎么做合理」**，
+参照建筑施工质量监控体系（监理独立性/隐蔽验收/试块/竣工资料），DeerFlow 为实验环境——
+质量控制体系映射表见 bundle-contract plan 的设计理由节。
+
 ## 决策 / 方案
 
 1. **embedded 接线**（runtime 层）：`DeerFlowClient` 封装——构造参数（model_name /
@@ -63,14 +70,35 @@ v2 拿得过来就拿，拿不过来就算了。证据底座：`_reference/deerf
    - **base config 必须显式开 `summarization.enabled: true`**：pydantic 层默认关、上游
      example 模板写 true，两处默认态不一致——以我们自己的 checked-in 文件为准（长跑
      deep research 需要 compaction 保护，这不是可选项）。
-7. **UNVERIFIED 验证项**（入线前必须落实）：① ask_clarification 在我们 run 里的处置
-   （禁用可配置性 or 超时默认继续——HITL 暂缓裁决的尾巴）；② ~~Langfuse/tracing 在
+7. **UNVERIFIED 验证项**（入线前必须落实）：① ~~ask_clarification 在我们 run 里的处置~~
+   **已关闭（2026-10-02 定案，处置设计见决策 8）**——事实查证：embedded 模式无禁用开关
+   （原拟的两个选项「禁用可配置性/超时默认继续」均不存在于 embedded 路径）；② ~~Langfuse/tracing 在
    embedded 模式下是否可用~~ **已关闭（2026-10-02，digest+源码双证）**：可用——
    `client.stream()` 在图调用根注入 `build_tracing_callbacks()` + `inject_langfuse_metadata()`
    （client.py:933-942），`chat()` 包装 `stream()` 同覆盖；开启 = 环境变量
    `LANGFUSE_TRACING` + `LANGFUSE_PUBLIC_KEY/SECRET_KEY`，构造参数 `environment` 打
    env 标签，session_id=thread_id，`deerflow_trace_id` 恒写入；例外：Monocle 仅 Gateway
    lifespan 初始化，embedded 不覆盖。第一版不依赖，保持记录备查。
+8. **ask_clarification 处置 = (a) harness 自动续答 + (c) prompt 减频**（2026-10-02
+   用户定案；透明与质量两准绳同向选择）。事实底座（源码查证）：embedded 模式无法从工具
+   集剔除该工具——剔除机制 `non_interactive` 是 Gateway 内部认证路径的 configurable 键，
+   client 的 configurable 写死 5 键（client.py:282-294）；框架自带的抑制机制
+   `disable_clarification`（转 proceed ToolMessage）是 runtime context 键，client kwargs
+   白名单（8 个授权键）传不进；链尾 ClarificationMiddleware 无条件在位，调用时
+   `Command(goto=END)`——本轮优雅终止、问题入 checkpoint、stream 正常走到 end。处置：
+   - **(c) 第一道（减频）**：任务消息自带「非交互环境，不要请求澄清，按最佳判断继续并
+     说明假设」；
+   - **(a) 承重**：检测谓词为纯函数（stream 终态末条 AI 消息带未应答的 ask_clarification
+     调用）→ 有界自动续答（同 thread_id 发续答轮，最多 N 次，N 初定 2）→ 续答消息带
+     来源戳「[非交互模式·系统自动应答] …」（框架 provenance 纪律，回放永远诚实）→
+     耗尽 → fail-loud 终态，**未回答的问题原文保留进 bundle**；
+   - **检测机器复用**：同一套「读 stream 终态判原因」能力承担 stop_reason 识别
+     （token_capped/loop_capped/model_length_capped）——wiring 层的通用观察底座；
+   - **联动**：状态机转移（auto_proceed 有界、耗尽终态）落 bundle-contract plan 决策 2；
+     watch 把续答轮呈现为显式事件（透明准绳）；
+   - **弃选 (b)**（#32 槽中间件抑制）：机制埋进框架 hook 隐式语义（after_model 反序分发、
+     混合批次丢兄弟调用），与透明/质量准绳相悖；将来工程化期可换路线，(a) 的检测机器
+     不白写。
 
 ## 风险 / 取舍
 
