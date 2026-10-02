@@ -33,11 +33,20 @@ wiring plan 背景节，先序于本 plan 一切裁决。
 2. **watch = 渲染器，不是调试器**：消费 stream 事件流（messages-tuple 的 token/工具调用、
    custom 的 subagent 生命周期、values 快照、end 用量）三消费者设计之一；**默认人话摘要，
    `--verbose` 切原始事件**。单向观察（HITL 暂缓，与 6/6 裁决自洽）。
-3. **inspect 的两层事后排障**：journal 时间线（谁何时 admit/reject）+ **checkpoint 全程回放**
-   （从 checkpoint.sqlite 重渲染完整消息历史/工具调用——debugger 硬需求的第三层）。
-4. **两级阶梯**：fixture 演跑（零凭证，provider 替换）→ real 跑；不做 001-031 八级。
-5. **验收标准（硬需求落条款）**：三层观察（watch 直播/journal 时间线/checkpoint 回放）
-   第一天全部可用且好用——每层的红绿测试 + 一次真实排障演练作为 closeout 证据。
+3. **inspect 的事后三面（2026-10-02 补写关闭线索③⑥）**：journal 时间线（谁何时
+   admit/reject）+ **checkpoint 全程回放**（复用 `client.get_thread()` /
+   `CheckpointStateAccessor` 的 checkpoint 历史量化机器——不自造 sqlite 解析；配合
+   bundle 装配快照可完整重建「模型当时看到什么」）+ **质量报告页**（一页「验收结论 +
+   证据链」人话呈现——交付给不懂 AI 的接手人，QC 映射的「竣工资料移交」形态）。
+4. **两级阶梯**：fixture 演跑（零凭证——落地形态 = wiring 决策 6 的 checked-in
+   fixture config，`use:` 类路径缝换假模型/假 web_search，跑完整真实 client 链路，
+   2026-10-02 关闭线索④）→ real 跑（base config）；不做 001-031 八级。
+5. **验收标准（硬需求落条款；2026-10-02 EV2 机制级化，关闭线索⑤）**：三层观察
+   （watch 直播/journal 时间线/checkpoint 回放）第一天全部可用且好用——closeout 证据
+   两件套：① 每层红绿测试，且每个新守卫过一次**负例控制**（引入违规→看红→还原→看绿，
+   记录在案——「从不红的守卫≈不存在」；gate smoke 元测试形态：一条测试专门证明 gate
+   自己会拦，它不拦即 gate 坏）；② 一次真实排障演练，CI 化形态 = record/replay golden
+   （录一次真实排障、永久零凭证回放，验形状漂移而非 volatile 值）。
 6. **运行进程模型（2026-10-02 用户定案选项 A；关闭打磨线索⑦②）**：run 活在 create 的
    前台进程——**单泵三汇**（一次 stream 迭代分发三汇：本终端渲染 / journal 落账 / 终态
    检测——wiring「三消费者」在泵层原样成立）；`watch <id>` attach = journal tail（渲染器
@@ -46,7 +55,7 @@ wiring plan 背景节，先序于本 plan 一切裁决。
    两用（直播载体 + 时间线，正是三层观察里 journal 的双重身份）；`nohup create &` +
    `watch <id>` 免费获得后台形态，不建后台 worker 路线。续答轮（wiring 决策 8）在两种
    数据源下都渲染为显式事件。弃选：后台 worker（进程管理新机器、发起终端失直播，违背
-   透明准绳）、砍独立 watch attach（违背裁决 #4 的五子命令形态）。
+   透明准绳）、砍独立 watch attach（违背裁决 #4 的最小 CLI 形态）。
 
 ## 风险 / 取舍
 
@@ -55,24 +64,14 @@ wiring plan 背景节，先序于本 plan 一切裁决。
 - [checkpoint 回放依赖框架格式] → 与 bundle-contract 的 fail-loud 语义共用；回放失败
   如实报，不静默。
 
-## 打磨线索（2026-10-02 系统审计登记，随本 plan 打磨轮逐个过）
+## 打磨线索（全部关闭，2026-10-02）
 
-① ~~**refine 的 CLI 入口裁决**~~ 已关闭（2026-10-02 用户定案：补第六子命令
-`refine <id> "方向文本"`，CLI 镜像状态机动作集，见决策 1）。
-② ~~**watch 对齐**~~ 已关闭（2026-10-02 随进程模型定案，见决策 6：渲染器共享双数据源，
-续答轮显式渲染）。
-③ **inspect 回放复用内建机器**：`client.get_thread()` / `CheckpointStateAccessor` 已
-提供 checkpoint 历史量化 + 消息序列化——不自造 sqlite 解析；RT2/RT7 影像盲区裁决联动
-bundle 打磨线索②（回放重建得了对话、重建不了「模型当时看到什么」）。
-④ **两级阶梯落地形态** = wiring 决策 6 的 checked-in fixture config（`use:` 类路径缝，
-零凭证跑完整真实 client 链路）。
-⑤ **EV2 负例控制机制级化**：验收条款（决策 5）的「红绿测试」落为「引入违规→看红→还原
-→看绿并记录」+ gate smoke 元测试形态（「从不红的守卫≈不存在」）；排障演练的 CI 化形态
-= record/replay golden（录一次真实排障、永久零凭证回放，验形状漂移）。
-⑥ **inspect 质量报告面**（联动 bundle 打磨线索③）：一页「验收结论 + 证据链」人话呈现，
-交付给不懂 AI 的接手人。
-⑦ ~~**运行进程模型**~~ 已关闭（2026-10-02 用户定案选项 A，见决策 6：前台单泵三汇 +
-journal tail attach + 状态标记取消 + PID 活性检测）。
+① ~~refine 的 CLI 入口~~ → 用户定案：第六子命令（见决策 1）。② ~~watch 对齐~~ →
+随进程模型定案（见决策 6：渲染器共享双数据源，续答轮显式渲染）。③ ~~inspect 复用
+内建机器~~ → 已并入决策 3（get_thread / CheckpointStateAccessor）。④ ~~两级阶梯落地
+形态~~ → 已并入决策 4（指向 wiring 决策 6）。⑤ ~~EV2 机制级化~~ → 已并入决策 5
+（负例控制 + gate smoke + replay golden）。⑥ ~~inspect 质量报告面~~ → 已并入决策 3
+（事后三面）。⑦ ~~运行进程模型~~ → 用户定案选项 A（见决策 6）。
 
 ## 落地关联
 

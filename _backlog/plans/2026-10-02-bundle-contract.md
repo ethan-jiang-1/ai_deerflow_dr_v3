@@ -25,7 +25,7 @@
 | 样板间/试拼装 | fixture 演跑（零凭证彩排，决策 6 + wiring 决策 6） |
 | 标准试块（要真的压到破坏） | ReplayChatModel 录制/回放 golden——录一次真实行为，永久比对形状漂移 |
 | 旁站监理 + 施工日志 | watch 直播（单向观察）+ journal（有界诚实，决策 3） |
-| 关键工序影像记录 | checkpoint 回放（盲区见打磨线索②） |
+| 关键工序影像记录 | checkpoint 回放 + 装配快照（决策 3，盲区已补） |
 | 不合格品显式处置（返工/让步/报废，无静默通过） | admit/reject/replay 三分；删除即永久（决策 5）；fail-loud→failed-resume；返工 = refine（v1 砍 in-place repair = 只留「重新施工」砍「现场返修」） |
 | 质量追溯（每批材料可溯） | hash 链 ledger + 消息 provenance 戳 + thread_id/pin 入 state.json |
 | 竣工资料移交 | inspect 质量报告面（打磨线索③） |
@@ -35,19 +35,12 @@ LLM workflow 比施工**多**出的三个质量控制维度：① 非确定性�
 fixture/replay 确定性）；② 施工队自评不可信（专检必须是代码、互检必须是机械规则）；③
 交付后框架会漂移（建筑不会，submodule 会 → pin + 契约镜像 = 「结构被偷偷改」的报警器）。
 
-**打磨线索（缺口，随本 plan 打磨轮逐个过）**：① EV2 负例控制升格为 closeout 机制级条款
-（引入违规→看红→还原→看绿并记录——「从不红的守卫≈不存在」）；② RT2/RT7 影像盲区裁决
-——system prompt 与组装后可见工具清单不落盘，回放重建得了对话、重建不了「模型当时看到
-什么」（接受 + 成文能力边界 vs provider 层 RecordingModel 捕获，两选一）；③ inspect 增
-一页「验收结论 + 证据链」人话质量报告（交付给不懂 AI 的接手人）；④ RT10 检查注册处
-——validator/gate/contract test/make verify 的单一清单面。⑤ **子树差异说明**：v2 七子树
-（含 synthesis/review）→ v3 五子树——synthesis（跨题综合）与 review（报告计划）随研究
-本体交框架而砍；其产物去向（最终报告草稿、验收记录的物理位置：final/ vs evidence/ vs
-diagnostics/）在本 plan 的 change 定稿时成文。⑥ **journal 事件类别集**：v2 十类
-（admission/lifecycle/node/attempt/model_tool/validation/submit/retry/exhaustion/
-terminal）中 node/attempt 是静态图概念、随图退役——v3 的类别继承/砍除/映射表（含
-subagent 生命周期事件 task_started/running/completed 落账到哪类）在 change 里定稿，
-与决策 4 的「小封闭集合」纪律同源。
+**打磨线索（全部关闭，2026-10-02）**：① ~~EV2 负例控制~~ → 已升格为 entry 决策 5 的
+closeout 机制级条款（负例控制 + gate smoke + replay golden）；② ~~RT2/RT7 影像盲区~~ →
+用户定案选项 C：装配快照（见决策 3）；③ ~~inspect 质量报告面~~ → 已并入 entry 决策 3
+（事后三面）；④ ~~RT10 检查注册处~~ → 已并入决策 4（随收口 change 附清单面）；
+⑤ ~~子树差异~~ → 已并入决策 1（产物去向成文）；⑥ ~~journal 类别集~~ → 已并入决策 3
+（v1 起步八类，change 定稿可调）。
 
 ## 决策 / 方案
 
@@ -57,7 +50,9 @@ subagent 生命周期事件 task_started/running/completed 落账到哪类）在
    为同步驱动，async saver 不匹配，修正依据见 wiring plan 决策 1 修正注（2026-10-02）；
    无 64KiB bound 包装、无 legacy 校验子系统；打开失败 fail-loud → failed-resume 降级）。
    thread_id、deerflow pin commit 与 **owner PID**（entry 进程模型：create 前台进程，
-   2026-10-02 定案）记进 state.json。
+   2026-10-02 定案）记进 state.json。**子树差异（对 v2 七子树，2026-10-02 补写关闭
+   线索⑤）**：砍 synthesis（跨题综合）与 review（报告计划）——研究本体已交框架；产物
+   去向 = 最终报告 → final/，验收/证据记录 → evidence/，过程诊断 → diagnostics/。
 2. **普通状态机**（domain + engine 层纯函数）：v1 动作集 start/status/cancel/**refine（仅
    方向文本形态——砍 v2 的 continuation 双形态/replay receipts/crash-window 恢复例外）**
    ——refine 的 CLI 镜像已定（entry 决策 1：`refine <id> "方向文本"`，2026-10-02；
@@ -74,12 +69,22 @@ subagent 生命周期事件 task_started/running/completed 落账到哪类）在
 3. **三层观察**（debugger 硬需求）：journal（diagnostics/，有界保留 + 优先级驱逐 +
    admission anchor 永不驱逐——v2「诚实有界」哲学保留；**复用 v2 的 model_tool 类别、
    换数据源**（v2 由节点桥接事件发射；v3 改由 stream 工具调用事件落账，类别本身不是
-   新增）；修复 v2 O(n²) 整写 → 真 append + 周期 compaction）；watch 与
-   checkpoint 回放的渲染在 entry-surface plan。
+   新增）；**v1 类别集起步（2026-10-02 关闭线索⑥）**：admission / lifecycle /
+   model_tool / subagent〔新增，承接 task_started/running/completed 生命周期〕/
+   validation / submit / exhaustion / terminal——砍 v2 的 node/attempt（静态图概念，
+   随图退役）与 retry（框架内部重试行为，不入 harness 账）；修复 v2 O(n²) 整写 →
+   真 append + 周期 compaction）；**装配快照（2026-10-02 用户定案选项 C，关闭线索②）**：
+   每 run 一张——渲染后 system prompt 全文 + 可见工具清单（自算：config 声明 + 内建 +
+   条件附加规则）+ 装配事实（模型名/pin），存 diagnostics/；我们的形态「装配一次定
+   终身」使一张快照 ≈ 补齐 RT2/RT7 盲区（checkpoint 回放 + 快照 = 完整重建「模型当时
+   看到什么」）；逐轮不额外记（消息已在 checkpoint）；捕获实现走 wiring 决策 4 逃生口
+   （首轮 hook）；watch 与 checkpoint 回放的渲染在 entry-surface plan。
 4. **验收收口最小版**（engine 层）：纯函数 validator（写前跑）+ hash 链 ledger
    （evidence/submissions.jsonl，单一 commit owner，admit/reject/replay 三分）+ gate
    最小推导（PhaseVerdict pass/blocked 起，repair 预算机制砍）。ResultCode/事件字段
-   **小封闭集合起步**（v2 轰炸教训）。
+   **小封闭集合起步**（v2 轰炸教训）。随本收口的 change 附**检查注册处**（RT10，
+   2026-10-02 关闭线索④）：validator/gate/contract test/make verify 的单一清单面
+   ——接手者一眼看到「质量由哪些机器保证」。
 5. **删除语义**：无注册表（发现=扫描目录）、删除即 never recover、写路径活性重验——
    v2 反模式清单（不复活/不静默迁移/不 second authority）全数继承。
 6. **显式组成**：fixture/mixed/all_real 状态记进 state.json；v3 的 fixture 替换层 =
