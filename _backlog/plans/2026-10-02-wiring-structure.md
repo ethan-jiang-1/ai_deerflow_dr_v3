@@ -22,9 +22,11 @@ v2 拿得过来就拿，拿不过来就算了。证据底座：`_reference/deerf
 
 1. **embedded 接线**（runtime 层）：`DeerFlowClient` 封装——构造参数全集（10 个：
    config_path〔决策 6：显式传 base 或 fixture〕/ checkpointer=Bundle 的 **sync
-   SqliteSaver** / model_name〔取自 .env 模型 selector〕/ thinking_enabled〔默认 True
-   保持〕/ subagent_enabled=True / plan_mode〔默认 False；开的话 TodoList 经 values
-   快照提供计划可见性——watch 直播是否受益，首笔 change 实测后定〕/ agent_name〔None，
+   SqliteSaver** / model_name〔config.yaml `models[]` 中的名称，缺省 models[0]；.env 只持
+   key 不选模型〕/ thinking_enabled〔默认 True
+   保持〕/ subagent_enabled=True / plan_mode〔默认 False；注意 embedded values 事件只带
+   title/messages/artifacts/summary_text（client.py:132/901），**todos 不在快照里**——
+   TodoList 对 watch 的可见性收益不成立，除非将来经 custom 事件另路透出〕/ agent_name〔None，
    不用 custom agent〕/ available_skills〔构造期参数，不能 per-call 切换；取值 None=全部
    vs 限定研究 skill 集——影响 prompt 面大小，随首笔 change 定〕/ middlewares〔逃生口，
    注入语义见决策 4〕/ environment〔tracing 标签，见决策 7②〕）；stream 事件流消费
@@ -81,6 +83,8 @@ v2 拿得过来就拿，拿不过来就算了。证据底座：`_reference/deerf
    - **fixture 档 = 框架自己的 `use:` 类路径缝**：fixture config 的 `models[].use` /
      `tools[].use` 指向假模型（FakeToolCallingModel 式）/ 假 web_search 类路径——零凭证
      跑完整真实 client 链路（供 entry-surface 两级阶梯消费）。
+   - **两份配置的落盘路径** + required-paths 治理登记：随首笔 change 定（新增路径属治理
+     合同小改，与撤 graph 语法同批走最省）。
    - **base config 必须显式开 `summarization.enabled: true`**：pydantic 层默认关、上游
      example 模板写 true，两处默认态不一致——以我们自己的 checked-in 文件为准（长跑
      deep research 需要 compaction 保护，这不是可选项）。

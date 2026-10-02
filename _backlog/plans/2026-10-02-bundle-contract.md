@@ -43,7 +43,11 @@ fixture/replay 确定性）；② 施工队自评不可信（专检必须是代�
 ——validator/gate/contract test/make verify 的单一清单面。⑤ **子树差异说明**：v2 七子树
 （含 synthesis/review）→ v3 五子树——synthesis（跨题综合）与 review（报告计划）随研究
 本体交框架而砍；其产物去向（最终报告草稿、验收记录的物理位置：final/ vs evidence/ vs
-diagnostics/）在本 plan 的 change 定稿时成文。
+diagnostics/）在本 plan 的 change 定稿时成文。⑥ **journal 事件类别集**：v2 十类
+（admission/lifecycle/node/attempt/model_tool/validation/submit/retry/exhaustion/
+terminal）中 node/attempt 是静态图概念、随图退役——v3 的类别继承/砍除/映射表（含
+subagent 生命周期事件 task_started/running/completed 落账到哪类）在 change 里定稿，
+与决策 4 的「小封闭集合」纪律同源。
 
 ## 决策 / 方案
 
