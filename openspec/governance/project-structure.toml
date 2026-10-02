@@ -1,0 +1,50 @@
+schema_version = 1
+contract = "project-structure"
+# v3 骨架期：唯一 requirement 是结构清单锚本身。specs 为空（从头搭），
+# PRS-001 暂以 registered 状态停在 req-registry；首个治理 change 将建立
+# project-structure 的 owning spec，把它提升为 alive。参见
+# _backlog/plans/2026-10-02-digest-deerflow-native-deep-research.md 的落地关联。
+requirement_ids = ["PRS-001"]
+
+[upstream_gitlink]
+path = "deerflow"
+commit = "ceebf97fc31afbbfe2aadf7c8d82b03c3742d5d7"
+
+[guide]
+path = "deep_research_harness/AGENTS.md"
+begin_marker = "<!-- BEGIN GENERATED: PROJECT-STRUCTURE -->"
+end_marker = "<!-- END GENERATED: PROJECT-STRUCTURE -->"
+
+[package]
+source_root = "deep_research_harness/src/deerflow_deep_research"
+test_root = "deep_research_harness/tests"
+ownership_layers = ["runtime", "domain", "engine", "agents", "graph"]
+forbidden_source_roots = ["backend", "frontend"]
+forbidden_shared_modules = ["utils", "helpers", "common"]
+
+# fixture_root / fixture_package：骨架期缺省（checker 中为可选项）。
+# 显式组成（all_real/fixture/mixed）落地时随 owning spec 一并声明。
+
+[ignored_paths]
+path = "deep_research_harness/.gitignore"
+entries = [".venv/", ".pytest_cache/", ".ruff_cache/", "__pycache__/"]
+
+[inventory]
+path = "openspec/governance/required-paths.toml"
+
+# Import-boundary keys：六个 import 层（含 nodes——graph 自有的节点包子层）。
+# 内部层方向由 checker 硬编码政策固定；此处每层的值 = 内部层名 + 该层授权的外部命名空间。
+[imports]
+domain = ["stdlib", "pydantic"]
+engine = ["domain"]
+agents = ["domain"]
+graph = ["domain", "engine", "nodes"]
+nodes = ["domain", "engine"]
+runtime = ["domain", "graph", "agents"]
+
+[node_packages]
+root = "deep_research_harness/src/deerflow_deep_research/graph/nodes"
+required_files = ["__init__.py", "node.py", "contracts.py"]
+optional_files = ["subgraph.py", "capabilities.py"]
+forbidden_files = ["fake.py"]
+public_export = "NODE_SPEC"

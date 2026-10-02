@@ -1,0 +1,41 @@
+[project]
+name = "deerflow-deep-research"
+description = "Deep research runtime harness for DeerFlow (v3 rewrite)"
+requires-python = ">=3.12"
+dynamic = ["version"]
+# 骨架期：无运行时依赖。deerflow-harness 的 editable 依赖随"接线"change 进入
+# （uv source 已在下方占位，指向同级 submodule 的 harness 包）。
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "ruff>=0.14.11",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/deerflow_deep_research/__about__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/deerflow_deep_research"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]
+
+[tool.uv]
+index-url = "https://pypi.org/simple"
+
+[tool.uv.sources]
+deerflow-harness = { path = "../deerflow/backend/packages/harness", editable = true }

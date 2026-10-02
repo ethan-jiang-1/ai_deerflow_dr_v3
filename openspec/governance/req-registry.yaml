@@ -1,0 +1,28 @@
+# Requirement ID Registry
+#
+# 需求 ID 的唯一登记处。规则沿自前代仓库（ai_deerflow_deep_research_v2）的治理思想；
+# 本仓库（v3）从零开始分配，与前代 ID 空间互不通用。
+#
+# 规则:
+#   1. 只增不删 — 已分配的 ID 永不复用，废弃的在描述末尾追加 [DEPRECATED]
+#   2. 分配前先查 — 在此文件中搜索确认 ID 未被占用
+#   3. 格式:  PREFIX-NNN: <capability-name> — <description>
+#      - key 是全局唯一 ID，格式 [A-Z]{3}-\d{3}
+#      - value 的 <capability-name> 用 kebab-case
+#   4. 引号:  YAML 值不需要引号，除非值内包含 ": "（冒号+空格）
+#      切勿用单引号——YAML 单引号内无法转义，双引号用 \" 即可。
+#   5. check_project_reqs.py 扫描本文件做一致性校验
+#
+# 三态:
+#   alive   — ID 出现在 openspec/specs/ 某个 main spec 的 > req: 行
+#   pending — ID 出现在 openspec/changes/<active>/specs/ 的 delta spec 中
+#   retired — 本行末尾标了 [DEPRECATED]，ID 占位永不复用
+#
+# 缩写规则: 首单词前 2 字母 + 次单词首字母（如 custom-tool → CUT，memory-policy → MEP）；
+#           单词型 capability 取前 3 字母（如 skills → SKI）。冲突时先查 registry 再定。
+#
+# ---- 骨架期登记（2026-10-02）-------------------------------------------------
+# specs 为空（从头搭），以下 ID 暂为 registered-not-alive 状态；
+# 各 capability 的 owning spec 由 v3 自己的首批 change 建立。
+
+PRS-001: project-structure — v3 仓库骨架的结构合同：治理清单、import 分层、节点语法、submodule 锚

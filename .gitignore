@@ -157,6 +157,21 @@ ENV/
 env.bak/
 venv.bak/
 
+# Local runtime config (master template for profiles/; not committed)
+# Anchored to the repo root: profiles/*/config.yaml is covered by
+# profiles/.gitignore, and deep_research_harness/openspec/config.yaml is a
+# tracked application OpenSpec configuration (see the negation below).
+/config.yaml
+/config.yaml.bak
+# Application-owned OpenSpec config under deep_research_harness/ is tracked.
+!deep_research_harness/openspec/config.yaml
+
+# Runtime-materialized profile root (configure.py writes the public skill here)
+skills/
+# Re-include the committed agent skill set (tracked delivery artifacts)
+!.agents/skills/
+!.agents/skills/**
+
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -216,3 +231,13 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local editor / tooling dirs (not shared via git)
+.claude/
+.vscode/
+
+RUN*.command
+RUN-*.command
+
+# proof receipts/transcripts are local evidence, never history
+.proof/

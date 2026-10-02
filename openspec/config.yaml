@@ -1,0 +1,101 @@
+schema: spec-driven
+
+context: |
+  ## Default Context Boundary
+
+  This is a short OpenSpec-authoring route, not a project manual. It intentionally
+  does not restate runtime facts, roadmap decisions, or historical change material.
+  For Deep Research-specific orientation, read
+  [product/README.md](product/README.md). Follow a pointer to the
+  owning source only when the change's question requires it.
+
+  ## Sources Of Truth
+
+  1. Approved main specs define required behavior; one active owning delta defines
+     pending behavior.
+  2. Code, typed contracts, tests, and the authority that owns a runtime fact define
+     current behavior and conformance evidence.
+  3. `openspec/governance/project-structure.toml` (contract) and `openspec/governance/required-paths.toml` (inventory) form the exact structural manifest;
+     `architecture-policy.md` defines its update protocol.
+  4. [Change Guidance](change-guidance/README.md) guides local design and
+     admission only. It never creates runtime behavior, authority, or permission.
+
+  Label unknowns and proposals as such. Do not convert a roadmap idea, imported workflow reference,
+  or unverified DeerFlow assumption into a claim about current behavior.
+
+  ## Test Evidence
+
+  For a test-bearing change, use `openspec/governance/test-evidence-policy.md`.
+  The `evaluation-hardening` capability owns its behavior; select the lowest
+  responsible deterministic seam instead of copying test policy into the proposal.
+
+  ## Start A Local Change
+
+  1. Read `deep_research_harness/AGENTS.md` and select one primary module / causal owner.
+  2. Read its owning capability spec/delta, closest implementation, and lowest
+     responsible evidence seam.
+  3. Use `openspec/change-guidance/README.md` to select every canonical policy whose
+     route-table trigger applies to the change. A change still has one primary module
+     / causal owner.
+  4. Add `## Change Focus` to the proposal with Primary module / causal owner,
+     Seam classification, Question, Necessary adjacent/external contracts, Evidence
+     seam, Not in scope, and Triggered review policies. List every selected canonical
+     policy name separated by commas on that single list item; do not use continuation
+     lines. Use `none: <short rationale>` only when no policy applies.
+
+  Program form: `## Program Focus` with at least two registered `### Workstream Focus:
+  <stable-id>` records replaces (never supplements) Change Focus. Its decision
+  authority approves only frozen scope, order, and whole-program archive closure;
+  it is never a runtime fact authority, writer, or shared implementation owner.
+
+  An adjacent module or public DeerFlow interface enters scope only when the proposal
+  names the contract and the interface, authority, compatibility, or observed-failure
+  question it must answer. A possible future use is not enough to expand scope. If
+  ownership remains unclear, clarify the Focus Card instead of scanning unrelated
+  host code, root material, or sibling changes for orientation.
+
+rules:
+  proposal:
+    - "Every active Deep Research proposal MUST include a `## Change Focus` section with Primary module / causal owner, Seam classification (one of cognitive-program, human-decision, deterministic-guardrail, or wiring, written bare, with a short rationale), Question, Necessary adjacent/external contracts, Evidence seam, Not in scope, and Triggered review policies. The primary owner is the smallest module that owns the semantic decision; each non-none adjacent/external contract names the question it answers. Triggered review policies use canonical comma-separated names on one list item, or `none: <short rationale>` when no policy applies."
+    - "Program form: `## Program Focus` with at least two registered `### Workstream Focus: <stable-id>` records replaces Change Focus. Freeze the complete Candidate / obligation budget, declared order, shared archive invariant, and recovery rule; each workstream owns its decision, IDs, target/retirement, surface grade, negative path, policies, and level-four review records. The checker closes only grammar: apply/archive review compares the approved scope, actual tasks, diff, and evidence. A failed workstream stays active for approved repair, rollback, or plan-level re-scope; no workstream partially archives."
+    - "When Triggered review policies selects `control-placement`, the proposal MUST include one `## Control Placement Review` table with Changed decision or fact, Cognitive candidate or human judgment, Direct fact and deterministic owner/evaluator, Design posture, Protected invariant or legal recovery, Reuse or complexity removed/avoided, and Deterministic evidence seam. The review guides design only; it creates no runtime authority."
+    - "When Triggered review policies selects `workflow-outcome-review`, the proposal MUST include one `## Workflow Outcome Review` table with Failure class, Fact owner, Recovery owner and bound, Terminal disposition, Legal next action, and Deterministic evidence seam. This review record guides design and review only; it does not create runtime authority."
+    - "When Triggered review policies selects `node-agent-workflow-integrity`, the proposal MUST include one `## Node Agent Review` table with Surface, Classification, Bounded cognitive question or no-agent rationale, Input authority boundary, Tool posture and runtime enforcer, Candidate result and deterministic admission owner, Failure owner and bound, and Deterministic evidence seam. This routes admission only: root `config.yaml`, `openspec/config.yaml`, the review record, and a prompt do not grant a node role, graph route, state write, model invocation, tool permission, or recovery behavior."
+    - "State that ordinary downstream work neither modifies nor source-browses the `deerflow/` gitlink unless the proposal explicitly owns and approves that boundary. Describe proposed behavior as scope, not current fact."
+    - "For a changed user-facing or AI-facing lifecycle outcome, name the owning typed fact, the evidence seam, and the legal next action; projections and diagnostics do not become lifecycle authority."
+  specs:
+    - "Requirements describe observable or mechanically verifiable downstream behavior and do not redefine DeerFlow internals. Main specs and active deltas declare owned requirement IDs before their first heading."
+    - "Retain zero-API deterministic evidence at the lowest responsible seam. Credentialed live/release evidence is supplemental and needs explicit bounds."
+    - "A MODIFIED block SHALL carry the complete requirement statement and every scenario that survives the change (verbatim); scenarios the main spec still has SHALL NOT be dropped from the delta."
+    - "New requirement IDs SHALL be declared on the delta's `> req:` line before its first heading; the change's own apply task SHALL register them in `openspec/governance/req-registry.yaml`. Planning stages only reserve; they never write the registry."
+  design:
+    - "Separate verified current behavior, approved decisions, and unresolved questions. Define ownership for state, checkpoints, artifacts, evidence, and recovery; do not create competing controllers or authorities."
+    - "Cross-surface vocabularies (result contracts, trace/lifecycle statuses, report keys, cursor identities) evolve additively: add an optional field with a defined default rather than a new enum value or a changed meaning, and pin the change with a contract test that compares the implementation's values against the machine-readable contract. A projection (a value derived for readers) is never part of a write permit or an identity comparison unless a spec says so."
+    - "New downstream code lives under deep_research_harness/ and may use public deerflow.* APIs. Keep blocking I/O off the async event loop."
+    - >
+      当 graph、node、state、checkpoint、candidate admission、retry 或 terminal handling 改变时，
+      先从 `openspec/change-guidance/README.md` 选择触发的 policy；node 的 LLM role、
+      tool posture 或 candidate admission 读取
+      `openspec/change-guidance/profiles/node-agent/node-agent.md`，而 model、tool、
+      provider、retry、terminal、diagnostic 或 lifecycle projection 读取
+      `openspec/change-guidance/profiles/workflow-control/workflow-control.md`。随后在 design 识别 owning
+      StateGraph transition/predicate、typed input/output、writer/reducer、evaluator/materializer、
+      bounded recovery/terminal disposition 与 deterministic test；不得创建 competing controller 或 authority。
+  tasks:
+    - "Pair changed behavior with a red-before-green deterministic test and include the narrowest relevant verification command."
+    - "Before archive, from the repository root, run the OpenSpec root governance gate `python3 openspec/governance/check_project_gate.py --phase closeout`; from `deep_research_harness/`, independently run `UV_OFFLINE=1 make verify`; then, from the repository root, run `openspec validate <change-name> --strict` and `git diff HEAD --check`. Measure every exit code directly — a `| tail` (or any pipe) pipeline returns the last command's status and swallows the gate's real result. Record `git status --porcelain=v1 --untracked-files=all`, `git ls-files --stage deerflow`, `git submodule status -- deerflow`, `git -C deerflow status --porcelain=v1 --untracked-files=all`, and review `git diff --submodule=short`. These are supplementary manual scope/diff evidence for the observed gitlink pointer and nested worktree; full architecture governance separately performs its declared metadata-only gitlink validation, and neither kind of evidence approves a pointer bump or proves upstream runtime compatibility. The Harness gate stays application-independent: `make verify` neither reads, imports, executes, nor links OpenSpec content, and no Harness target invokes the OpenSpec gate."
+    - "Before archive, confirm generation alignment between the OpenSpec CLI and the workspace agent skills: `openspec --version` equals the `generatedBy` frontmatter in `.agents/skills/*/SKILL.md`. A mismatch is recorded as drift in the closing change and resolved (or explicitly accepted by the user) before archive; `.agents/skills/` is a user-reserved area, so this check reads frontmatter only and never edits skills."
+    - "When `Triggered review policies` includes `control-placement`, tasks.md MUST retain a plan-review and archive-closeout-review obligation. Each names its current apply/archive agent owner, minimal review or correction action, and deterministic or bounded-evidence done condition; another policy alone does not require either obligation."
+
+operations:
+  apply:
+    guidance:
+      - "Review control-placement only when the selected proposal declares it; guidance is advisory."
+      - "Before a target edit or resumed apply, re-read the selected review, policy, tasks, and relevant historical counterexample; add every actionable finding as an unchecked ordinary task."
+      - "For a selected control-placement change, openspec/governance/selected-change-closeout.py verifies only caller-declared committed ranges; its evidence is non-authoritative and does not change native archive authority."
+      - "Guidance does not execute commands, create or complete tasks, or block native operations."
+  archive:
+    guidance:
+      - "Before archive, review control-placement only when the selected proposal declares it; guidance is advisory."
+      - "Bind closeout to the selected change's actual boundary, unresolved tasks, and existing deterministic evidence; add every actionable finding as an unchecked ordinary task."
+      - "Guidance does not execute commands, create or complete tasks, or block native operations."

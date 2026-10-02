@@ -1,0 +1,4 @@
+# Profile 实体内容含凭证引用，不入库；README 除外
+*
+!.gitignore
+!README.md
