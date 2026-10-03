@@ -39,7 +39,7 @@ ignored). Final reports SHALL be routed to `final/`, acceptance and evidence rec
 
 ### Requirement: state.json is the single run-state authority with revision CAS
 
-`state.json` SHALL be the only authority for run status, thread id, owner PID, deerflow
+`state.json` SHALL be the only authority for run status, thread id, prior thread lineage, owner PID, deerflow
 pin commit, generation, composition, and clarification-continuation state. Every state
 write SHALL carry the writer's observed revision and SHALL be rejected loudly, naming the
 expected and actual revisions, when the stored revision is not that value; a successful
@@ -86,6 +86,12 @@ reason.
 - **WHEN** `refine` is requested on an `active` bundle
 - **THEN** the action fails naming current state `active`, the requested action, and the
   legal precondition
+
+#### Scenario: Fresh-thread refine restarts light with recorded lineage
+
+- **WHEN** `refine` is requested on a terminal bundle with a fresh context document
+- **THEN** the bundle returns to `active` on a new thread id, the prior thread is
+  appended to the recorded lineage, and the seed document lands in `request/`
 
 #### Scenario: Refine creates the next generation
 

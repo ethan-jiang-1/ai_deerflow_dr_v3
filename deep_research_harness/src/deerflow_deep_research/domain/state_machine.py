@@ -38,6 +38,7 @@ class BundleState:
     cancel_requested: bool
     auto_proceed_count: int
     auto_proceed_bound: int
+    prior_thread_ids: tuple[str, ...] = ()
 
     def validate(self) -> "BundleState":
         if self.schema_version != _SCHEMA_VERSION:
@@ -88,6 +89,7 @@ class BundleState:
                 cancel_requested=bool(raw["cancel_requested"]),
                 auto_proceed_count=int(raw["auto_proceed_count"]),
                 auto_proceed_bound=int(raw["auto_proceed_bound"]),
+                prior_thread_ids=tuple(str(x) for x in raw.get("prior_thread_ids", [])),
             ).validate()
         except KeyError as exc:
             raise RuleViolation(f"state.json is missing the field {exc.args[0]!r}") from exc
@@ -109,6 +111,7 @@ class BundleState:
             "cancel_requested": self.cancel_requested,
             "auto_proceed_count": self.auto_proceed_count,
             "auto_proceed_bound": self.auto_proceed_bound,
+            "prior_thread_ids": list(self.prior_thread_ids),
         }
 
 
@@ -157,7 +160,9 @@ def rule_cancel(state: BundleState) -> BundleState:
     return replace(state, cancel_requested=True)
 
 
-def rule_refine(state: BundleState, direction_text: str) -> tuple[BundleState, RefineRecord]:
+def rule_refine(
+    state: BundleState, direction_text: str, *, next_thread_id: str | None = None
+) -> tuple[BundleState, RefineRecord]:
     _require(
         state.status in TERMINAL_STATUSES,
         state.status,
@@ -172,6 +177,8 @@ def rule_refine(state: BundleState, direction_text: str) -> tuple[BundleState, R
         generation=state.generation + 1,
         cancel_requested=False,
         auto_proceed_count=0,
+        thread_id=next_thread_id or state.thread_id,
+        prior_thread_ids=state.prior_thread_ids + ((state.thread_id,) if next_thread_id else ()),
     ).validate()
     return refined, RefineRecord(generation=refined.generation, direction_text=direction_text)
 

@@ -202,5 +202,23 @@ class JournalPolicyTest(unittest.TestCase):
         self.assertIs(tail[-1], entries[-1])
 
 
+class FreshThreadRefineTest(unittest.TestCase):
+    def _terminal(self):
+        return state_machine.rule_run_terminal(_active_state(), "completed")
+
+    def test_fresh_refine_migrates_thread_and_records_lineage(self) -> None:
+        done = self._terminal()
+        fresh_id = "0f0e0d0c-0b0a-4938-8276-5f5d4e3d2c1b"
+        refined, _ = state_machine.rule_refine(done, "深挖", next_thread_id=fresh_id)
+        self.assertEqual(refined.thread_id, fresh_id)
+        self.assertEqual(refined.prior_thread_ids, (done.thread_id,))
+
+    def test_same_thread_refine_is_unchanged(self) -> None:
+        done = self._terminal()
+        refined, _ = state_machine.rule_refine(done, "深挖")
+        self.assertEqual(refined.thread_id, done.thread_id)
+        self.assertEqual(refined.prior_thread_ids, ())
+
+
 if __name__ == "__main__":
     unittest.main()

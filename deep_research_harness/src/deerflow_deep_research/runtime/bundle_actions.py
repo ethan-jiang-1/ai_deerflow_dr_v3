@@ -137,13 +137,26 @@ def cancel(handle: BundleHandle) -> BundleState:
     return written
 
 
-def refine(handle: BundleHandle, direction_text: str) -> tuple[BundleState, RefineRecord]:
+def refine(
+    handle: BundleHandle, direction_text: str, *, fresh_context: str | None = None
+) -> tuple[BundleState, RefineRecord]:
+    """Refine the next generation. With ``fresh_context``, restart light: a new thread
+    id, the prior lineage recorded, and the seed document in request/."""
+
+    import uuid as _uuid
+
     state = bundle_state.read_state(handle)
-    refined, record = state_machine.rule_refine(state, direction_text)
+    next_thread = str(_uuid.uuid4()) if fresh_context is not None else None
+    refined, record = state_machine.rule_refine(state, direction_text, next_thread_id=next_thread)
     written = write_state(handle, state, refined)
     atomic.atomic_write_text(
         handle.root / bundle.refine_request_relative(record.generation), direction_text
     )
+    if fresh_context is not None:
+        atomic.atomic_write_text(
+            handle.root / bundle.generation_context_relative(record.generation),
+            fresh_context + "\n",
+        )
     _journal(handle, "lifecycle", "refined", {"generation": record.generation})
     return written, record
 

@@ -224,5 +224,17 @@ class RefineAndCancelTest(unittest.TestCase):
         self.assertTrue(any(e.category == "lifecycle" and e.event == "refined" for e in entries))
 
 
+    def test_fresh_context_refine_seeds_and_migrates(self) -> None:
+        done = state_machine.rule_run_terminal(self.state, "completed")
+        bundle_state.write_state(self.handle, self.state, done)
+        old_thread = self.state.thread_id
+        refined, record = bundle_actions.refine(self.handle, "直接写简报", fresh_context="先前材料摘要：3 份文件")
+        self.assertNotEqual(refined.thread_id, old_thread)
+        self.assertEqual(refined.prior_thread_ids, (old_thread,))
+        seed = self.handle.root / "request" / f"generation-{record.generation}-context.md"
+        self.assertTrue(seed.is_file())
+        self.assertIn("先前材料摘要", seed.read_text(encoding="utf-8"))
+
+
 if __name__ == "__main__":
     unittest.main()

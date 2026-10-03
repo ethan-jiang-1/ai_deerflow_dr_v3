@@ -105,3 +105,28 @@ def build_client(
         available_skills=None,
         middlewares=injected,
     )
+
+
+def summarize_prior_thread(checkpoint_path, thread_id: str) -> str:
+    """A mechanical projection of the prior thread (framework-lazy): counts, the
+    original question, the prior final-answer excerpt. Deterministic code — the model
+    decides how to use it, never what it says."""
+
+    from langgraph.checkpoint.sqlite import SqliteSaver  # framework import (lazy)
+
+    with SqliteSaver.from_conn_string(str(checkpoint_path)) as saver:
+        state = saver.get_tuple({"configurable": {"thread_id": thread_id}})
+        messages = (
+            state.checkpoint.get("channel_values", {}).get("messages", []) if state and state.checkpoint else []
+        )
+    humans = [m for m in messages if getattr(m, "type", "") == "human"]
+    tools = [m for m in messages if getattr(m, "type", "") == "tool"]
+    answers = [m for m in messages if getattr(m, "type", "") == "ai" and getattr(m, "content", "")]
+    question = str(humans[0].content)[:300] if humans else "(未记录)"
+    excerpt = str(answers[-1].content)[-800:] if answers else "(无最终回答)"
+    return (
+        f"# 上一代上下文摘要（机械投影）\n\n"
+        f"- 原始问题：{question}\n"
+        f"- 消息总数：{len(messages)}；工具结果：{len(tools)}\n"
+        f"- 上一代最终回答（末 800 字）：\n\n{excerpt}\n"
+    )

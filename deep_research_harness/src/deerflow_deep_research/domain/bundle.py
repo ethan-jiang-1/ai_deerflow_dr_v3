@@ -80,5 +80,9 @@ def refine_request_relative(generation: int) -> PurePosixPath:
     return PurePosixPath("request") / f"refine-{generation}.txt"
 
 
+def generation_context_relative(generation: int) -> PurePosixPath:
+    return PurePosixPath("request") / f"generation-{generation}-context.md"
+
+
 def staging_name(bundle_id: str) -> str:
     return f"{_STAGING_PREFIX}{bundle_id}"
