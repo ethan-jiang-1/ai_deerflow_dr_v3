@@ -30,4 +30,6 @@ plan 完成后从 `_backlog/plans/` 通过 `git mv` 移入本目录：
 
 | CLS-008 | 2026-10-03 | [2026-10-03-deep-run-postmortem.md](2026-10-03-deep-run-postmortem.md) | 深研究真跑复盘：skill 装载/完整研究流水线/崩溃检测/材料保全实证 + 守卫落地（framework_error 人话终态）；递归上限经 per-call 缝（非 AppConfig）——已记 known-limitation 待修 |
 
-**Next available plan ID: CLS-009**
+| CLS-009 | 2026-10-04 | [2026-10-04-queued-triple.md](2026-10-04-queued-triple.md) | 三连击全落地：① land-final-report（报告经 hold point 落 final/，真跑实证 ledger admit）② refine-slim-restart（新线程+机械摘要+lineage，机制实证；一次完成如实界定为非保证）③ ci-integration-lane（setup-uv + make smoke，声明三件套同步，UNVERIFIED-until-push） |
+
+**Next available plan ID: CLS-010**
