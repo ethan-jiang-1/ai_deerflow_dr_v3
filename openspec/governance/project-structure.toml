@@ -6,7 +6,7 @@ contract = "project-structure"
 # owner（随 add-ci-governance 登记）；DOB-001 = 入口层预算闸的 owner
 #（随 add-doc-budget-gate 登记，无新增结构路径——预算表在 doc-hygiene
 # checker 内声明）。
-requirement_ids = ["PRS-001", "CIG-001", "DOB-001", "DEW-001"]
+requirement_ids = ["PRS-001", "CIG-001", "DOB-001", "DEW-001", "ENS-001"]
 
 [upstream_gitlink]
 path = "deerflow"
@@ -29,7 +29,7 @@ forbidden_shared_modules = ["utils", "helpers", "common"]
 
 [ignored_paths]
 path = "deep_research_harness/.gitignore"
-entries = [".venv/", ".pytest_cache/", ".ruff_cache/", "__pycache__/"]
+entries = [".venv/", ".pytest_cache/", ".ruff_cache/", "__pycache__/", ".deer-flow/", "scopes/"]
 
 [inventory]
 path = "openspec/governance/required-paths.toml"

@@ -11,4 +11,5 @@
 | [`local-operations.md`](local-operations.md) | ⬜ 骨架占位：随入口面 change |
 | [`testing-and-evaluation.md`](testing-and-evaluation.md) | ✅ 起步版：lane 划分（application unit gate = make verify）随 establish-run-bundle |
 | [`quality-register.md`](quality-register.md) | ✅ 首版：RT10 检查注册处（质量机器单一清单面），随 establish-run-admission；代码事实源 = `engine/machines.py` |
+| [`known-limitations.md`](known-limitations.md) | ✅ 首版：存续中的产品已知限制（接手者必读），随 establish-entry-surface 激活 |
 | Run lifecycle walkthrough | ⬜ 随 run-bundle 生命周期 change |

@@ -1,6 +1,6 @@
 # Closed Plans Index — 已完成 plan 归档
 
-> 最后更新: 2026-10-03（bundle-contract plan 关闭：CLS-004） | `_backlog/_done/_closed_plans/` — 已完成 plan 的归档目录。
+> 最后更新: 2026-10-03（entry-surface plan 关闭：CLS-005） | `_backlog/_done/_closed_plans/` — 已完成 plan 的归档目录。
 > 接收来自 [`../../plans/`](../../plans/) 的 plan。`_` 前缀 = coding agent 默认忽略。
 >
 > **plan 完成后文件名不变，位置即状态。** 移入时分配 `CLS-NNN` 序号（Closed），按完成时间递增。
@@ -23,5 +23,6 @@ plan 完成后从 `_backlog/plans/` 通过 `git mv` 移入本目录：
 | CLS-002 | 2026-10-02 | [2026-10-02-borrow-dsh-harness-gap-analysis.md](2026-10-02-borrow-dsh-harness-gap-analysis.md) | DSH 借鉴 plan：硬化队列 A–F 全吸收（A→CI+hook、B/F→决策记录纪律、C/D→预算闸+D 理由、E→垂直切片记录），三个治理 change 闭环 |
 | CLS-003 | 2026-10-02 | [2026-10-02-digest-deerflow-native-deep-research.md](2026-10-02-digest-deerflow-native-deep-research.md) | digest 边界 plan：六裁决推敲定案（embedded/checkpoint 内嵌/普通状态机/最小 CLI/只配置/HITL 暂缓）+ 元原则 + 契约镜像要求，拆解为三份衍生 plan |
 | CLS-004 | 2026-10-03 | [2026-10-02-bundle-contract.md](2026-10-02-bundle-contract.md) | Run Bundle 合同：六决策全落地（establish-run-bundle + establish-run-admission 两 change 归档；validator hold point/哈希链 ledger/gate/RT10 注册处/make verify 变真），质量控制映射成立 |
+| CLS-005 | 2026-10-03 | [2026-10-02-entry-surface.md](2026-10-02-entry-surface.md) | 入口面：六子命令 CLI 全落地（establish-entry-surface 归档；create/watch/status/cancel/refine/inspect + 共享渲染 + 有界 watch + 双梯 + EV2 证据 journey/golden/负例；known-limitations 激活） |
 
-**Next available plan ID: CLS-005**
+**Next available plan ID: CLS-006**

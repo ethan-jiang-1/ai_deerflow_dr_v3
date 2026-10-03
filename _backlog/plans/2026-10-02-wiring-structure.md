@@ -141,7 +141,11 @@ available_skills 自主定 None=全部技能面、透明准绳，可否决）、
 签名）、4（middleware 只配置 + 逃生口首用：装配快照钩子）、6（两份 checked-in 配置落
 `config/`，显式 config_path + 钉死框架二次解析缝）、8（澄清续答 client 回路，冒烟实证）
 全部落地；冒烟钉死 sync saver 不确定性（多轮 + checkpoint 可读 + 快照 + 续答，零凭证全绿）。
-**决策 5（(b)层 subagents.* 旋钮声明）尚未落地**——随入口面或配置 change 补齐。**〕**
+**决策 5（(b)层 subagents.* 旋钮声明）尚未落地**——随入口面或配置 change 补齐。
+**〔决策 5 处置更新（2026-10-03，入口面落地时）**：DeerFlow 原生 deep-research 已自带
+subagent 委派与技能面，v3 现无自定义 subagent 类型需求——(b)层 config 旋钮声明**暂不需要**
+（刻意分歧就地写明）；若将来引入自定义 subagent，由 owning change 在 config 声明并附
+一层深度自校验（disallowed_tools 含 task）。plan 保持活跃仅为此项与后续可能的接线微调。**〕****〕**
 接线首笔的红绿冒烟项：**embedded client + sync
 SqliteSaver 跑通多轮对话且 `checkpoint.sqlite` 落盘可读**——当前证据 ~90% 指 sync 正确
 （决策 1 修正注），此冒烟把剩余不确定性钉死（async saver + 同步 client 若意外可行也在此

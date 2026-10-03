@@ -101,6 +101,14 @@ directories = [
   "deep_research_harness/src/deerflow_deep_research/runtime/fixtures",
 ]
 
+[paths.ENS-001]
+# Human command surface (owner: entry-surface capability).
+files = [
+  "deep_research_harness/cli.py",
+  "deep_research_harness/docs/known-limitations.md",
+  "deep_research_harness/src/deerflow_deep_research/runtime/render.py",
+]
+
 [paths.CIG-001]
 # CI 门禁与本地 hook 的接受路径文件（owner: ci-governance capability）。
 files = [

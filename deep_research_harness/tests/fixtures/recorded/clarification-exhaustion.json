@@ -1,0 +1,17 @@
+{
+  "scenario": "clarification-exhaustion (recorded from a real scripted run; volatile timestamps/ids excluded)",
+  "entries": [
+    {"category": "lifecycle", "event": "auto_continuation", "detail": {"count": 1, "bound": 2}},
+    {"category": "lifecycle", "event": "auto_continuation", "detail": {"count": 2, "bound": 2}},
+    {"category": "model_tool", "event": "model_tool_call", "detail": {"calls": ["web_search"]}},
+    {"category": "exhaustion", "event": "clarification_bound_exhausted", "detail": {"bound": 2}},
+    {"category": "terminal", "event": "run_failed_resume", "detail": {"reason": "clarification bound exhausted"}}
+  ],
+  "expected_lines": [
+    "auto continuation 1/2",
+    "auto continuation 2/2",
+    "model calls web_search",
+    "clarification bound exhausted (2)",
+    "run failed-resume (clarification bound exhausted)"
+  ]
+}

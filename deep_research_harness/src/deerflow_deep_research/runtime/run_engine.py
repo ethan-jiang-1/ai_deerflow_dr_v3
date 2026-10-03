@@ -57,7 +57,11 @@ def _is_framework_clarification_echo(message: object, answered_id: str) -> bool:
 
 
 def _consume_turn(
-    handle: BundleHandle, stream_fn: Callable[[str], object], message: str, thread_id: str
+    handle: BundleHandle,
+    stream_fn: Callable[[str], object],
+    message: str,
+    thread_id: str,
+    on_event: Callable[[object], None] | None = None,
 ) -> tuple[list[clarification.TerminalToolCall], set[str], str | None]:
     """One stream turn: journal tool/subagent events, and derive the terminal picture
     from the final ``values`` snapshot (complete message list) with streamed chunks as
@@ -69,6 +73,8 @@ def _consume_turn(
     values_calls: list[clarification.TerminalToolCall] = []
     values_answered: set[str] = set()
     for event in stream_fn(message):
+        if on_event is not None:
+            on_event(event)
         event_type = getattr(event, "type", None)
         data = getattr(event, "data", None) or {}
         if event_type == "values":
@@ -125,10 +131,38 @@ def _consume_turn(
     return tool_calls, answered, stop_reason
 
 
+def tail_journal(journal_path: Path, position: int = 0):
+    """Read new journal entries from ``position`` (character offset).
+
+    Returns ``(entries, reached_terminal, new_position)``: ``reached_terminal`` is True
+    once a ``terminal`` entry has been rendered — the bounded watch exits there."""
+
+    from ..domain.journal_policy import JournalEntry
+
+    entries: list[JournalEntry] = []
+    reached_terminal = False
+    if not journal_path.is_file():
+        return entries, reached_terminal, position
+    text = journal_path.read_text(encoding="utf-8")
+    for line in text[position:].splitlines():
+        if not line.strip():
+            continue
+        try:
+            raw = json.loads(line)
+        except json.JSONDecodeError:
+            continue  # a partially written tail line is re-read on the next poll
+        entry = JournalEntry.from_dict(raw)
+        entries.append(entry)
+        if entry.category == "terminal":
+            reached_terminal = True
+    return entries, reached_terminal, position + len(text[position:])
+
+
 def run_research(
     handle: BundleHandle,
     *,
     stream_fn: Callable[[str], object],
+    on_event: Callable[[object], None] | None = None,
 ) -> BundleState:
     """Drive one research run to an honest terminal state.
 
@@ -141,7 +175,9 @@ def run_research(
     message = problem
 
     while True:
-        tool_calls, answered, stop_reason = _consume_turn(handle, stream_fn, message, state.thread_id)
+        tool_calls, answered, stop_reason = _consume_turn(
+            handle, stream_fn, message, state.thread_id, on_event
+        )
         detected = clarification.unanswered_ask_clarification(
             clarification.TerminalObservation(
                 tool_calls=tuple(tool_calls),
@@ -153,14 +189,18 @@ def run_research(
             fresh = bundle_state.read_state(handle)
             if fresh.cancel_requested:
                 state = rule_run_terminal(fresh, "cancelled")
-                return bundle_state.write_state(handle, fresh, state)
+                written = bundle_state.write_state(handle, fresh, state)
+                _journal(handle, "terminal", "run_cancelled", {"generation": written.generation})
+                return written
             if stop_reason:
                 state = rule_run_terminal(fresh, "failed-resume")
                 written = bundle_state.write_state(handle, fresh, state)
                 _journal(handle, "terminal", "stop_reason", {"reason": stop_reason})
                 return written
             state = rule_run_terminal(fresh, "completed")
-            return bundle_state.write_state(handle, fresh, state)
+            written = bundle_state.write_state(handle, fresh, state)
+            _journal(handle, "terminal", "run_completed", {"generation": written.generation})
+            return written
 
         last_question = tool_calls[-1].arguments if tool_calls else ""
         if state.auto_proceed_count < state.auto_proceed_bound:
@@ -194,4 +234,5 @@ def run_research(
             "clarification_bound_exhausted",
             {"bound": state.auto_proceed_bound},
         )
+        _journal(handle, "terminal", "run_failed_resume", {"reason": "clarification bound exhausted"})
         return written

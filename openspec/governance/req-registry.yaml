@@ -39,6 +39,10 @@ RUA-001: run-admission — 验收收口：validator hold point（未裁决不入
 # 嵌入式 DeerFlow 绑定（owning delta: openspec/changes/establish-embedded-wiring）。
 DEW-001: deerflow-wiring — 嵌入式绑定：显式配置解析（拒自动发现）、契约镜像锁漂移、装配快照每 run 一张、终态诚实 run engine（journal 三汇 + 有界澄清续答回路）
 
+# ---- establish-entry-surface 登记（2026-10-03）--------------------------------
+# 人类命令面（owning delta: openspec/changes/establish-entry-surface）。
+ENS-001: entry-surface — 六子命令入口（create/status/watch/cancel/refine/inspect，薄委托无第二权威）、共享人话渲染、有界 watch、双梯选择、EV2 证据（journey + golden 回放）
+
 # ---- add-ci-governance 登记（2026-10-02）--------------------------------------
 # CI 门禁与本地 hook 的接受路径合同（owning delta: openspec/changes/add-ci-governance）。
 CIG-001: ci-governance — CI 门禁与本地 hook 的接受路径合同：单 job CI 全量治理套件、hook 只跑便宜高置信检查、声明自身被机器校验
