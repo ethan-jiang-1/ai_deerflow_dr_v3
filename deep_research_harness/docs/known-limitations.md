@@ -11,5 +11,5 @@
 
 | 深研究递归上限：embedded stream 默认 100（client.py:293，per-call overrides 而非 AppConfig 顶层键）；深研究 ~10 轮工具即触顶；守卫已使其响亮失败但尚不能跑完 | harden-run-continuity 复跑发现 | 已修（pass-recursion-limit：make_stream_fn 单缝注入，实证 23→86→209 消息）|
 
-| 深研究 checkpoint 体积：1000 步级深研究的每步快照使单 bundle 的 checkpoint.sqlite 可膨胀至 GB 级（实测 1GB/五代）| refine-slim-restart 真跑发现 | 待议：按代压实/快照频率调参（框架 database.checkpoint_delta 旋钮在配置面可调）|
+| 深研究 checkpoint 体积（曾实测 1GB/五代，full 模式每步全量快照）| refine-slim-restart 真跑发现 | **已修（switch-checkpoint-delta）**：配置声明 delta 模式 + snapshot_frequency 10；短跑实测 144K vs 192K，深跑增长模式结构性移除；读路径与报告落位真跑验证。存留告诫：delta 依赖框架的 delta-history patch（langgraph 1.2.12 高于验证版 1.2.9，警告仍在 stderr 非失败）|
 | 大 bundle 上 state.json 瞬时缺失（1GB checkpoint 邻域，fail-loud StateCorruption 兜底，无静默损坏）| refine-slim-restart gen-7 尝试 | 待诊断（疑似 FS 压力）|

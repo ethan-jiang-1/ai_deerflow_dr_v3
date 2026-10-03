@@ -5,6 +5,14 @@ config_version: 45
 recursion_limit: 300
 log_level: info
 
+# Checkpoint growth: the framework default (full) stores the whole message list on
+# every per-step write — a 1000-step deep-research run reached 1.0G. Delta mode keeps
+# full snapshots every N writes (framework-documented cadence; coarser resume accepted).
+database:
+  checkpoint_channel_mode: delta
+  checkpoint_delta:
+    snapshot_frequency: 10
+
 sandbox:
   use: deerflow.sandbox.local:LocalSandboxProvider
   allow_host_bash: false
