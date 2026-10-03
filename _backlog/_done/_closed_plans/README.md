@@ -1,6 +1,6 @@
 # Closed Plans Index — 已完成 plan 归档
 
-> 最后更新: 2026-10-03（wiring-structure plan 关闭：CLS-006） | `_backlog/_done/_closed_plans/` — 已完成 plan 的归档目录。
+> 最后更新: 2026-10-03（stream-adapter plan 关闭：CLS-007） | `_backlog/_done/_closed_plans/` — 已完成 plan 的归档目录。
 > 接收来自 [`../../plans/`](../../plans/) 的 plan。`_` 前缀 = coding agent 默认忽略。
 >
 > **plan 完成后文件名不变，位置即状态。** 移入时分配 `CLS-NNN` 序号（Closed），按完成时间递增。
@@ -26,4 +26,6 @@ plan 完成后从 `_backlog/plans/` 通过 `git mv` 移入本目录：
 | CLS-005 | 2026-10-03 | [2026-10-02-entry-surface.md](2026-10-02-entry-surface.md) | 入口面：六子命令 CLI 全落地（establish-entry-surface 归档；create/watch/status/cancel/refine/inspect + 共享渲染 + 有界 watch + 双梯 + EV2 证据 journey/golden/负例；known-limitations 激活） |
 | CLS-006 | 2026-10-03 | [2026-10-02-wiring-structure.md](2026-10-02-wiring-structure.md) | 接线与结构：决策 1/2/3/4/6/8 落地（remove-graph-layer + establish-embedded-wiring），决策 5 以明示 posture + 深度自校验守卫处置（pin-subagent-knobs）——三份衍生 plan 全部消费完毕 |
 
-**Next available plan ID: CLS-007**
+| CLS-007 | 2026-10-03 | [2026-10-03-stream-adapter-and-live-view.md](2026-10-03-stream-adapter-and-live-view.md) | 流适配器修正：真实流形状（扁平 chunk/逐 token）适配 + journal 回合聚合 + token 内联直播；real 梯实证（journal 聚合条目含真实回答节选） |
+
+**Next available plan ID: CLS-008**

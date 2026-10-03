@@ -15,23 +15,40 @@ def _msg_field(message: object, name: str, default=None):  # noqa: ANN001
     return getattr(message, name, default)
 
 
+def stream_chunk_text(event) -> str | None:  # noqa: ANN001 — streaming mode
+    """Inline text for an AI content chunk (the live view prints it without a
+    newline); None for everything else (those render as phrase lines)."""
+
+    if getattr(event, "type", None) != "messages-tuple":
+        return None
+    data = getattr(event, "data", None)
+    if not isinstance(data, dict):
+        return None
+    if str(data.get("type", "")) not in {"ai", "AIMessage", "AIMessageChunk"}:
+        return None
+    if data.get("tool_calls"):
+        return None
+    text = str(data.get("content", "") or "")
+    return text or None
+
+
 def event_line(event) -> str:  # noqa: ANN001 — live view (raw stream event)
     event_type = getattr(event, "type", "?")
     data = getattr(event, "data", None) or {}
     if event_type == "messages-tuple":
-        message = data.get("message") if isinstance(data, dict) else getattr(data, "message", None)
-        kind = _msg_field(message, "type", "")
+        chunk = data if isinstance(data, dict) else {}
+        kind = str(chunk.get("type", ""))
         if kind in {"ai", "AIMessage", "AIMessageChunk"}:
-            calls = _msg_field(message, "tool_calls", []) or []
+            calls = chunk.get("tool_calls") or []
             if calls:
                 names = ", ".join(str(call.get("name", "?")) for call in calls)
                 return f"model calls {names}"
-            content = str(_msg_field(message, "content", "") or "").strip()
+            content = str(chunk.get("content", "") or "").strip()
             if content:
                 return f"model: {content[:80]}"
             return "model thinking"
         if kind in {"tool", "ToolMessage"}:
-            name = str(_msg_field(message, "name", "tool") or "tool")
+            name = str(chunk.get("name", "tool") or "tool")
             return f"tool {name} finished"
         return "message"
     if event_type == "custom":

@@ -64,6 +64,26 @@ def _terminal_line(state) -> str:
     return render.journal_line(entry)
 
 
+def _live_renderer():
+    """Streaming live view: AI tokens print inline (no newline); tools, state
+    changes, and turn ends render as the shared phrase lines."""
+
+    state = {"inline": False}
+
+    def _render(event) -> None:
+        text = render.stream_chunk_text(event)
+        if text is not None:
+            print(text, end="", flush=True)
+            state["inline"] = True
+            return
+        if state["inline"]:
+            print()
+            state["inline"] = False
+        print(render.event_line(event))
+
+    return _render
+
+
 def cmd_create(args) -> None:
     composition = "fixture" if args.config == "fixture" else "all_real"
     state = bundle_actions.start(
@@ -86,7 +106,7 @@ def cmd_create(args) -> None:
             result = run_engine.run_research(
                 handle,
                 stream_fn=lambda message: client.stream(message, thread_id=state.thread_id),
-                on_event=lambda event: print(render.event_line(event)),
+                on_event=_live_renderer(),
             )
     except ImportError as exc:
         raise SystemExit(

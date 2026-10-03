@@ -32,10 +32,17 @@ def _entry(category: str, event: str, detail: dict) -> journal_policy.JournalEnt
 
 class RendererTest(unittest.TestCase):
     def test_tool_call_phrase_is_stable(self) -> None:
-        event = _event("messages-tuple", message={"type": "ai", "tool_calls": [
+        event = _event("messages-tuple", type="ai", tool_calls=[
             {"id": "t1", "name": "web_search", "args": {"query": "认证"}}
-        ]})
+        ])
         self.assertEqual(render.event_line(event), "model calls web_search")
+
+    def test_stream_chunk_text_returns_inline_text_only_for_ai_content(self) -> None:
+        self.assertEqual(render.stream_chunk_text(_event("messages-tuple", type="ai", content="无人")), "无人")
+        self.assertIsNone(render.stream_chunk_text(_event("messages-tuple", type="ai", content="")))
+        self.assertIsNone(render.stream_chunk_text(_event("messages-tuple", type="ai", tool_calls=[{"id": "t1", "name": "web_search", "args": {}}])))
+        self.assertIsNone(render.stream_chunk_text(_event("messages-tuple", type="tool", tool_call_id="t1", content="ok")))
+        self.assertIsNone(render.stream_chunk_text(_event("end")))
 
     def test_journal_projection_uses_the_same_phrase(self) -> None:
         entry = _entry("model_tool", "model_tool_call", {"calls": ["web_search"]})

@@ -1,6 +1,6 @@
 # Plans — plan/分析文档索引
 
-> 最后更新: 2026-10-03（wiring-structure plan 关闭：CLS-006，决策 5 以明示 posture + 守卫处置——**活跃 plan 清零**，digest 衍生 plan 家族全部消费完毕） | `_backlog/plans/` — 活跃 plan 在此（顶层），
+> 最后更新: 2026-10-03（stream-adapter plan 关闭：CLS-007；活跃列表空） | `_backlog/plans/` — 活跃 plan 在此（顶层），
 > 完成的普通 plan 移入 [`../_done/_closed_plans/`](../_done/_closed_plans/)。
 >
 > **plan 没有编号，文件名即标识。完成后文件名不变，位置即状态。**
@@ -23,9 +23,10 @@
 
 | Plan | 一句话 |
 |------|--------|
-| [2026-10-03-stream-adapter-and-live-view.md](2026-10-03-stream-adapter-and-live-view.md) | 流适配器修正（messages-tuple=扁平 chunk、journal 聚合到回合）+ token 流式直播视图；含 real 梯首跑的调试记录与 DeerFlow 流协议速览（教学向） |
 
-**Next available plan ID: CLS-007**（移入 `_closed_plans/` 时分配）
+（空）
+
+**Next available plan ID: CLS-008**（移入 `_closed_plans/` 时分配）
 
 ## 已归档（移至 `_done/_closed_plans/`）
 
@@ -37,6 +38,7 @@
 | CLS-004 bundle-contract | establish-run-bundle + establish-run-admission（均已 archive；决策 1/2/3/5/6 → 底座 change，决策 4 → 验收收口 change） | 2026-10-03 |
 | CLS-005 entry-surface | establish-entry-surface（已 archive；六子命令 + 渲染 + EV2 证据） | 2026-10-03 |
 | CLS-006 wiring-structure | remove-graph-layer + establish-embedded-wiring + pin-subagent-knobs（均已 archive；决策 5 以 posture + 守卫处置） | 2026-10-03 |
+| CLS-007 stream-adapter-and-live-view | fix-stream-adapter（已 archive；真实流形状适配 + journal 聚合 + token 内联直播） | 2026-10-03 |
 
 ---
 

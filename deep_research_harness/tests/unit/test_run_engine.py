@@ -24,6 +24,11 @@ def _event(event_type: str, **data) -> SimpleNamespace:
     return SimpleNamespace(type=event_type, data=data)
 
 
+def _chunk_event(chunk: dict) -> SimpleNamespace:
+    """A real-shaped messages-tuple event: the data IS the message chunk (flat)."""
+    return SimpleNamespace(type="messages-tuple", data=chunk)
+
+
 def _ai(content: str = "", tool_calls: list | None = None) -> dict:
     message = {"type": "ai", "content": content}
     if tool_calls is not None:
@@ -53,7 +58,7 @@ class RunEngineTest(unittest.TestCase):
     def test_clean_stream_completes(self) -> None:
         def stream_fn(message: str):
             yield _event("values", title="t")
-            yield _event("messages-tuple", message=_ai("最终报告内容"))
+            yield _chunk_event(_ai("最终报告内容"))
             yield _event("end")
 
         result = run_engine.run_research(self.handle, stream_fn=stream_fn)
@@ -65,10 +70,10 @@ class RunEngineTest(unittest.TestCase):
         def stream_fn(message: str):
             turns.append(message)
             if len(turns) == 1:
-                yield _event("messages-tuple", message=_ai(tool_calls=[_ask_call("c1")]))
+                yield _chunk_event(_ai(tool_calls=[_ask_call("c1")]))
                 yield _event("end")
             else:
-                yield _event("messages-tuple", message=_ai("已按假设继续：A 国"))
+                yield _chunk_event(_ai("已按假设继续：A 国"))
                 yield _event("end")
 
         result = run_engine.run_research(self.handle, stream_fn=stream_fn)
@@ -80,7 +85,7 @@ class RunEngineTest(unittest.TestCase):
 
     def test_exhausted_bound_fails_loud_with_question_file(self) -> None:
         def stream_fn(message: str):
-            yield _event("messages-tuple", message=_ai(tool_calls=[_ask_call("c1")]))
+            yield _chunk_event(_ai(tool_calls=[_ask_call("c1")]))
             yield _event("end")
 
         result = run_engine.run_research(self.handle, stream_fn=stream_fn)
@@ -95,24 +100,25 @@ class RunEngineTest(unittest.TestCase):
 
     def test_tool_events_are_journaled(self) -> None:
         def stream_fn(message: str):
-            yield _event("messages-tuple", message=_ai(tool_calls=[
+            yield _chunk_event(_ai(tool_calls=[
                 {"id": "t1", "name": "web_search", "args": {"query": "认证壁垒"}}
             ]))
-            yield _event("messages-tuple", message=_tool_result("t1"))
+            yield _chunk_event(_tool_result("t1"))
             yield _event("custom", event="subagent_started", detail="x")
-            yield _event("messages-tuple", message=_ai("结论"))
+            yield _chunk_event(_ai("结论"))
             yield _event("end")
 
         result = run_engine.run_research(self.handle, stream_fn=stream_fn)
         self.assertEqual(result.status, "completed")
         entries = journal_mod_entries(self.handle)
-        self.assertTrue(any(e.category == "model_tool" and e.event == "model_tool_call" for e in entries))
-        self.assertTrue(any(e.category == "model_tool" and e.event == "tool_result" for e in entries))
+        tool_turns = [e for e in entries if e.category == "model_tool" and e.event == "model_tool_call"]
+        self.assertEqual(len(tool_turns), 1)  # ONE aggregated entry per turn, not per token
+        self.assertEqual(tool_turns[0].detail.get("calls"), ["web_search"])
         self.assertTrue(any(e.category == "subagent" for e in entries))
 
     def test_stop_reason_transfers_to_failed_resume(self) -> None:
         def stream_fn(message: str):
-            yield _event("messages-tuple", message=_ai("部分内容"))
+            yield _chunk_event(_ai("部分内容"))
             yield _event("end", stop_reason="token_capped")
 
         result = run_engine.run_research(self.handle, stream_fn=stream_fn)
@@ -122,7 +128,7 @@ class RunEngineTest(unittest.TestCase):
 
     def test_observed_cancellation_wins(self) -> None:
         def stream_fn(message: str):
-            yield _event("messages-tuple", message=_ai("内容"))
+            yield _chunk_event(_ai("内容"))
             yield _event("end")
 
         # The cancel action records the request externally while the run streams.
@@ -170,13 +176,28 @@ class RunEngineTest(unittest.TestCase):
 
     def test_clean_run_has_no_fallback_behavior(self) -> None:
         def stream_fn(message: str):
-            yield _event("messages-tuple", message={"type": "ai", "content": "正常回答", "additional_kwargs": {}})
+            yield _chunk_event({"type": "ai", "content": "正常回答", "additional_kwargs": {}})
             yield _event("end")
 
         result = run_engine.run_research(self.handle, stream_fn=stream_fn)
         self.assertEqual(result.status, "completed")
         entries = journal_mod_entries(self.handle)
         self.assertFalse(any(e.event == "llm_error_fallback" for e in entries))
+
+
+    def test_token_chunks_aggregate_into_one_turn_entry(self) -> None:
+        def stream_fn(message: str):
+            for token in ["无人", "机进口", "认证"]:
+                yield _chunk_event({"type": "ai", "content": token})
+            yield _event("end")
+
+        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        self.assertEqual(result.status, "completed")
+        entries = journal_mod_entries(self.handle)
+        text_turns = [e for e in entries if e.category == "model_tool"]
+        self.assertEqual(len(text_turns), 1)
+        self.assertIn("answer_excerpt", text_turns[0].detail)
+        self.assertIn("认证", text_turns[0].detail["answer_excerpt"])
 
 
 def journal_mod_entries(handle):
