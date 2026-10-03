@@ -59,7 +59,7 @@ def _terminal_line(state) -> str:
         event={"completed": "run_completed", "cancelled": "run_cancelled"}.get(
             state.status, "run_failed_resume"
         ),
-        detail={"generation": state.generation},
+        detail={"generation": state.generation, "reason": "see journal timeline"} if state.status == "failed-resume" else {"generation": state.generation},
     )
     return render.journal_line(entry)
 

@@ -1,6 +1,8 @@
 # fixture.yaml — zero-credential rehearsal: `use:` seams point at harness-owned fakes
 # (runtime/fixtures) running the real client chain. The smoke proves this path.
 config_version: 45
+# Deep research exceeds the framework default (100) at ~10 tool rounds.
+recursion_limit: 300
 log_level: info
 
 sandbox:

@@ -192,6 +192,17 @@ def run_research(
     problem = (handle.root / bundle.request_problem_relative()).read_text(encoding="utf-8").strip()
     message = problem
 
+    try:
+        return _drive(handle, stream_fn, on_event, state, message)
+    except Exception as exc:  # framework/stream failure: loud terminal, material preserved
+        fresh = bundle_state.read_state(handle)
+        failed = rule_run_terminal(fresh, "failed-resume")
+        written = bundle_state.write_state(handle, fresh, failed)
+        _journal(handle, "terminal", "framework_error", {"reason": "framework_error", "error": type(exc).__name__})
+        return written
+
+
+def _drive(handle, stream_fn, on_event, state, message):
     while True:
         tool_calls, answered, stop_reason, fallback_error_type = _consume_turn(
             handle, stream_fn, message, state.thread_id, on_event

@@ -200,6 +200,16 @@ class RunEngineTest(unittest.TestCase):
         self.assertIn("认证", text_turns[0].detail["answer_excerpt"])
 
 
+    def test_framework_exception_transfers_to_failed_resume(self) -> None:
+        def stream_fn(message: str):
+            yield _event("values", messages=[])
+            raise RuntimeError("GraphRecursionError: limit reached")
+
+        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        self.assertEqual(result.status, "failed-resume")
+        entries = journal_mod_entries(self.handle)
+        self.assertTrue(any(e.category == "terminal" and e.event == "framework_error" for e in entries))
+
 def journal_mod_entries(handle):
     from deerflow_deep_research.runtime import journal as journal_mod
 

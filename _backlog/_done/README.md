@@ -25,7 +25,7 @@ _done/
 | 归档目录 | 数量 | Next ID |
 |---------|------|---------|
 | `_fixed_bugs/` | 0 | BUG-001 |
-| `_closed_plans/` | 7 | CLS-008 |
+| `_closed_plans/` | 8 | CLS-009 |
 
 ### ⏸ SUSPENDED（明确暂停）
 

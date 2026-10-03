@@ -2,6 +2,8 @@
 # Modeled on the framework's config.example.yaml active entries; the model entry is
 # UNVERIFIED until a real-key run (the wiring smoke proves the fixture path instead).
 config_version: 45
+# Deep research exceeds the framework default (100) at ~10 tool rounds.
+recursion_limit: 300
 log_level: info
 
 sandbox:
