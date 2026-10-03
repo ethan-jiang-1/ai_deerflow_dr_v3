@@ -17,7 +17,7 @@ verify: test
 
 # Integration lane (framework-dependent): requires the synced environment (`uv sync`).
 smoke:
-	UV_CACHE_DIR=$$(pwd)/../.uv-cache uv run --no-sync python -m unittest discover -s tests/integration -v
+	UV_CACHE_DIR=$$(pwd)/../.uv-cache uv sync && UV_CACHE_DIR=$$(pwd)/../.uv-cache uv run --no-sync python -m unittest discover -s tests/integration -v
 
 # Human entry surface (six verbs over the substrate). See COMMANDS.md.
 CONFIG ?= fixture

@@ -60,6 +60,8 @@ jobs:
       - run: python3 openspec/governance/check_project_gate.py --phase closeout
       - run: python3 openspec/governance/check_doc_hygiene.py
       - run: UV_OFFLINE=1 make verify
+      - uses: astral-sh/setup-uv@v7
+      - run: make smoke
 """
 
 VALID_HOOK = """#!/bin/sh

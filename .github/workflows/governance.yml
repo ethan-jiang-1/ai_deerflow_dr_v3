@@ -49,3 +49,7 @@ jobs:
       - name: Harness verify
         run: UV_OFFLINE=1 make verify
         working-directory: deep_research_harness
+      - uses: astral-sh/setup-uv@v7
+      - name: Harness integration smoke (fixture lane, zero credentials)
+        run: make smoke
+        working-directory: deep_research_harness

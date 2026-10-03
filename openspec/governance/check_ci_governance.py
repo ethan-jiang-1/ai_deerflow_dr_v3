@@ -37,6 +37,8 @@ WORKFLOW_REQUIRED_MARKERS: tuple[str, ...] = (
     "python3 openspec/governance/check_project_gate.py --phase closeout",
     "python3 openspec/governance/check_doc_hygiene.py",
     "UV_OFFLINE=1 make verify",
+    "astral-sh/setup-uv@v7",
+    "make smoke",
 )
 
 # The hook runs only the two declared cheap checks. Suite, snapshot,
