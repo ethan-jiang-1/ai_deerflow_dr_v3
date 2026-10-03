@@ -15,12 +15,12 @@ A possible future use is not enough to expand scope.
 
 A possible future use is not enough to expand scope. Start from `domain/` for typed
 meaning, `engine/` for deterministic policy, `agents/` for model-facing cognition,
-`graph/` for composition/routes, and `runtime/` for DeerFlow binding/I/O/persistence.
+and `runtime/` for DeerFlow binding, composition, I/O, and persistence.
 
 - **cognitive-program:** capability/prompt/context/feedback.
 - **deterministic-guardrail:** typed parser/evaluator/gate after cognition is considered
   for a model-bearing symptom and does not fabricate a prompt obligation.
-- **human-decision:** semantic subject/input/graph authority.
+- **human-decision:** semantic subject/input authority.
 - **wiring:** composition or adapter; inspect cognition only when model-visible behavior changes.
 
 ## Program Focus

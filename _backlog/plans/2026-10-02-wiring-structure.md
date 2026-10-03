@@ -51,7 +51,11 @@ v2 拿得过来就拿，拿不过来就算了。证据底座：`_reference/deerf
 3. **结构定案**：外层编排 = 普通 Python 状态机（生命周期动作见 bundle-contract plan）；
    `graph/` 层与 NODE_SPEC 语法去留 → **撤**（第 7 轮查证：目录空、语法从未用），随之
    治理合同小改（project-structure.toml `[node_packages]` 段 + guide 再渲染，量级同
-   add-doc-budget-gate）。
+   add-doc-budget-gate）。**〔已落地（2026-10-03）**：change `remove-graph-layer` 归档于
+   `openspec/changes/archive/2026-10-03-remove-graph-layer/`——撤除面实测比本决策预记更宽
+   （checker 硬编码词表与固定策略、清单 5 路径、7 处文档措辞同批清零），并新增封闭集守卫
+   （ownership_layers / [imports] 键）与 `node.grammar_removed` 违规码锁死复活路径，见其
+   delta 与红绿回执。**〕**
 4. **middleware 只配置**：用框架现成实现（错误处理/输入消毒/compaction/循环熔断/token
    预算/委派限额——旋钮表引 `_reference/deerflow-cognition-engine.md` §6）；逃生口：
    真需要框架没有的行为时写标准 AgentMiddleware 插头，不碰框架（**首个具体用途 =
@@ -130,8 +134,8 @@ v2 拿得过来就拿，拿不过来就算了。证据底座：`_reference/deerf
 
 ## 落地关联
 
-成熟后**经用户拍板**入线（HITL 闸门）。change 候选：撤节点语法（治理小改）与 embedded 接线 +
-契约镜像（产品首笔）可分可合，入线时定。接线首笔的红绿冒烟项：**embedded client + sync
+成熟后**经用户拍板**入线（HITL 闸门）。撤节点语法已单独立线并归档（`remove-graph-layer`，
+2026-10-03，落地注见决策 3）；embedded 接线 + 契约镜像（产品首笔）待入线。接线首笔的红绿冒烟项：**embedded client + sync
 SqliteSaver 跑通多轮对话且 `checkpoint.sqlite` 落盘可读**——当前证据 ~90% 指 sync 正确
 （决策 1 修正注），此冒烟把剩余不确定性钉死（async saver + 同步 client 若意外可行也在此
 实验中显形）。

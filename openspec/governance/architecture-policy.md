@@ -11,7 +11,7 @@ must retain short bootstrap pointers to this policy and its checker.
 | Active `project-structure` main spec | Normative semantic requirements after the first archive |
 | One active owning delta | Pending normative requirements before the first archive |
 | Project-structure manifest (`project-structure.toml` contract + `required-paths.toml` inventory) | Exact machine-readable structural enumeration |
-| Generated block in `deep_research_harness/AGENTS.md` | Deterministic compact locator for the registry, roots, grammar, and checker |
+| Generated block in `deep_research_harness/AGENTS.md` | Deterministic compact locator for the registry, roots, layers, and checker |
 | Human-authored `deep_research_harness/AGENTS.md` text | Navigation, rationale, commands, and explicitly labelled future plans |
 | Archived change artifacts | Historical context only |
 | Contract tests and `check_project_architecture.py` | Mechanical enforcement |
@@ -33,11 +33,13 @@ The per-layer import matrix splits into two authorities:
   checker. Assigning an already-whitelisted namespace to a layer is a TOML-only edit; a
   genuinely new namespace needs a one-time whitelist entry.
 
-The checker therefore does not hard-code a per-layer external-namespace set. The `[imports]`
-table has six import-boundary keys (`domain`, `engine`, `agents`, `graph`, `nodes`,
-`runtime`) where `nodes` is the graph-owned node-package import sub-layer; the five
-ownership layers (`runtime`, `domain`, `engine`, `agents`, `graph`) are a distinct
-vocabulary.
+The checker therefore does not hard-code a per-layer external-namespace set. The
+`[imports]` table has four import-boundary keys (`domain`, `engine`, `agents`,
+`runtime`); the four ownership layers (`runtime`, `domain`, `engine`, `agents`) are a
+distinct vocabulary. The node-package grammar (`graph`/`nodes` layers and the
+`[node_packages]` table) has been removed from the structure contract and cannot be
+re-declared: a manifest that declares it fails governance validation naming the removed
+grammar.
 
 ## Lifecycle
 
@@ -59,9 +61,10 @@ declared upstream gitlink lock must:
    evidence mapping; and
 5. pass `check_project_architecture.py` before archive.
 
-A new node that conforms to the existing node-package grammar adds its current
-package path to the registry without rewriting the grammar. Changing the grammar
-itself requires a `project-structure` spec change.
+The node-package grammar has been removed from the structure contract (removed by the
+`remove-graph-layer` change). Reintroducing a node grammar or an additional ownership
+layer requires a `project-structure` spec change; a manifest edit alone fails
+governance validation.
 
 The registry's `[upstream_gitlink]` table is one exact metadata lock, not a source,
 runtime, remote, release, or compatibility assertion. Full architecture governance

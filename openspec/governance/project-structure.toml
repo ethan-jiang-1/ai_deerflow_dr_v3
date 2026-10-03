@@ -20,7 +20,7 @@ end_marker = "<!-- END GENERATED: PROJECT-STRUCTURE -->"
 [package]
 source_root = "deep_research_harness/src/deerflow_deep_research"
 test_root = "deep_research_harness/tests"
-ownership_layers = ["runtime", "domain", "engine", "agents", "graph"]
+ownership_layers = ["runtime", "domain", "engine", "agents"]
 forbidden_source_roots = ["backend", "frontend"]
 forbidden_shared_modules = ["utils", "helpers", "common"]
 
@@ -34,19 +34,12 @@ entries = [".venv/", ".pytest_cache/", ".ruff_cache/", "__pycache__/"]
 [inventory]
 path = "openspec/governance/required-paths.toml"
 
-# Import-boundary keys：六个 import 层（含 nodes——graph 自有的节点包子层）。
+# Import-boundary keys：四个 import 层（同时即四个 canonical ownership layers）。
 # 内部层方向由 checker 硬编码政策固定；此处每层的值 = 内部层名 + 该层授权的外部命名空间。
+# 被移除的 node-package 语法（graph/nodes 层、[node_packages] 表）不可再声明——
+# 恢复它需要 project-structure spec change。
 [imports]
 domain = ["stdlib", "pydantic"]
 engine = ["domain"]
 agents = ["domain"]
-graph = ["domain", "engine", "nodes"]
-nodes = ["domain", "engine"]
-runtime = ["domain", "graph", "agents"]
-
-[node_packages]
-root = "deep_research_harness/src/deerflow_deep_research/graph/nodes"
-required_files = ["__init__.py", "node.py", "contracts.py"]
-optional_files = ["subgraph.py", "capabilities.py"]
-forbidden_files = ["fake.py"]
-public_export = "NODE_SPEC"
+runtime = ["domain", "agents"]

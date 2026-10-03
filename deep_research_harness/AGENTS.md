@@ -21,7 +21,7 @@ observed-failure question. A possible future use is not enough to expand scope.
 | Typed meaning, invariant, or pure data contract | `src/deerflow_deep_research/domain/` | A plain typed value first; escalate only when the typed contract itself must change |
 | Deterministic validation, gate, or admission policy | `src/deerflow_deep_research/engine/` | A pure function at the owning layer first; escalate when the admission needs a kernel seam |
 | Bounded model role, prompt, context, or candidate | `src/deerflow_deep_research/agents/` | The framework's own agent/skill configuration first; escalate when a harness-owned bounded policy is required |
-| Composition, routing, or capability injection | `src/deerflow_deep_research/graph/` | Existing composition knobs first; escalate when routing needs a new node or `NODE_SPEC` change |
+| Composition, routing, or capability injection | `src/deerflow_deep_research/runtime/` | The framework's own assembly knobs first; escalate when a harness-owned composition seam must change |
 | DeerFlow binding, trusted I/O, persistence, or lifecycle adapter | `src/deerflow_deep_research/runtime/` | A thin adapter at the framework's public boundary first; escalate when a trusted lifecycle seam must change |
 
 ## LLM-Node Authoring Gate
@@ -49,7 +49,7 @@ numbered route below plus the explicit Non-Model Work branch.
 5. **Focused proof and applicable cognitive evaluation**: use the lowest deterministic
    composition/admission proof, then state the cognitive evaluation and its limitation.
 6. **Deterministic handoff owners**: only then inspect parser, evaluator/materializer,
-   ledger, gate, graph, and other owners that admit legal effects and choose observable
+   ledger, gate, and other owners that admit legal effects and choose observable
    behavior.
 
 ## Where These Decisions Live
@@ -57,8 +57,8 @@ numbered route below plus the explicit Non-Model Work branch.
 | Question | Application-owned first read |
 | --- | --- |
 | What may a bounded cognitive role think about and return? | The owning contract in `src/deerflow_deep_research/agents/` |
-| What proves composition/admission? | The closest unit/graph/contract test for that owner |
-| Who admits state, routes, and effects? | The `engine/`, `graph/`, and `runtime/` owners behind it |
+| What proves composition/admission? | The closest unit/contract test for that owner |
+| Who admits state, routes, and effects? | The `engine/` and `runtime/` owners behind it |
 
 Implementations arrive with their owning changes; this table stays layer-level until
 then and must not invent file paths that do not exist.
@@ -66,7 +66,7 @@ then and must not invent file paths that do not exist.
 ## Non-Model Work
 
 For deterministic, human-decision, or wiring work without a causal model-bearing
-symptom, begin at the actual typed/domain/control/graph/adapter owner and record why
+symptom, begin at the actual typed/domain/control/adapter owner and record why
 cognition is not causal. Do not invent a capability, prompt, or repair loop.
 
 ## Information Map
@@ -109,7 +109,6 @@ Exact inventory: the structure registry declared by the owning `project-structur
 
 - Source root: `deep_research_harness/src/deerflow_deep_research/`
 - Test root: `deep_research_harness/tests/`
-- Ownership layers: `runtime`, `domain`, `engine`, `agents`, `graph`
-- Node grammar: `deep_research_harness/src/deerflow_deep_research/graph/nodes/` packages export `NODE_SPEC`; see the registry for files
+- Ownership layers: `runtime`, `domain`, `engine`, `agents`
 - Validate: repository architecture governance (`check_project_architecture.py`)
 <!-- END GENERATED: PROJECT-STRUCTURE -->

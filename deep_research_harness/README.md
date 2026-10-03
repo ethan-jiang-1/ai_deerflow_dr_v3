@@ -13,10 +13,10 @@ keeps the deterministic, inspectable parts:
   Bundle and the Harness keeps working, while that run becomes permanently unavailable.
   The Harness owns no durable run state.
 - **Explicit composition.** Public host routes are fixed to `all_real`; fixture recipes
-  report `fixture`; the same graph can be exercised with zero credentials. Fixture
+  report `fixture`; the same workflow can be exercised with zero credentials. Fixture
   adapters live only in `src_fixtures/` (excluded from the production wheel).
 - **Models propose, code disposes.** Candidate work, evidence, and routes are admitted
-  only by deterministic owners (validators, ledger, gates, graph).
+  only by deterministic owners (validators, ledger, gates).
 
 > Status notice: none of the above is implemented yet. The specification tree is
 > intentionally empty; every capability grows from a v3 change, starting from the

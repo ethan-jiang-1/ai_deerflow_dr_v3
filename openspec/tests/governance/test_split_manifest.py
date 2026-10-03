@@ -35,7 +35,7 @@ commit = "ceebf97fc31afbbfe2aadf7c8d82b03c3742d5d7"
 [package]
 source_root = "deep_research_harness/src/deerflow_deep_research"
 test_root = "deep_research_harness/tests"
-ownership_layers = ["runtime", "domain", "engine", "agents", "graph"]
+ownership_layers = ["runtime", "domain", "engine", "agents"]
 forbidden_source_roots = ["backend", "frontend"]
 forbidden_shared_modules = ["utils", "helpers", "common"]
 
@@ -50,16 +50,7 @@ path = "openspec/governance/required-paths.toml"
 domain = ["stdlib", "pydantic"]
 engine = ["domain"]
 agents = ["domain", "deerflow", "langchain"]
-graph = ["domain", "engine", "nodes", "langgraph"]
-nodes = ["domain", "engine", "langgraph", "pydantic"]
-runtime = ["domain", "graph", "agents", "deerflow", "httpx", "httpx_sse", "langchain", "langgraph", "openai"]
-
-[node_packages]
-root = "deep_research_harness/src/deerflow_deep_research/graph/nodes"
-required_files = ["__init__.py", "node.py", "contracts.py"]
-optional_files = ["subgraph.py", "capabilities.py"]
-forbidden_files = ["fake.py"]
-public_export = "NODE_SPEC"
+runtime = ["domain", "agents", "deerflow", "httpx", "httpx_sse", "langchain", "langgraph", "openai"]
 
 [guide]
 path = "deep_research_harness/AGENTS.md"
@@ -88,6 +79,27 @@ files = [
 REGISTRY = """PRS-001: project-structure — fixture one
 PRS-004: project-structure — fixture four
 PRS-006: project-structure — fixture six
+"""
+
+# Pre-change `[imports]` table (six keys incl. the removed grammar) and the
+# pre-change mandatory `[node_packages]` table: together they let the
+# ownership-layer case reach the old checker's accepting path, so its red today
+# is "the grammar-declaring manifest validates", not a wrong-code rejection.
+LEGACY_SIX_KEY_IMPORTS = """[imports]
+domain = ["stdlib", "pydantic"]
+engine = ["domain"]
+agents = ["domain", "deerflow", "langchain"]
+graph = ["domain", "engine", "nodes", "langgraph"]
+nodes = ["domain", "engine", "langgraph", "pydantic"]
+runtime = ["domain", "graph", "agents", "deerflow", "httpx", "httpx_sse", "langchain", "langgraph", "openai"]"""
+
+LEGACY_NODE_PACKAGES = """
+[node_packages]
+root = "deep_research_harness/src/deerflow_deep_research/graph/nodes"
+required_files = ["__init__.py", "node.py", "contracts.py"]
+optional_files = ["subgraph.py", "capabilities.py"]
+forbidden_files = ["fake.py"]
+public_export = "NODE_SPEC"
 """
 
 
@@ -212,6 +224,67 @@ class SplitManifestParseTest(unittest.TestCase):
             with self.assertRaises(checker.ContractViolation) as ctx:
                 checker._validate_required_paths(root, manifest)
             self.assertEqual(ctx.exception.code, "path.missing")
+
+
+class RemovedNodeGrammarTest(unittest.TestCase):
+    """Negative controls for the removed node-package grammar (remove-graph-layer).
+
+    Case 1 is the vocabulary flip's red engine: the canonical four-layer manifest
+    must validate. Cases 2-4 pin the three loud-failure surfaces named by the
+    "Removed node grammar fails loudly" scenario.
+    """
+
+    def test_canonical_manifest_without_node_grammar_validates(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root, checker = _make_repo(Path(td), contract=CONTRACT)
+            manifest = checker.load_manifest(root)
+            self.assertEqual(
+                set(manifest.ownership_layers),
+                {"runtime", "domain", "engine", "agents"},
+            )
+
+    def test_node_packages_table_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            contract = CONTRACT + LEGACY_NODE_PACKAGES
+            root, checker = _make_repo(Path(td), contract=contract)
+            with self.assertRaises(checker.ContractViolation) as ctx:
+                checker.load_manifest(root)
+            self.assertEqual(ctx.exception.code, "node.grammar_removed")
+
+    def test_non_canonical_ownership_layer_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            contract = (
+                CONTRACT.replace(
+                    'ownership_layers = ["runtime", "domain", "engine", "agents"]',
+                    'ownership_layers = ["runtime", "domain", "engine", "agents", "graph"]',
+                )
+                .replace(
+                    '[imports]\ndomain = ["stdlib", "pydantic"]\nengine = ["domain"]\n'
+                    'agents = ["domain", "deerflow", "langchain"]\n'
+                    'runtime = ["domain", "agents", "deerflow", "httpx", "httpx_sse", '
+                    '"langchain", "langgraph", "openai"]',
+                    LEGACY_SIX_KEY_IMPORTS,
+                )
+                + LEGACY_NODE_PACKAGES
+            )
+            root, checker = _make_repo(Path(td), contract=contract)
+            with self.assertRaises(checker.ContractViolation) as ctx:
+                checker.load_manifest(root)
+            self.assertEqual(ctx.exception.code, "manifest.schema")
+
+    def test_extra_imports_layer_key_rejected(self) -> None:
+        # Regression pin for the closed `[imports]` vocabulary. The old checker also
+        # rejects five-key tables (under the same code), so this case is green before
+        # and after the change; cases 1-3 carry the red-before-green proof.
+        with tempfile.TemporaryDirectory() as td:
+            contract = CONTRACT.replace(
+                "[imports]\ndomain",
+                '[imports]\ngraph = ["domain", "engine", "nodes"]\ndomain',
+            )
+            root, checker = _make_repo(Path(td), contract=contract)
+            with self.assertRaises(checker.ContractViolation) as ctx:
+                checker.load_manifest(root)
+            self.assertEqual(ctx.exception.code, "manifest.schema")
 
 
 if __name__ == "__main__":

@@ -31,20 +31,20 @@ REQ_HEADER_RE = re.compile(r"^> req:\s*(.+)$", re.MULTILINE)
 PACKAGE_NAME = "deerflow_deep_research"
 FIXTURE_PACKAGE_NAME = "deerflow_deep_research_fixtures"
 CANONICAL_HARNESS_ROOT = PurePosixPath("deep_research_harness")
-# Import-boundary layers: the six keys of the `[imports]` table. `nodes` is the
-# graph-owned node-package import sub-layer, not one of the five ownership layers
-# (`runtime`, `domain`, `engine`, `agents`, `graph`).
-INTERNAL_LAYERS = {"domain", "engine", "agents", "graph", "nodes", "runtime"}
-# Non-weakenable internal-layer import directions, owned by PRS-002. The `[imports]`
+# Import-boundary layers: the four keys of the `[imports]` table, which are also the
+# four canonical ownership layers (`runtime`, `domain`, `engine`, `agents`). The
+# removed node-package grammar (`graph`/`nodes` layers, `[node_packages]`) cannot be
+# re-declared: see load_manifest.
+INTERNAL_LAYERS = {"domain", "engine", "agents", "runtime"}
+# Non-weakenable internal-layer import directions, owned by PRS-001. The `[imports]`
 # table cannot add an internal layer to a layer that these rules exclude.
 REQUIRED_INTERNAL_IMPORT_POLICY = {
     "domain": set(),
     "engine": {"domain"},
     "agents": {"domain"},
-    "graph": {"domain", "engine", "nodes"},
-    "nodes": {"domain", "engine"},
-    "runtime": {"domain", "graph", "agents"},
+    "runtime": {"domain", "agents"},
 }
+CANONICAL_OWNERSHIP_LAYERS = frozenset(REQUIRED_INTERNAL_IMPORT_POLICY)
 # Closed set of legal external top-level namespaces. External namespaces are
 # TOML-authorized per layer; this whitelist only answers "is this external namespace
 # real at all". Internal layers are validated separately above.
@@ -58,8 +58,6 @@ TOP_LEVEL_NAMESPACE_WHITELIST = {
     "httpx_sse",
     "openai",
 }
-REQUIRED_NODE_FILES = {"__init__.py", "node.py", "contracts.py"}
-REQUIRED_NODE_FORBIDDEN_FILES = {"fake.py"}
 
 
 class ContractViolation(Exception):
@@ -104,11 +102,6 @@ class StructureManifest:
     ignored_entries: tuple[str, ...]
     required_paths: tuple[RequiredPath, ...]
     imports: dict[str, tuple[str, ...]]
-    node_root: PurePosixPath
-    node_required_files: tuple[str, ...]
-    node_optional_files: tuple[str, ...]
-    node_forbidden_files: tuple[str, ...]
-    node_public_export: str
 
 
 def _expect_mapping(value: Any, label: str) -> dict[str, Any]:
@@ -275,6 +268,13 @@ def load_manifest(root: Path) -> StructureManifest:
             f"package.test_root must be {expected_test_root}",
         )
     ownership_layers = _expect_string_list(package.get("ownership_layers"), "package.ownership_layers")
+    if set(ownership_layers) != CANONICAL_OWNERSHIP_LAYERS:
+        raise ContractViolation(
+            "manifest.schema",
+            "ownership_layers must declare exactly the canonical layers runtime, domain, "
+            "engine, and agents; the removed node-package grammar (graph/nodes) cannot "
+            "be re-declared",
+        )
     forbidden_source_roots = tuple(
         _relative_path(item, "package.forbidden_source_roots")
         for item in _expect_string_list(package.get("forbidden_source_roots"), "package.forbidden_source_roots")
@@ -374,10 +374,11 @@ def load_manifest(root: Path) -> StructureManifest:
 
     raw_imports = _expect_mapping(data.get("imports"), "imports")
     imports = {name: _expect_string_list(values, f"imports.{name}") for name, values in raw_imports.items()}
-    if set(imports) != {"domain", "engine", "agents", "graph", "nodes", "runtime"}:
+    if set(imports) != CANONICAL_OWNERSHIP_LAYERS:
         raise ContractViolation(
             "manifest.schema",
-            "imports must define domain, engine, agents, graph, nodes, and runtime",
+            "imports must define exactly domain, engine, agents, and runtime; the "
+            "removed node-package grammar (graph/nodes) cannot be re-declared",
         )
     for layer, required_internal in REQUIRED_INTERNAL_IMPORT_POLICY.items():
         internal = set(imports[layer]) & INTERNAL_LAYERS
@@ -393,18 +394,12 @@ def load_manifest(root: Path) -> StructureManifest:
                 f"imports.{layer} names an unknown external namespace: {sorted(unknown)}",
             )
 
-    node_packages = _expect_mapping(data.get("node_packages"), "node_packages")
-    node_root = _relative_path(node_packages.get("root"), "node_packages.root")
-    node_required_files = _expect_string_list(node_packages.get("required_files"), "node_packages.required_files")
-    node_optional_files = _expect_string_list(node_packages.get("optional_files"), "node_packages.optional_files")
-    node_forbidden_files = _expect_string_list(node_packages.get("forbidden_files"), "node_packages.forbidden_files")
-    if set(node_required_files) != REQUIRED_NODE_FILES:
-        raise ContractViolation("manifest.schema", "node_packages.required_files must retain the real-only node grammar")
-    if set(node_forbidden_files) != REQUIRED_NODE_FORBIDDEN_FILES:
-        raise ContractViolation("manifest.schema", "node_packages.forbidden_files must reject production fake adapters")
-    if set(node_required_files) & set(node_optional_files) or set(node_required_files) & set(node_forbidden_files):
-        raise ContractViolation("manifest.schema", "node package file categories must not overlap")
-    node_public_export = _expect_string(node_packages.get("public_export"), "node_packages.public_export")
+    if data.get("node_packages") is not None:
+        raise ContractViolation(
+            "node.grammar_removed",
+            "the node-package grammar was removed from the structure contract; "
+            "reintroduction requires a project-structure spec change",
+        )
 
     guide = _expect_mapping(data.get("guide"), "guide")
     guide_path = _relative_path(guide.get("path"), "guide.path")
@@ -437,11 +432,6 @@ def load_manifest(root: Path) -> StructureManifest:
         ignored_entries=ignored_entries,
         required_paths=tuple(required_paths),
         imports=imports,
-        node_root=node_root,
-        node_required_files=node_required_files,
-        node_optional_files=node_optional_files,
-        node_forbidden_files=node_forbidden_files,
-        node_public_export=node_public_export,
     )
 
 
@@ -465,8 +455,6 @@ def render_guide_block(manifest: StructureManifest) -> str:
         ),
         f"- Test root: `{_directory_display(manifest.test_root)}`",
         "- Ownership layers: " + ", ".join(f"`{layer}`" for layer in manifest.ownership_layers),
-        f"- Node grammar: `{_directory_display(manifest.node_root)}` packages export "
-        f"`{manifest.node_public_export}`; see the registry for files",
         "- Validate: repository architecture governance (`check_project_architecture.py`)",
         manifest.end_marker,
     ]
@@ -755,9 +743,7 @@ def _source_owner(relative: PurePosixPath) -> tuple[str, str | None]:
     parts = relative.parts
     if not parts:
         return "package", None
-    if parts[0] == "graph" and len(parts) >= 3 and parts[1] == "nodes":
-        return "nodes", parts[2]
-    if parts[0] in {"domain", "engine", "agents", "graph", "runtime"}:
+    if parts[0] in {"domain", "engine", "agents", "runtime"}:
         return parts[0], None
     if len(parts) == 1 and parts[0] == "tool.py":
         return "tool", None
@@ -770,9 +756,7 @@ def _target_owner(module_name: str) -> tuple[str | None, str | None]:
         return None, None
     if len(parts) == 1:
         return "package", None
-    if parts[1] == "graph" and len(parts) >= 4 and parts[2] == "nodes":
-        return "nodes", parts[3]
-    if parts[1] in {"domain", "engine", "agents", "graph", "runtime"}:
+    if parts[1] in {"domain", "engine", "agents", "runtime"}:
         return parts[1], None
     return "package", None
 
@@ -816,7 +800,7 @@ def _validate_module_imports(
     except (OSError, UnicodeError, SyntaxError) as exc:
         raise ContractViolation("import.syntax", f"cannot parse {path.relative_to(root)}: {exc}") from exc
 
-    layer, source_node = _source_owner(relative)
+    layer, _ = _source_owner(relative)
     module_parts = _module_parts(source_root, path)
     for imported in _resolved_imports(tree, module_parts, path.name == "__init__.py"):
         if not imported:
@@ -830,20 +814,8 @@ def _validate_module_imports(
         if module_root == "app":
             raise ContractViolation("import.app", f"production downstream code imports app.*: {path.relative_to(root)}")
 
-        target_layer, target_node = _target_owner(imported)
+        target_layer, _ = _target_owner(imported)
         if target_layer is None:
-            if layer == "nodes" and module_root == "langgraph":
-                hitl_interrupt = (
-                    source_node in {"hitl1", "hitl2"}
-                    and path.name == "node.py"
-                    and imported == "langgraph.types.interrupt"
-                )
-                if path.name != "subgraph.py" and not hitl_interrupt:
-                    raise ContractViolation(
-                        "import.boundary",
-                        "node LangGraph import is outside subgraph/HITL-interrupt exceptions: "
-                        f"{path.relative_to(root)}",
-                    )
             if not _external_allowed(layer, module_root, manifest, relative):
                 raise ContractViolation(
                     "import.external",
@@ -851,19 +823,6 @@ def _validate_module_imports(
                 )
             continue
 
-        if layer == "nodes" and target_layer == "nodes":
-            if target_node != source_node:
-                raise ContractViolation(
-                    "import.sibling",
-                    f"node {source_node} imports sibling node {target_node}: {path.relative_to(root)}",
-                )
-            continue
-        if layer == "nodes" and target_layer == "graph":
-            component_prefix = f"{PACKAGE_NAME}.graph.components"
-            if path.name == "subgraph.py" and (
-                imported == component_prefix or imported.startswith(f"{component_prefix}.")
-            ):
-                continue
         if target_layer == layer or (layer == "package" and target_layer == "package"):
             continue
         if layer == "tool":
@@ -922,40 +881,6 @@ def _static_all_exports(path: Path) -> list[str] | None:
             exports.append(element.value)
         return exports
     return None
-
-
-def _validate_node_packages(root: Path, manifest: StructureManifest) -> None:
-    node_root = root / manifest.node_root
-    if not node_root.exists():
-        return
-    if not node_root.is_dir():
-        raise ContractViolation("node.root_kind", f"node root is not a directory: {manifest.node_root}")
-    reserved = {"components", "topology"}
-    for package_root in sorted(path for path in node_root.iterdir() if path.is_dir() and path.name != "__pycache__"):
-        relative = package_root.relative_to(root)
-        if package_root.name in reserved:
-            raise ContractViolation(
-                "node.package_confusion",
-                f"reusable components/topology cannot be top-level nodes: {relative}",
-            )
-        missing = sorted(name for name in manifest.node_required_files if not (package_root / name).is_file())
-        if missing:
-            raise ContractViolation(
-                "node.file_missing",
-                f"node package {relative} is missing {', '.join(missing)}",
-            )
-        exports = _static_all_exports(package_root / "__init__.py")
-        if exports != [manifest.node_public_export]:
-            raise ContractViolation(
-                "node.exports",
-                f"node package {relative} must export only {manifest.node_public_export}",
-            )
-        for forbidden_file in manifest.node_forbidden_files:
-            if (package_root / forbidden_file).is_file():
-                raise ContractViolation(
-                    "node.fixture_file",
-                    f"production node package contains a fixture adapter: {relative / forbidden_file}",
-                )
 
 
 def _fixture_production_import_is_allowed(imported: str, manifest: StructureManifest) -> bool:
@@ -1075,7 +1000,6 @@ def validate_imports(root: Path, manifest: StructureManifest) -> None:
     _validate_fixture_imports(root, manifest)
     _validate_production_wheel(root, manifest)
     _validate_upstream_does_not_import_downstream(root, manifest)
-    _validate_node_packages(root, manifest)
 
 
 def validate_project(root: Path, manifest: StructureManifest) -> None:

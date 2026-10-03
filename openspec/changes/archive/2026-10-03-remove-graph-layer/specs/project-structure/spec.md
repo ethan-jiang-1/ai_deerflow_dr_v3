@@ -1,17 +1,9 @@
-# project-structure Specification
-
 > req: PRS-001
-
-## Purpose
-
-Owns the required behavior of structural governance: the declared structural manifest is
-the exact structural authority for the repository, validation of declared structure is
-deterministic and fails loudly on drift, and the pinned upstream gitlink is treated as a
-metadata-only anchor that claims no runtime compatibility.
-
 > structure: openspec/governance/project-structure.toml
 
-## Requirements
+# Spec Delta
+
+## MODIFIED Requirements
 
 ### Requirement: Structural manifest is the exact structural authority
 
@@ -57,46 +49,3 @@ governance validation.
   `[imports]` key beyond the canonical four, or a `[node_packages]` table
 - **THEN** the architecture governance checker exits non-zero and names the removed
   node-package grammar as the violation
-
-### Requirement: Upstream gitlink is a metadata-only anchor
-
-The structural manifest SHALL declare the pinned upstream gitlink (submodule path and
-pinned commit) as declared metadata. Gitlink validation SHALL be metadata-only: it SHALL
-compare the declared commit with the checked-out gitlink pointer and SHALL NOT test,
-claim, or imply upstream runtime compatibility. Downstream work SHALL neither modify nor
-source-browse the gitlink unless a change explicitly owns and approves that boundary.
-
-#### Scenario: Pointer disagreement fails
-
-- **WHEN** the declared gitlink commit differs from the checked-out submodule pointer
-- **THEN** governance validation exits non-zero and names the disagreement
-
-#### Scenario: Pointer agreement proves metadata only
-
-- **WHEN** the checked-out gitlink pointer matches the declared commit while the upstream
-  content itself is untested by this governance
-- **THEN** gitlink validation passes without running or asserting anything about upstream
-  runtime behavior
-
-### Requirement: Registered requirements are owned by specs
-
-Every requirement ID registered in `openspec/governance/req-registry.yaml` SHALL be owned
-by a main spec (declared on the spec's `> req:` line before its first heading) or by an
-active change's delta spec header. A registered ID owned by neither SHALL fail requirement
-governance and be reported as an orphan, with the legal resolution being an owning spec,
-an active delta, or explicit retirement marked in the registry. The registry SHALL be
-append-only: allocated IDs are never reused, and retired IDs stay declared with a
-retirement marker.
-
-#### Scenario: Orphan registry ID fails governance
-
-- **WHEN** requirement governance runs while a registered ID appears in no main spec and
-  no active delta header
-- **THEN** validation exits non-zero and reports the ID as an orphan with the legal
-  resolutions
-
-#### Scenario: Retired ID is declared, never reused
-
-- **WHEN** a registered ID is marked retired in the registry
-- **THEN** the ID remains declared in the registry, is reported as retired rather than
-  orphan, and allocating the same ID again fails governance

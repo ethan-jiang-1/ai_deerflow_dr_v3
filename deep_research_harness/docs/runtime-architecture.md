@@ -1,6 +1,6 @@
 # Runtime Architecture
 
-> 骨架占位。权威边界（Run Bundle、graph、evidence、sandbox、public-control）随
+> 骨架占位。权威边界（Run Bundle、evidence、sandbox、public-control）随
 > run-bundle 生命周期 change 与接线 change 充实；本文件届时成为运行时权威边界文档。
 
 v3 的方向性事实（详见根目录 boundary plan）：

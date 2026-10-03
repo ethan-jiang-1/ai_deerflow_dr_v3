@@ -25,7 +25,7 @@
 # specs 为空（从头搭），以下 ID 暂为 registered-not-alive 状态；
 # 各 capability 的 owning spec 由 v3 自己的首批 change 建立。
 
-PRS-001: project-structure — v3 仓库骨架的结构合同：治理清单、import 分层、节点语法、submodule 锚
+PRS-001: project-structure — v3 仓库骨架的结构合同：治理清单、import 分层、submodule 锚
 
 # ---- add-ci-governance 登记（2026-10-02）--------------------------------------
 # CI 门禁与本地 hook 的接受路径合同（owning delta: openspec/changes/add-ci-governance）。
