@@ -15,6 +15,21 @@ from .contracts import client_surface
 
 CONFIG_NAMES: tuple[str, ...] = ("base", "fixture")
 
+# The embedded stream's recursion limit is a PER-CALL override (client.py:293) — the
+# AppConfig top-level key is not consumed by the embedded path. Deep research exhausts
+# the default 100 at ~10 tool rounds; 300 is a conservative start (framework max 1000).
+DEEP_RESEARCH_RECURSION_LIMIT = 300
+
+
+def make_stream_fn(client, thread_id: str, *, recursion_limit: int = DEEP_RESEARCH_RECURSION_LIMIT):
+    """Build the run's stream callable: the single seam where stream calls are made,
+    carrying the thread id and the per-call recursion limit."""
+
+    def _stream(message: str):
+        return client.stream(message, thread_id=thread_id, recursion_limit=recursion_limit)
+
+    return _stream
+
 # The ruled binding defaults (see runtime/contracts/client_surface.CONSUMED_DEFAULTS).
 BINDING_DEFAULTS: dict[str, object] = dict(client_surface.CONSUMED_DEFAULTS)
 

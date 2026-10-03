@@ -105,7 +105,7 @@ def cmd_create(args) -> None:
             )
             result = run_engine.run_research(
                 handle,
-                stream_fn=lambda message: client.stream(message, thread_id=state.thread_id),
+                stream_fn=client_binding.make_stream_fn(client, state.thread_id),
                 on_event=_live_renderer(),
             )
     except ImportError as exc:
