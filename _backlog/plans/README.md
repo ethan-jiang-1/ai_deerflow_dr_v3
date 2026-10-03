@@ -21,7 +21,9 @@
 
 ## 活跃列表
 
-（空——digest 衍生 plan 家族全部消费完毕。新 plan 按上方卡片模板新建。）
+| Plan | 一句话 |
+|------|--------|
+| [2026-10-03-stream-adapter-and-live-view.md](2026-10-03-stream-adapter-and-live-view.md) | 流适配器修正（messages-tuple=扁平 chunk、journal 聚合到回合）+ token 流式直播视图；含 real 梯首跑的调试记录与 DeerFlow 流协议速览（教学向） |
 
 **Next available plan ID: CLS-007**（移入 `_closed_plans/` 时分配）
 
