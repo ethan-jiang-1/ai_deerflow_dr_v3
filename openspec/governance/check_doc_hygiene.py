@@ -98,6 +98,7 @@ DOC_LAYER_DOCS: tuple[str, ...] = (
     # docs/**/*.md on disk must be listed here and every entry must exist.
     "deep_research_harness/docs/README.md",
     "deep_research_harness/docs/local-operations.md",
+    "deep_research_harness/docs/quality-register.md",
     "deep_research_harness/docs/runtime-architecture.md",
     "deep_research_harness/docs/testing-and-evaluation.md",
 )

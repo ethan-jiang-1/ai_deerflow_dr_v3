@@ -42,4 +42,4 @@ path = "openspec/governance/required-paths.toml"
 domain = ["stdlib", "pydantic"]
 engine = ["domain"]
 agents = ["domain"]
-runtime = ["domain", "agents"]
+runtime = ["domain", "engine", "agents"]

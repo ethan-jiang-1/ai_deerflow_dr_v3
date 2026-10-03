@@ -106,4 +106,9 @@ closeout 机制级条款（负例控制 + gate smoke + replay golden）；② ~~
 run-bundle capability（RUB-001）；本 change 同时把 make verify 变真（stdlib unittest，
 CI 无依赖安装步 ⇒ 门禁零外部依赖）。**决策 4（validator/hash 链 ledger/gate 收口）为
 下一把 change**（journal 已预留 admission anchor 类别）；装配快照捕获与澄清续答的
-client 回路随接线 change。**〕**
+client 回路随接线 change。**〔决策 4 亦已落地（2026-10-03）**：change
+`establish-run-admission` 归档于 `openspec/changes/archive/2026-10-03-establish-run-admission/`
+——validator hold point + sha256 哈希链三分处置 ledger + gate pass/blocked 推导 + RT10
+质量注册处（`docs/quality-register.md`，与 `engine/machines.py` 测试同步）；runtime 的
+import 允许面 deliberate 地补上 engine（组合层职责所在，方向链 domain ← engine ← runtime
+无环）。至此 bundle plan 六决策全部落地，plan 关闭条件成立。**〕**

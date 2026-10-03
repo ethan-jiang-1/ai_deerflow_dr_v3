@@ -37,12 +37,14 @@ CANONICAL_HARNESS_ROOT = PurePosixPath("deep_research_harness")
 # re-declared: see load_manifest.
 INTERNAL_LAYERS = {"domain", "engine", "agents", "runtime"}
 # Non-weakenable internal-layer import directions, owned by PRS-001. The `[imports]`
-# table cannot add an internal layer to a layer that these rules exclude.
+# table cannot add an internal layer to a layer that these rules exclude. runtime is
+# the declared composition home: its allowance reaches engine (composition deepens
+# domain <- engine <- runtime; no cycle).
 REQUIRED_INTERNAL_IMPORT_POLICY = {
     "domain": set(),
     "engine": {"domain"},
     "agents": {"domain"},
-    "runtime": {"domain", "agents"},
+    "runtime": {"domain", "engine", "agents"},
 }
 CANONICAL_OWNERSHIP_LAYERS = frozenset(REQUIRED_INTERNAL_IMPORT_POLICY)
 # Closed set of legal external top-level namespaces. External namespaces are

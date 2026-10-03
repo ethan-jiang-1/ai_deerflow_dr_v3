@@ -50,7 +50,7 @@ path = "openspec/governance/required-paths.toml"
 domain = ["stdlib", "pydantic"]
 engine = ["domain"]
 agents = ["domain", "deerflow", "langchain"]
-runtime = ["domain", "agents", "deerflow", "httpx", "httpx_sse", "langchain", "langgraph", "openai"]
+runtime = ["domain", "engine", "agents", "deerflow", "httpx", "httpx_sse", "langchain", "langgraph", "openai"]
 
 [guide]
 path = "deep_research_harness/AGENTS.md"

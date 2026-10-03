@@ -1,6 +1,6 @@
 # Plans — plan/分析文档索引
 
-> 最后更新: 2026-10-02（三份衍生 plan 打磨全部完成：七项用户裁决落定〔saver sync/配置面/澄清处置/三准绳+QC映射/进程模型/refine入口/装配快照〕，UNVERIFIED 全关，打磨线索全关闭——全部经用户拍板，待统一放行进 OpenSpec） | `_backlog/plans/` — 活跃 plan 在此（顶层），
+> 最后更新: 2026-10-03（bundle-contract plan 关闭：CLS-004，六决策经 establish-run-bundle + establish-run-admission 两 change 全部落地归档） | `_backlog/plans/` — 活跃 plan 在此（顶层），
 > 完成的普通 plan 移入 [`../_done/_closed_plans/`](../_done/_closed_plans/)。
 >
 > **plan 没有编号，文件名即标识。完成后文件名不变，位置即状态。**
@@ -23,11 +23,10 @@
 
 | Plan | 一句话 |
 |------|--------|
-| [2026-10-02-wiring-structure.md](2026-10-02-wiring-structure.md) | 接线与结构定案：embedded client（sync saver / 配置面 base+fixture / 澄清自动续答定案）+ 契约镜像层 + 撤 graph 语法 + middleware 只配置；两项 UNVERIFIED 均已关闭 |
-| [2026-10-02-bundle-contract.md](2026-10-02-bundle-contract.md) | Run Bundle 合同：目录契约（checkpoint 内嵌 sync saver + 子树差异成文）+ 普通状态机（澄清续答循环 + 崩溃检测）+ 三层观察（journal 八类起步 + 装配快照补盲区）+ 验收收口最小版（附检查注册处）+ 质量控制映射（设计理由节）；打磨线索全部关闭；产品第一 change 候选 |
-| [2026-10-02-entry-surface.md](2026-10-02-entry-surface.md) | 入口面：六子命令 CLI（refine 入口与运行进程模型已定案：前台单泵三汇 + journal tail attach）+ watch 渲染器 + inspect 事后三面（含质量报告页）+ 两级阶梯 + EV2 机制级验收；依赖前两份合同；打磨线索全部关闭 |
+| [2026-10-02-wiring-structure.md](2026-10-02-wiring-structure.md) | 接线与结构定案：embedded client（sync saver / 配置面 base+fixture / 澄清自动续答定案）+ 契约镜像层 + middleware 只配置；撤 graph 语法已落地（CLS-004 前的治理 change）；两项 UNVERIFIED 均已关闭 |
+| [2026-10-02-entry-surface.md](2026-10-02-entry-surface.md) | 入口面：六子命令 CLI（refine 入口与运行进程模型已定案：前台单泵三汇 + journal tail attach）+ watch 渲染器 + inspect 事后三面（含质量报告页）+ 两级阶梯 + EV2 机制级验收；依赖前两份合同（均已落地）；打磨线索全部关闭 |
 
-**Next available plan ID: CLS-004**（移入 `_closed_plans/` 时分配）
+**Next available plan ID: CLS-005**（移入 `_closed_plans/` 时分配）
 
 ## 已归档（移至 `_done/_closed_plans/`）
 
@@ -36,6 +35,7 @@
 | CLS-001 execution-roadmap | establish-project-structure（已 archive） | 2026-10-02 |
 | CLS-002 borrow-dsh-harness-gap-analysis | add-ci-governance + harden-change-practice-guidance + add-doc-budget-gate（均已 archive） | 2026-10-02 |
 | CLS-003 digest-deerflow-native-deep-research | 六裁决推敲定案 + 三份衍生 plan（wiring-structure / bundle-contract / entry-surface）拆解落账 | 2026-10-02 |
+| CLS-004 bundle-contract | establish-run-bundle + establish-run-admission（均已 archive；决策 1/2/3/5/6 → 底座 change，决策 4 → 验收收口 change） | 2026-10-03 |
 
 ---
 
