@@ -24,7 +24,7 @@
 | Plan | 一句话 |
 |------|--------|
 
-（空）
+| [2026-10-04-queued-triple.md](2026-10-04-queued-triple.md) | 三连击：① 报告经 hold point 落 final/（QC 闭环收口）② refine 轻装重启（新线程+机械摘要）③ 集成 lane 进 CI（uv 缓存步+checker 同步）——一个 ongoing goal 顺序全管道落地 |
 
 **Next available plan ID: CLS-009**（移入 `_closed_plans/` 时分配）
 
