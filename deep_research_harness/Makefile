@@ -1,11 +1,16 @@
-# Skeleton Makefile — real targets arrive with their owning changes.
-# 骨架期占位：install/verify 尚不承载任何验证承诺（见各 target 的响亮提示）。
+# Deep Research Harness — Makefile
+# make verify is the application unit gate: stdlib unittest, zero external
+# dependencies, offline-safe (UV_OFFLINE=1 is honored by construction). It never
+# reads, imports, executes, or links OpenSpec content.
 
-.PHONY: install verify
+.PHONY: install verify test
 
 install:
-	@echo "[skeleton] deep_research_harness has no implementation yet; dependencies land with the wiring change. (nothing to install)"
+	@echo "[install] nothing to install: the harness has no external dependencies; the"
+	@echo "[install] deerflow-harness editable source lands with the wiring change."
 
-verify:
-	@echo "[skeleton] make verify is a stub: no tests exist yet, so it deliberately verifies NOTHING."
-	@echo "[skeleton] this stub exists so the command surface is visible before the first change lands."
+test:
+	PYTHONPATH=src python3 -m unittest discover -s tests
+
+verify: test
+	@echo "[verify] harness unittest gate passed."

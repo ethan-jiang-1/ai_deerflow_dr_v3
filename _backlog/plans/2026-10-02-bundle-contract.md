@@ -101,4 +101,9 @@ closeout 机制级条款（负例控制 + gate smoke + replay golden）；② ~~
 ## 落地关联
 
 成熟后**经用户拍板**入线（HITL 闸门）。likely change：bundle 域契约 + 状态机 + journal 首笔
-（产品第一 change 候选）。
+（产品第一 change 候选）。**〔已落地（2026-10-03）**：change `establish-run-bundle` 归档于
+`openspec/changes/archive/2026-10-03-establish-run-bundle/`——决策 1/2/3/5/6 落为
+run-bundle capability（RUB-001）；本 change 同时把 make verify 变真（stdlib unittest，
+CI 无依赖安装步 ⇒ 门禁零外部依赖）。**决策 4（validator/hash 链 ledger/gate 收口）为
+下一把 change**（journal 已预留 admission anchor 类别）；装配快照捕获与澄清续答的
+client 回路随接线 change。**〕**

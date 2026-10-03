@@ -27,6 +27,10 @@
 
 PRS-001: project-structure — v3 仓库骨架的结构合同：治理清单、import 分层、submodule 锚
 
+# ---- establish-run-bundle 登记（2026-10-03）------------------------------------
+# Run Bundle 域契约（owning delta: openspec/changes/establish-run-bundle）。
+RUB-001: run-bundle — 运行底座：目录契约、单真相状态机（revision CAS + 目录 lease）、崩溃检测与有界澄清续答状态、有界诚实 journal（anchor 永不驱逐）、永久删除语义、显式组成记录
+
 # ---- add-ci-governance 登记（2026-10-02）--------------------------------------
 # CI 门禁与本地 hook 的接受路径合同（owning delta: openspec/changes/add-ci-governance）。
 CIG-001: ci-governance — CI 门禁与本地 hook 的接受路径合同：单 job CI 全量治理套件、hook 只跑便宜高置信检查、声明自身被机器校验

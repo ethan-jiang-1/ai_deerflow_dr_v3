@@ -92,9 +92,11 @@ cognition is not causal. Do not invent a capability, prompt, or repair loop.
 
 ## Verification
 
-Pre-implementation state: `make install` and `make verify` are loud stubs that carry no
-verification promise. The first test-bearing change replaces them and this section
-names the narrowest relevant test command per lane.
+`make verify` is the application unit gate: the stdlib unittest suite under `tests/`
+(`PYTHONPATH=src`, zero external dependencies, offline-safe). It exits non-zero on any
+failure and never reads, imports, executes, or links OpenSpec content. The narrowest
+relevant command for domain/runtime rules is the suite itself; the admission-machinery,
+CLI, and receipt lanes arrive with their owning changes.
 
 ## Structural Authority
 

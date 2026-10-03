@@ -1,14 +1,21 @@
 # COMMANDS — 命令速查
 
-> **骨架期占位。** v2 的 demo 阶梯（001–004 / 010 / 020 / 030 / 031）只是参照形状，不是承诺；
-> v3 的入口面由边界 plan 及其 change 定义后，本文件才成为权威命令索引。
+> v3 的入口面（六子命令 CLI）由 entry-surface plan 的 owning change 定义后在此扩充；
+> 当前已落地的目标如下。
 
-当前唯一可用的目标（均为响亮占位，不承载验证）：
+## Harness（`cd deep_research_harness`）
 
 ```bash
-cd deep_research_harness
-make install    # 骨架占位：什么都不装，只声明状态
-make verify     # 骨架占位：什么都不验证，只声明状态
+make install    # 诚实 no-op：无外部依赖可装（deerflow-harness editable 源随接线 change 进入）
+make test       # unittest 套件（stdlib，离线可跑）
+make verify     # 应用单元门禁 = make test 的 gate 形态；任一测试失败即非零退出
 ```
 
-治理门禁与更多入口随其 owning change 落地后在此登记。
+`make verify` 只承载 harness 自身测试，不读、不引、不执行任何 OpenSpec 内容。
+
+## 治理（repo 根，非 harness 命令）
+
+治理门禁属于仓库根的治理目录（读其 README 的 Checker 命令一节）；本文件只登记
+harness 自身的命令。
+
+其余 CLI 子命令随各自 owning change 落地后在此登记。
