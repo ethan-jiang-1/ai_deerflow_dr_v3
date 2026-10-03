@@ -130,6 +130,54 @@ class RunEngineTest(unittest.TestCase):
         result = run_engine.run_research(self.handle, stream_fn=stream_fn)
         self.assertEqual(result.status, "cancelled")
 
+    def test_error_fallback_transfers_to_failed_resume(self) -> None:
+        fallback_ai = {
+            "type": "ai",
+            "content": "LLM request failed: No generations found in stream.",
+            "additional_kwargs": {"deerflow_error_fallback": True, "error_type": "ValueError"},
+        }
+
+        def stream_fn(message: str):
+            yield _event("values", messages=[{"type": "human", "content": "q"}, fallback_ai])
+            yield _event("end")
+
+        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        self.assertEqual(result.status, "failed-resume")
+        entries = journal_mod_entries(self.handle)
+        terminal = [e for e in entries if e.category == "terminal"]
+        self.assertEqual(len(terminal), 1)
+        self.assertEqual(terminal[0].event, "llm_error_fallback")
+        self.assertEqual(terminal[0].detail.get("error_type"), "ValueError")
+
+    def test_error_fallback_beats_a_clean_completion(self) -> None:
+        # The fallback message is an error report: the run must not complete even
+        # though the stream reaches end with no stop reason and no clarification.
+        # Shape mirrors a real run (values snapshot + messages-tuple, per the wiring
+        # smoke diagnostic).
+        fallback_ai = {
+            "type": "ai",
+            "content": "LLM request failed: boom",
+            "additional_kwargs": {"deerflow_error_fallback": True, "error_type": "RuntimeError"},
+        }
+
+        def stream_fn(message: str):
+            yield _event("values", messages=[{"type": "human", "content": "q"}, fallback_ai])
+            yield _event("messages-tuple", message=fallback_ai)
+            yield _event("end")
+
+        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        self.assertEqual(result.status, "failed-resume")
+
+    def test_clean_run_has_no_fallback_behavior(self) -> None:
+        def stream_fn(message: str):
+            yield _event("messages-tuple", message={"type": "ai", "content": "正常回答", "additional_kwargs": {}})
+            yield _event("end")
+
+        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        self.assertEqual(result.status, "completed")
+        entries = journal_mod_entries(self.handle)
+        self.assertFalse(any(e.event == "llm_error_fallback" for e in entries))
+
 
 def journal_mod_entries(handle):
     from deerflow_deep_research.runtime import journal as journal_mod

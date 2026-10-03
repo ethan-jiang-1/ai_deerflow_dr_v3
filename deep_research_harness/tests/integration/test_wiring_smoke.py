@@ -24,7 +24,12 @@ except ImportError:  # pragma: no cover — environments without the framework
 
 from deerflow_deep_research.runtime import bundle_actions, bundle_state
 from deerflow_deep_research.runtime import client as client_binding
+from deerflow_deep_research.runtime import journal as journal_mod
 from deerflow_deep_research.runtime import run_engine
+
+
+def journal_entries(handle):
+    return journal_mod.read_entries(handle)
 
 _PIN = "c" * 40
 _FIXED_NOW = datetime(2026, 10, 3, 12, 0, tzinfo=timezone.utc)
@@ -36,6 +41,8 @@ _SCRIPT_CONTINUATION = json.dumps(
         {"content": "已按假设完成：聚焦 A 国市场，认证壁垒分析见报告。"},
     ]
 )
+
+_SCRIPT_RAISE = json.dumps([{"raise": "deliberate fixture failure"}])
 
 
 @unittest.skipUnless(_FRAMEWORK_AVAILABLE, "deerflow environment required: run `uv sync` in deep_research_harness/")
@@ -83,6 +90,23 @@ class WiringSmokeTest(unittest.TestCase):
         payload = json.loads(snapshot.read_text(encoding="utf-8"))
         self.assertEqual(payload["model_name"], "fixture-scripted")
         self.assertIn("system_prompt", payload)
+
+    def test_raising_model_fails_loud_via_the_framework_fallback(self) -> None:
+        # The full chain: scripted model raises → the framework's error-handling
+        # middleware renders the deerflow_error_fallback message → the run engine's
+        # guard lands the run in failed-resume instead of a silent completion.
+        os.environ["DEERFLOW_FAKE_SCRIPT"] = _SCRIPT_RAISE
+        self.addCleanup(os.environ.pop, "DEERFLOW_FAKE_SCRIPT", None)
+        with client_binding.bundle_checkpointer(self.handle) as saver:
+            client = client_binding.build_client(_CONFIG_ROOT, "fixture", checkpointer=saver)
+            result = run_engine.run_research(
+                self.handle, stream_fn=lambda message: client.stream(message, thread_id=self.state.thread_id)
+            )
+        self.assertEqual(result.status, "failed-resume")
+        entries = journal_entries(self.handle)
+        terminal = [e for e in entries if e.category == "terminal" and e.event == "llm_error_fallback"]
+        self.assertEqual(len(terminal), 1)
+        self.assertEqual(terminal[0].detail.get("error_type"), "RuntimeError")
 
     def test_contract_mirror_matches_the_real_surface(self) -> None:
         import inspect

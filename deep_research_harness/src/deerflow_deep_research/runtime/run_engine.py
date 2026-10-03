@@ -62,7 +62,7 @@ def _consume_turn(
     message: str,
     thread_id: str,
     on_event: Callable[[object], None] | None = None,
-) -> tuple[list[clarification.TerminalToolCall], set[str], str | None]:
+) -> tuple[list[clarification.TerminalToolCall], set[str], str | None, str | None]:
     """One stream turn: journal tool/subagent events, and derive the terminal picture
     from the final ``values`` snapshot (complete message list) with streamed chunks as
     the fallback — chunk-level tool_calls are partial; the snapshot is authoritative."""
@@ -70,8 +70,10 @@ def _consume_turn(
     tool_calls: list[clarification.TerminalToolCall] = []
     answered: set[str] = set()
     stop_reason: str | None = None
+    fallback_error_type: str | None = None
     values_calls: list[clarification.TerminalToolCall] = []
     values_answered: set[str] = set()
+    values_fallback_error_type: str | None = None
     for event in stream_fn(message):
         if on_event is not None:
             on_event(event)
@@ -94,6 +96,15 @@ def _consume_turn(
                         )
                         for call in calls
                     ]
+                    # The framework's error-handling middleware disguises a model-call
+                    # failure as a normal AI message (deerflow_error_fallback marker):
+                    # the terminal picture must carry it (wiring plan, error-fallback
+                    # guard).
+                    extra = _msg_field(message_item, "additional_kwargs", {}) or {}
+                    marker = extra.get("deerflow_error_fallback") if isinstance(extra, dict) else None
+                    values_fallback_error_type = (
+                        str(extra.get("error_type", "unknown")) if marker else None
+                    )
                 elif kind in {"tool", "ToolMessage"}:
                     answered_id = str(_msg_field(message_item, "tool_call_id", "") or "")
                     if answered_id and not _is_framework_clarification_echo(message_item, answered_id):
@@ -126,9 +137,9 @@ def _consume_turn(
             _journal(handle, "subagent", str(data.get("event", "subagent_event")), dict(data))
         elif event_type == "end":
             stop_reason = data.get("stop_reason") if isinstance(data, dict) else None
-    if values_calls or values_answered:
-        return values_calls, values_answered, stop_reason
-    return tool_calls, answered, stop_reason
+    if values_calls or values_answered or values_fallback_error_type is not None:
+        return values_calls, values_answered, stop_reason, values_fallback_error_type
+    return tool_calls, answered, stop_reason, values_fallback_error_type
 
 
 def tail_journal(journal_path: Path, position: int = 0):
@@ -175,7 +186,7 @@ def run_research(
     message = problem
 
     while True:
-        tool_calls, answered, stop_reason = _consume_turn(
+        tool_calls, answered, stop_reason, fallback_error_type = _consume_turn(
             handle, stream_fn, message, state.thread_id, on_event
         )
         detected = clarification.unanswered_ask_clarification(
@@ -187,6 +198,18 @@ def run_research(
 
         if not detected:
             fresh = bundle_state.read_state(handle)
+            if fallback_error_type is not None:
+                # The framework disguised a model-call failure as a normal AI message:
+                # fail loud instead of completing (wiring plan, error-fallback guard).
+                state = rule_run_terminal(fresh, "failed-resume")
+                written = bundle_state.write_state(handle, fresh, state)
+                _journal(
+                    handle,
+                    "terminal",
+                    "llm_error_fallback",
+                    {"reason": "llm_error_fallback", "error_type": fallback_error_type},
+                )
+                return written
             if fresh.cancel_requested:
                 state = rule_run_terminal(fresh, "cancelled")
                 written = bundle_state.write_state(handle, fresh, state)

@@ -29,23 +29,17 @@ DEFAULT_SCRIPT: list[dict] = [
 ]
 
 
-def _load_script() -> list[AIMessage]:
+def _load_script() -> list[dict]:
     raw = os.environ.get("DEERFLOW_FAKE_SCRIPT")
-    script = json.loads(raw) if raw else DEFAULT_SCRIPT
-    messages: list[AIMessage] = []
-    for item in script:
-        kwargs: dict = {"content": item.get("content", "")}
-        if item.get("tool_calls"):
-            kwargs["tool_calls"] = item["tool_calls"]
-        messages.append(AIMessage(**kwargs))
-    return messages
+    return json.loads(raw) if raw else DEFAULT_SCRIPT
 
 
 class ScriptedChatModel(BaseChatModel):
     """Replays the scripted AIMessages in order (the last one repeats on overflow —
-    loop caps belong to the caller)."""
+    loop caps belong to the caller). A script item may carry ``{"raise": "..."}``:
+    ``_generate`` then raises, driving the framework's real error-fallback path."""
 
-    script: list[AIMessage] = Field(default_factory=list)
+    script: list[dict] = Field(default_factory=list)
     cursor: int = 0
 
     def __init__(self, **kwargs) -> None:  # noqa: ANN401 — the loader passes model-config kwargs
@@ -58,7 +52,13 @@ class ScriptedChatModel(BaseChatModel):
     def _generate(self, messages, stop=None, run_manager=None, **kwargs):  # noqa: ANN001, ANN202
         index = min(self.cursor, len(self.script) - 1)
         self.cursor += 1
-        return ChatResult(generations=[ChatGeneration(message=self.script[index])])
+        item = self.script[index]
+        if item.get("raise"):
+            raise RuntimeError(str(item["raise"]))
+        kwargs: dict = {"content": item.get("content", "")}
+        if item.get("tool_calls"):
+            kwargs["tool_calls"] = item["tool_calls"]
+        return ChatResult(generations=[ChatGeneration(message=AIMessage(**kwargs))])
 
     def bind_tools(self, tools, **kwargs):  # noqa: ANN001, ANN202 — framework signature
         # Tool execution happens in the agent's tool node; the scripted model only

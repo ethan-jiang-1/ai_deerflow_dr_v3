@@ -6,5 +6,5 @@
 
 | 限制 | 来源 | 处置 |
 | --- | --- | --- |
-| 框架 LLM 调用失败不抛异常，而是降级为一条带 `deerflow_error_fallback` 标记的正常 AI 消息——run 会"正常完成"，失败被包装在内容里 | establish-embedded-wiring 冒烟发现 | 未修复（框架行为）；watch/journal 里该消息可见，渲染层如实显示；后续可加检测守卫识别 fallback 标记并转 failed-resume |
+| 框架 LLM 调用失败不抛异常，而是降级为一条带 `deerflow_error_fallback` 标记的正常 AI 消息——框架行为本身不变 | establish-embedded-wiring 冒烟发现 | **harness 守卫已落地（surface-llm-error-fallback）**：run engine 检测标记 → 转 `failed-resume` + terminal journal 记录 error_type，不再静默 completed；集成冒烟实证（脚本模型故意抛错→全链路 failed-resume） |
 | 集成冒烟/旅程测试不在 CI 里跑（CI 无依赖安装步；unit gate 保持纯 stdlib） | establish-embedded-wiring 设计决策 1 | 有意为之并记录在案；集成 lane 经 `make smoke` 在本地同步环境运行 |
