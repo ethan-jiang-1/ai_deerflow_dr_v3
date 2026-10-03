@@ -118,7 +118,7 @@ class StreamFactoryTest(unittest.TestCase):
         fn = cb.make_stream_fn(FakeClient(), "thread-1")
         fn("研究问题")
         self.assertEqual(recorded["thread_id"], "thread-1")
-        self.assertEqual(recorded["recursion_limit"], 300)
+        self.assertEqual(recorded["recursion_limit"], 1000)
 
 
 if __name__ == "__main__":
