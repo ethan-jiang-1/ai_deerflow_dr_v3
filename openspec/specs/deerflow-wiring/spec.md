@@ -91,6 +91,11 @@ terminal state contradicting the state machine.
 - **THEN** the engine transfers the bundle to `failed-resume`, journals a `terminal`
   entry naming the error type, and does not report `completed`
 
+#### Scenario: A clean completion lands the report through the hold point
+
+- **WHEN** a run completes cleanly with a non-empty final answer
+- **THEN** the engine submits the answer as a final_report through the admission hold point, and an admitted report file appears under final/ with a ledger admit entry
+
 ### Requirement: Every run records an assembly snapshot
 
 The run engine SHALL inject a first-round middleware hook that records the rendered

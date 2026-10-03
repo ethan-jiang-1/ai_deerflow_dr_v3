@@ -201,5 +201,16 @@ class AdmissionRuntimeTest(unittest.TestCase):
         self.assertEqual(counts, {"evidence": 1, "final_report": 1})
 
 
+    def test_final_report_places_to_final(self) -> None:
+        entry = admission_mod.submit_artifact(
+            self.handle,
+            _submission(kind="final_report", filename="report-gen1.md", content="# 简报\n内容".encode()),
+        )
+        self.assertEqual(entry.disposition, "admit")
+        placed = self.handle.root / "final" / "report-gen1.md"
+        self.assertTrue(placed.is_file())
+        self.assertEqual(entry.artifact_path, "final/report-gen1.md")
+
+
 if __name__ == "__main__":
     unittest.main()

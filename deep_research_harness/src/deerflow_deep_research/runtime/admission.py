@@ -58,14 +58,16 @@ def submit_artifact(handle: BundleHandle, submission: ArtifactSubmission) -> Led
 
     context = _build_context(handle)
     verdict = validate(submission, context)
+    # RUB-001's directory contract: final reports route to final/; everything else evidence/.
+    placement = f"final/{submission.filename}" if submission.kind == "final_report" else f"evidence/{submission.kind}/{submission.filename}"
     if verdict.result_code != "ok":
         disposition, artifact_path, replay_of = "reject", "", None
     elif verdict.content_hash in context.rejected_hashes:
         disposition = "replay"
-        artifact_path = f"evidence/{submission.kind}/{submission.filename}"
+        artifact_path = placement
         replay_of = context.rejected_hashes[verdict.content_hash]
     else:
-        disposition, artifact_path, replay_of = "admit", f"evidence/{submission.kind}/{submission.filename}", None
+        disposition, artifact_path, replay_of = "admit", placement, None
 
     if disposition in {"admit", "replay"}:
         atomic.atomic_write_bytes(handle.root / artifact_path, submission.content)

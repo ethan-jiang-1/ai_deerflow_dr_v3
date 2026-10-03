@@ -10,6 +10,7 @@ ledger, a minimal pass/blocked gate derivation, closed admission vocabularies, a
 quality register that cannot silently rot.
 
 ## Requirements
+
 ### Requirement: The validator is the admission hold point
 
 Every artifact submission SHALL be rendered a verdict by the pure validator before any
@@ -73,6 +74,11 @@ entry's `content_hash` and the validator now renders `ok`; content matching an a
   validates
 - **THEN** a `replay` entry references the rejected entry's sequence, and the reworked
   content is placed under `evidence/`
+
+#### Scenario: An admitted final report lands in final/
+
+- **WHEN** a valid final_report submission is admitted
+- **THEN** the content is placed under `final/` and the ledger entry records that path
 
 ### Requirement: The gate derives pass or blocked from admitted facts
 

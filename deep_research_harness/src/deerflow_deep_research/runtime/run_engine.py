@@ -62,7 +62,7 @@ def _consume_turn(
     message: str,
     thread_id: str,
     on_event: Callable[[object], None] | None = None,
-) -> tuple[list[clarification.TerminalToolCall], set[str], str | None, str | None]:
+) -> tuple[list[clarification.TerminalToolCall], set[str], str | None, str | None, str]:
     """One stream turn: journal tool/subagent events, and derive the terminal picture
     from the final ``values`` snapshot (complete message list) with streamed chunks as
     the fallback — chunk-level tool_calls are partial; the snapshot is authoritative."""
@@ -76,6 +76,7 @@ def _consume_turn(
     values_fallback_error_type: str | None = None
     turn_text: list[str] = []
     saw_values = False
+    values_final_text: list[str] = []
     for event in stream_fn(message):
         if on_event is not None:
             on_event(event)
@@ -90,6 +91,7 @@ def _consume_turn(
                 if kind in {"ai", "AIMessage", "AIMessageChunk"}:
                     # Only the LAST AI message's calls count (the terminal picture) —
                     # older turns' clarifications are history, not pending questions.
+                    values_final_text = [str(_msg_field(message_item, "content", "") or "")]
                     calls = _msg_field(message_item, "tool_calls", []) or []
                     values_calls = [
                         clarification.TerminalToolCall(
@@ -145,8 +147,30 @@ def _consume_turn(
         detail = {"calls": [call.name for call in tool_calls], "answer_excerpt": excerpt} if tool_calls else {"answer_excerpt": excerpt}
         _journal(handle, "model_tool", "model_tool_call", detail)
     if saw_values or values_calls or values_answered or values_fallback_error_type is not None:
-        return values_calls, values_answered, stop_reason, values_fallback_error_type
-    return tool_calls, answered, stop_reason, values_fallback_error_type
+        return values_calls, values_answered, stop_reason, values_fallback_error_type, "".join(values_final_text)
+    return tool_calls, answered, stop_reason, values_fallback_error_type, "".join(turn_text)
+
+
+
+def _submit_final_report(handle: BundleHandle, generation: int, final_text: str) -> None:
+    """A clean completion's final answer passes the admission hold point as a
+    final_report (models propose, code disposes); an empty answer never submits."""
+
+    text = (final_text or "").strip()
+    if not text:
+        return
+    from .admission import submit_artifact
+    from ..engine.validator import ArtifactSubmission
+
+    submit_artifact(
+        handle,
+        ArtifactSubmission(
+            kind="final_report",
+            filename=f"report-gen{generation}.md",
+            content=text.encode("utf-8"),
+            provenance={"producer": "run-engine"},
+        ),
+    )
 
 
 def tail_journal(journal_path: Path, position: int = 0):
@@ -204,7 +228,7 @@ def run_research(
 
 def _drive(handle, stream_fn, on_event, state, message):
     while True:
-        tool_calls, answered, stop_reason, fallback_error_type = _consume_turn(
+        tool_calls, answered, stop_reason, fallback_error_type, final_text = _consume_turn(
             handle, stream_fn, message, state.thread_id, on_event
         )
         detected = clarification.unanswered_ask_clarification(
@@ -241,6 +265,7 @@ def _drive(handle, stream_fn, on_event, state, message):
             state = rule_run_terminal(fresh, "completed")
             written = bundle_state.write_state(handle, fresh, state)
             _journal(handle, "terminal", "run_completed", {"generation": written.generation})
+            _submit_final_report(handle, written.generation, final_text)
             return written
 
         last_question = tool_calls[-1].arguments if tool_calls else ""

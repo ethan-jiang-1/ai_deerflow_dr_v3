@@ -210,6 +210,34 @@ class RunEngineTest(unittest.TestCase):
         entries = journal_mod_entries(self.handle)
         self.assertTrue(any(e.category == "terminal" and e.event == "framework_error" for e in entries))
 
+    def test_clean_completion_lands_final_report_through_hold_point(self) -> None:
+        def stream_fn(message: str):
+            yield _event("values", messages=[
+                {"type": "human", "content": "q"},
+                {"type": "ai", "content": "最终简报全文内容"},
+            ])
+            yield _event("end")
+
+        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        self.assertEqual(result.status, "completed")
+        report = self.handle.root / "final" / f"report-gen{result.generation}.md"
+        self.assertTrue(report.is_file(), report)
+        self.assertIn("最终简报全文内容", report.read_text(encoding="utf-8"))
+        from deerflow_deep_research.runtime.ledger import read_ledger
+        entries = read_ledger(self.handle)
+        self.assertTrue(any(e.disposition == "admit" and e.kind == "final_report" for e in entries))
+
+    def test_fallback_completion_never_submits(self) -> None:
+        fallback_ai = {"type": "ai", "content": "LLM request failed", "additional_kwargs": {"deerflow_error_fallback": True, "error_type": "RuntimeError"}}
+
+        def stream_fn(message: str):
+            yield _event("values", messages=[{"type": "human", "content": "q"}, fallback_ai])
+            yield _event("end")
+
+        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        self.assertEqual(result.status, "failed-resume")
+        self.assertEqual(list((self.handle.root / "final").iterdir()), [], "no report file on a failed run")
+
 def journal_mod_entries(handle):
     from deerflow_deep_research.runtime import journal as journal_mod
 
