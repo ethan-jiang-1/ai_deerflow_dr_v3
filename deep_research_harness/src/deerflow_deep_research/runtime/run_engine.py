@@ -75,12 +75,14 @@ def _consume_turn(
     values_answered: set[str] = set()
     values_fallback_error_type: str | None = None
     turn_text: list[str] = []
+    saw_values = False
     for event in stream_fn(message):
         if on_event is not None:
             on_event(event)
         event_type = getattr(event, "type", None)
         data = getattr(event, "data", None) or {}
         if event_type == "values":
+            saw_values = True
             messages = data.get("messages", []) if isinstance(data, dict) else []
             values_calls, values_answered = [], set()
             for message_item in messages:
@@ -142,7 +144,7 @@ def _consume_turn(
         excerpt = "".join(turn_text)[-80:]
         detail = {"calls": [call.name for call in tool_calls], "answer_excerpt": excerpt} if tool_calls else {"answer_excerpt": excerpt}
         _journal(handle, "model_tool", "model_tool_call", detail)
-    if values_calls or values_answered or values_fallback_error_type is not None:
+    if saw_values or values_calls or values_answered or values_fallback_error_type is not None:
         return values_calls, values_answered, stop_reason, values_fallback_error_type
     return tool_calls, answered, stop_reason, values_fallback_error_type
 
