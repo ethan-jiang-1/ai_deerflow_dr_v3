@@ -241,3 +241,4 @@ RUN-*.command
 
 # proof receipts/transcripts are local evidence, never history
 .proof/
+.uv-cache/

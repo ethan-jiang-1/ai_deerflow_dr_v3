@@ -1,0 +1,28 @@
+# fixture.yaml — zero-credential rehearsal: `use:` seams point at harness-owned fakes
+# (runtime/fixtures) running the real client chain. The smoke proves this path.
+config_version: 45
+log_level: info
+
+sandbox:
+  use: deerflow.sandbox.local:LocalSandboxProvider
+  allow_host_bash: false
+
+models:
+  - name: fixture-scripted
+    display_name: Fixture Scripted Model
+    use: deerflow_deep_research.runtime.fixtures:ScriptedChatModel
+    model: fixture-scripted
+    # Zero-credential rehearsal: no secret exists here, so a literal placeholder
+    # (the strict $VAR resolver would fail on an unset environment variable).
+    api_key: fixture-no-secret
+
+tool_groups:
+  - name: web
+
+tools:
+  - name: web_search
+    group: web
+    use: deerflow_deep_research.runtime.fixtures:fake_web_search
+
+summarization:
+  enabled: true

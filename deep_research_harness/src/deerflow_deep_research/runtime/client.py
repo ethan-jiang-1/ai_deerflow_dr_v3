@@ -1,0 +1,92 @@
+"""DeerFlow client binding: explicit config resolution and ruled defaults.
+
+The framework import is lazy (inside build_client) so mirror-constant and
+config-resolution logic stay testable without the framework.
+
+@impl DEW-001"""
+
+from __future__ import annotations
+
+from contextlib import contextmanager
+from pathlib import Path
+
+from ..domain import bundle
+from .contracts import client_surface
+
+CONFIG_NAMES: tuple[str, ...] = ("base", "fixture")
+
+# The ruled binding defaults (see runtime/contracts/client_surface.CONSUMED_DEFAULTS).
+BINDING_DEFAULTS: dict[str, object] = dict(client_surface.CONSUMED_DEFAULTS)
+
+
+def resolve_config_path(config_root: Path, name: str) -> Path:
+    """Resolve an explicit checked-in configuration path. No framework auto-discovery:
+    an unknown name or a missing file fails loudly naming the request."""
+
+    if name not in CONFIG_NAMES:
+        raise ValueError(
+            f"unknown configuration {name!r}: expected one of {CONFIG_NAMES} "
+            "(explicit config resolution — the framework's default discovery is refused)"
+        )
+    path = Path(config_root) / f"{name}.yaml"
+    if not path.is_file():
+        raise FileNotFoundError(
+            f"configuration {name!r} not found at {path} — pass an explicit, checked-in path"
+        )
+    return path
+
+
+@contextmanager
+def bundle_checkpointer(handle):
+    """Open the bundle's sync SqliteSaver via the framework's own factory seam
+    (from_conn_string + setup). Framework import is lazy."""
+
+    from langgraph.checkpoint.sqlite import SqliteSaver  # framework import (lazy)
+
+    conn_str = str(Path(handle.root) / bundle.checkpoint_relative())
+    with SqliteSaver.from_conn_string(conn_str) as saver:
+        saver.setup()
+        yield saver
+
+
+def build_client(
+    config_root: Path,
+    config_name: str,
+    *,
+    checkpointer,
+    middlewares=None,
+    model_name: str | None = None,
+    snapshot_dir: Path | None = None,
+    pin: str | None = None,
+):
+    """Construct the embedded DeerFlowClient with the ruled defaults.
+
+    When ``snapshot_dir`` is given, the assembly-snapshot middleware is injected
+    first (plan decision 4's escape hatch, first use). The framework import is
+    deliberately lazy: this function requires the deerflow-harness dependency; the
+    unit lane never calls it."""
+
+    from deerflow.client import DeerFlowClient  # lazy: framework import
+
+    config_path = resolve_config_path(config_root, config_name)
+    # The framework re-resolves lazily in later code paths (agent build, extensions);
+    # pin its own resolution seam to our explicit file so nothing auto-discovers a
+    # different config.yaml behind the binding's back.
+    import os
+
+    os.environ["DEER_FLOW_CONFIG_PATH"] = str(config_path)
+    injected = list(middlewares) if middlewares else []
+    if snapshot_dir is not None:
+        from .snapshot_middleware import build_snapshot_middleware
+
+        injected.insert(0, build_snapshot_middleware(snapshot_dir, model_name=model_name or "", pin=pin or ""))
+    return DeerFlowClient(
+        config_path=str(config_path),
+        checkpointer=checkpointer,
+        model_name=model_name,
+        thinking_enabled=True,
+        subagent_enabled=True,
+        plan_mode=False,
+        available_skills=None,
+        middlewares=injected,
+    )

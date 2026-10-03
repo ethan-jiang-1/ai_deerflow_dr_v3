@@ -35,6 +35,10 @@ RUB-001: run-bundle — 运行底座：目录契约、单真相状态机（revis
 # 验收收口（owning delta: openspec/changes/establish-run-admission）。
 RUA-001: run-admission — 验收收口：validator hold point（未裁决不入账）、sha256 哈希链三分处置 ledger（admit/reject/replay，篡改响亮失败）、gate 最小推导（pass/blocked）、封闭准入词表、质量注册处同步
 
+# ---- establish-embedded-wiring 登记（2026-10-03）------------------------------
+# 嵌入式 DeerFlow 绑定（owning delta: openspec/changes/establish-embedded-wiring）。
+DEW-001: deerflow-wiring — 嵌入式绑定：显式配置解析（拒自动发现）、契约镜像锁漂移、装配快照每 run 一张、终态诚实 run engine（journal 三汇 + 有界澄清续答回路）
+
 # ---- add-ci-governance 登记（2026-10-02）--------------------------------------
 # CI 门禁与本地 hook 的接受路径合同（owning delta: openspec/changes/add-ci-governance）。
 CIG-001: ci-governance — CI 门禁与本地 hook 的接受路径合同：单 job CI 全量治理套件、hook 只跑便宜高置信检查、声明自身被机器校验

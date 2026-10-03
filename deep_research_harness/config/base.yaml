@@ -1,0 +1,34 @@
+# base.yaml — real-run configuration (shape here, secrets as $VAR references).
+# Modeled on the framework's config.example.yaml active entries; the model entry is
+# UNVERIFIED until a real-key run (the wiring smoke proves the fixture path instead).
+config_version: 45
+log_level: info
+
+sandbox:
+  use: deerflow.sandbox.local:LocalSandboxProvider
+  allow_host_bash: false
+
+models:
+  - name: deepseek-chat
+    display_name: DeepSeek Chat
+    use: deerflow.models.patched_deepseek:PatchedChatDeepSeek
+    model: deepseek-chat
+    api_key: $DEEPSEEK_API_KEY
+    supports_thinking: false
+
+tool_groups:
+  - name: web
+
+tools:
+  - name: web_search
+    group: web
+    use: deerflow.community.ddg_search.tools:web_search_tool
+    max_results: 5
+  - name: web_fetch
+    group: web
+    use: deerflow.community.jina_ai.tools:web_fetch_tool
+    timeout: 10
+
+# Long research runs need compaction protection (plan decision 6: explicit, not default).
+summarization:
+  enabled: true

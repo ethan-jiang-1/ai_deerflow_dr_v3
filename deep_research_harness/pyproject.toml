@@ -3,9 +3,8 @@ name = "deerflow-deep-research"
 description = "Deep research runtime harness for DeerFlow (v3 rewrite)"
 requires-python = ">=3.12"
 dynamic = ["version"]
-# 骨架期：无运行时依赖。deerflow-harness 的 editable 依赖随"接线"change 进入
-# （uv source 已在下方占位，指向同级 submodule 的 harness 包）。
-dependencies = []
+# 嵌入式接线（establish-embedded-wiring）：DeerFlow harness 包进入运行时依赖。
+dependencies = ["deerflow-harness"]
 
 [dependency-groups]
 dev = [

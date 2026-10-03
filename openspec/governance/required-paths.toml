@@ -87,6 +87,20 @@ files = [
   "profiles/README.md",
 ]
 
+[paths.DEW-001]
+# Embedded DeerFlow binding (owner: deerflow-wiring capability).
+files = [
+  "deep_research_harness/config/base.yaml",
+  "deep_research_harness/config/fixture.yaml",
+  "deep_research_harness/src/deerflow_deep_research/runtime/client.py",
+  "deep_research_harness/src/deerflow_deep_research/runtime/run_engine.py",
+  "deep_research_harness/src/deerflow_deep_research/runtime/snapshot_middleware.py",
+]
+directories = [
+  "deep_research_harness/src/deerflow_deep_research/runtime/contracts",
+  "deep_research_harness/src/deerflow_deep_research/runtime/fixtures",
+]
+
 [paths.CIG-001]
 # CI 门禁与本地 hook 的接受路径文件（owner: ci-governance capability）。
 files = [

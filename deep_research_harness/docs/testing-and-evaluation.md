@@ -7,7 +7,8 @@
 
 | Lane | Command | 覆盖 |
 | --- | --- | --- |
-| Application unit gate | `make verify`（= `PYTHONPATH=src python3 -m unittest discover -s tests`） | domain 纯规则（转移/检测/journal 策略）+ runtime 物化（CAS/lease/journal/删除语义） |
+| Application unit gate | `make verify`（= `PYTHONPATH=src python3 -m unittest discover -s tests`） | domain 纯规则（转移/检测/journal 策略）+ runtime 物化（CAS/lease/journal/删除语义）+ mirror/配置解析（框架无关） |
+| Integration smoke | `make smoke`（需先 `uv sync`：框架依赖环境） | 嵌入式 client + sync saver 多轮 + 有界澄清续答 + checkpoint 可读 + 装配快照 + 契约镜像对比真实面 |
 | Governance checks（governance-owned，非 harness lane） | 聚合治理门禁（repo 根治理目录的 README 登记确切命令） | 结构/需求/文档治理 |
 
 ## 原则（承接自 v3 方向）

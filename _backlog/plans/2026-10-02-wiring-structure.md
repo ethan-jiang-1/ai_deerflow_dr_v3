@@ -134,8 +134,15 @@ v2 拿得过来就拿，拿不过来就算了。证据底座：`_reference/deerf
 
 ## 落地关联
 
-成熟后**经用户拍板**入线（HITL 闸门）。撤节点语法已单独立线并归档（`remove-graph-layer`，
-2026-10-03，落地注见决策 3）；embedded 接线 + 契约镜像（产品首笔）待入线。接线首笔的红绿冒烟项：**embedded client + sync
+成熟后**经用户拍板**入线（HITL 闸门）。**〔部分落地（2026-10-03）**：change
+`establish-embedded-wiring` 归档于
+`openspec/changes/archive/2026-10-03-establish-embedded-wiring/`——决策 1（client 绑定，
+available_skills 自主定 None=全部技能面、透明准绳，可否决）、2（契约镜像 + 契约测试对真实
+签名）、4（middleware 只配置 + 逃生口首用：装配快照钩子）、6（两份 checked-in 配置落
+`config/`，显式 config_path + 钉死框架二次解析缝）、8（澄清续答 client 回路，冒烟实证）
+全部落地；冒烟钉死 sync saver 不确定性（多轮 + checkpoint 可读 + 快照 + 续答，零凭证全绿）。
+**决策 5（(b)层 subagents.* 旋钮声明）尚未落地**——随入口面或配置 change 补齐。**〕**
+接线首笔的红绿冒烟项：**embedded client + sync
 SqliteSaver 跑通多轮对话且 `checkpoint.sqlite` 落盘可读**——当前证据 ~90% 指 sync 正确
 （决策 1 修正注），此冒烟把剩余不确定性钉死（async saver + 同步 client 若意外可行也在此
 实验中显形）。

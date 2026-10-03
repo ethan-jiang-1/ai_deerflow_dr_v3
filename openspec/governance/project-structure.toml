@@ -6,7 +6,7 @@ contract = "project-structure"
 # owner（随 add-ci-governance 登记）；DOB-001 = 入口层预算闸的 owner
 #（随 add-doc-budget-gate 登记，无新增结构路径——预算表在 doc-hygiene
 # checker 内声明）。
-requirement_ids = ["PRS-001", "CIG-001", "DOB-001"]
+requirement_ids = ["PRS-001", "CIG-001", "DOB-001", "DEW-001"]
 
 [upstream_gitlink]
 path = "deerflow"
@@ -42,4 +42,4 @@ path = "openspec/governance/required-paths.toml"
 domain = ["stdlib", "pydantic"]
 engine = ["domain"]
 agents = ["domain"]
-runtime = ["domain", "engine", "agents"]
+runtime = ["domain", "engine", "agents", "deerflow", "langchain", "langgraph", "pydantic"]
