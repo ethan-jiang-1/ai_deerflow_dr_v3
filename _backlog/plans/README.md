@@ -24,7 +24,7 @@
 | Plan | 一句话 |
 |------|--------|
 
-（空）
+| [2026-10-03-deep-run-postmortem.md](2026-10-03-deep-run-postmortem.md) | 深研究真跑复盘：skill 装载/完整研究流水线/崩溃检测/材料保全的黄金证据 + 两修复（递归上限 300、run_research 异常守卫→failed-resume 人话失败）+ refine 复跑即验证 |
 
 **Next available plan ID: CLS-008**（移入 `_closed_plans/` 时分配）
 
