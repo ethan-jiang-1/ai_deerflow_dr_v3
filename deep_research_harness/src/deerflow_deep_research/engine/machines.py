@@ -16,6 +16,10 @@ DECLARED_MACHINES: tuple[tuple[str, str], ...] = (
      "requirements versus admitted facts; blocked names the unmet."),
     ("ledger-chain-verification", "evidence/submissions.jsonl is a sha256 hash chain: "
      "any field edit, insertion, or deletion fails the read at the first broken link."),
+    ("subagent-posture-guard", "Checked-in configurations declare no custom subagent "
+     "types, and any future declaration must exclude 'task' from its "
+     "disallowed_tools (the depth self-check fails closed naming the config, the "
+     "offender, and the remedy)."),
     ("application-unit-gate", "make verify runs the stdlib unittest suite and exits "
      "non-zero on any failure; it never links OpenSpec content."),
     ("repository-governance-gates", "The aggregate closeout gate and its component "

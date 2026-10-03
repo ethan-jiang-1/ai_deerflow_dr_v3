@@ -1,6 +1,6 @@
 # Plans — plan/分析文档索引
 
-> 最后更新: 2026-10-03（entry-surface plan 关闭：CLS-005，六子命令经 establish-entry-surface 落地归档；活跃 plan 仅剩 wiring-structure） | `_backlog/plans/` — 活跃 plan 在此（顶层），
+> 最后更新: 2026-10-03（wiring-structure plan 关闭：CLS-006，决策 5 以明示 posture + 守卫处置——**活跃 plan 清零**，digest 衍生 plan 家族全部消费完毕） | `_backlog/plans/` — 活跃 plan 在此（顶层），
 > 完成的普通 plan 移入 [`../_done/_closed_plans/`](../_done/_closed_plans/)。
 >
 > **plan 没有编号，文件名即标识。完成后文件名不变，位置即状态。**
@@ -21,11 +21,9 @@
 
 ## 活跃列表
 
-| Plan | 一句话 |
-|------|--------|
-| [2026-10-02-wiring-structure.md](2026-10-02-wiring-structure.md) | 接线与结构定案：embedded client（sync saver / 配置面 base+fixture / 澄清自动续答定案）+ 契约镜像层 + middleware 只配置；撤 graph 语法已落地（CLS-004 前的治理 change）；两项 UNVERIFIED 均已关闭 |
+（空——digest 衍生 plan 家族全部消费完毕。新 plan 按上方卡片模板新建。）
 
-**Next available plan ID: CLS-006**（移入 `_closed_plans/` 时分配）
+**Next available plan ID: CLS-007**（移入 `_closed_plans/` 时分配）
 
 ## 已归档（移至 `_done/_closed_plans/`）
 
@@ -36,6 +34,7 @@
 | CLS-003 digest-deerflow-native-deep-research | 六裁决推敲定案 + 三份衍生 plan（wiring-structure / bundle-contract / entry-surface）拆解落账 | 2026-10-02 |
 | CLS-004 bundle-contract | establish-run-bundle + establish-run-admission（均已 archive；决策 1/2/3/5/6 → 底座 change，决策 4 → 验收收口 change） | 2026-10-03 |
 | CLS-005 entry-surface | establish-entry-surface（已 archive；六子命令 + 渲染 + EV2 证据） | 2026-10-03 |
+| CLS-006 wiring-structure | remove-graph-layer + establish-embedded-wiring + pin-subagent-knobs（均已 archive；决策 5 以 posture + 守卫处置） | 2026-10-03 |
 
 ---
 

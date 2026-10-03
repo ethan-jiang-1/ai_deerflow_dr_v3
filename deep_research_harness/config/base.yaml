@@ -32,3 +32,11 @@ tools:
 # Long research runs need compaction protection (plan decision 6: explicit, not default).
 summarization:
   enabled: true
+
+# Subagent posture (wiring plan decision 5): no custom subagent types are declared —
+# DeerFlow's native deep-research delegation covers the research need. A future
+# declaration must arrive through an owning change and satisfy the depth self-check
+# (every custom agent excludes 'task' via disallowed_tools; guarded by
+# tests/unit/test_subagent_posture.py). See the quality register.
+# subagents:
+#   custom_agents: []
