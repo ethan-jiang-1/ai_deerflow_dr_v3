@@ -16,7 +16,7 @@
 
 DeerFlow 是宿主运行时，**不 import 本包**；触达方式（反射工具 / controller skill / 或更薄的接线）由首个 change 定义。
 
-> **当前状态：已实现核心。** specs 主干 9 个能力落地、29 个 changes 归档（活跃为空）、六动词 CLI 与 112-test 单元门禁在跑。
+> **当前状态：已实现核心。** specs 主干 11 个能力落地、31 个 changes 归档（活跃为空；以 `openspec/specs/` 与 `openspec/changes/archive/` 实际清单为准）、六动词 CLI 与单元门禁在跑。
 > 边界已定（六裁决，见 [`_backlog/_done/_closed_plans/`](_backlog/_done/_closed_plans/README.md)）；新方向按 [`_backlog/plans/README.md`](_backlog/plans/README.md) 的卡片模板立 plan 入账。
 
 ## 布局
@@ -32,7 +32,7 @@ _backlog/                 任务账本（plans / bugs 两类 + _done 归档 + _r
 
 其他根目录居民：
 
-- `config.yaml`、`.env` — 宿主运行时配置与凭证（均 gitignored；按 DeerFlow 宿主约定从模板/环境准备）
+- `config.yaml`、`.env` — 按需准备的宿主配置与凭证（gitignored，当前不在库内；与实存的 `openspec/config.yaml` 是两物）
 - `profiles/` — 本地运行 profile（暂未注册；权威将来落在 harness 的 local-operations 文档）
 - `CONTEXT.md`、`CONTEXT-MAP.md` — 三个 bounded context 的词汇边界（Host / Product / Governance）
 

@@ -15,7 +15,8 @@ from .contracts import client_surface
 
 CONFIG_NAMES: tuple[str, ...] = ("base", "fixture")
 
-# The embedded stream's recursion limit is a PER-CALL override (client.py:293) — the
+# The embedded stream's recursion limit is a PER-CALL override (upstream
+# deerflow/backend/packages/harness/deerflow/client.py:293) — the
 # AppConfig top-level key is not consumed by the embedded path. Deep research exhausts
 # the default 100 at ~10 tool rounds; 300 is a conservative start (framework max 1000).
 DEEP_RESEARCH_RECURSION_LIMIT = 1000  # proven by the completing gen-5 run (evidence arc 23->86->209->completed)

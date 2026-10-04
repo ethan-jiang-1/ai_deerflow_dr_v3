@@ -17,6 +17,10 @@
 | `check_ci_governance.py` | CI 工作流与本地 hook 的声明是否漂移（触发器、路径过滤、pinned 工具链、canonical 命令、hook 命令集）？ | 脚本 docstring（`@impl CIG-001`） |
 | `check_doc_hygiene.py` | 文档层（ADR 索引↔目录 / 入口链与 docs 层的相对链接 / 编码换行 / docs 层范围完整性 / `_backlog` 的 `_` 目录命名约定 / **入口层字符预算闸**——受管常驻文件的声明上限，超限与缺失响亮报错，只降不升棘轮）是否漂移？ | 脚本 docstring（standalone，非 gate 组件、非 `make verify` 目标；已进 CI canonical 序列；`@impl DOB-001`） |
 | `check_release_face.py` | 最小发布面是否完整（gitlink 在场且 pin 一致 / 兄弟布局与 `[tool.uv.sources]` 目标都在发布面内 / 随行源码零开发面耦合 / COMMANDS 路由目标存在）？ | 脚本 docstring（standalone，slow cold-start lane 见 playbook；`@impl RLF-001`） |
+| `check_proof_receipts.py` | 选中 change 的回执/证据是否在案（proof receipts）？ | 脚本 docstring（gate 组件，closeout 阶段 enforce） |
+| `selected-change-closeout.md` / `.py` | 选中 change 的 closeout 义务清单与执行？ | 文档+脚本（`@impl` 见文件头） |
+| `change_guidance_kernel.py` | change-guidance 规则的共享内核（checker 复用）？ | 脚本 docstring |
+| `portable_change_guidance_export.py` | 指导规则的可移植导出是否最新？ | 脚本 docstring |
 | `test-evidence-policy.md` | 测试证据的 authority、lifecycle、synchronized-change？ | [test-evidence-policy.md](test-evidence-policy.md)；批准语义由测试证据的 owning main spec 拥有（随 v3 首批治理 change 建立） |
 | `change-guidance/README.md` | 先按什么原则、再选哪个 policy？ | [change-guidance/README.md](../change-guidance/README.md) |
 
@@ -34,7 +38,7 @@ python3 openspec/governance/check_project_architecture.py
 python3 openspec/governance/check_change_guidance.py
 python3 openspec/governance/check_harness_dependency_direction.py
 python3 openspec/governance/check_ci_governance.py
-python3 openspec/governance/check_release_face.py
+python3 openspec/governance/check_proof_receipts.py
 ```
 
 共六个 component checker（closeout gate 的实装清单，见 `check_project_gate.py` 的
@@ -51,8 +55,8 @@ git config core.hooksPath .githooks
 
 CI 门禁：`.github/workflows/governance.yml` 在 push / pull request（路径过滤
 `openspec/**`、`deep_research_harness/**`、工作流与 hooks 自身）上单 job 运行
-canonical 序列——治理 unittest 套件、聚合 closeout gate、doc hygiene、harness
-`make verify`；任何非零退出即失败。声明由 `check_ci_governance.py` 机器校验。
+canonical 序列——治理 unittest 套件、聚合 closeout gate、doc hygiene、setup-uv +
+harness `make smoke`（fixture 梯集成 lane）、harness `make verify`；任何非零退出即失败。声明由 `check_ci_governance.py` 机器校验。
 
 文档层卫生另有独立 checker（不属于六 component 聚合、不进 `make verify`）：
 `python3 openspec/governance/check_doc_hygiene.py`（含 `--self-test` 负例控制）；

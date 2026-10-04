@@ -5,9 +5,8 @@ This independent Python project is the downstream **Deep Research Harness** for 
 execution and control environment that creates, drives, and disposes of research runs.
 
 **v3 rewrite, implemented core.** The philosophy carries over from v2; the implementation
-route is inverted: the research cognition engine is DeerFlow's native deep research
-capability (lead agent + `deep-research` skill + subagent delegation), and this harness
-keeps the deterministic, inspectable parts:
+route is inverted — v3 borrows DeerFlow's native deep research capability instead of
+hand-building the research graph (full telling: root `README.md`). This harness keeps:
 
 - **Run Bundles.** Each run gets an independently deletable durable record — delete a
   Bundle and the Harness keeps working, while that run becomes permanently unavailable.
@@ -42,7 +41,7 @@ repository's governance suite) fails loudly when the face is violated.
 | Need | Start here |
 | --- | --- |
 | Scope, layers, and boundaries | [`AGENTS.md`](AGENTS.md) |
-| Why v3 exists and what the harness keeps vs. delegates | [v3 direction note](AGENTS.md) + the boundary plan above |
+| 边界、分层与所有权（v3 为何存在、harness 留什么） | [AGENTS.md 引言段](AGENTS.md) |
 | Runtime and authority boundaries | [`docs/runtime-architecture.md`](docs/runtime-architecture.md) |
 | Local commands and profiles | [`docs/local-operations.md`](docs/local-operations.md) |
 | How to prove a change | [`docs/testing-and-evaluation.md`](docs/testing-and-evaluation.md) |

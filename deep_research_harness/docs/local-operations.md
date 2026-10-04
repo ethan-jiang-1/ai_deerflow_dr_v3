@@ -10,11 +10,6 @@
 - `make verify` 是纯 stdlib：不依赖 `uv sync`，`UV_OFFLINE=1` 兼容，离线可跑。
 - `profiles/` 目前没有已注册 profile；本地运行 profile 的权威将来落在 owning change。
 
-## 坑（详见 [`../playbook/run-research.md`](../playbook/run-research.md) 的坑节）
+## 坑
 
-- real 梯（`--config base` / `CONFIG=base`）需要本目录 `.env` 凭证。凭证属用户保留区：
-  缺了就问，绝不代建。fixture 梯零凭证。
-- `make create` 里裸写 `--config` 会被 make 本身吃掉（`unrecognized option`）——换梯走
-  `CONFIG=` 变量。
-- `make smoke` 里以 `RuntimeError: deliberate fixture failure` 收尾的 traceback 是响亮
-  失败测试在通过——看退出码，别看噪音。
+坑清单唯一持有处在 [`playbook/run-research.md`](../playbook/run-research.md) 的坑节（`--config` 被 make 吃掉、`.env` 保留区、smoke 响亮失败噪音等）；本文件不再复制，见坑即去 playbook。

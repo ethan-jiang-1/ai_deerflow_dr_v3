@@ -1,14 +1,16 @@
 # Deep Research Coding Guide
 
 This file is the self-contained code-change map for `deep_research_harness/`. The
-application does not depend on the repository's development-governance framework.
+application is runtime-independent of the repository's development-governance
+framework; its structural contract is owned by governance.
 `deerflow/` is a read-only upstream runtime framework: use its public API, never modify
-or source-browse it for ordinary application work.
+or source-browse it for ordinary application work — inspecting a framework-internal
+builder named by LLM-Node gate step 3 is the declared exception.
 
-v3's research cognition engine is DeerFlow's native deep research capability (lead agent
-+ `deep-research` skill + subagent delegation), and the harness keeps the deterministic,
-inspectable parts. The `agents/` layer is the one still-empty owner (see Non-Model Work);
-the other ownership boundaries are binding today.
+v3 borrows DeerFlow's native deep research capability; the harness keeps the
+deterministic, inspectable parts (full telling: root `README.md`). The `agents/` layer
+is the one still-empty owner (see Non-Model Work); the other ownership boundaries are
+binding today.
 
 ## Application Focus
 
@@ -30,8 +32,7 @@ For a Coding Agent creating, changing, or reviewing an LLM-bearing node or direc
 model branch, use this route before implementation navigation. Never infer the seam
 from the first file found or from presence or absence of a model call.
 
-This section is the complete application-owned cognition-versus-code contract: the
-numbered route below plus the explicit Non-Model Work branch.
+This section is the complete application-owned cognition-versus-code contract: the numbered route plus the explicit Non-Model Work branch.
 
 1. **Classify the surface** as `cognitive-program`, `deterministic-guardrail`,
    `human-decision`, or `wiring`. A model-bearing behavior symptom reaches cognition
@@ -56,7 +57,7 @@ numbered route below plus the explicit Non-Model Work branch.
 
 | Question | Application-owned first read |
 | --- | --- |
-| What may a bounded cognitive role think about and return? | The owning contract in `src/deerflow_deep_research/agents/` |
+| What may a bounded cognitive role think about and return? | The owning contract in `src/deerflow_deep_research/agents/`（空层；契约随 owning code 落地） |
 | What proves composition/admission? | The closest unit/contract test for that owner |
 | Who admits state, routes, and effects? | The `engine/` and `runtime/` owners behind it |
 
@@ -92,10 +93,9 @@ cognition is not causal. Do not invent a capability, prompt, or repair loop.
 
 ## Verification
 
-`make verify` is the application unit gate: the stdlib unittest suite under `tests/`
-(`PYTHONPATH=src`, zero external dependencies, offline-safe). It exits non-zero on any
-failure and never reads, imports, executes, or links OpenSpec content. Lane separation
-is explicit: `tests/integration/` is exercised by `make smoke`, not by `make verify`.
+`make verify` = the application unit gate (semantic owner: `COMMANDS.md`): stdlib
+unittest under `tests/`, `PYTHONPATH=src`, offline-safe, non-zero on any failure.
+Lane separation: `tests/integration/` belongs to `make smoke`.
 
 ## Structural Authority
 

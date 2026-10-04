@@ -16,7 +16,7 @@
 
 ## 这个仓库是什么
 
-`ai_deerflow_dr_v3` 是对上游 [bytedance/deer-flow](https://github.com/bytedance/deer-flow)（基于 LangGraph 的 AI super-agent 框架）之上，以 OpenSpec spec-driven 规范开发的 **Deep Research 智能体应用**。硬约束：**绝不修改上游源码**（`deerflow/backend/`、`deerflow/frontend/` 是上游镜像，位于 `deerflow/` submodule 内）。与 v2（`ai_deerflow_deep_research_v2`）的关键分野：v2 逐节点手搓研究图；v3 改为**消化并借力 DeerFlow v2.1.0 原生的 Deep Research 能力**（lead agent + subagent 委派 + deep-research skill），harness 只保留运行底座与确定性控制边界。Deep Research 智能体开发走 `openspec/`。
+`ai_deerflow_dr_v3` 是对上游 [bytedance/deer-flow](https://github.com/bytedance/deer-flow)（基于 LangGraph 的 AI super-agent 框架）之上，以 OpenSpec spec-driven 规范开发的 **Deep Research 智能体应用**。硬约束：**绝不修改上游源码**（`deerflow/backend/`、`deerflow/frontend/` 是上游镜像，位于 `deerflow/` submodule 内）。与 v2（`ai_deerflow_deep_research_v2`）的关键分野：v3 **借力 DeerFlow 原生 Deep Research 能力**而非逐节点手搓研究图（完整叙述见根 `README.md`）。Deep Research 智能体开发走 `openspec/`。
 
 ## 目录结构
 

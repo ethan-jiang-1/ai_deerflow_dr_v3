@@ -1,7 +1,5 @@
 # Deep Research Harness — Makefile
-# make verify is the application unit gate: stdlib unittest, zero external
-# dependencies, offline-safe (UV_OFFLINE=1 is honored by construction). It never
-# reads, imports, executes, or links OpenSpec content.
+# make verify = the application unit gate; semantic owner: COMMANDS.md.
 
 .PHONY: install verify test smoke create watch status record-stream
 

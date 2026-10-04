@@ -10,8 +10,8 @@ composition without changing portable core or profiles.
 ## Context Expansion Gate
 
 Expansion discipline: [`../core/change-practice.md`](../core/change-practice.md)
-(change admission). Adjacent seams start from `domain/` for typed
-meaning, `engine/` for deterministic policy, `agents/` for model-facing cognition,
+(change admission). Adjacent seams route by seam type, one statement:
+
 ## Context And Seams
 
 Start from `domain/` for typed meaning, `engine/` for deterministic policy,

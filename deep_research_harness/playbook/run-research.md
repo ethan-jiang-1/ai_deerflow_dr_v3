@@ -40,7 +40,7 @@
 4. **交回回执**：命令 + 退出码 + 终态行。只报本会话实际执行过的 run——没跑过的命令
    不得当作结果报告。
 
-## 冷启动 lane（发布证明，慢速；RLF-001 的 on-demand 全量证据）
+## 冷启动 lane（发布证明，慢速；RLF-001——ID 已退役，沿革归档 change `2026-10-04-remove-requirement-id-tracking`，在仓库根治理目录——的 on-demand 全量证据）
 
 全新两件套 checkout（harness + deerflow submodule）从零跑通全链路，证明发布面自足：
 
@@ -82,8 +82,6 @@ make create PROBLEM="发布面冷启动证明"
 - 全动词旅程回执（2026-10-04）：create exit 0（bundle `fe3f0fcf-…`，completed g1）→
   watch exit 0（历史渲染后退出）→ refine exit 0（generation 2 active）→
   cancel exit 0（cancellation requested, generation 2）。
-- 历史基线（本 change 之前）：verify 106 tests · fixture create 完成 generation 1 ·
-  inspect 见 `final_report: 1` · smoke 9 tests OK。
 - 冷启动 lane 回执（2026-10-04，本 change apply 时）：本仓库 `git clone -q --recursive .`
   至 /tmp → `uv sync` exit 0 → `UV_OFFLINE=1 make verify` exit 0（unittest gate passed）→
   `make create` exit 0（`state: completed (generation 1, revision 2)`）；
