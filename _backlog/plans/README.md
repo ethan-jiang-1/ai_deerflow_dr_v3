@@ -1,6 +1,6 @@
 # Plans — plan/分析文档索引
 
-> 最后更新: 2026-10-03（stream-adapter plan 关闭：CLS-007；活跃列表空） | `_backlog/plans/` — 活跃 plan 在此（顶层），
+> 最后更新: 2026-10-04（新增 agent-playbook-and-minimal-release：agent 启动面收归仓库文档 + 发布约束） | `_backlog/plans/` — 活跃 plan 在此（顶层），
 > 完成的普通 plan 移入 [`../_done/_closed_plans/`](../_done/_closed_plans/)。
 >
 > **plan 没有编号，文件名即标识。完成后文件名不变，位置即状态。**
@@ -23,6 +23,7 @@
 
 | Plan | 一句话 |
 |------|--------|
+| [agent-playbook-and-minimal-release](2026-10-04-agent-playbook-and-minimal-release.md) | 两层结构：COMMANDS=入口菜单，playbook/=MD mixed with CLI 子目录；发布面实证=两件套（harness+deerflow submodule，openspec 在外）+ 冷启动判据；待 REVIEW，拟入线 `ratify-agent-playbook-and-minimal-release` |
 
 （空）
 
