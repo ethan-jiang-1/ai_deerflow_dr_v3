@@ -61,14 +61,43 @@ def check_lease(handle: BundleHandle) -> None:
         )
 
 
+def _loud_unreadable(handle: BundleHandle, phase: str, cause: Exception | None = None) -> StateCorruption:
+    """Classify a state-file absence by its shape.
+
+    Directory absent -> the bundle is unavailable under the permanent-deletion
+    semantics (a transiently invisible directory is indistinguishable from
+    deletion). Directory present but file absent -> state corruption carrying
+    the read evidence (failure phase and the .tmp-* siblings as crash-scene
+    context). Keeps the two shapes from being conflated (the gen-7
+    misdiagnosis): a directory-level event never reports as file corruption.
+    """
+    if not handle.root.is_dir():
+        raise BundleUnavailable(
+            f"bundle directory is not present at {handle.root}: the record is "
+            "unavailable (deletion is permanent; there is no recovery path)"
+        )
+    siblings = sorted(p.name for p in handle.root.glob(".tmp-*"))
+    detail = f"phase={phase} tmp-siblings={siblings or 'none'}"
+    state_path = handle.root / bundle.state_relative()
+    corruption = StateCorruption(
+        f"state.json is missing at {state_path}: "
+        f"the bundle record is incomplete ({detail})"
+    )
+    if cause is not None:
+        raise corruption from cause
+    return corruption
+
+
 def read_state(handle: BundleHandle) -> BundleState:
     path = handle.root / bundle.state_relative()
     if not path.is_file():
-        raise StateCorruption(f"state.json is missing at {path}: the bundle record is incomplete")
+        raise _loud_unreadable(handle, phase="stat")
     try:
         raw = json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, UnicodeError) as exc:
         raise StateCorruption(f"state.json at {path} cannot be parsed: {exc}") from exc
+    except FileNotFoundError as exc:
+        raise _loud_unreadable(handle, phase="read", cause=exc) from exc
     return BundleState.from_dict(raw)
 
 

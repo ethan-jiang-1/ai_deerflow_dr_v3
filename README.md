@@ -16,7 +16,7 @@
 
 DeerFlow 是宿主运行时，**不 import 本包**；触达方式（反射工具 / controller skill / 或更薄的接线）由首个 change 定义。
 
-> **当前状态：已实现核心。** specs 主干 11 个能力落地、32 个 changes 归档（活跃为空；以 `openspec/specs/` 与 `openspec/changes/archive/` 实际清单为准）、六动词 CLI 与单元门禁在跑。
+> **当前状态：已实现核心。** specs 主干 11 个能力落地、33 个 changes 归档（活跃为空；以 `openspec/specs/` 与 `openspec/changes/archive/` 实际清单为准）、六动词 CLI 与单元门禁在跑。
 > 边界已定（六裁决，见 [`_backlog/_done/_closed_plans/`](_backlog/_done/_closed_plans/README.md)）；新方向按 [`_backlog/plans/README.md`](_backlog/plans/README.md) 的卡片模板立 plan 入账。
 
 ## 布局

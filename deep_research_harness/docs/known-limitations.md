@@ -7,7 +7,7 @@
 
 | 限制 | 来源 | 处置 |
 | --- | --- | --- |
-| 大 bundle 上 state.json 瞬时缺失（fail-loud StateCorruption 兜底，无静默损坏） | refine-slim-restart gen-7 尝试 | 待诊断（疑似 FS 压力） |
+| bundle 目录级瞬时不可见（外部进程干扰 gitignored 的 `scopes/`：移动/同步/清理）在读取时曾误报为 `state.json is missing`——诊断已证实 state.json 写路径 temp+replace 原子、无应用内删除者，事故文件在窗口内持续存在（mtime/revision 未变），与 checkpoint full/delta 无因果；读分类已修正（honest-state-read-diagnosis：目录级→unavailable，文件级→带 phase 与 tmp-siblings 证据的 corruption）。存留：兜底内二次读失败会使终态写缺席、bundle 滞留 active（可由 crash-transfer 恢复）。UNVERIFIED：当时触碰 `scopes/` 的外部进程身份；被兜底掩盖的 gen-7 首发异常。 | refine-slim-restart gen-7 尝试 + 专项诊断 | 诊断收口（分类已修，外部条件不可由应用预防） |
 | checkpoint delta 依赖框架的 delta-history patch（langgraph 1.2.12 高于验证版 1.2.9）：警告常驻 stderr（非失败），升级 langgraph 前先复查该 patch | switch-checkpoint-delta | 存留告诫（结构未变） |
 
 ## 已处置（指针，细节归归档 change）
