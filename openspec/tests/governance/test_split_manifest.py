@@ -24,8 +24,6 @@ CHECKER = GOVERNANCE_DIR / "check_project_architecture.py"
 
 CONTRACT = """schema_version = 1
 contract = "project-structure"
-requirement_ids = ["PRS-001", "PRS-004", "PRS-006"]
-
 [upstream_gitlink]
 path = "deerflow"
 # Sample value for a temp-dir fixture only; never compared against the real submodule.
@@ -61,7 +59,7 @@ end_marker = "<!-- END TEST -->"
 INVENTORY = """schema_version = 1
 contract = "project-structure-inventory"
 
-[paths.PRS-004]
+[paths.structure]
 files = [
   "openspec/governance/project-structure.toml",
   "openspec/governance/required-paths.toml",
@@ -70,15 +68,10 @@ directories = [
   "deep_research_harness/src/deerflow_deep_research",
 ]
 
-[paths.PRS-006]
+[paths.harness-root]
 files = [
   "deep_research_harness/.gitignore",
 ]
-"""
-
-REGISTRY = """PRS-001: project-structure — fixture one
-PRS-004: project-structure — fixture four
-PRS-006: project-structure — fixture six
 """
 
 # Pre-change `[imports]` table (six keys incl. the removed grammar) and the
@@ -113,12 +106,11 @@ def _load_checker():
 
 
 def _make_repo(tmp: Path, contract: str = CONTRACT, inventory: str = INVENTORY) -> tuple[Path, object]:
-    """Minimal repo fixture: registry + contract + inventory + required files."""
+    """Minimal repo fixture: contract + inventory + required files."""
     checker = _load_checker()
     root = tmp / "repo"
     (root / "openspec" / "governance").mkdir(parents=True)
     (root / "deep_research_harness" / "src" / "deerflow_deep_research").mkdir(parents=True)
-    (root / "openspec" / "governance" / "req-registry.yaml").write_text(REGISTRY, encoding="utf-8")
     (root / "openspec" / "governance" / "project-structure.toml").write_text(contract, encoding="utf-8")
     (root / "openspec" / "governance" / "required-paths.toml").write_text(inventory, encoding="utf-8")
     (root / "deep_research_harness" / ".gitignore").write_text("generated-output/\n", encoding="utf-8")
@@ -134,10 +126,10 @@ class SplitManifestParseTest(unittest.TestCase):
             self.assertEqual(
                 triples,
                 {
-                    ("openspec/governance/project-structure.toml", "file", "PRS-004"),
-                    ("openspec/governance/required-paths.toml", "file", "PRS-004"),
-                    ("deep_research_harness/src/deerflow_deep_research", "directory", "PRS-004"),
-                    ("deep_research_harness/.gitignore", "file", "PRS-006"),
+                    ("openspec/governance/project-structure.toml", "file", "structure"),
+                    ("openspec/governance/required-paths.toml", "file", "structure"),
+                    ("deep_research_harness/src/deerflow_deep_research", "directory", "structure"),
+                    ("deep_research_harness/.gitignore", "file", "harness-root"),
                 },
             )
 
@@ -173,22 +165,6 @@ class SplitManifestParseTest(unittest.TestCase):
                 checker.load_manifest(root)
             self.assertEqual(ctx.exception.code, "inventory.missing")
 
-    def test_invalid_section_owner_rejected(self) -> None:
-        with tempfile.TemporaryDirectory() as td:
-            inventory = INVENTORY.replace("[paths.PRS-004]", "[paths.xyz]")
-            root, checker = _make_repo(Path(td), inventory=inventory)
-            with self.assertRaises(checker.ContractViolation) as ctx:
-                checker.load_manifest(root)
-            self.assertEqual(ctx.exception.code, "inventory.owner")
-
-    def test_unknown_owner_rejected(self) -> None:
-        with tempfile.TemporaryDirectory() as td:
-            inventory = INVENTORY.replace("[paths.PRS-006]", "[paths.PRS-999]")
-            root, checker = _make_repo(Path(td), inventory=inventory)
-            with self.assertRaises(checker.ContractViolation) as ctx:
-                checker.load_manifest(root)
-            self.assertEqual(ctx.exception.code, "owner.unknown")
-
     def test_inventory_not_self_registered_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             inventory = INVENTORY.replace('  "openspec/governance/required-paths.toml",\n', "")
@@ -200,8 +176,8 @@ class SplitManifestParseTest(unittest.TestCase):
     def test_duplicate_path_across_sections_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             inventory = INVENTORY.replace(
-                '[paths.PRS-004]\nfiles = [\n  "openspec/governance/project-structure.toml",\n  "openspec/governance/required-paths.toml",\n]\ndirectories = [',
-                '[paths.PRS-004]\nfiles = [\n  "deep_research_harness/.gitignore",\n]\ndirectories = [',
+                '[paths.structure]\nfiles = [\n  "openspec/governance/project-structure.toml",\n  "openspec/governance/required-paths.toml",\n]\ndirectories = [',
+                '[paths.structure]\nfiles = [\n  "deep_research_harness/.gitignore",\n]\ndirectories = [',
             )
             root, checker = _make_repo(Path(td), inventory=inventory)
             with self.assertRaises(checker.ContractViolation) as ctx:
@@ -210,7 +186,7 @@ class SplitManifestParseTest(unittest.TestCase):
 
     def test_ignored_file_must_be_registered(self) -> None:
         with tempfile.TemporaryDirectory() as td:
-            inventory = INVENTORY.replace('[paths.PRS-006]\nfiles = [\n  "deep_research_harness/.gitignore",\n]\n', "")
+            inventory = INVENTORY.replace('[paths.harness-root]\nfiles = [\n  "deep_research_harness/.gitignore",\n]\n', "")
             root, checker = _make_repo(Path(td), inventory=inventory)
             with self.assertRaises(checker.ContractViolation) as ctx:
                 checker.load_manifest(root)

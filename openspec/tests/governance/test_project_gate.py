@@ -34,7 +34,6 @@ from pathlib import Path
 GOVERNANCE_DIR = Path(__file__).resolve().parents[2] / "governance"
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SPECS_CHECKER = GOVERNANCE_DIR / "check_project_specs.py"
-REQS_CHECKER = GOVERNANCE_DIR / "check_project_reqs.py"
 GATE = GOVERNANCE_DIR / "check_project_gate.py"
 
 
@@ -56,21 +55,15 @@ def _load_gate():
 
 
 def _make_repo(tmp: Path) -> Path:
-    """Minimal repo fixture: registry + changes dir + governance checkers."""
+    """Minimal repo fixture: changes dir + governance checkers."""
     root = tmp / "repo"
     (root / "openspec" / "governance").mkdir(parents=True)
     (root / "openspec" / "changes").mkdir(parents=True)
-    (root / "openspec" / "governance" / "req-registry.yaml").write_text(
-        "# fixture registry\nEXI-001: execution-intent — Fixture requirement\n",
-        encoding="utf-8",
-    )
     # Copy the real component scripts so the gate's default inventory resolves.
     for name in (
-        "check_project_reqs.py",
         "check_project_specs.py",
         "check_project_architecture.py",
         "check_change_guidance.py",
-        "check_project_req_coverage.py",
         "check_harness_dependency_direction.py",
         "check_ci_governance.py",
         "check_proof_receipts.py",
@@ -113,21 +106,19 @@ class SpecsSelectedChangeModeTest(unittest.TestCase):
             result = _run(sys.executable, SPECS_CHECKER, root, "--change", "valid-change")
             self.assertEqual(result.returncode, 0, result.stderr)
 
-    def test_missing_header_fails(self) -> None:
+    def test_missing_header_passes(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = _make_repo(Path(td))
             _write_change(root, "no-header", "demo", None, "### Requirement: Demo behaves")
             result = _run(sys.executable, SPECS_CHECKER, root, "--change", "no-header")
-            self.assertEqual(result.returncode, 1)
-            self.assertIn("Missing > req: header in delta spec", result.stderr)
+            self.assertEqual(result.returncode, 0, result.stderr)
 
-    def test_title_embedded_id_fails(self) -> None:
+    def test_title_embedded_id_passes(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = _make_repo(Path(td))
             _write_change(root, "title-id", "demo", "> req: DEM-001", "### Requirement: Demo behaves (DEM-001)")
             result = _run(sys.executable, SPECS_CHECKER, root, "--change", "title-id")
-            self.assertEqual(result.returncode, 1)
-            self.assertIn("Requirement title embeds a requirement ID", result.stderr)
+            self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_missing_selected_change_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory() as td:
@@ -201,24 +192,6 @@ class SpecsSelectedChangeModeTest(unittest.TestCase):
             self.assertEqual(result.returncode, 1)
             self.assertIn("unhonorable", result.stderr)
 
-    def test_fenced_fake_req_header_does_not_satisfy_req_trace(self) -> None:
-        with tempfile.TemporaryDirectory() as td:
-            root = _make_repo(Path(td))
-            change_dir = root / "openspec" / "changes" / "fenced-only"
-            spec_dir = change_dir / "specs" / "demo"
-            spec_dir.mkdir(parents=True)
-            # The only `> req:` line lives inside a fenced code block; it is
-            # not a real declaration and must not satisfy the header rule.
-            (spec_dir / "spec.md").write_text(
-                "```markdown\n> req: DEM-001\n```\n\n"
-                "## MODIFIED Requirements\n\n"
-                "### Requirement: Demo behaves\n\nBody.\n",
-                encoding="utf-8",
-            )
-            result = _run(sys.executable, SPECS_CHECKER, root, "--change", "fenced-only")
-            self.assertEqual(result.returncode, 1)
-            self.assertIn("Missing > req: header in delta spec", result.stderr)
-
     def test_default_full_mode_still_catches_unrelated_main_spec_violation(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = _make_repo(Path(td))
@@ -227,7 +200,7 @@ class SpecsSelectedChangeModeTest(unittest.TestCase):
             main_spec = root / "openspec" / "specs" / "demo" / "spec.md"
             main_spec.parent.mkdir(parents=True)
             main_spec.write_text(
-                "## Purpose\nFixture purpose.\n## Requirements\n\n### Requirement: Demo\nBody.\n",
+                "## Requirements\n\n### Requirement: Demo\nBody.\n",
                 encoding="utf-8",
             )
             selected = _run(sys.executable, SPECS_CHECKER, root, "--change", "valid-change")
@@ -236,105 +209,8 @@ class SpecsSelectedChangeModeTest(unittest.TestCase):
             self.assertEqual(full.returncode, 1, "full mode must still catch unrelated main-spec drift")
 
 
-class ReqsPlanningModeTest(unittest.TestCase):
-    def test_legal_reservation_prints_and_exits_zero(self) -> None:
-        with tempfile.TemporaryDirectory() as td:
-            root = _make_repo(Path(td))
-            _write_change(root, "new-change", "demo", "> req: DEM-001", "### Requirement: Demo behaves")
-            result = _run(sys.executable, REQS_CHECKER, root, "--change", "new-change")
-            self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertIn("reservation: DEM-001 (demo)", result.stdout)
-
-    def test_same_capability_registered_is_already_assigned(self) -> None:
-        with tempfile.TemporaryDirectory() as td:
-            root = _make_repo(Path(td))
-            _write_change(root, "uses-existing", "execution-intent", "> req: EXI-001", "### Requirement: Intent")
-            result = _run(sys.executable, REQS_CHECKER, root, "--change", "uses-existing")
-            self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertIn("already-assigned: EXI-001 (execution-intent)", result.stdout)
-            self.assertNotIn("reservation:", result.stdout)
-
-    def test_foreign_owner_fails(self) -> None:
-        with tempfile.TemporaryDirectory() as td:
-            root = _make_repo(Path(td))
-            _write_change(root, "wrong-owner", "other-capability", "> req: EXI-001", "### Requirement: Intent")
-            result = _run(sys.executable, REQS_CHECKER, root, "--change", "wrong-owner")
-            self.assertEqual(result.returncode, 1)
-            self.assertIn("already-assigned ownership violation", result.stderr)
-            self.assertIn("EXI-001", result.stderr)
-
-    def test_retired_reuse_fails(self) -> None:
-        with tempfile.TemporaryDirectory() as td:
-            root = _make_repo(Path(td))
-            (root / "openspec" / "governance" / "req-registry.yaml").write_text(
-                "OLD-001: demo — Old requirement [DEPRECATED: superseded]\n",
-                encoding="utf-8",
-            )
-            _write_change(root, "reuses-retired", "demo", "> req: OLD-001", "### Requirement: Old behavior")
-            result = _run(sys.executable, REQS_CHECKER, root, "--change", "reuses-retired")
-            self.assertEqual(result.returncode, 1)
-            self.assertIn("reused-retired", result.stderr)
-
-    def test_collision_with_other_active_change_fails_foreign_capability(self) -> None:
-        with tempfile.TemporaryDirectory() as td:
-            root = _make_repo(Path(td))
-            _write_change(root, "change-a", "cap-a", "> req: NEW-001", "### Requirement: A")
-            _write_change(root, "change-b", "cap-b", "> req: NEW-001", "### Requirement: B")
-            result = _run(sys.executable, REQS_CHECKER, root, "--change", "change-b")
-            self.assertEqual(result.returncode, 1)
-            self.assertIn("collision", result.stderr)
-            self.assertIn("NEW-001", result.stderr)
-
-    def test_collision_with_other_active_change_fails_same_capability(self) -> None:
-        with tempfile.TemporaryDirectory() as td:
-            root = _make_repo(Path(td))
-            # Both deltas declare the same unregistered ID under the SAME
-            # capability directory; grouping by capability alone would miss
-            # this collision, so the scan must be keyed by (change, capability).
-            _write_change(root, "change-a", "demo", "> req: NEW-001", "### Requirement: A")
-            _write_change(root, "change-b", "demo", "> req: NEW-001", "### Requirement: B")
-            result = _run(sys.executable, REQS_CHECKER, root, "--change", "change-b")
-            self.assertEqual(result.returncode, 1)
-            self.assertIn("collision", result.stderr)
-            self.assertIn("NEW-001", result.stderr)
-            self.assertIn("change-a (demo)", result.stderr)
-
-    def test_selected_change_own_declaration_is_not_other_active(self) -> None:
-        with tempfile.TemporaryDirectory() as td:
-            root = _make_repo(Path(td))
-            # Only one active change: its own declaration must be a reservation,
-            # never reported as a collision with itself.
-            _write_change(root, "solo", "demo", "> req: NEW-001", "### Requirement: Solo")
-            result = _run(sys.executable, REQS_CHECKER, root, "--change", "solo")
-            self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertIn("reservation: NEW-001 (demo)", result.stdout)
-
-    def test_missing_selected_change_fails_closed(self) -> None:
-        with tempfile.TemporaryDirectory() as td:
-            root = _make_repo(Path(td))
-            result = _run(sys.executable, REQS_CHECKER, root, "--change", "absent")
-            self.assertEqual(result.returncode, 1)
-            self.assertIn("not found", result.stderr)
-
-    def test_default_full_mode_still_catches_unrelated_drift(self) -> None:
-        with tempfile.TemporaryDirectory() as td:
-            root = _make_repo(Path(td))
-            _write_change(root, "valid-change", "demo", "> req: DEM-001", "### Requirement: Demo behaves")
-            # An unrelated main spec header references an unregistered ID.
-            main_spec = root / "openspec" / "specs" / "demo" / "spec.md"
-            main_spec.parent.mkdir(parents=True)
-            main_spec.write_text(
-                "> req: GHOST-001\n\n## Purpose\nFixture.\n## Requirements\n\n### Requirement: Demo\nBody.\n",
-                encoding="utf-8",
-            )
-            selected = _run(sys.executable, REQS_CHECKER, root, "--change", "valid-change")
-            self.assertEqual(selected.returncode, 0, selected.stderr)
-            full = _run(sys.executable, REQS_CHECKER, root)
-            self.assertEqual(full.returncode, 1, "full mode must still catch unrelated global drift")
-
-
 class GateCloseoutTest(unittest.TestCase):
-    def test_closeout_runs_all_eight_and_propagates_failures_with_explicit_cwd(self) -> None:
+    def test_closeout_runs_all_six_and_propagates_failures_with_explicit_cwd(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = _make_repo(Path(td))
             gate = _load_gate()
@@ -350,11 +226,9 @@ class GateCloseoutTest(unittest.TestCase):
             self.assertEqual(code, 1)
             names = [arguments[1].split("/")[-1] for arguments, _ in invoked]
             for expected in (
-                "check_project_reqs.py",
                 "check_project_specs.py",
                 "check_project_architecture.py",
                 "check_change_guidance.py",
-                "check_project_req_coverage.py",
                 "check_harness_dependency_direction.py",
                 "check_ci_governance.py",
                 "check_proof_receipts.py",
@@ -390,15 +264,6 @@ class GateCloseoutTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = _make_repo(Path(td))
             (root / "openspec" / "governance" / "check_change_guidance.py").unlink()
-            gate = _load_gate()
-            code = gate.run_closeout(root, runner=lambda arguments, cwd=None: (0, ""))
-            self.assertEqual(code, 1)
-
-    def test_unreadable_registry_fails_closed(self) -> None:
-        with tempfile.TemporaryDirectory() as td:
-            root = _make_repo(Path(td))
-            registry = root / "openspec" / "governance" / "req-registry.yaml"
-            registry.write_text("", encoding="utf-8")
             gate = _load_gate()
             code = gate.run_closeout(root, runner=lambda arguments, cwd=None: (0, ""))
             self.assertEqual(code, 1)
@@ -454,16 +319,15 @@ class GatePlanTest(unittest.TestCase):
 
             code = gate.run_plan(root, "demo-change", runner=fake_runner)
             self.assertEqual(code, 0)
-            self.assertEqual(len(calls), 4)
+            self.assertEqual(len(calls), 3)
             # arguments layout: [python, <script>, ...args] / [openspec, validate, <name>, --strict]
             scripts = [arguments[1].split("/")[-1] for arguments, _ in calls]
             self.assertEqual(
                 scripts,
-                ["check_change_guidance.py", "check_project_specs.py", "check_project_reqs.py", "validate"],
+                ["check_change_guidance.py", "check_project_specs.py", "validate"],
             )
             self.assertEqual(calls[1][0][-2:], ["--change", "demo-change"])
-            self.assertEqual(calls[2][0][-2:], ["--change", "demo-change"])
-            self.assertEqual(calls[3][0][-3:], ["validate", "demo-change", "--strict"])
+            self.assertEqual(calls[2][0][-3:], ["validate", "demo-change", "--strict"])
             self.assertTrue(
                 all(cwd == root for _, cwd in calls),
                 "every plan subprocess must run with explicit cwd=repo root",
@@ -515,7 +379,7 @@ class GatePlanTest(unittest.TestCase):
                 code = gate.run_plan(root, "demo-change", runner=fake_runner)
             self.assertEqual(code, 1)
             # The gate must still run ALL plan owners even when one fails.
-            self.assertEqual(len(calls), 4)
+            self.assertEqual(len(calls), 3)
             self.assertIn("[change-guidance] exit=1", stdout.getvalue())
             self.assertIn("focus.heading_missing", stdout.getvalue())
             self.assertIn("first finding for the planted owner failure", stdout.getvalue())
@@ -543,7 +407,7 @@ class GatePlanTest(unittest.TestCase):
             self.assertEqual(code, 1)
             # All four plan owners still run; the failing strict-validation
             # owner is named with its captured output.
-            self.assertEqual(len(calls), 4)
+            self.assertEqual(len(calls), 3)
             self.assertIn("[strict-validation] exit=1", stdout.getvalue())
             self.assertIn("drops a surviving scenario", stdout.getvalue())
             self.assertIn("OpenSpec planning admission failed", stderr.getvalue())

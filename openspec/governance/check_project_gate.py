@@ -12,17 +12,16 @@ Phases:
 
 - `closeout` — runs every registered component checker from the repository
   root, runs ALL of them even when one fails, and exits 0 only when every
-  component exits 0. Fails closed on a missing/empty checker inventory, a
-  missing checker file, or an unreadable registry.
+  component exits 0. Fails closed on a missing/empty checker inventory or a
+  missing checker file.
 - `plan --change NAME` — sequences the read-only admission owners for one
   active change: the Change Guidance checker (Focus Card / Program Focus
   grammar), the specification checker's selected-change scope (delta headers
-  and titles), the requirement checker's planning scope (reservation /
-  already-assigned / collision / reused-retired), and native strict change
-  validation (MODIFIED requirement/scenario preservation). All subprocesses
-  run from the repository root; each exact exit status is printed and
-  propagated into the final exit code. Plan does NOT run unrelated
-  project-wide full-tree checkers.
+  and titles), and native strict change validation (MODIFIED
+  requirement/scenario preservation). All subprocesses run from the
+  repository root; each exact exit status is printed and propagated into the
+  final exit code. Plan does NOT run unrelated project-wide full-tree
+  checkers.
 
 The hard stop this gate provides is in-repository workflow enforcement only:
 it does not and cannot block a direct native `openspec archive` invocation
@@ -41,16 +40,13 @@ from pathlib import Path
 # Fixed inventory: the registered OpenSpec component checkers.
 # Keep the order stable; closeout aggregates these and nothing else.
 CHECKER_NAMES: tuple[str, ...] = (
-    "check_project_reqs.py",
     "check_project_specs.py",
     "check_project_architecture.py",
     "check_change_guidance.py",
-    "check_project_req_coverage.py",
     "check_harness_dependency_direction.py",
     "check_ci_governance.py",
     "check_proof_receipts.py",
 )
-REGISTRY_RELATIVE = Path("openspec") / "governance" / "req-registry.yaml"
 
 
 def _default_root() -> Path:
@@ -103,15 +99,6 @@ def _safe_run(runner, arguments: list[str], cwd: Path) -> tuple[int, str]:
         return 126, f"failed to run {arguments[0]}: {exc}"
 
 
-def _registry_readable(root: Path) -> bool:
-    try:
-        return (root / REGISTRY_RELATIVE).is_file() and (root / REGISTRY_RELATIVE).read_text(
-            encoding="utf-8"
-        ).strip() != ""
-    except (OSError, UnicodeError):
-        return False
-
-
 def _print_component(name: str, exit_code: int, output: str) -> None:
     print(f"[{name}] exit={exit_code}")
     if output:
@@ -139,10 +126,6 @@ def run_closeout(
     if missing:
         print(f"Gate inventory references missing checker(s): {', '.join(missing)}", file=sys.stderr)
         return 1
-    if not _registry_readable(root):
-        print(f"Gate registry is missing or unreadable: {REGISTRY_RELATIVE}", file=sys.stderr)
-        return 1
-
     all_zero = True
     for name in names:
         script = _component_script(root, name)
@@ -180,10 +163,6 @@ def run_plan(root: Path, change_name: str, runner=_run) -> int:
     if missing:
         print(f"Gate inventory references missing checker(s): {', '.join(missing)}", file=sys.stderr)
         return 1
-    if not _registry_readable(root):
-        print(f"Gate registry is missing or unreadable: {REGISTRY_RELATIVE}", file=sys.stderr)
-        return 1
-
     steps: list[tuple[str, list[str]]] = [
         (
             "change-guidance",
@@ -192,10 +171,6 @@ def run_plan(root: Path, change_name: str, runner=_run) -> int:
         (
             "delta-specs",
             [sys.executable, str(_component_script(root, "check_project_specs.py")), "--change", change_name],
-        ),
-        (
-            "requirement-reservation",
-            [sys.executable, str(_component_script(root, "check_project_reqs.py")), "--change", change_name],
         ),
         (
             "strict-validation",

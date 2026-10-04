@@ -1,6 +1,5 @@
 # ci-governance Specification
 
-> req: CIG-001
 
 ## Purpose
 

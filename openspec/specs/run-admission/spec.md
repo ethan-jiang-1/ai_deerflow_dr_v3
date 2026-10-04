@@ -1,4 +1,3 @@
-> req: RUA-001
 
 # run-admission Specification
 

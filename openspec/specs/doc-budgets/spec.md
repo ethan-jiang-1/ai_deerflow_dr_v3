@@ -1,6 +1,5 @@
 # doc-budgets Specification
 
-> req: DOB-001
 
 ## Purpose
 

@@ -20,14 +20,10 @@ from typing import Any
 
 MANIFEST_RELATIVE = PurePosixPath("openspec/governance/project-structure.toml")
 INVENTORY_RELATIVE = PurePosixPath("openspec/governance/required-paths.toml")
-REGISTRY_RELATIVE = PurePosixPath("openspec/governance/req-registry.yaml")
 MAIN_SPEC_RELATIVE = PurePosixPath("openspec/specs/project-structure/spec.md")
 UPSTREAM_GITLINK_PATH = PurePosixPath("deerflow")
 SPEC_REFERENCE = "> structure: openspec/governance/project-structure.toml"
-ID_RE = re.compile(r"^[A-Z]{3}-\d{3}$")
 GIT_COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
-REGISTRY_ID_RE = re.compile(r"^([A-Z]{3}-\d{3}):", re.MULTILINE)
-REQ_HEADER_RE = re.compile(r"^> req:\s*(.+)$", re.MULTILINE)
 PACKAGE_NAME = "deerflow_deep_research"
 FIXTURE_PACKAGE_NAME = "deerflow_deep_research_fixtures"
 CANONICAL_HARNESS_ROOT = PurePosixPath("deep_research_harness")
@@ -84,7 +80,6 @@ class UpstreamGitlink:
 
 @dataclass(frozen=True)
 class StructureManifest:
-    requirement_ids: tuple[str, ...]
     guide_path: PurePosixPath
     begin_marker: str
     end_marker: str
@@ -140,13 +135,6 @@ def _relative_path(value: Any, label: str) -> PurePosixPath:
     return path
 
 
-def _registered_ids(root: Path) -> set[str]:
-    path = root / REGISTRY_RELATIVE
-    if not path.is_file():
-        raise ContractViolation("owner.registry_missing", f"requirement registry is missing: {REGISTRY_RELATIVE}")
-    return set(REGISTRY_ID_RE.findall(path.read_text(encoding="utf-8")))
-
-
 def load_manifest(root: Path) -> StructureManifest:
     path = root / MANIFEST_RELATIVE
     if not path.is_file():
@@ -160,17 +148,6 @@ def load_manifest(root: Path) -> StructureManifest:
         raise ContractViolation("manifest.schema", "schema_version must be integer 1")
     if data.get("contract") != "project-structure":
         raise ContractViolation("manifest.schema", "contract must be 'project-structure'")
-
-    requirement_ids = _expect_string_list(data.get("requirement_ids"), "requirement_ids")
-    if any(not ID_RE.fullmatch(requirement_id) for requirement_id in requirement_ids):
-        raise ContractViolation("manifest.schema", "requirement_ids contains an invalid ID")
-    registered = _registered_ids(root)
-    unknown_requirements = sorted(set(requirement_ids) - registered)
-    if unknown_requirements:
-        raise ContractViolation(
-            "owner.unknown",
-            f"unregistered manifest requirement IDs: {', '.join(unknown_requirements)}",
-        )
 
     upstream_gitlink_raw = data.get("upstream_gitlink")
     if not isinstance(upstream_gitlink_raw, dict):
@@ -333,13 +310,11 @@ def load_manifest(root: Path) -> StructureManifest:
     if not isinstance(raw_path_sections, dict) or not raw_path_sections:
         raise ContractViolation(
             "inventory.schema",
-            "inventory must declare a non-empty [paths.<ID>] section table",
+            "inventory must declare a non-empty [paths.<group>] section table",
         )
     required_paths: list[RequiredPath] = []
     seen_paths: set[PurePosixPath] = set()
     for section_owner in sorted(raw_path_sections):
-        if not ID_RE.fullmatch(section_owner):
-            raise ContractViolation("inventory.owner", f"inventory section has an invalid owner ID: {section_owner}")
         section = _expect_mapping(raw_path_sections[section_owner], f"paths.{section_owner}")
         for kind, key in (("file", "files"), ("directory", "directories")):
             raw_values = section.get(key)
@@ -350,11 +325,6 @@ def load_manifest(root: Path) -> StructureManifest:
                 if item_path in seen_paths:
                     raise ContractViolation("path.duplicate", f"required path appears more than once: {item_path}")
                 seen_paths.add(item_path)
-                if section_owner not in registered or section_owner not in requirement_ids:
-                    raise ContractViolation(
-                        "owner.unknown",
-                        f"required path {item_path} has unknown owner {section_owner}",
-                    )
                 if any(item_path == root_path or root_path in item_path.parents for root_path in forbidden_source_roots):
                     raise ContractViolation(
                         "path.forbidden_owner",
@@ -414,7 +384,6 @@ def load_manifest(root: Path) -> StructureManifest:
         raise ContractViolation("manifest.schema", f"guide.path must be {expected_guide_path.as_posix()}")
 
     return StructureManifest(
-        requirement_ids=requirement_ids,
         guide_path=guide_path,
         begin_marker=begin_marker,
         end_marker=end_marker,
@@ -502,12 +471,9 @@ def _validate_spec_authority(root: Path, manifest: StructureManifest) -> None:
     referenced_specs: list[Path] = []
     for spec_path in active_specs:
         text = spec_path.read_text(encoding="utf-8")
-        header = REQ_HEADER_RE.search(text)
-        declared = set(re.findall(r"[A-Z]{3}-\d{3}", header.group(1))) if header else set()
-        if set(manifest.requirement_ids).issubset(declared):
-            owning_specs.append(spec_path)
-            if SPEC_REFERENCE in text:
-                referenced_specs.append(spec_path)
+        owning_specs.append(spec_path)
+        if SPEC_REFERENCE in text:
+            referenced_specs.append(spec_path)
 
     if len(referenced_specs) > 1 or len(owning_specs) > 1:
         raise ContractViolation("spec.reference_ambiguous", "more than one active delta claims structural authority")

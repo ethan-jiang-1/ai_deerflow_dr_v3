@@ -1,4 +1,3 @@
-> req: APB-001
 
 # agent-playbook Specification
 

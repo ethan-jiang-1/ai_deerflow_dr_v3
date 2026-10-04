@@ -1,4 +1,3 @@
-> req: RLF-001
 
 # release-face Specification
 

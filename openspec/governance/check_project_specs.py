@@ -14,13 +14,6 @@
 #   1. deltaHeaderInMain   — main spec 出现 delta 头 (OpenSpec 结构错误)
 #   2. missingPurpose      — 缺少 ## Purpose 节
 #   3. missingRequirements — 缺少 ## Requirements 节
-#   4. missingReqHeader    — 缺少 > req: 行 (本项目 req-registry.yaml 追踪约定)
-#
-# --change <name> 模式（selected-change scope）只检查该 active change 的 delta specs，
-# 不检查 main specs：
-#   5. missingDeltaReqHeader — delta spec 在首个 ## 前缺少声明 owned requirement IDs
-#      的 > req: 行
-#   6. titleEmbeddedId       — Requirement 标题（### Requirement: ...）内嵌 requirement ID
 #
 # zero-delta opt-out（对齐原生 OpenSpec schema）：行为不变的纯重构/tooling/docs 可在
 # `.openspec.yaml` 设 `skip_specs: true`，此时无 delta spec 合法。标记只有在元数据是
@@ -43,11 +36,7 @@ SCENARIO_HEADING_RE = re.compile(r"^\s*####\s+Scenario:")
 
 PURPOSE_HEADER_RE = re.compile(r"^##\s+Purpose\s*$", re.IGNORECASE | re.MULTILINE)
 REQUIREMENTS_HEADER_RE = re.compile(r"^##\s+Requirements\s*$", re.IGNORECASE | re.MULTILINE)
-REQ_TRACE_RE = re.compile(r"^> req:\s*[A-Z]{3}-\d{3}")
-REQ_HEADER_RE = re.compile(r"^\s*>\s*req:\s*(.+)$")
-ID_SCAN_RE = re.compile(r"[A-Z]{3}-\d{3}")
 REQUIREMENT_TITLE_RE = re.compile(r"^###\s+Requirement:\s+(.+)$", re.IGNORECASE)
-ID_IN_TEXT_RE = re.compile(r"[A-Z]{3}-\d{3}")
 ARCHIVE_PLACEHOLDER_PURPOSE_RE = re.compile(r"^TBD\s*-\s*created by archiving", re.IGNORECASE)
 METADATA_LINE_RE = re.compile(r"^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*([^#]*?)\s*(?:#.*)?$")
 KNOWN_SCHEMAS = frozenset({"spec-driven"})
@@ -83,21 +72,6 @@ def strip_fenced_code_blocks(content: str) -> str:
         if closing and closing.group(1)[0] == active[0] and len(closing.group(1)) >= active[1]:
             active = None
     return "\n".join(output)
-
-
-def has_req_trace_before_second_heading(content: str) -> bool:
-    """`> req:` 行必须出现在首个二级标题之前。
-
-    Fenced code blocks are stripped first, consistent with `_delta_header_ids`:
-    a fake `> req:` inside a code fence must never satisfy the header rule.
-    """
-    seen_first_heading = False
-    for line in strip_fenced_code_blocks(content).split("\n"):
-        if REQ_TRACE_RE.search(line):
-            return not seen_first_heading
-        if re.match(r"^##\s+", line):
-            seen_first_heading = True
-    return False
 
 
 def _delta_spec_files(change_dir: Path) -> list[Path]:
@@ -154,34 +128,6 @@ def _skip_specs_marker(change_dir: Path) -> tuple[bool, str | None]:
     return False, "skip_specs is not a boolean"
 
 
-def _delta_header_ids(content: str) -> set[str]:
-    """Requirement IDs declared on `> req:` lines before the first `##` heading."""
-    declared: set[str] = set()
-    for line in strip_fenced_code_blocks(content).split("\n"):
-        if re.match(r"^##\s+", line):
-            break
-        m = REQ_HEADER_RE.match(line)
-        if m:
-            declared.update(ID_SCAN_RE.findall(m.group(1)))
-    return declared
-
-
-def _requirement_title_id_violations(content: str) -> list[str]:
-    """Requirement titles are stable semantic anchors and SHALL NOT embed IDs."""
-    found: list[str] = []
-    for line_number, line in enumerate(content.split("\n"), start=1):
-        m = REQUIREMENT_TITLE_RE.match(line.strip())
-        if not m:
-            continue
-        embedded = ID_IN_TEXT_RE.findall(m.group(1))
-        if embedded:
-            found.append(
-                f"requirement title embeds requirement ID(s) {', '.join(sorted(set(embedded)))} "
-                f"(title is a semantic anchor; IDs live on the `> req:` line)"
-            )
-    return found
-
-
 def validate_selected_change_delta_specs(root: Path, change_name: str) -> tuple[list[dict], int]:
     """Selected-change scope: validate one active change's delta specs only.
 
@@ -223,13 +169,6 @@ def validate_selected_change_delta_specs(root: Path, change_name: str) -> tuple[
     for file in delta_files:
         content = file.read_text(encoding="utf-8")
         short = str(file).replace(str(root) + "/", "")
-        if not has_req_trace_before_second_heading(content):
-            violations.append(
-                {"file": short, "check": "missingDeltaReqHeader",
-                 "detail": "delta spec lacks a > req: <ID> line before its first ## heading", "line": None}
-            )
-        for detail in _requirement_title_id_violations(content):
-            violations.append({"file": short, "check": "titleEmbeddedId", "detail": detail, "line": None})
     return violations, 0
 
 
@@ -271,12 +210,8 @@ def _validate_main_specs(root: Path) -> int:
         if not REQUIREMENTS_HEADER_RE.search(structural):
             violations.append({"file": short, "check": "missingRequirements", "detail": "缺少 ## Requirements 节", "line": None})
 
-        # 4. missingReqHeader（项目追踪约定，非 OpenSpec 原生字段）
-        if not has_req_trace_before_second_heading(structural):
-            violations.append({"file": short, "check": "missingReqHeader",
-                               "detail": "缺少位于首个二级标题之前的 > req: <ID> 行（本项目 req-registry.yaml 追踪约定）",
-                               "line": None})
-        elif not purpose_is_current(structural):
+        # 4. placeholderPurpose
+        if not purpose_is_current(structural):
             violations.append({"file": short, "check": "placeholderPurpose", "detail": "Purpose 为空或仍是 archive placeholder", "line": None})
 
     for violation in active_terminology_violations(root):
@@ -295,7 +230,6 @@ def _validate_main_specs(root: Path) -> int:
             "missingPurpose": "Missing ## Purpose section",
             "placeholderPurpose": "Empty or placeholder Purpose section",
             "missingRequirements": "Missing ## Requirements section",
-            "missingReqHeader": "Missing > req: header",
             "historicalTerminology": "Historical terminology in active authority",
         }
         by_check: dict[str, list] = {}
@@ -335,7 +269,6 @@ def active_terminology_violations(root: Path) -> list[dict[str, str]]:
     """Reject archive-only language from current specification authority."""
     authority_paths = [
         *sorted((root / "openspec" / "specs").rglob("*.md")),
-        root / "openspec" / "governance" / "req-registry.yaml",
         root / "deep_research_harness" / "AGENTS.md",
         root / "deep_research_harness" / "README.md",
         root / "deep_research_harness" / "config" / "public-skill" / "deep-research-controller" / "SKILL.md",
@@ -383,8 +316,6 @@ def main() -> int:
                 "selectedChangeMissing": "Selected active change missing",
                 "selectedChangeEmpty": "Selected change has no delta spec files",
                 "selectedChangeSkipSpecsInvalid": "Selected change skip_specs marker is unhonorable",
-                "missingDeltaReqHeader": "Missing > req: header in delta spec",
-                "titleEmbeddedId": "Requirement title embeds a requirement ID",
             }
             by_check: dict[str, list] = {}
             for v in violations:

@@ -1,15 +1,15 @@
 schema_version = 1
 contract = "project-structure-inventory"
 
-# Required-path inventory, grouped by owning requirement ID.
+# Required-path inventory, grouped by owning feature family.
 # Every path is repository-relative, normalized, and MUST exist with the
-# declared kind. Owner IDs MUST be registered in req-registry.yaml and
-# declared in the manifest requirement_ids. See project-structure.toml [inventory].
+# declared kind. Group names are declared keys (existence + uniqueness only).
+# See project-structure.toml [inventory].
 #
 # v3 骨架期：本清单钉住"骨架本身必须存在"的最小集合。
 # 实现文件随各自 change 的 spec 增补，不在骨架期预登记。
 
-[paths.PRS-001]
+[paths.repo-skeleton]
 files = [
   ".gitignore",
   ".gitmodules",
@@ -66,13 +66,10 @@ files = [
   "openspec/governance/check_harness_dependency_direction.py",
   "openspec/governance/check_project_architecture.py",
   "openspec/governance/check_project_gate.py",
-  "openspec/governance/check_project_req_coverage.py",
-  "openspec/governance/check_project_reqs.py",
   "openspec/governance/check_project_specs.py",
   "openspec/governance/check_proof_receipts.py",
   "openspec/governance/portable_change_guidance_export.py",
   "openspec/governance/project-structure.toml",
-  "openspec/governance/req-registry.yaml",
   "openspec/governance/required-paths.toml",
   "openspec/governance/selected-change-closeout.md",
   "openspec/governance/selected-change-closeout.py",
@@ -80,6 +77,7 @@ files = [
   "openspec/product/README.md",
   "openspec/tests/governance/test_ci_governance_steps.py",
   "openspec/tests/governance/test_project_gate.py",
+  "openspec/tests/governance/test_project_specs.py",
   "openspec/tests/governance/test_split_manifest.py",
   "openspec/tests/governance/test_terminology_rules.py",
   "openspec/tests/governance/test_upstream_pin_agreement.py",
@@ -87,7 +85,7 @@ files = [
   "profiles/README.md",
 ]
 
-[paths.DEW-001]
+[paths.deerflow-wiring]
 # Embedded DeerFlow binding (owner: deerflow-wiring capability).
 files = [
   "deep_research_harness/config/base.yaml",
@@ -101,7 +99,7 @@ directories = [
   "deep_research_harness/src/deerflow_deep_research/runtime/fixtures",
 ]
 
-[paths.ENS-001]
+[paths.entry-surface]
 # Human command surface (owner: entry-surface capability).
 files = [
   "deep_research_harness/cli.py",
@@ -109,7 +107,7 @@ files = [
   "deep_research_harness/src/deerflow_deep_research/runtime/render.py",
 ]
 
-[paths.APB-001]
+[paths.agent-playbook]
 # Agent invocation surface (owner: agent-playbook capability).
 files = [
   "deep_research_harness/playbook/run-research.md",
@@ -118,14 +116,14 @@ directories = [
   "deep_research_harness/playbook",
 ]
 
-[paths.RLF-001]
+[paths.release-face]
 # Minimal release contract (owner: release-face capability).
 files = [
   "openspec/governance/check_release_face.py",
   "openspec/tests/governance/test_release_face.py",
 ]
 
-[paths.CIG-001]
+[paths.ci-governance]
 # CI 门禁与本地 hook 的接受路径文件（owner: ci-governance capability）。
 files = [
   ".github/workflows/governance.yml",

@@ -8,14 +8,11 @@
 
 | 对象 | 读者问题 | 权威细节位于 |
 |------|----------|--------------|
-| `req-registry.yaml` | 这条 requirement 的 ID 是否存在、如何分配缩写 / 三态 / 标题？ | [req-registry.yaml](req-registry.yaml) 自身 |
 | `architecture-policy.md` | 什么算 active spec、结构权威如何分工？ | [architecture-policy.md](architecture-policy.md) |
 | Project-structure manifest（`project-structure.toml` 契约 + `required-paths.toml` 清单） | 精确目录 / import 清单？ | [project-structure.toml](project-structure.toml) · [required-paths.toml](required-paths.toml) |
-| `check_project_reqs.py` | 需求 registry 一致性是否通过？ | 脚本 docstring |
 | `check_project_specs.py` | main spec 结构是否有效？ | 脚本 docstring |
 | `check_project_architecture.py` | 结构治理是否通过？ | 脚本 docstring |
 | `check_change_guidance.py` | Change Guidance / policy 路由 / Focus Card 是否通过？ | 脚本 docstring |
-| `check_project_req_coverage.py` | 应用 requirement 是否有测试证据、OpenSpec 治理 requirement 是否有执行脚本证据？ | 测试或治理脚本 docstring |
 | `check_harness_dependency_direction.py` | Harness 是否反向依赖 OpenSpec？ | 脚本 docstring |
 | `check_ci_governance.py` | CI 工作流与本地 hook 的声明是否漂移（触发器、路径过滤、pinned 工具链、canonical 命令、hook 命令集）？ | 脚本 docstring（`@impl CIG-001`） |
 | `check_doc_hygiene.py` | 文档层（ADR 索引↔目录 / 入口链与 docs 层的相对链接 / 编码换行 / docs 层范围完整性 / `_backlog` 的 `_` 目录命名约定 / **入口层字符预算闸**——受管常驻文件的声明上限，超限与缺失响亮报错，只降不升棘轮）是否漂移？ | 脚本 docstring（standalone，非 gate 组件、非 `make verify` 目标；已进 CI canonical 序列；`@impl DOB-001`） |
@@ -32,18 +29,18 @@ Deep Research-specific orientation, leave this directory and read the
 在 repo 根运行（默认扫当前目录；也可传 projectRoot 参数）：
 
 ```bash
-python3 openspec/governance/check_project_reqs.py
 python3 openspec/governance/check_project_specs.py
 python3 openspec/governance/check_project_architecture.py
 python3 openspec/governance/check_change_guidance.py
-python3 openspec/governance/check_project_req_coverage.py
 python3 openspec/governance/check_harness_dependency_direction.py
 python3 openspec/governance/check_ci_governance.py
 python3 openspec/governance/check_release_face.py
 ```
 
-共九个 component checker。每个 checker 拥有自己规则的全部语义；它们只读、不写
-registry，也不修改任何文件。
+共六个 component checker（closeout gate 的实装清单，见 `check_project_gate.py` 的
+`CHECKER_NAMES`）。每个 checker 拥有自己规则的全部语义；它们只读、不写 registry，也不修改
+任何文件。`check_doc_hygiene.py` 与 `check_release_face.py` 是 gate 之外的独立检查，不在
+component 清单内。
 
 本地 pre-commit hook（版本化于 `.githooks/pre-commit`，只跑便宜高置信检查：
 staged 空白检查 + doc hygiene；测试/快照/类型分析/构建一律属于 CI）。一次性激活：
@@ -64,7 +61,7 @@ canonical 序列——治理 unittest 套件、聚合 closeout gate、doc hygien
 ## Canonical aggregate gate
 
 `openspec/governance/check_project_gate.py`（标准库、零外部依赖、在 repo 根运行）
-只编排并聚合上述六个 component checker 的退出码，不拥有规则语义、不写 registry、
+只编排并聚合上述六个 component checker 的退出码，不拥有规则语义、
 不复刻任何解析。命令：
 
 ```bash
@@ -78,7 +75,7 @@ python3 openspec/governance/check_project_gate.py --phase closeout
   reuse；native strict validation 检查 MODIFIED 场景保留）。合法的新 ID 输出为
   `reservation: <id> (capability)`——reservation 只是只读占号提示，非权威、不写文件；
   正式登记 registry 由 apply 任务完成。
-- `--phase closeout`：运行八个 component checker 并聚合退出码；任一非零即整体非零，
+- `--phase closeout`：运行六个 component checker 并聚合退出码；任一非零即整体非零，
   并点名失败的 checker。归档 agent workflow 在非零时停止；这是仓内 workflow 的
   确定性门禁，不阻断、不改变直接调用 native `openspec archive`。
 

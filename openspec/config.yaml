@@ -65,10 +65,9 @@ rules:
     - "State that ordinary downstream work neither modifies nor source-browses the `deerflow/` gitlink unless the proposal explicitly owns and approves that boundary. Describe proposed behavior as scope, not current fact."
     - "For a changed user-facing or AI-facing lifecycle outcome, name the owning typed fact, the evidence seam, and the legal next action; projections and diagnostics do not become lifecycle authority."
   specs:
-    - "Requirements describe observable or mechanically verifiable downstream behavior and do not redefine DeerFlow internals. Main specs and active deltas declare owned requirement IDs before their first heading."
+    - "Requirements describe observable or mechanically verifiable downstream behavior and do not redefine DeerFlow internals."
     - "Retain zero-API deterministic evidence at the lowest responsible seam. Credentialed live/release evidence is supplemental and needs explicit bounds."
     - "A MODIFIED block SHALL carry the complete requirement statement and every scenario that survives the change (verbatim); scenarios the main spec still has SHALL NOT be dropped from the delta."
-    - "New requirement IDs SHALL be declared on the delta's `> req:` line before its first heading; the change's own apply task SHALL register them in `openspec/governance/req-registry.yaml`. Planning stages only reserve; they never write the registry."
   design:
     - "Separate verified current behavior, approved decisions, and unresolved questions. Define ownership for state, checkpoints, artifacts, evidence, and recovery; do not create competing controllers or authorities."
     - "A change's design document MUST carry an `## Alternatives` section when real alternatives were considered and rejected, recording each rejected alternative and why it lost; when none existed it MUST state `none: <rationale>` explicitly. Reversing an earlier decision adds a new record with cross-links instead of rewriting the old one in place; full replacement first absorbs every unique rationale, alternative, consequence, and verification gap. The exemption criterion is the absence of a durable tradeoff, never diff size."

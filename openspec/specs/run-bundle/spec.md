@@ -1,4 +1,3 @@
-> req: RUB-001
 
 # run-bundle Specification
 

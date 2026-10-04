@@ -1,4 +1,3 @@
-> req: DEW-001
 
 # deerflow-wiring Specification
 

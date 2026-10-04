@@ -1,6 +1,5 @@
 # project-structure Specification
 
-> req: PRS-001
 
 ## Purpose
 
@@ -77,26 +76,3 @@ source-browse the gitlink unless a change explicitly owns and approves that boun
   content itself is untested by this governance
 - **THEN** gitlink validation passes without running or asserting anything about upstream
   runtime behavior
-
-### Requirement: Registered requirements are owned by specs
-
-Every requirement ID registered in `openspec/governance/req-registry.yaml` SHALL be owned
-by a main spec (declared on the spec's `> req:` line before its first heading) or by an
-active change's delta spec header. A registered ID owned by neither SHALL fail requirement
-governance and be reported as an orphan, with the legal resolution being an owning spec,
-an active delta, or explicit retirement marked in the registry. The registry SHALL be
-append-only: allocated IDs are never reused, and retired IDs stay declared with a
-retirement marker.
-
-#### Scenario: Orphan registry ID fails governance
-
-- **WHEN** requirement governance runs while a registered ID appears in no main spec and
-  no active delta header
-- **THEN** validation exits non-zero and reports the ID as an orphan with the legal
-  resolutions
-
-#### Scenario: Retired ID is declared, never reused
-
-- **WHEN** a registered ID is marked retired in the registry
-- **THEN** the ID remains declared in the registry, is reported as retired rather than
-  orphan, and allocating the same ID again fails governance
