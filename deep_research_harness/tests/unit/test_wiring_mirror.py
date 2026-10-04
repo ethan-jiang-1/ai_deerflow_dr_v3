@@ -104,6 +104,13 @@ class FixtureSeamsTest(unittest.TestCase):
         self.assertIn("$VAR", base_text)
 
 
+class StreamSeamMirrorTest(unittest.TestCase):
+    def test_consumed_stream_kwargs_are_declared(self) -> None:
+        self.assertEqual(
+            client_surface.CONSUMED_STREAM_KWARGS, ("thread_id", "recursion_limit")
+        )
+
+
 class StreamFactoryTest(unittest.TestCase):
     def test_stream_fn_carries_the_recursion_limit_and_thread(self) -> None:
         from deerflow_deep_research.runtime import client as cb

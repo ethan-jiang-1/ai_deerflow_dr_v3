@@ -42,7 +42,8 @@ CONSUMED_DEFAULTS: dict[str, object] = {
 # (runtime/checkpointer/provider.py: SqliteSaver.from_conn_string + setup()).
 CHECKPOINTER_SEAM: tuple[str, ...] = ("SqliteSaver.from_conn_string", "setup")
 
-# Consumed stream-call kwarg (verified client.py:293): the embedded stream's
-# recursion_limit is a per-call override (default 100, NOT the AppConfig top-level
-# key) — the binding's make_stream_fn injects DEEP_RESEARCH_RECURSION_LIMIT there.
+# Consumed stream-call kwargs (verified client.py:293): the embedded stream's
+# recursion_limit is a PER-CALL override (default 100, NOT the AppConfig top-level
+# key — the recursion-chain scar) — the binding's make_stream_fn injects
+# DEEP_RESEARCH_RECURSION_LIMIT there. Pinned here and by test.
 CONSUMED_STREAM_KWARGS: tuple[str, ...] = ("thread_id", "recursion_limit")
