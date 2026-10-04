@@ -35,6 +35,7 @@ files = [
   "deep_research_harness/COMMANDS.md",
   "deep_research_harness/CONTEXT.md",
   "deep_research_harness/Makefile",
+  "deep_research_harness/proof-lanes.toml",
   "deep_research_harness/README.md",
   "deep_research_harness/docs/README.md",
   "deep_research_harness/docs/local-operations.md",

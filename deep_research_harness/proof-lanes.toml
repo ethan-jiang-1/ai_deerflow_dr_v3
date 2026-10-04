@@ -1,0 +1,28 @@
+# Delivery-lane registry consumed by the repository's proof-receipt checker.
+# Schema: version = 1; [[lane]] with name/command/cwd/tier/sentinel/surfaces.
+# Receipts are evaluated only for a selected-change attestation; with none, the
+# checker is dormant. The receipt producer (make proof LANE=<name>) lands with
+# the change that adopts the attestation flow (checker is governance-owned).
+version = 1
+
+[[lane]]
+name = "verify"
+command = "make verify"
+cwd = "deep_research_harness"
+tier = "fast"
+sentinel = "[verify] harness unittest gate passed."
+surfaces = [
+  "deep_research_harness/src/**",
+  "deep_research_harness/tests/**",
+]
+
+[[lane]]
+name = "smoke"
+command = "make smoke"
+cwd = "deep_research_harness"
+tier = "integration"
+sentinel = "OK"
+surfaces = [
+  "deep_research_harness/tests/integration/**",
+  "deep_research_harness/cli.py",
+]
