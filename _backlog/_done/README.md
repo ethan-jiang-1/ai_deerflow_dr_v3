@@ -44,7 +44,7 @@ _Closed plan count follows the indexed CLS records; each future move increments 
 → [`../plans/README.md`](../plans/README.md) 的活跃列表。
 
 ### 想看 _backlog 的规矩
-→ [`../README.md`](../README.md) — 三套搬迁 ritual（todo / bug / plan）+ 铁律 + 外部文件地图。
+→ [`../README.md`](../README.md) — 两套搬迁 ritual（bug / plan）+ 铁律 + 外部文件地图。
 
 ### 想看历史决策
 → `_closed_plans/` 下的 plan（分析/复盘，按文件名主题查阅）。

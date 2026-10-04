@@ -42,6 +42,7 @@
 | CLS-009 queued-triple | 三连击（已 archive；land-final-report + refine-slim-restart + ci-integration-lane 全落地） | 2026-10-04 |
 | CLS-010 test-doctrine-borrows | 测试战略采纳路线图 v3 全量版（文件先期归档，账本行补记） | 2026-10-04 |
 | CLS-011 agent-playbook-and-minimal-release | ratify-agent-playbook-and-minimal-release（已 archive；两层启动面 + 发布面两件套 + 冷启动守卫） | 2026-10-04 |
+| CLS-012 fresh-agent-doc-cleanup | remove-requirement-id-tracking + catch-up-doc-truthfulness（均已 archive；40 条审计发现全量处置，三项规范语义留待各自 change；B11 已由 land-proof-lane-registry 拆除） | 2026-10-04 |
 
 ---
 
@@ -66,4 +67,3 @@
 ## 落地关联
 计划如何变成 `openspec/changes/` 里的 change（或已被哪个 change 吸收）。
 ```
-| CLS-012 fresh-agent-doc-cleanup | remove-requirement-id-tracking + catch-up-doc-truthfulness（均已 archive；40 条审计发现全量处置，三项规范语义留待各自 change；B11 已由 land-proof-lane-registry 拆除） | 2026-10-04 |
