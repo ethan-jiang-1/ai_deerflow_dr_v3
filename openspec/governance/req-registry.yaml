@@ -50,3 +50,11 @@ CIG-001: ci-governance — CI 门禁与本地 hook 的接受路径合同：单 j
 # ---- add-doc-budget-gate 登记（2026-10-02）------------------------------------
 # 入口层预算闸（owning delta: openspec/changes/add-doc-budget-gate）。
 DOB-001: doc-budgets — 入口层字符预算闸：受管常驻文件的声明上限、超限与缺失响亮报错、只降不升棘轮
+
+# ---- ratify-agent-playbook-and-minimal-release 登记（2026-10-04）--------------
+# agent 启动面（owning delta: openspec/changes/ratify-agent-playbook-and-minimal-release）。
+APB-001: agent-playbook — agent 启动面：COMMANDS.md 入口菜单（一行一条 + 路由指针，不写过程）、playbook/ 子目录（一场景一文件、MD mixed with CLI、退出码级完成判据）、回执纪律（事实过期同轮修掉、未执行的 run 不报告）
+
+# ---- ratify-agent-playbook-and-minimal-release 登记（2026-10-04）--------------
+# 最小发布面（owning delta: openspec/changes/ratify-agent-playbook-and-minimal-release）。
+RLF-001: release-face — 最小发布合同：发布面 = harness + 锁定 deerflow gitlink 两件套（openspec/_backlog/保留区在外）、源码仓库 --recursive 分发（不承诺 wheel）、兄弟布局不变量、随行代码零开发面依赖、确定性冷启动守卫（违规响亮变红、慢速全量 lane 书面化）

@@ -19,6 +19,7 @@
 | `check_harness_dependency_direction.py` | Harness 是否反向依赖 OpenSpec？ | 脚本 docstring |
 | `check_ci_governance.py` | CI 工作流与本地 hook 的声明是否漂移（触发器、路径过滤、pinned 工具链、canonical 命令、hook 命令集）？ | 脚本 docstring（`@impl CIG-001`） |
 | `check_doc_hygiene.py` | 文档层（ADR 索引↔目录 / 入口链与 docs 层的相对链接 / 编码换行 / docs 层范围完整性 / `_backlog` 的 `_` 目录命名约定 / **入口层字符预算闸**——受管常驻文件的声明上限，超限与缺失响亮报错，只降不升棘轮）是否漂移？ | 脚本 docstring（standalone，非 gate 组件、非 `make verify` 目标；已进 CI canonical 序列；`@impl DOB-001`） |
+| `check_release_face.py` | 最小发布面是否完整（gitlink 在场且 pin 一致 / 兄弟布局与 `[tool.uv.sources]` 目标都在发布面内 / 随行源码零开发面耦合 / COMMANDS 路由目标存在）？ | 脚本 docstring（standalone，slow cold-start lane 见 playbook；`@impl RLF-001`） |
 | `test-evidence-policy.md` | 测试证据的 authority、lifecycle、synchronized-change？ | [test-evidence-policy.md](test-evidence-policy.md)；批准语义由测试证据的 owning main spec 拥有（随 v3 首批治理 change 建立） |
 | `change-guidance/README.md` | 先按什么原则、再选哪个 policy？ | [change-guidance/README.md](../change-guidance/README.md) |
 
@@ -38,9 +39,10 @@ python3 openspec/governance/check_change_guidance.py
 python3 openspec/governance/check_project_req_coverage.py
 python3 openspec/governance/check_harness_dependency_direction.py
 python3 openspec/governance/check_ci_governance.py
+python3 openspec/governance/check_release_face.py
 ```
 
-共八个 component checker。每个 checker 拥有自己规则的全部语义；它们只读、不写
+共九个 component checker。每个 checker 拥有自己规则的全部语义；它们只读、不写
 registry，也不修改任何文件。
 
 本地 pre-commit hook（版本化于 `.githooks/pre-commit`，只跑便宜高置信检查：

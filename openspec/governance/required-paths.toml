@@ -109,6 +109,22 @@ files = [
   "deep_research_harness/src/deerflow_deep_research/runtime/render.py",
 ]
 
+[paths.APB-001]
+# Agent invocation surface (owner: agent-playbook capability).
+files = [
+  "deep_research_harness/playbook/run-research.md",
+]
+directories = [
+  "deep_research_harness/playbook",
+]
+
+[paths.RLF-001]
+# Minimal release contract (owner: release-face capability).
+files = [
+  "openspec/governance/check_release_face.py",
+  "openspec/tests/governance/test_release_face.py",
+]
+
 [paths.CIG-001]
 # CI 门禁与本地 hook 的接受路径文件（owner: ci-governance capability）。
 files = [

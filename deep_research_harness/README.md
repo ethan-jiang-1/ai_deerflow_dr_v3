@@ -4,7 +4,7 @@ This independent Python project is the downstream **Deep Research Harness** for 
 2.1. It is a *runtime harness*, not a single question-to-report pipeline: it is the stable
 execution and control environment that creates, drives, and disposes of research runs.
 
-**v3 rewrite, pre-implementation.** The philosophy carries over from v2; the implementation
+**v3 rewrite, implemented core.** The philosophy carries over from v2; the implementation
 route is inverted: the research cognition engine is DeerFlow's native deep research
 capability (lead agent + `deep-research` skill + subagent delegation), and this harness
 keeps the deterministic, inspectable parts:
@@ -14,30 +14,28 @@ keeps the deterministic, inspectable parts:
   The Harness owns no durable run state.
 - **Explicit composition.** Public host routes are fixed to `all_real`; fixture recipes
   report `fixture`; the same workflow can be exercised with zero credentials. Fixture
-  adapters live only in `src_fixtures/` (excluded from the production wheel).
+  adapters live only in the runtime fixtures package (excluded from the production wheel).
 - **Models propose, code disposes.** Candidate work, evidence, and routes are admitted
   only by deterministic owners (validators, ledger, gates).
 
-> Status notice: none of the above is implemented yet. The specification tree is
-> intentionally empty; every capability grows from a v3 change, starting from the
-> boundary plan at `_backlog/plans/2026-10-02-digest-deerflow-native-deep-research.md`
-> in the repository root.
-
 ## Entry Surfaces
 
-Not defined yet. The v2 ladder (CLI / TUI / debugger) is a reference shape, not a
-commitment; v3 surfaces are decided by the boundary plan and its changes.
+The entry surface is live: the six-verb CLI (`create` / `status` / `watch` / `cancel` /
+`refine` / `inspect`) over the run-bundle substrate, plus the make lanes (`test`,
+`verify`, `smoke`, `create`, …). The menu with one line per command — and routing to the
+procedure playbook — is [`COMMANDS.md`](COMMANDS.md).
 
 ## Quick Start
 
 ```bash
-make install    # pre-implementation stub (announces that nothing is installed yet)
-make verify     # pre-implementation stub (announces that nothing is verified yet)
+make verify    # application unit gate: stdlib unittest suite, offline-safe
+make create PROBLEM="研究问题"   # zero-credential fixture research run
 ```
 
-Requirements once implementation lands: Python 3.12+, `uv`, and the sibling DeerFlow
-harness at `../deerflow/backend/packages/harness` (already declared in
-`[tool.uv.sources]`).
+Requires Python 3.12+, `uv`, and the sibling DeerFlow gitlink at `../deerflow`
+(submodule, already declared in `[tool.uv.sources]`). The release face is exactly this
+tree plus that gitlink; a deterministic guard (`check_release_face.py` in the
+repository's governance suite) fails loudly when the face is violated.
 
 ## Reading Map
 
