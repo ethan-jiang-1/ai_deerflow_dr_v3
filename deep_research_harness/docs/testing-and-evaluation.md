@@ -41,6 +41,13 @@
 **Tier C 规模门槛**（有意不借）：时长分片（>500 测试）、迁移契约（schema v2）、行为断言 eval 栈。
 详见 plan 卡 `2026-10-04-test-doctrine-borrows.md` 的全对照表（digest 十域 × 我方资产）。
 
+## 元纪律（守卫也需要被怀疑）
+
+- **Evidence over a green check**：CI 是信号不是判决——全绿从不豁免"读一遍改动路径"的责任；必需检查的红本身就是发现。
+- **无覆盖率门禁的取舍**：质量门禁是结构性的（命令面守卫、契约镜像、门禁自测、配置钉住），不靠"覆盖率百分比"这类可被 gaming 的代理指标——门禁回答"结构还成立吗"，不是"跑过了多少行"。
+- **静态发现 → 运行时证明**：静态扫描是发现工具，发现只是候选；人工评审选出高危路径 → 加守卫 → 变异验证（红→绿）。扁平 chunk 与 fallback 标记两个守卫都由此循环长出。
+- **as-if-restarted 崩溃模拟**：崩溃不需要真崩——丢弃内存态、从同一 store 重建（"as if Worker A restarted"），或直接构造崩溃后状态再调对账；SIGKILL 级场景毫秒级确定性断言（run_engine 的死 PID 用例即此习语）。
+
 ## 已知限制
 
 见 [`known-limitations.md`](known-limitations.md)（LLM fallback 守卫后的框架行为记录、CI UNVERIFIED-until-push 已收口、checkpoint 体积已由 delta 模式修复——存留 patch 版本告诫）。

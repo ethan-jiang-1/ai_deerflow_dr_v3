@@ -7,9 +7,11 @@ dynamic = ["version"]
 dependencies = ["deerflow-harness"]
 
 [dependency-groups]
+# Dev tools are local conveniences, never gate dependencies: the unit gate is
+# stdlib-only (the CI job installs nothing). Each entry states its role.
 dev = [
-    "pytest>=9.0.3",
-    "ruff>=0.14.11",
+    "pytest>=9.0.3",   # local runner for the same tests the stdlib gate runs
+    "ruff>=0.14.11",   # lint/format convenience (CI does not enforce it)
 ]
 
 [build-system]
