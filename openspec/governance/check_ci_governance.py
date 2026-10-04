@@ -39,6 +39,9 @@ WORKFLOW_REQUIRED_MARKERS: tuple[str, ...] = (
     "UV_OFFLINE=1 make verify",
     "astral-sh/setup-uv@v7",
     "make smoke",
+    "concurrency:",
+    "cancel-in-progress: true",
+    "timeout-minutes: 30",
 )
 
 # The hook runs only the two declared cheap checks. Suite, snapshot,

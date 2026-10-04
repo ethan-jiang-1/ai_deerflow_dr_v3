@@ -62,6 +62,10 @@ jobs:
       - run: UV_OFFLINE=1 make verify
       - uses: astral-sh/setup-uv@v7
       - run: make smoke
+  concurrency:
+    group: governance-${{ github.ref }}
+    cancel-in-progress: true
+  timeout-minutes: 30
 """
 
 VALID_HOOK = """#!/bin/sh
