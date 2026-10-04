@@ -1,6 +1,6 @@
 # Plans — plan/分析文档索引
 
-> 最后更新: 2026-10-04（doc-hygiene-second-sweep 立卡入账：第二轮 fresh-agent 审计 26 条） | `_backlog/plans/` — 活跃 plan 在此（顶层），
+> 最后更新: 2026-10-04（doc-hygiene-second-sweep 关闭：CLS-013；活跃列表空） | `_backlog/plans/` — 活跃 plan 在此（顶层），
 > 完成的普通 plan 移入 [`../_done/_closed_plans/`](../_done/_closed_plans/)。
 >
 > **plan 没有编号，文件名即标识。完成后文件名不变，位置即状态。**
@@ -23,9 +23,8 @@
 
 | Plan | 一句话 |
 |------|--------|
-| [2026-10-04-doc-hygiene-second-sweep.md](2026-10-04-doc-hygiene-second-sweep.md) | 第二轮 fresh-agent 审计：上轮打扫后的新增与复发 26 条（A8/B10/C8），含防复发装置方向 |
 
-**Next available plan ID: CLS-013**（移入 `_closed_plans/` 时分配）
+**Next available plan ID: CLS-014**（移入 `_closed_plans/` 时分配）
 
 ## 已归档（移至 `_done/_closed_plans/`）
 
@@ -42,6 +41,7 @@
 | CLS-009 queued-triple | 三连击（已 archive；land-final-report + refine-slim-restart + ci-integration-lane 全落地） | 2026-10-04 |
 | CLS-010 test-doctrine-borrows | 测试战略采纳路线图 v3 全量版（文件先期归档，账本行补记） | 2026-10-04 |
 | CLS-011 agent-playbook-and-minimal-release | ratify-agent-playbook-and-minimal-release（已 archive；两层启动面 + 发布面两件套 + 冷启动守卫） | 2026-10-04 |
+| CLS-013 doc-hygiene-second-sweep | 同名 change（已 archive；26 条审计发现全处置，防复发装置另立） | 2026-10-04 |
 | CLS-012 fresh-agent-doc-cleanup | remove-requirement-id-tracking + catch-up-doc-truthfulness（均已 archive；40 条审计发现全量处置，三项规范语义留待各自 change；B11 已由 land-proof-lane-registry 拆除） | 2026-10-04 |
 
 ---

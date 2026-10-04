@@ -32,4 +32,6 @@ plan 完成后从 `_backlog/plans/` 通过 `git mv` 移入本目录：
 | CLS-011 | 2026-10-04 | [2026-10-04-agent-playbook-and-minimal-release.md](2026-10-04-agent-playbook-and-minimal-release.md) | agent 启动面 + 最小发布面全落地（ratify-agent-playbook-and-minimal-release 归档：COMMANDS 菜单+playbook/ 两层、发布面两件套、冷启动守卫红先绿后、全动词旅程回执） |
 | CLS-012 | 2026-10-04 | [2026-10-04-fresh-agent-doc-cleanup.md](2026-10-04-fresh-agent-doc-cleanup.md) | fresh agent 全库文档审计（40 条发现）：catch-up-doc-truthfulness + remove-requirement-id-tracking 两 change 归档（narrative catch-up + 两条红先绿后守卫 + req 追踪体系退役）；A11/B4/agents 空层三项规范语义留待各自 change（B11 lane 装置已由 land-proof-lane-registry 落地拆除） |
 
-**Next available plan ID: CLS-013**
+| CLS-013 | 2026-10-04 | [2026-10-04-doc-hygiene-second-sweep.md](2026-10-04-doc-hygiene-second-sweep.md) | 第二轮文档卫生审计 26 条全处置：账本 ritual 修正直落（B2-B5/A4）+ 同名 change 归档（19 条声明层修复；A5/C2/C3 与计数钉死形态 defer 给操作者与后续治理 change；依赖方向守卫新抓三处跨树链接即改即绿） |
+
+**Next available plan ID: CLS-014**
