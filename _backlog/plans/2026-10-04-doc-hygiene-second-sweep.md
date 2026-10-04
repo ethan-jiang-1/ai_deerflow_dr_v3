@@ -31,7 +31,7 @@
 |---|------|------|------|
 | A1 ⏮ | `openspec/governance/README.md:31-43` | 六组件命令块含 check_release_face.py（非组件），真第六组件 check_proof_receipts.py 全 README 未导航；实测 `CHECKER_NAMES` = specs/architecture/change_guidance/harness_dep/ci_governance/**proof_receipts**。上轮 A10 修了计数（"6"），枚举仍错——同族复发 | 命令块列真实六组件；release_face 归 standalone 段；"何时读"表补 proof_receipts、selected-change-closeout、kernel、export 行 |
 | A2 ⏮ | `README.md:19` | "9 个能力、29 个 changes 归档" vs 实测 11/31；该数字恰由上轮 catch-up 写对、随后两次归档即再漂移（见诊断 1） | 计数指针化或 checker 钉死（REVIEW 拍板）；短期先改对 |
-| A3 | `deep_research_harness/docs/known-limitations.md:3-4` vs 表内 :10-14 | 自称只记"**存续中的**限制"，6 行中 2 行已修、1 行已解决划线、1 行是已落地守卫（:14）——半本处置台账 | 拆"存续"与"已处置"；已处置行收缩为指针 |
+| A3 | `deep_research_harness/docs/known-limitations.md:3-4` vs 表内 :9-14 | 自称只记"**存续中的**限制"，6 行中 2 行已修、1 行已解决划线、2 行是已落地守卫（:9 与 :14）——5/6 已处置，真正存续仅 :13 待诊断一行（:12 尾存留告诫）——半本处置台账 | 拆"存续"与"已处置"；已处置行收缩为指针 |
 | A4 | `_backlog/_done/README.md:47` | "三套搬迁 ritual（todo / bug / plan）" vs `_backlog/README.md:44` 两类铁律（"不再增加类别"）——v2"todo"化石 | 改"两套" |
 | A5 | "profile" 一词两义 | 根 `profiles/`（本地运行配置）vs `openspec/change-guidance/profiles/`（政策 profile）；根 AGENTS 路由行与根 README 各指一个；CONTEXT-MAP 未消歧（harness CONTEXT.md 对 "Gate" 双义有消歧先例，机制存在未用） | 词汇登记进 CONTEXT 层（规范语义，REVIEW 拍板归属哪层） |
 | A6 | `deep_research_harness/AGENTS.md:4` vs :100-115 | "应用不依赖治理框架" vs 同文结构权威/生成块重渲染在 openspec 治理——各自为真（运行时独立 ≠ 结构被治理），并置无消解 | :4 加半句消解（"运行时不依赖；结构契约由治理拥有"） |
@@ -46,12 +46,12 @@
 | B2 | `_backlog/_done/_suspended_bugs/README.md:9` | 指向 `_fixed_bugs/README.md` 的 "Suspended" 段不存在（死胡同） | 改指或删 |
 | B3 ⏮ | `_backlog/plans/README.md:70` | CLS-012 归档行游离在卡片模板代码块（:53-69）之后，脱离 :31-45 归档表——按表读必漏 | 移入表格（账本 ritual 修正，不进 change） |
 | B4 | `_backlog/README.md:3` | 头部"最后更新"停在 CLS-011，未反映 CLS-012（plans/_done 两侧头部均已到 012） | 补记（账本 ritual 修正） |
-| B5 ⏮ | `_backlog/_done/_closed_plans/README.md:29-38` | 空行把表格切成多段（CLS-006..012 行渲染破碎）——上轮 C7 修过，"补记"动作复发 | 删空行（账本 ritual 修正） |
+| B5 ⏮ | `_backlog/_done/_closed_plans/README.md:29-38` | 空行把表格切成多段（CLS-007..012 行渲染破碎；004..006 在完整段内）——上轮 C7 修过，"补记"动作复发 | 删空行（账本 ritual 修正） |
 | B6 | `COMMANDS.md:5`（ENS-001）/ `docs/quality-register.md:1`（RT10）/ `playbook/run-research.md:43`（RLF-001） | 退役需求 ID 惯性引用：remove-requirement-id-tracking 后 main specs 已不可解析（该 change 明确留作 inert history，已披露残留） | 保留则标注指向归档 change；或删 |
 | B7 | `docs/known-limitations.md:11` + `src/.../runtime/client.py:18` 注释 | 裸 `client.py:293`：harness 自己的 client.py 仅 132 行；实指上游 `deerflow/backend/packages/harness/deerflow/client.py:293`（已核实该行存在 `recursion_limit=overrides.get(...)`） | 限定为上游完整路径 |
 | B8 | `README.md:35` | "根目录居民 `config.yaml`、`.env`"两者均不存在（gitignored 待备）；且 config.yaml 与实存的 `openspec/config.yaml`（另一物）重名 | 改"按需准备"措辞；点名区分 |
-| B9 ⏮ | `openspec/change-guidance/local/deep-research.md:12-19` | "Context Expansion Gate" 段被 `## Context And Seams` 标题拦腰截断，同一句"start from domain/…engine/…agents/"重复两遍——疑为上轮 C10（Program Focus 三处复述收敛）修复的编辑副产物 | 修复段落结构、去重 |
-| B10 ⏮ | `deep_research_harness/README.md:45` | "v3 direction note" 链接标签在目标 AGENTS.md 无对应文件/章节（上轮 B2 删了"boundary plan above"，标签残留） | 改标签为实际内容（AGENTS.md 引言段） |
+| B9 ⏮ | `openspec/change-guidance/local/deep-research.md:12-19` | "Context Expansion Gate" 段被 `## Context And Seams` 标题拦腰截断，同一句"start from domain/…engine/…agents/"重复两遍——经 git 归因证实（a30d1c1）为上轮口号收敛编辑进行到一半、停在逗号 | 修复段落结构、去重 |
+| B10 ⏮ | `deep_research_harness/README.md:45` | 行内仍逐字保留 "+ the boundary plan above"（全文件唯一 boundary 提及，上方并无此物——上轮 B2 只清了根 README 的同款短语，此处漏网）；且 "v3 direction note" 链接标签在目标 AGENTS.md 无对应文件/章节 | 删悬空短语；改标签为实际内容（AGENTS.md 引言段） |
 
 ### C 级复述 / 沉积 / 格式（8 条）
 
@@ -84,6 +84,6 @@
 ## 落地关联
 
 - **账本修正（B2-B5）**按 `_backlog` ritual 直接修三处 README，不进 change（沿 CLS-012 先例）。
-- **建议 change `doc-hygiene-second-sweep`**：A1-A4、A6-A8、B1、B6-B10、C1、C4-C8（openspec 侧 A1/B6/B9 可与根/harness 侧拆两个，按"一次放行一把"由 REVIEW 定）。红绿判据 = `check_doc_hygiene.py` + `check_release_face.py` + `make verify` 全 exit 0，A 级条目逐条前后对照。
+- **建议 change `doc-hygiene-second-sweep`**：A1-A4、A6-A8、B1、B6-B10、C1、C4-C8（openspec 侧 A1/B9 可与根/harness 侧拆两个——B6 的三处位置均在 harness 层——按"一次放行一把"由 REVIEW 定）。红绿判据 = `check_doc_hygiene.py` + `check_release_face.py` + `make verify` 全 exit 0，A 级条目逐条前后对照。
 - **防复发装置**（计数指针化/回写、账本补记位置校验入规则 7）另立治理 change，属 checker 语义，REVIEW 拍板后立项。
 - **实施顺序**：账本修正（零风险）→ 根层 → harness 层 → openspec 层 → 常驻三文件最后做（预算最紧）→ 每层收尾跑 checker。
