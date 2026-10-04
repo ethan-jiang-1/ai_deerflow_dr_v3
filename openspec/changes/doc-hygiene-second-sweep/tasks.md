@@ -152,3 +152,10 @@
   frontmatter in `.agents/skills/*/SKILL.md` (read-only check over the user-reserved
   area). Verify: versions equal, or the mismatch is recorded as drift for resolution
   before archive.
+
+## Closing notes
+
+- Generation drift recorded and explicitly accepted by the operator (2026-10-04): `openspec --version` 1.14.0 vs skills `generatedBy` 1.13.1; skills are the user-reserved area, realignment happens at the next CLI-driven skill refresh.
+- Resident budget post-measurements (for the follow-up governance change's ratchet-down): root AGENTS.md 2425/2435 · harness AGENTS.md 6863/6864 · openspec/config.yaml 11436/11436 (untouched).
+- New finding folded into task 2.7 execution: the B6 pointer links initially crossed the harness→governance tree boundary; the dependency-direction checker caught all three files; resolved to slug-only mentions (boundary rule kept intact, no checker edit).
+- Scope/diff evidence: gitlink 160000 ceebf97f unchanged, nested worktree clean, `git -C deerflow status` empty; ledger fixes (B2-B5, A4) committed separately per plan routing.
