@@ -96,10 +96,16 @@ def cmd_create(args) -> None:
 
     try:
         with client_binding.bundle_checkpointer(handle) as saver:
+            import yaml as _yaml
+
+            model_name = _yaml.safe_load(
+                (CONFIG_ROOT / f"{args.config}.yaml").read_text(encoding="utf-8")
+            )["models"][0]["name"]
             client = client_binding.build_client(
                 CONFIG_ROOT,
                 args.config,
                 checkpointer=saver,
+                model_name=model_name,
                 snapshot_dir=handle.root / "diagnostics",
                 pin=_pin(),
             )

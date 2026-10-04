@@ -50,7 +50,7 @@ def event_line(event) -> str:  # noqa: ANN001 — live view (raw stream event)
         if kind in {"tool", "ToolMessage"}:
             name = str(chunk.get("name", "tool") or "tool")
             return f"tool {name} finished"
-        return "message"
+        return f"message ({kind or 'unknown'})"
     if event_type == "custom":
         detail = data.get("event", "subagent event") if isinstance(data, dict) else "subagent event"
         return f"subagent {detail}"

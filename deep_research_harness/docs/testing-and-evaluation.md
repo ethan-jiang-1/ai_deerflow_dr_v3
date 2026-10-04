@@ -21,7 +21,7 @@
 | --- | --- | --- | --- |
 | 1 剧本模型 | ✅ `runtime/fixtures.ScriptedChatModel`（BaseChatModel 子类 + `DEERFLOW_FAKE_SCRIPT`） | 预编程消息序列（含 tool_calls 与 raise 动作），真图真中间件真 checkpointer 照跑 | 验证引擎/绑定/入口的行为契约（毫秒级、零 fixture） |
 | 2 真实事件流回放 | ✅ `tests/fixtures/replay/real-small-stream.json`（1386 真实事件）+ 回放测试 | 真实形状（含真 tool_calls）永久进回归——扁平 chunk 疤的机械化防复发 |
-| 3 内容寻址模型回放（级 2 完全体） | 📋 借鉴队列（plan 卡） | caller+归一化输入哈希索引的真模型 I/O 回放 | 同上，覆盖面更大 |
+| 3 内容寻址模型回放（级 2 完全体） | ✅ `runtime/fixtures/replay_model.py` + `tests/fixtures/replay/real-model-io.jsonl`（真实 DeepSeek I/O） | 真模型 I/O 按归一化哈希确定性回放；miss 响亮点名 |
 | 3 行为断言（live 面） | ⬜ 未规划 | 对真实运行的 trace 断言（工具选择/token/时长） | 显式 opt-in 的质量观察 |
 
 替身选型纪律（借鉴）：**替身只替换"贵的与不确定的"（模型、时间、外部凭证），不替换"被测语义本身"**——无 fake-redis 类的先例，我们同样无假 checkpointer。
@@ -34,7 +34,7 @@
 - fail-closed：扫描不了的形状、解析不了的配置、缺的必填字段——一律响亮失败点名，不静默。
 - scar-tissue：真实事故留疤成测试（error-fallback 守卫、澄清回声排除均由此而来）。
 
-## 借鉴队列（挂钩在账，不靠唠叨；v2 全对照修订见 plan 卡）
+## 借鉴队列（已收口——详见 plan 卡 CLS-010；v2 全对照修订见同卡）
 
 **Tier A 机制件**（各一 change）：A1 真实事件流回放 fixture（扁平 chunk 疤的永久回归）→ A3 stream 缝镜像（recursion per-call 语义钉住）→ A4 docs-as-contract 守卫（COMMANDS↔Makefile↔cli 一致性）→ A2 内容寻址回放模型（真跑证据→永久 fixture）→ A5 unit lane 网络守卫（digest 自评缺口 #1 的预防性补齐）。
 **Tier B 纪律挂钩**：B1 change 设计工件自带 Testing Strategy 节；B2 doctrine 文档钉住（lane 表 targets 与守卫清单一致性）；B3 as-if-restarted 习语成文。
