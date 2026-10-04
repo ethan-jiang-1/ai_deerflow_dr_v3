@@ -1,6 +1,6 @@
 # Plans — plan/分析文档索引
 
-> 最后更新: 2026-10-04（fresh-agent-doc-cleanup 关闭：CLS-012） | `_backlog/plans/` — 活跃 plan 在此（顶层），
+> 最后更新: 2026-10-04（doc-hygiene-second-sweep 立卡入账：第二轮 fresh-agent 审计 26 条） | `_backlog/plans/` — 活跃 plan 在此（顶层），
 > 完成的普通 plan 移入 [`../_done/_closed_plans/`](../_done/_closed_plans/)。
 >
 > **plan 没有编号，文件名即标识。完成后文件名不变，位置即状态。**
@@ -23,8 +23,7 @@
 
 | Plan | 一句话 |
 |------|--------|
-
-（空）
+| [2026-10-04-doc-hygiene-second-sweep.md](2026-10-04-doc-hygiene-second-sweep.md) | 第二轮 fresh-agent 审计：上轮打扫后的新增与复发 26 条（A8/B10/C8），含防复发装置方向 |
 
 **Next available plan ID: CLS-013**（移入 `_closed_plans/` 时分配）
 
