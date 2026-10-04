@@ -7,7 +7,7 @@
 裁决：checkpoint 归 **Bundle 内**（精简实现）；外层 = **普通状态机**；HITL **暂缓**（v1 run
 全自动）。**debugger 为用户一级硬需求**：watch 直播 / journal 时间线 / checkpoint 回放三层
 从第一天都要好用。元原则：v2 资产按「拿得过来」重加权。证据底座：
-`_reference/v2-run-bundle-implementation.md`（v2 全量实现 + 继承/丢弃清单）、
+`_reference/v2/v2-run-bundle-implementation.md`（v2 全量实现 + 继承/丢弃清单）、
 `v2-harness-app-shape.md`。
 
 ## 设计理由：质量控制体系映射（2026-10-02 用户拍板收录）

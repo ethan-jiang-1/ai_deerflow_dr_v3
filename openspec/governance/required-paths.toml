@@ -29,7 +29,7 @@ files = [
   "_backlog/_done/_suspended_bugs/README.md",
   "_backlog/_done/_suspended_plans/README.md",
   "_backlog/_reference/README.md",
-  "_backlog/_reference/deerflow-native-deep-research.md",
+  "_backlog/_reference/deerflow/deerflow-native-deep-research.md",
   "deep_research_harness/.gitignore",
   "deep_research_harness/AGENTS.md",
   "deep_research_harness/CLAUDE.md",

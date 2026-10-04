@@ -8,7 +8,7 @@
 补齐，见决策 1）。**debugger 为用户一级硬需求**（v2 之痛：
 可调试性糟糕 → 工具堆失控；v3 必须根治）。元原则：v2 剧场（12 子命令/TUI 三形态/调试工作台/
 9 runbook/双凭证路线）整体不抄——阶梯概念留精神、砍厚度。证据底座：
-`_reference/v2-harness-app-shape.md`（剧场全貌）、`deerflow-runtime-and-persistence.md` §5
+`_reference/v2/v2-harness-app-shape.md`（剧场全貌）、`_reference/deerflow/deerflow-runtime-and-persistence.md` §5
 （事件清单）。项目级准绳（透明可见优先 / 交付质量给非 AI 接手者 / QC 研究定位）见
 wiring plan 背景节，先序于本 plan 一切裁决。
 

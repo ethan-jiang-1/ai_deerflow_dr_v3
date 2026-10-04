@@ -6,7 +6,7 @@
 
 v3 骨架已立（本仓库）：`deep_research_harness/` + `deerflow/`（submodule 锁 `ceebf97f` = v2.1.0）+ `openspec/`（空壳）+ `_backlog/`（本账本）。命名与结构沿用 v2，**实现从零开始**。
 
-方向性决策（用户拍板，2026-10-02）：v2 逐节点手搓研究图；v3 直接借力 DeerFlow v2.1.0 原生的 Deep Research 能力。原生能力的盘点见 [`../_reference/deerflow-native-deep-research.md`](../_reference/deerflow-native-deep-research.md)：框架侧没有固定研究图，deep research = `deep-research` skill（四阶段方法论）+ subagent 委派系统（可自定义类型、一层委派、框架级预算/并发治理）+ 宿主工具。
+方向性决策（用户拍板，2026-10-02）：v2 逐节点手搓研究图；v3 直接借力 DeerFlow v2.1.0 原生的 Deep Research 能力。原生能力的盘点见 [`../_reference/deerflow-native-deep-research.md`](../_reference/deerflow/deerflow-native-deep-research.md)：框架侧没有固定研究图，deep research = `deep-research` skill（四阶段方法论）+ subagent 委派系统（可自定义类型、一层委派、框架级预算/并发治理）+ 宿主工具。
 
 ## 本 plan 要回答的问题
 
@@ -17,7 +17,7 @@ v3 骨架已立（本仓库）：`deep_research_harness/` + `deerflow/`（submod
 
 ## 决策 / 方案
 
-（2026-10-02 填实。证据底座：[原生能力盘点](../_reference/deerflow-native-deep-research.md)（事实层）
+（2026-10-02 填实。证据底座：[原生能力盘点](../_reference/deerflow/deerflow-native-deep-research.md)（事实层）
 + DSH 借鉴 plan 的产品映射表（设计检查单：执行链三环节 / 静与动四层 / 模型可见⟺落日志 /
 可见集≠授权 / 事实源检验法）+ 框架只读指引。四问答案由 change ② 的 design 按吸收义务全量消化。）
 

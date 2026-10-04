@@ -7,7 +7,7 @@
 六项裁决已定（见 digest plan 修订节）：接线路 = **embedded DeerFlowClient**；外层编排 = **普通状态机**
 （非 LangGraph 图）；middleware = **只配置不编写**。用户硬要求：我们借力的每个 DeerFlow 表面
 要在**自己源码树里有一份肉眼可见的拷贝**（契约镜像）。元原则：能借 DeerFlow 多少就借多少；
-v2 拿得过来就拿，拿不过来就算了。证据底座：`_reference/deerflow-runtime-and-persistence.md`
+v2 拿得过来就拿，拿不过来就算了。证据底座：`_reference/deerflow/deerflow-runtime-and-persistence.md`
 （接线路事实）、`deerflow-cognition-engine.md`（旋钮表）、`deerflow-harness-architecture.md`
 （结构标本）。
 
@@ -57,7 +57,7 @@ v2 拿得过来就拿，拿不过来就算了。证据底座：`_reference/deerf
    （ownership_layers / [imports] 键）与 `node.grammar_removed` 违规码锁死复活路径，见其
    delta 与红绿回执。**〕**
 4. **middleware 只配置**：用框架现成实现（错误处理/输入消毒/compaction/循环熔断/token
-   预算/委派限额——旋钮表引 `_reference/deerflow-cognition-engine.md` §6）；逃生口：
+   预算/委派限额——旋钮表引 `_reference/deerflow/deerflow-cognition-engine.md` §6）；逃生口：
    真需要框架没有的行为时写标准 AgentMiddleware 插头，不碰框架（**首个具体用途 =
    bundle 决策 3 的装配快照捕获**——首轮 hook 记 system prompt，2026-10-02 定）。**注入语义（2026-10-02
    digest 补课）**：client 的 `middlewares=[...]` 参数是**插入**（lead 链 #32 槽位，
