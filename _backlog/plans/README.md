@@ -67,4 +67,4 @@
 ## 落地关联
 计划如何变成 `openspec/changes/` 里的 change（或已被哪个 change 吸收）。
 ```
-| CLS-012 fresh-agent-doc-cleanup | remove-requirement-id-tracking + catch-up-doc-truthfulness（均已 archive；40 条审计发现全量处置，四项规范语义留待各自 change） | 2026-10-04 |
+| CLS-012 fresh-agent-doc-cleanup | remove-requirement-id-tracking + catch-up-doc-truthfulness（均已 archive；40 条审计发现全量处置，三项规范语义留待各自 change；B11 已由 land-proof-lane-registry 拆除） | 2026-10-04 |
