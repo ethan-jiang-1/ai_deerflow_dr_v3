@@ -1,6 +1,6 @@
 # Plans — plan/分析文档索引
 
-> 最后更新: 2026-10-04（agent-playbook-and-minimal-release 关闭：CLS-011；活跃列表空） | `_backlog/plans/` — 活跃 plan 在此（顶层），
+> 最后更新: 2026-10-04（fresh-agent-doc-cleanup 入账） | `_backlog/plans/` — 活跃 plan 在此（顶层），
 > 完成的普通 plan 移入 [`../_done/_closed_plans/`](../_done/_closed_plans/)。
 >
 > **plan 没有编号，文件名即标识。完成后文件名不变，位置即状态。**
@@ -23,8 +23,9 @@
 
 | Plan | 一句话 |
 |------|--------|
+| [fresh-agent-doc-cleanup](2026-10-04-fresh-agent-doc-cleanup.md) | fresh agent 视角全库文档审计：40 条发现（A 矛盾 11 / B 过期死链 16 / C 术语噪音 13），核心病灶 = 骨架叙事落后实现；待 REVIEW 拍板后拆 change |
 
-（空）
+（无其他活跃 plan）
 
 **Next available plan ID: CLS-012**（移入 `_closed_plans/` 时分配）
 
