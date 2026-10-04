@@ -46,6 +46,7 @@ wired into the Harness ``make verify`` gate, which stays application-independent
 from __future__ import annotations
 
 import argparse
+import re as _re
 import re
 import sys
 import tempfile
@@ -79,12 +80,14 @@ ENTRY_DOCS: tuple[str, ...] = (
 # lowering one is always allowed; raising one requires a one-line justification
 # recorded next to the entry below.
 DOC_BUDGETS: dict[str, int] = {
-    # Root resident instructions (2435 chars post catch-up-doc-truthfulness).
-    "AGENTS.md": 2435,
+    # Root resident instructions (2425 chars measured post doc-hygiene-second-sweep;
+    # ratcheted down from 2435).
+    "AGENTS.md": 2425,
     # Root Claude entry stub; must stay a thin AGENTS.md import, never a copy.
     "CLAUDE.md": 400,
-    # Module change map incl. generated structure block (6864 chars post catch-up-doc-truthfulness).
-    "deep_research_harness/AGENTS.md": 6864,
+    # Module change map incl. generated structure block (6863 chars measured post
+    # doc-hygiene-second-sweep; ratcheted down from 6864).
+    "deep_research_harness/AGENTS.md": 6863,
     # Module Claude entry stub (253 chars at adoption).
     "deep_research_harness/CLAUDE.md": 400,
     # The largest resident-injection layer (11436 chars post
@@ -295,7 +298,7 @@ STALE_MARKER_FILES: tuple[str, ...] = (
 MARKER_ALLOWLIST: dict[tuple[str, str], str] = {
     ("deep_research_harness/src/deerflow_deep_research/agents/__init__.py", "(skeleton)"):
         "the agents layer is genuinely empty; its fate is a deferred owning decision "
-        "(audit plan _backlog/plans/2026-10-04-fresh-agent-doc-cleanup.md, not-in-scope item)",
+        "(audit plan _backlog/_done/_closed_plans/2026-10-04-fresh-agent-doc-cleanup.md, not-in-scope item)",
 }
 
 def _rule_doc_budgets(root: Path) -> list[str]:
@@ -379,6 +382,43 @@ def _rule_ledger_consistency(root: Path) -> list[str]:
             if not (surface_dir / target).is_file():
                 problems.append(f"dangling index row in {surface}/README.md: {target}")
 
+        # Placement: every table row must sit inside a real table block —
+        # contiguous with a header separator. Blank lines, prose, or fences
+        # between a row and its header shatter the table (observed twice as
+        # the B3/B5 recurrence); such blocks fail naming the surface.
+        in_fence = False
+        block: list[str] = []
+        blocks: list[list[str]] = []
+
+        def _flush() -> None:
+            if block:
+                blocks.append(list(block))
+                block.clear()
+
+        for raw in index_text.splitlines():
+            if raw.strip().startswith("```"):
+                _flush()
+                in_fence = not in_fence
+                continue
+            if in_fence:
+                continue
+            if raw.strip():
+                block.append(raw)
+            else:
+                _flush()
+        _flush()
+        for blk in blocks:
+            if not any(line.lstrip().startswith("|") for line in blk):
+                continue
+            has_separator = any(
+                _re.match(r"^\|[\s:\-|]+\|?\s*$", line) for line in blk
+            )
+            if not (has_separator and all(line.lstrip().startswith("|") for line in blk)):
+                problems.append(
+                    f"ledger row placement defect in {surface}/README.md: "
+                    "table rows separated from their header block"
+                )
+
     counters = backlog / BACKLOG_COUNTERS_FILE
     if counters.is_file():
         counters_text, decode_problem = _read_utf8(counters)
@@ -418,6 +458,50 @@ def _rule_ledger_consistency(root: Path) -> list[str]:
                         f"next-ID mismatch in {BACKLOG_COUNTERS_FILE}: {surface} declares "
                         f"{prefix}-{number:03d} but allocation implies {prefix}-{expected_next:03d}"
                     )
+    return problems
+
+
+_COUNT_SPECS_RE = _re.compile(r"(\d+)\s*个\s*能力")
+_COUNT_ARCHIVE_RE = _re.compile(r"(\d+)\s*个\s*changes\s*归档")
+
+
+def _rule_root_counts(root: Path) -> list[str]:
+    """Root README inventory counts must match the machine-computed values.
+
+    The checker computes the capability-spec and archived-change counts from
+    disk and requires the root README status line to declare exactly those
+    numbers, anchored to their inventory nouns. Wording may evolve; numbers
+    may not drift (every archive silently ages a hand-written count).
+    """
+    problems: list[str] = []
+    specs_dir = root / "openspec" / "specs"
+    archive_dir = root / "openspec" / "changes" / "archive"
+    readme = root / "README.md"
+    if not (specs_dir.is_dir() and archive_dir.is_dir() and readme.is_file()):
+        return problems
+    text, decode_problem = _read_utf8(readme)
+    if text is None:
+        problems.append("non-UTF-8 root README, count pinning not checked")
+        return problems
+    computed_specs = sum(1 for p in specs_dir.iterdir() if p.is_dir())
+    computed_archive = sum(1 for p in archive_dir.iterdir() if p.is_dir())
+    declared_specs = _COUNT_SPECS_RE.search(text)
+    declared_archive = _COUNT_ARCHIVE_RE.search(text)
+    if declared_specs is None or declared_archive is None:
+        problems.append(
+            "root README inventory count unpinned: the status line must declare "
+            f"both counts (能力: {computed_specs}, changes 归档: {computed_archive})"
+        )
+        return problems
+    if (
+        int(declared_specs.group(1)) != computed_specs
+        or int(declared_archive.group(1)) != computed_archive
+    ):
+        problems.append(
+            f"root README count drift: declared {declared_specs.group(1)} 个能力 / "
+            f"{declared_archive.group(1)} 个 changes 归档, computed "
+            f"{computed_specs} / {computed_archive}"
+        )
     return problems
 
 
@@ -466,6 +550,7 @@ def violations(root: Path) -> list[str]:
     found.extend(_rule_doc_budgets(root))
     found.extend(_rule_ledger_consistency(root))
     found.extend(_rule_stale_markers(root))
+    found.extend(_rule_root_counts(root))
     return found
 
 
@@ -623,6 +708,62 @@ def _self_test() -> list[str]:
         ):
             if not any(needle in v for v in ledger_problems):
                 errors.append(f"self-test: ledger rule did not detect: {needle}")
+
+        # Rule 7 negative (placement): a work-item row separated from its table
+        # header block by a blank line and a fence must fail loudly. Uses a
+        # fresh ledger tree; the row references a file that exists on disk so
+        # only the placement defect is exercised.
+        placed = base / "placement-repo"
+        closed = placed / "_backlog" / "_done" / "_closed_plans"
+        closed.mkdir(parents=True, exist_ok=True)
+        (closed / "2026-10-01-here.md").write_text("# plan\n", encoding="utf-8")
+        (closed / "README.md").write_text(
+            "# Closed\n\n"
+            "```markdown\n"
+            "| Plan | 一句话 |\n"
+            "|------|--------|\n"
+            "```\n"
+            "| CLS-001 | 2026-10-01 | [2026-10-01-here.md](2026-10-01-here.md) | ok |\n\n"
+            "**Next available plan ID: CLS-002**\n",
+            encoding="utf-8",
+        )
+        placed_problems = _rule_ledger_consistency(placed)
+        if not any("placement" in v for v in placed_problems):
+            errors.append("self-test: ledger row placement defect not detected")
+        contiguous = placed / "_backlog" / "_done" / "_contiguous_plans"
+        contiguous.mkdir(parents=True, exist_ok=True)
+        (contiguous / "2026-10-01-here.md").write_text("# plan\n", encoding="utf-8")
+        (contiguous / "README.md").write_text(
+            "# Closed\n\n"
+            "| ID | Date | File | Summary |\n"
+            "|---|---|---|---|\n"
+            "| CLS-001 | 2026-10-01 | [2026-10-01-here.md](2026-10-01-here.md) | ok |\n",
+            encoding="utf-8",
+        )
+        if any("placement" in v for v in _rule_ledger_consistency(contiguous)):
+            errors.append("self-test: contiguous table flagged as misplaced")
+
+        # Root-count pinning negative: a README status line whose declared
+        # counts differ from the computed inventory must fail loudly.
+        counted = base / "counts-repo"
+        (counted / "openspec/specs/alpha").mkdir(parents=True, exist_ok=True)
+        (counted / "openspec/specs/beta").mkdir(parents=True, exist_ok=True)
+        (counted / "openspec/changes/archive/2026-01-01-one").mkdir(parents=True, exist_ok=True)
+        readme = counted / "README.md"
+        readme.write_text(
+            "> specs 主干 5 个能力落地、7 个 changes 归档。\n", encoding="utf-8"
+        )
+        count_problems = _rule_root_counts(counted)
+        if not any("5" in v and "7" in v for v in count_problems):
+            errors.append("self-test: drifted root-README count not detected")
+        readme.write_text(
+            "> specs 主干 2 个能力落地、1 个 changes 归档。\n", encoding="utf-8"
+        )
+        if _rule_root_counts(counted):
+            errors.append("self-test: matching counts flagged as drifted")
+        readme.write_text("> 没有声明计数的行。\n", encoding="utf-8")
+        if not any("unpinned" in v for v in _rule_root_counts(counted)):
+            errors.append("self-test: missing count declaration not detected")
 
         # Rule 8 negatives: a re-introduced marker fails; an unjustified or
         # dangling allowlist entry fails.

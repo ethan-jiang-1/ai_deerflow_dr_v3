@@ -15,6 +15,12 @@ responsibility, host integration, and change governance do not blur together.
 - **OpenSpec Governance -> Deep Research Product**: approved requirements constrain product changes; governance does not become runtime behavior.
 - **DeerFlow Host <-> OpenSpec Governance**: host boundaries constrain a change's scope; governance records rather than expands those boundaries.
 
+## Shared words with two owners
+
+- **profile** — 根 `profiles/` 是**本地运行配置**（宿主侧 ladder/profile，暂未注册）；
+  `openspec/change-guidance/profiles/` 是**政策 profile**（change-guidance 的规则集）。
+  同名异物，按目录归属读。
+
 ## Reading order for a fresh agent
 
 The single entry chain is [AGENTS.md](AGENTS.md) — its routing table owns "where do I

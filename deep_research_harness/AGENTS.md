@@ -32,7 +32,7 @@ For a Coding Agent creating, changing, or reviewing an LLM-bearing node or direc
 model branch, use this route before implementation navigation. Never infer the seam
 from the first file found or from presence or absence of a model call.
 
-This section is the complete application-owned cognition-versus-code contract: the numbered route plus the explicit Non-Model Work branch.
+Application authority for the cognition-versus-code contract — the portable node-agent profile may diverge; this file wins here. Route: the numbered steps plus Non-Model Work.
 
 1. **Classify the surface** as `cognitive-program`, `deterministic-guardrail`,
    `human-decision`, or `wiring`. A model-bearing behavior symptom reaches cognition
@@ -87,9 +87,8 @@ cognition is not causal. Do not invent a capability, prompt, or repair loop.
 - Keep blocking I/O off the async event loop.
 - Keep application tests and build commands independently runnable from this directory.
 - Do not add nested `AGENTS.md` files or copy this guide into `CLAUDE.md`. The
-  prohibition prevents subtree entries created for their own sake; a sublayer that
-  accumulates three or more standing rules only that layer needs re-opens the
-  subtree-entry question through its owning change.
+  prohibition prevents subtree entries created for their own sake; a sublayer gaining
+  three or more standing rules re-opens the subtree-entry question via its owning change.
 
 ## Verification
 

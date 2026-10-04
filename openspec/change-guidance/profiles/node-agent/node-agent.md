@@ -4,8 +4,10 @@
 > trigger: changing an LLM-bearing role, capability, tool posture, candidate admission, repair, or model/non-model classification
 
 Enable for an LLM-bearing role, capability, tool posture, candidate admission, repair,
-or model/non-model classification. This is the complete cognition-versus-code
-contract formerly carried by `node-edit-map.md`; the filename is not the authority.
+or model/non-model classification. This is the complete portable
+cognition-versus-code contract formerly carried by `node-edit-map.md`; the filename is
+not the authority. The adopting application's own guide may diverge and wins in its
+tree (in this repository: `deep_research_harness/AGENTS.md`).
 
 ## Ordered Authoring Route
 
