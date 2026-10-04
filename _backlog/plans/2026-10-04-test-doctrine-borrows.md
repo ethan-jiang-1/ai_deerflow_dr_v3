@@ -62,7 +62,7 @@ DeerFlow 自测体系的一句话策略：**"离线确定性是默认，真实�
 | **A4** | `pin-command-surface`（小） | docs-as-contract 守卫：COMMANDS.md 提及的 make targets 必须存在于 Makefile、cli.py 子命令必须在 COMMANDS.md 登记（双向） | 单测红绿：删一个 target→红；补 B4 单测命令进 COMMANDS.md |
 | **A5** | `guard-unit-lane-network`（小，digest 自评缺口 #1 的预防性补齐） | unit gate 结构性禁外联：socket guard（unittest 基类/conftest 级），负例控制（故意联网→红） | 单测红绿 + verify 仍 0 |
 | **A1** | `add-replay-model`（最重） | 内容寻址回放模型（caller+归一化输入哈希、system prompt 剔键、miss 响亮清单）+ EASA 简报真跑录制 + 回放断言（报告落位/澄清/fallback 全在真实形状上回归） | 单测红绿 + 录制/回放双真跑 |
-| **A5'** | `adopt-skill-review-surface`（第二把借鉴，独立） | 技能测试面最小借鉴：定制技能落位→确定性 review（零 LLM analyzer）→waiver 边界先例；服务"拎出 deep-research 换名换 trigger" | review 冒烟红绿 |
+| ~~A5'~~ | `adopt-skill-review-surface` | **降级为触发式**：技能 review 面的消费者是"定制技能本体"，而定制技能尚未立项（Context Expansion Gate）。触发条件=技能定制 change 入线时随行落地 | 触发后 review 冒烟红绿 |
 
 ### Tier B——纪律挂钩（文档/约定/轻测试，可两把合并）
 
@@ -98,4 +98,15 @@ DeerFlow 自测体系的一句话策略：**"离线确定性是默认，真实�
 
 ## 落地关联
 
-执行顺序：A6 → A4 → A5 → A1（最重）→ A2 → A5' → B 类合并收尾。每把 archive 后在本卡登记；全部完成后本 plan 关闭（CLS-010），doctrine 文档同步最终态。
+执行顺序：A6 ✓ → A4 ✓ → A5 ✓ → A1(事件流回放) ✓ → B 类 ✓ → **A2 回放模型（下一步执行）** → A5' 触发式挂起（技能定制立项时随行）。A2 落地后本 plan 关闭（CLS-010）。
+
+## A2 执行设计（起草于 2026-10-04，满预算实施）
+
+**录制端**：`RecordingChatModel` 组合包装真实 ChatDeepSeek（BaseChatModel 子类
+持有 inner 模型，`_generate` 先委托后记录），每次调用把 `{归一化输入哈希, 输出}`
+追加进 JSONL（构造注入 sink 路径）；录制脚本经 use: 缝构造（base 的真实模型条目
++ recording 包装），产出 `tests/fixtures/replay/real-model-io.jsonl`。
+**回放端**：`ReplayChatModel` 按同一哈希索引服务已录输出；miss 响亮（已知哈希
+清单 + 输入预览）。**归一化最小集**：剥日期/UUID/系统提醒块；system prompt 按
+digest 关键决定剔出键（v3 单线程单 caller，哈希键按实测定）。
+**测试**：哈希命中/miss 响亮/归一化稳定 + 真实录制 fixture 回放绿 + 报告落位断言。
