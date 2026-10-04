@@ -3,7 +3,7 @@
 # dependencies, offline-safe (UV_OFFLINE=1 is honored by construction). It never
 # reads, imports, executes, or links OpenSpec content.
 
-.PHONY: install verify test smoke create watch status
+.PHONY: install verify test smoke create watch status record-stream
 
 install:
 	@echo "[install] nothing to install: the harness has no external dependencies; the"
@@ -18,6 +18,10 @@ verify: test
 # Integration lane (framework-dependent): requires the synced environment (`uv sync`).
 smoke:
 	UV_CACHE_DIR=$$(pwd)/../.uv-cache uv sync && UV_CACHE_DIR=$$(pwd)/../.uv-cache uv run --no-sync python -m unittest discover -s tests/integration -v
+
+# Integration fixture recording (real API, explicit opt-in).
+record-stream:
+	UV_CACHE_DIR=$$(pwd)/../.uv-cache uv run --no-sync python -m tests.integration.record_stream "$(PROBLEM)" $(CONFIG)
 
 # Human entry surface (six verbs over the substrate). See COMMANDS.md.
 CONFIG ?= fixture

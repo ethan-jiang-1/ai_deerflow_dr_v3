@@ -20,7 +20,8 @@
 | 级 | 状态 | 机制 | 用途 |
 | --- | --- | --- | --- |
 | 1 剧本模型 | ✅ `runtime/fixtures.ScriptedChatModel`（BaseChatModel 子类 + `DEERFLOW_FAKE_SCRIPT`） | 预编程消息序列（含 tool_calls 与 raise 动作），真图真中间件真 checkpointer 照跑 | 验证引擎/绑定/入口的行为契约（毫秒级、零 fixture） |
-| 2 内容寻址回放 | 📋 借鉴队列（plan 卡 `test-doctrine-borrows`） | 录一次真实运行（caller+归一化输入哈希索引，system prompt 剔出键），此后零 key 确定性回放 | 把最贵的证据（真跑产出）变成永久 fixture；防 fake-green |
+| 2 真实事件流回放 | ✅ `tests/fixtures/replay/real-small-stream.json`（1386 真实事件）+ 回放测试 | 真实形状（含真 tool_calls）永久进回归——扁平 chunk 疤的机械化防复发 |
+| 3 内容寻址模型回放（级 2 完全体） | 📋 借鉴队列（plan 卡） | caller+归一化输入哈希索引的真模型 I/O 回放 | 同上，覆盖面更大 |
 | 3 行为断言（live 面） | ⬜ 未规划 | 对真实运行的 trace 断言（工具选择/token/时长） | 显式 opt-in 的质量观察 |
 
 替身选型纪律（借鉴）：**替身只替换"贵的与不确定的"（模型、时间、外部凭证），不替换"被测语义本身"**——无 fake-redis 类的先例，我们同样无假 checkpointer。
