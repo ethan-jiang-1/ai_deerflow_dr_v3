@@ -20,6 +20,9 @@ DECLARED_MACHINES: tuple[tuple[str, str], ...] = (
      "types, and any future declaration must exclude 'task' from its "
      "disallowed_tools (the depth self-check fails closed naming the config, the "
      "offender, and the remedy)."),
+    ("command-surface-guard", "COMMANDS.md, the Makefile targets, and the cli.py "
+     "subcommands stay mutually consistent (docs-as-contract: the documented commands "
+     "are the deliverable)."),
     ("application-unit-gate", "make verify runs the stdlib unittest suite and exits "
      "non-zero on any failure; it never links OpenSpec content."),
     ("repository-governance-gates", "The aggregate closeout gate and its component "
