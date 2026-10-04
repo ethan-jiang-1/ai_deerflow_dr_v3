@@ -1,6 +1,6 @@
 # Plans — plan/分析文档索引
 
-> 最后更新: 2026-10-04（新增 agent-playbook-and-minimal-release：agent 启动面收归仓库文档 + 发布约束） | `_backlog/plans/` — 活跃 plan 在此（顶层），
+> 最后更新: 2026-10-04（agent-playbook-and-minimal-release 关闭：CLS-011；活跃列表空） | `_backlog/plans/` — 活跃 plan 在此（顶层），
 > 完成的普通 plan 移入 [`../_done/_closed_plans/`](../_done/_closed_plans/)。
 >
 > **plan 没有编号，文件名即标识。完成后文件名不变，位置即状态。**
@@ -23,11 +23,10 @@
 
 | Plan | 一句话 |
 |------|--------|
-| [agent-playbook-and-minimal-release](2026-10-04-agent-playbook-and-minimal-release.md) | 两层结构：COMMANDS=入口菜单，playbook/=MD mixed with CLI 子目录；发布面实证=两件套（harness+deerflow submodule，openspec 在外）+ 冷启动判据；待 REVIEW，拟入线 `ratify-agent-playbook-and-minimal-release` |
 
 （空）
 
-**Next available plan ID: CLS-010**（移入 `_closed_plans/` 时分配）
+**Next available plan ID: CLS-012**（移入 `_closed_plans/` 时分配）
 
 ## 已归档（移至 `_done/_closed_plans/`）
 
@@ -40,6 +39,8 @@
 | CLS-005 entry-surface | establish-entry-surface（已 archive；六子命令 + 渲染 + EV2 证据） | 2026-10-03 |
 | CLS-006 wiring-structure | remove-graph-layer + establish-embedded-wiring + pin-subagent-knobs（均已 archive；决策 5 以 posture + 守卫处置） | 2026-10-03 |
 | CLS-007 stream-adapter-and-live-view | fix-stream-adapter（已 archive；真实流形状适配 + journal 聚合 + token 内联直播） | 2026-10-03 |
+| CLS-010 test-doctrine-borrows | 测试战略采纳路线图 v3 全量版（文件先期归档，账本行补记） | 2026-10-04 |
+| CLS-011 agent-playbook-and-minimal-release | ratify-agent-playbook-and-minimal-release（已 archive；两层启动面 + 发布面两件套 + 冷启动守卫） | 2026-10-04 |
 
 ---
 

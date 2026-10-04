@@ -1,6 +1,6 @@
 # _backlog — 计划与缺陷账本（plans / bugs）
 
-> 最后更新: 2026-10-04（plans 新增 agent-playbook-and-minimal-release，待 REVIEW） | 本目录追踪本仓库的设计推敲、上游分析与缺陷。
+> 最后更新: 2026-10-04（agent-playbook-and-minimal-release 关闭：CLS-011；CLS-010 行补记） | 本目录追踪本仓库的设计推敲、上游分析与缺陷。
 > 活跃工作走 OpenSpec（`openspec/changes/`）；本目录是 **分析与决策记录 + 缺陷池**，不是运行时真相。
 >
 > **本文件是 `_backlog` 的规矩手册。** 搬迁流程在下面定死，今后大家都遵循这里头定的规矩。

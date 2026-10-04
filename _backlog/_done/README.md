@@ -1,6 +1,6 @@
 # _done — 已完成/暂停的归档记录
 
-> 最后更新: 2026-10-03（stream-adapter plan 关闭：CLS-007） | `_backlog/_done/` — 已完成内容与明确暂停项的归档根目录。
+> 最后更新: 2026-10-04（CLS-010 补记 + CLS-011 关闭） | `_backlog/_done/` — 已完成内容与明确暂停项的归档根目录。
 > **`_done/` = 归档工作件，coding agent 默认忽略，除非显式点名要读**（`_` 前缀的两类语义见 [`../README.md`](../README.md)）。
 >
 > 状态总览和查阅指南在本文件。当前该做什么、执行顺序 → 见 [`../plans/README.md`](../plans/README.md) 的活跃列表（三份衍生 plan，各自经用户拍板后才入线）。
@@ -25,7 +25,7 @@ _done/
 | 归档目录 | 数量 | Next ID |
 |---------|------|---------|
 | `_fixed_bugs/` | 0 | BUG-001 |
-| `_closed_plans/` | 9 | CLS-010 |
+| `_closed_plans/` | 11 | CLS-012 |
 
 ### ⏸ SUSPENDED（明确暂停）
 
