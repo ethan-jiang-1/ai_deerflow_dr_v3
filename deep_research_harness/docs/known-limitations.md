@@ -13,3 +13,4 @@
 
 | 深研究 checkpoint 体积（曾实测 1GB/五代，full 模式每步全量快照）| refine-slim-restart 真跑发现 | **已修（switch-checkpoint-delta）**：配置声明 delta 模式 + snapshot_frequency 10；短跑实测 144K vs 192K，深跑增长模式结构性移除；读路径与报告落位真跑验证。存留告诫：delta 依赖框架的 delta-history patch（langgraph 1.2.12 高于验证版 1.2.9，警告仍在 stderr 非失败）|
 | 大 bundle 上 state.json 瞬时缺失（1GB checkpoint 邻域，fail-loud StateCorruption 兜底，无静默损坏）| refine-slim-restart gen-7 尝试 | 待诊断（疑似 FS 压力）|
+| unit lane 网络守卫已落地（guard-unit-lane-network）：unit 测试结构性禁外联——digest 自评缺口 #1 在 v3 预防性闭合 | guard-unit-lane-network | 守卫即结构，负例在案 |
