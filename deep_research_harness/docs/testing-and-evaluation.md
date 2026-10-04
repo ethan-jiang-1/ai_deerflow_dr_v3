@@ -33,14 +33,12 @@
 - fail-closed：扫描不了的形状、解析不了的配置、缺的必填字段——一律响亮失败点名，不静默。
 - scar-tissue：真实事故留疤成测试（error-fallback 守卫、澄清回声排除均由此而来）。
 
-## 借鉴队列（挂钩在账，不靠唠叨）
+## 借鉴队列（挂钩在账，不靠唠叨；v2 全对照修订见 plan 卡）
 
-| 借鉴项 | 来源 digest | 承载 | 状态 |
-| --- | --- | --- | --- |
-| 内容寻址 ReplayChatModel（级 2） | `test-strategy/02-deterministic-llm.md` | plan 卡 `test-doctrine-borrows` | 📋 排队 |
-| 技能测试面（SkillScan/review/waiver） | `test-strategy/08-upper-layer-apps.md` §三 | 同上 plan 卡（服务技能定制） | 📋 排队 |
-| 时长基线分片 | `test-strategy/05-speed-isolation.md` | 未借鉴（90 测试未到规模）；测试数过百再议 | ⏸ 规模门槛 |
-| 崩溃模拟离线习语（不杀进程重建状态） | `test-strategy/07-durable-and-recovery.md` §二 | 部分已用（死子进程/直构状态）；其余按需 | ⏸ 部分在用 |
+**Tier A 机制件**（各一 change）：A1 真实事件流回放 fixture（扁平 chunk 疤的永久回归）→ A3 stream 缝镜像（recursion per-call 语义钉住）→ A4 docs-as-contract 守卫（COMMANDS↔Makefile↔cli 一致性）→ A2 内容寻址回放模型（真跑证据→永久 fixture）→ A5 unit lane 网络守卫（digest 自评缺口 #1 的预防性补齐）。
+**Tier B 纪律挂钩**：B1 change 设计工件自带 Testing Strategy 节；B2 doctrine 文档钉住（lane 表 targets 与守卫清单一致性）；B3 as-if-restarted 习语成文。
+**Tier C 规模门槛**（有意不借）：时长分片（>500 测试）、迁移契约（schema v2）、行为断言 eval 栈。
+详见 plan 卡 `2026-10-04-test-doctrine-borrows.md` 的全对照表（digest 十域 × 我方资产）。
 
 ## 已知限制
 
