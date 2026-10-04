@@ -25,10 +25,10 @@ context: |
 
   ## Test Evidence
 
-  For a test-bearing change, use `openspec/governance/test-evidence-policy.md`.
-  The test-evidence owning capability (to be established by a v3 governance
-  change) owns its behavior; select the lowest
-  responsible deterministic seam instead of copying test policy into the proposal.
+  For a test-bearing change, use `openspec/governance/test-evidence-policy.md`
+  (it owns the test-evidence authority statement and the owning capability's
+  establishment status); select the lowest responsible deterministic seam
+  instead of copying test policy into the proposal.
 
   ## Start A Local Change
 
@@ -44,10 +44,8 @@ context: |
      policy name separated by commas on that single list item; do not use continuation
      lines. Use `none: <short rationale>` only when no policy applies.
 
-  Program form: `## Program Focus` with at least two registered `### Workstream Focus:
-  <stable-id>` records replaces (never supplements) Change Focus. Its decision
-  authority approves only frozen scope, order, and whole-program archive closure;
-  it is never a runtime fact authority, writer, or shared implementation owner.
+  Program form (multi-workstream changes) is owned by the `rules.proposal` Program
+  Focus rule below; `change-guidance/local/deep-research.md` summarizes it.
 
   An adjacent module or public DeerFlow interface enters scope only when the proposal
   names the contract and the interface, authority, compatibility, or observed-failure
@@ -75,13 +73,10 @@ rules:
     - "New downstream code lives under deep_research_harness/ and may use public deerflow.* APIs. Keep blocking I/O off the async event loop."
     - >
       当 graph、node、state、checkpoint、candidate admission、retry 或 terminal handling 改变时，
-      先从 `openspec/change-guidance/README.md` 选择触发的 policy；node 的 LLM role、
-      tool posture 或 candidate admission 读取
-      `openspec/change-guidance/profiles/node-agent/node-agent.md`，而 model、tool、
-      provider、retry、terminal、diagnostic 或 lifecycle projection 读取
-      `openspec/change-guidance/profiles/workflow-control/workflow-control.md`。随后在 design 识别 owning
-      StateGraph transition/predicate、typed input/output、writer/reducer、evaluator/materializer、
-      bounded recovery/terminal disposition 与 deterministic test；不得创建 competing controller 或 authority。
+      先读 `openspec/change-guidance/README.md` 选择触发的 policy（node 语义 → node-agent，
+      workflow/model/retry/terminal 语义 → workflow-control），并在 design 落 owning
+      transition/predicate、typed contract、materializer 与 deterministic test；
+      不得创建 competing controller 或 authority。
   tasks:
     - "Pair changed behavior with a red-before-green deterministic test and include the narrowest relevant verification command."
     - "Before archive, from the repository root, run the OpenSpec root governance gate `python3 openspec/governance/check_project_gate.py --phase closeout`; from `deep_research_harness/`, independently run `UV_OFFLINE=1 make verify`; then, from the repository root, run `openspec validate <change-name> --strict` and `git diff HEAD --check`. Measure every exit code directly — a `| tail` (or any pipe) pipeline returns the last command's status and swallows the gate's real result. Record `git status --porcelain=v1 --untracked-files=all`, `git ls-files --stage deerflow`, `git submodule status -- deerflow`, `git -C deerflow status --porcelain=v1 --untracked-files=all`, and review `git diff --submodule=short`. These are supplementary manual scope/diff evidence for the observed gitlink pointer and nested worktree; full architecture governance separately performs its declared metadata-only gitlink validation, and neither kind of evidence approves a pointer bump or proves upstream runtime compatibility. The Harness gate stays application-independent: `make verify` neither reads, imports, executes, nor links OpenSpec content, and no Harness target invokes the OpenSpec gate."

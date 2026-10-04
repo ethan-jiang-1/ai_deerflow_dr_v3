@@ -6,9 +6,11 @@
 .PHONY: install verify test smoke create watch status record-stream
 
 install:
-	@echo "[install] nothing to install: the harness has no external dependencies; the"
-	@echo "[install] deerflow-harness editable source lands with the wiring change."
+	@echo "[install] nothing to install: the harness has no external dependencies."
+	@echo "[install] environment preparation is: uv sync (see COMMANDS.md)."
 
+# tests/integration is deliberately a directory without __init__.py, so unittest
+# discovery skips it here; the integration lane is `make smoke` (not an accident).
 test:
 	PYTHONPATH=src python3 -m unittest discover -s tests
 

@@ -79,18 +79,19 @@ ENTRY_DOCS: tuple[str, ...] = (
 # lowering one is always allowed; raising one requires a one-line justification
 # recorded next to the entry below.
 DOC_BUDGETS: dict[str, int] = {
-    # Root resident instructions (2323 chars at adoption, 2026-10-02).
-    "AGENTS.md": 2500,
+    # Root resident instructions (2435 chars post catch-up-doc-truthfulness).
+    "AGENTS.md": 2435,
     # Root Claude entry stub; must stay a thin AGENTS.md import, never a copy.
     "CLAUDE.md": 400,
-    # Module change map incl. generated structure block (6922 chars post-D, 2026-10-02).
-    "deep_research_harness/AGENTS.md": 7000,
+    # Module change map incl. generated structure block (6864 chars post catch-up-doc-truthfulness).
+    "deep_research_harness/AGENTS.md": 6864,
     # Module Claude entry stub (253 chars at adoption).
     "deep_research_harness/CLAUDE.md": 400,
-    # The largest resident-injection layer (12237 chars at adoption, 2026-10-02):
-    # config.yaml is injected into every OpenSpec instruction path; the ceiling is
-    # deliberately tight against the measured size to stop silent growth.
-    "openspec/config.yaml": 12500,
+    # The largest resident-injection layer (11436 chars post
+    # remove-requirement-id-tracking + catch-up-doc-truthfulness): config.yaml is
+    # injected into every OpenSpec instruction path; the ceiling is deliberately
+    # tight against the measured size to stop silent growth.
+    "openspec/config.yaml": 11436,
 }
 DOC_LAYER_DOCS: tuple[str, ...] = (
     # docs/ top-level markdown documents.
@@ -243,6 +244,60 @@ def _rule_backlog_underscore(root: Path) -> list[str]:
     return problems
 
 
+
+# Ledger bookkeeping surfaces (rule 7). The "编号、索引、计数三处一致" ritual,
+# mechanized: active/archive work-item files must be indexed by their surface
+# README, index rows must resolve to disk, and _done/README.md counters must
+# match disk. Adding a surface is a visible change to these tables.
+BACKLOG_ACTIVE_SURFACES: tuple[str, ...] = ("plans", "bugs")
+BACKLOG_ARCHIVE_SURFACES: tuple[str, ...] = (
+    "_fixed_bugs",
+    "_suspended_bugs",
+    "_closed_plans",
+    "_suspended_plans",
+)
+BACKLOG_COUNTERS_FILE = "_done/README.md"
+BACKLOG_NEXT_ID_RE = re.compile(r"\b([A-Z]{3})-(\d{3})\b")
+
+# Stale-narrative markers (rule 8). A declared closed list of resident and
+# doc-layer files must not contain a declared skeleton-era marker outside the
+# justification allowlist; an unjustified or dangling allowlist entry fails.
+STALE_MARKERS: tuple[str, ...] = (
+    "骨架占位",
+    "骨架期占位",
+    "响亮占位",
+    "预留位，尚未建档",
+    "骨架期",
+    "(skeleton)",
+    "scaffolding until their owning changes",
+)
+STALE_MARKER_FILES: tuple[str, ...] = (
+    "README.md",
+    "AGENTS.md",
+    "CONTEXT-MAP.md",
+    "deep_research_harness/README.md",
+    "deep_research_harness/AGENTS.md",
+    "deep_research_harness/COMMANDS.md",
+    "deep_research_harness/CONTEXT.md",
+    "deep_research_harness/docs/README.md",
+    "deep_research_harness/docs/local-operations.md",
+    "deep_research_harness/docs/known-limitations.md",
+    "deep_research_harness/docs/quality-register.md",
+    "deep_research_harness/docs/runtime-architecture.md",
+    "deep_research_harness/docs/testing-and-evaluation.md",
+    "deep_research_harness/tests/README.md",
+    "deep_research_harness/src/deerflow_deep_research/__init__.py",
+    "deep_research_harness/src/deerflow_deep_research/domain/__init__.py",
+    "deep_research_harness/src/deerflow_deep_research/engine/__init__.py",
+    "deep_research_harness/src/deerflow_deep_research/runtime/__init__.py",
+    "deep_research_harness/src/deerflow_deep_research/agents/__init__.py",
+)
+MARKER_ALLOWLIST: dict[tuple[str, str], str] = {
+    ("deep_research_harness/src/deerflow_deep_research/agents/__init__.py", "(skeleton)"):
+        "the agents layer is genuinely empty; its fate is a deferred owning decision "
+        "(audit plan _backlog/plans/2026-10-04-fresh-agent-doc-cleanup.md, not-in-scope item)",
+}
+
 def _rule_doc_budgets(root: Path) -> list[str]:
     """Resident documents listed in ``DOC_BUDGETS`` must fit their ceilings.
 
@@ -274,6 +329,133 @@ def _rule_doc_budgets(root: Path) -> list[str]:
     return problems
 
 
+
+def _rule_ledger_consistency(root: Path) -> list[str]:
+    """Ledger bookkeeping surfaces must be mechanically consistent (rule 7).
+
+    The `_backlog` ritual states "编号、索引、计数三处一致"; this rule makes
+    the stated ritual a checked invariant: every active/archive work-item file
+    is indexed by its surface README, every index row resolves to disk, and
+    the `_done/README.md` counters and Next-ID declarations match disk.
+    """
+    problems: list[str] = []
+    backlog = root / "_backlog"
+    if not backlog.is_dir():
+        return problems
+
+    def _surface_dir(surface: str) -> Path:
+        return backlog / surface if surface in BACKLOG_ACTIVE_SURFACES else backlog / "_done" / surface
+
+    def _work_files(surface: str) -> list[Path]:
+        surface_dir = _surface_dir(surface)
+        if not surface_dir.is_dir():
+            return []
+        return sorted(p for p in surface_dir.glob("*.md") if p.name != "README.md")
+
+    for surface in (*BACKLOG_ACTIVE_SURFACES, *BACKLOG_ARCHIVE_SURFACES):
+        surface_dir = _surface_dir(surface)
+        index = surface_dir / "README.md"
+        if not surface_dir.is_dir():
+            continue
+        work_files = _work_files(surface)
+        if work_files and not index.is_file():
+            problems.append(f"ledger surface with work items missing its README index: {surface}")
+            continue
+        if not index.is_file():
+            continue
+        index_text, decode_problem = _read_utf8(index)
+        if index_text is None:
+            problems.append(f"non-UTF-8 ledger index, consistency not checked: {surface}/README.md")
+            continue
+        for work in work_files:
+            if work.name not in index_text:
+                problems.append(
+                    f"active ledger surface has an unindexed work item: {surface}/{work.name}"
+                )
+        for link in MARKDOWN_LINK_RE.findall(index_text):
+            target = link.split("#", 1)[0].strip()
+            if not target.endswith(".md"):
+                continue
+            if not (surface_dir / target).is_file():
+                problems.append(f"dangling index row in {surface}/README.md: {target}")
+
+    counters = backlog / BACKLOG_COUNTERS_FILE
+    if counters.is_file():
+        counters_text, decode_problem = _read_utf8(counters)
+        if counters_text is not None:
+            for line in counters_text.splitlines():
+                row = re.match(r"^\|\s*`([\w-]+?)/`\s*\|\s*(\d+)\s*\|\s*([^|]+)\|", line)
+                if not row:
+                    continue
+                surface, declared_count, declared_next = row.group(1), int(row.group(2)), row.group(3).strip()
+                disk_count = len(_work_files(surface))
+                if declared_count != disk_count:
+                    problems.append(
+                        f"counter mismatch in {BACKLOG_COUNTERS_FILE}: {surface} declares "
+                        f"{declared_count} but disk holds {disk_count}"
+                    )
+                next_match = BACKLOG_NEXT_ID_RE.search(declared_next)
+                if not next_match:
+                    continue
+                prefix, number = next_match.group(1), int(next_match.group(2))
+                index = _surface_dir(surface) / "README.md"
+                allocated: list[int] = []
+                if index.is_file():
+                    index_body, _ = _read_utf8(index)
+                    for line in (index_body or "").splitlines():
+                        if not line.lstrip().startswith("|"):
+                            continue  # skip the Next-ID declaration line itself
+                        for id_match in BACKLOG_NEXT_ID_RE.finditer(line):
+                            if id_match.group(1) == prefix:
+                                allocated.append(int(id_match.group(2)))
+                for work in _work_files(surface):
+                    for id_match in BACKLOG_NEXT_ID_RE.finditer(work.name):
+                        if id_match.group(1) == prefix:
+                            allocated.append(int(id_match.group(2)))
+                expected_next = (max(allocated) + 1) if allocated else 1
+                if number != expected_next:
+                    problems.append(
+                        f"next-ID mismatch in {BACKLOG_COUNTERS_FILE}: {surface} declares "
+                        f"{prefix}-{number:03d} but allocation implies {prefix}-{expected_next:03d}"
+                    )
+    return problems
+
+
+def _rule_stale_markers(root: Path) -> list[str]:
+    """Declared files must not contain declared skeleton-era markers (rule 8).
+
+    A `(file, marker)` pair outside the justification allowlist fails with
+    file and line; an unjustified or dangling allowlist entry fails as well,
+    so the allowlist cannot become a silent dumping ground.
+    """
+    problems: list[str] = []
+    for rel in STALE_MARKER_FILES:
+        doc = root / rel
+        if not doc.is_file():
+            problems.append(f"missing stale-marker managed path: {rel}")
+            continue
+        text, decode_problem = _read_utf8(doc)
+        if text is None:
+            problems.append(f"non-UTF-8 managed file, marker scan skipped: {rel}")
+            continue
+        for line_number, line in enumerate(text.splitlines(), start=1):
+            for marker in STALE_MARKERS:
+                if marker in line and (rel, marker) not in MARKER_ALLOWLIST:
+                    problems.append(f"stale narrative marker {marker!r} at {rel}:{line_number}")
+    for (rel, marker), justification in MARKER_ALLOWLIST.items():
+        if not justification.strip():
+            problems.append(f"allowlist entry without justification: ({rel}, {marker!r})")
+        if rel not in STALE_MARKER_FILES:
+            problems.append(f"allowlist entry for unmanaged file: {rel}")
+            continue
+        doc = root / rel
+        if doc.is_file():
+            text, _ = _read_utf8(doc)
+            if text is not None and marker not in text:
+                problems.append(f"dangling allowlist entry: ({rel}, {marker!r}) no longer matches the file")
+    return problems
+
+
 def violations(root: Path) -> list[str]:
     found: list[str] = []
     found.extend(_rule_adr_index(root))
@@ -282,6 +464,8 @@ def violations(root: Path) -> list[str]:
     found.extend(_rule_docs_scope(root))
     found.extend(_rule_backlog_underscore(root))
     found.extend(_rule_doc_budgets(root))
+    found.extend(_rule_ledger_consistency(root))
+    found.extend(_rule_stale_markers(root))
     return found
 
 
@@ -320,11 +504,17 @@ def _self_test() -> list[str]:
         for name in BACKLOG_UNDERSCORE_DIRS:
             (backlog / name).mkdir(parents=True, exist_ok=True)
 
-        # Budget-managed files not on the entry chain get minimal stubs so the
-        # clean fixture satisfies the budget rule (missing managed paths fail).
-        for rel in DOC_BUDGETS:
+        # Budget-managed and marker-managed files not on the entry chain get
+        # minimal stubs so the clean fixture satisfies those rules (missing
+        # managed paths fail loudly by design).
+        for rel in (*DOC_BUDGETS, *STALE_MARKER_FILES):
             if not (base / rel).is_file():
-                write_doc(rel, "# T\n")
+                # An allowlisted marker must stay present in its stub, or the
+                # allowlist honestly reports dangling.
+                content = "# T\n"
+                if any(rel == allowed_rel for allowed_rel, _ in MARKER_ALLOWLIST):
+                    content = '"""stub (skeleton)."""\n'
+                write_doc(rel, content)
 
         if violations(base):
             errors.append("self-test: clean fixture must have zero violations")
@@ -405,6 +595,61 @@ def _self_test() -> list[str]:
         if not any("missing managed budget path" in v for v in _rule_doc_budgets(base)):
             errors.append("self-test: missing managed budget path not detected")
         write_doc("CLAUDE.md", "# T\n")
+
+        # Rule 7 negatives: ledger index/counter drift must fail loudly.
+        ledger = base / "ledger-repo"
+        for surface in ("plans", "_done/_closed_plans"):
+            surface_dir = ledger / "_backlog" / surface
+            surface_dir.mkdir(parents=True, exist_ok=True)
+        (ledger / "_backlog" / "plans" / "2026-10-01-demo.md").write_text("# plan\n", encoding="utf-8")
+        (ledger / "_backlog" / "plans" / "README.md").write_text("# Plans\n\n（空）\n", encoding="utf-8")
+        (ledger / "_backlog" / "_done" / "_closed_plans" / "README.md").write_text(
+            "# Closed\n\n| ID | Date | File | Summary |\n|---|---|---|---|\n"
+            "| CLS-001 | 2026-10-01 | [2026-10-01-gone.md](2026-10-01-gone.md) | x |\n\n"
+            "**Next available plan ID: CLS-002**\n",
+            encoding="utf-8",
+        )
+        (ledger / "_backlog" / "_done" ).mkdir(parents=True, exist_ok=True)
+        (ledger / "_backlog" / "_done" / "README.md").write_text(
+            "| 归档目录 | 数量 | Next ID |\n|---|---|---|\n"
+            "| `_fixed_bugs/` | 0 | BUG-001 |\n| `_closed_plans/` | 1 | CLS-002 |\n",
+            encoding="utf-8",
+        )
+        ledger_problems = _rule_ledger_consistency(ledger)
+        for needle in (
+            "active ledger surface",
+            "dangling index row",
+            "counter mismatch",
+        ):
+            if not any(needle in v for v in ledger_problems):
+                errors.append(f"self-test: ledger rule did not detect: {needle}")
+
+        # Rule 8 negatives: a re-introduced marker fails; an unjustified or
+        # dangling allowlist entry fails.
+        marker_root = base / "marker-repo"
+        marker_doc = marker_root / "AGENTS.md"
+        marker_doc.parent.mkdir(parents=True, exist_ok=True)
+        for rel in STALE_MARKER_FILES:
+            (marker_root / rel).parent.mkdir(parents=True, exist_ok=True)
+            content = "# T\n"
+            if any(rel == allowed_rel for allowed_rel, _ in MARKER_ALLOWLIST):
+                content = '"""stub (skeleton)."""\n'
+            (marker_root / rel).write_text(content, encoding="utf-8")
+        marker_doc.write_text("# T\n\n当前状态：骨架占位。\n", encoding="utf-8")
+        marker_problems = _rule_stale_markers(marker_root)
+        if not any("骨架占位" in v and "AGENTS.md:3" in v for v in marker_problems):
+            errors.append("self-test: stale marker not detected with file:line")
+        marker_doc.write_text("# T\n", encoding="utf-8")
+        if _rule_stale_markers(marker_root):
+            errors.append("self-test: clean file flagged by marker rule")
+        original_allowlist = dict(MARKER_ALLOWLIST)
+        MARKER_ALLOWLIST.clear()
+        MARKER_ALLOWLIST[(marker_doc.relative_to(marker_root).as_posix(), "(skeleton)")] = ""
+        unjustified = _rule_stale_markers(marker_root)
+        MARKER_ALLOWLIST.clear()
+        MARKER_ALLOWLIST.update(original_allowlist)
+        if not any("allowlist entry without justification" in v for v in unjustified):
+            errors.append("self-test: unjustified allowlist entry not detected")
 
     return errors
 

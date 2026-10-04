@@ -16,9 +16,10 @@
 | 设计/准入一个变更（原则、profile、本地绑定、预算） | [`openspec/change-guidance/README.md`](openspec/change-guidance/README.md) |
 | 证据 / 门禁 / 测试资产政策 | [`openspec/governance/`](openspec/governance/)（`test-evidence-policy.md` + 组件 checker） |
 | 账本 ritual（编号、索引、计数三处一致） | [`_backlog/README.md`](_backlog/README.md) |
-| 应用代码边界（分层、owner、验证命令） | [`deep_research_harness/AGENTS.md`](deep_research_harness/AGENTS.md)（骨架期内容随后续 change 充实） |
-| 启动某个入口该用哪条命令 | [`deep_research_harness/COMMANDS.md`](deep_research_harness/COMMANDS.md)（骨架期占位） |
+| 应用代码边界（分层、owner、验证命令） | [`deep_research_harness/AGENTS.md`](deep_research_harness/AGENTS.md) |
+| 启动某个入口该用哪条命令 | [`deep_research_harness/COMMANDS.md`](deep_research_harness/COMMANDS.md) |
 | 产品方向与快速上手 | [`openspec/product/README.md`](openspec/product/README.md) |
+| 词汇与三个 bounded context（谁拥有哪些词） | [`CONTEXT-MAP.md`](CONTEXT-MAP.md)（→ 各层 `CONTEXT.md`） |
 
 ## 不可谈判的约定（只列不变量；细则在各自 owner）
 
@@ -46,8 +47,8 @@
 
 ```bash
 cd deep_research_harness
-make install              # 骨架期占位
-make verify               # 骨架期占位
+make install              # 有意 no-op（零外部依赖；环境准备 = uv sync）
+make verify               # 单元门禁：stdlib unittest，任一失败非零退出
 ```
 
 ## 边界铁律

@@ -17,6 +17,7 @@ responsibility, host integration, and change governance do not blur together.
 
 ## Reading order for a fresh agent
 
-1. [AGENTS.md](AGENTS.md) — scope and boundaries.
-2. [_backlog/plans/README.md](_backlog/plans/README.md) — the active plan list. The three derived plans (wiring-structure / bundle-contract / entry-surface) carry the settled boundary decisions; each enters the OpenSpec pipeline only after explicit user approval.
-3. The three context files below — dictionaries, read on demand.
+The single entry chain is [AGENTS.md](AGENTS.md) — its routing table owns "where do I
+start". This file is a vocabulary stop on that chain: read it when a boundary question
+needs a term, then follow the three context files below on demand. Current active work,
+if any, lives in the `_backlog` ledger ([_backlog/README.md](_backlog/README.md)).

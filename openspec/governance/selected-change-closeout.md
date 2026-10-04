@@ -1,6 +1,6 @@
 # Selected Change Closeout Evidence
 
-`selected_change_closeout.py` records limited, local evidence for an explicitly
+`selected-change-closeout.py` records limited, local evidence for an explicitly
 declared selected OpenSpec change. It is a standard-library command, not an OpenSpec
 operation hook, archive wrapper, semantic reviewer, task writer, or runtime control.
 

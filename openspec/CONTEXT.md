@@ -18,18 +18,6 @@ _Avoid_: runtime authority, product user
 An observable product or system outcome approved in an owning specification.
 _Avoid_: a guide recommendation, an unverified implementation detail
 
-**Change Guidance Route**:
-The canonical route from a proposed Deep Research change to every relevant, actually
-triggered design or admission policy and its owning contract. A change still has one
-primary causal owner.
-_Avoid_: project manual, runtime controller
-
-**Cross-Cutting Review Guidance**:
-Design guidance in the unified policy library that the Change Guidance Route routes alongside
-its other policies while behavior remains owned by capability specifications and
-runtime authorities.
-_Avoid_: runtime guardrail, permission, approval
-
 **Selected Change Closeout Evidence**:
 Bounded evidence about one explicitly declared committed change range and its
 non-authoritative review disposition.

@@ -1,6 +1,6 @@
 # Plans — plan/分析文档索引
 
-> 最后更新: 2026-10-04（fresh-agent-doc-cleanup 入账） | `_backlog/plans/` — 活跃 plan 在此（顶层），
+> 最后更新: 2026-10-04（fresh-agent-doc-cleanup 关闭：CLS-012） | `_backlog/plans/` — 活跃 plan 在此（顶层），
 > 完成的普通 plan 移入 [`../_done/_closed_plans/`](../_done/_closed_plans/)。
 >
 > **plan 没有编号，文件名即标识。完成后文件名不变，位置即状态。**
@@ -23,11 +23,10 @@
 
 | Plan | 一句话 |
 |------|--------|
-| [fresh-agent-doc-cleanup](2026-10-04-fresh-agent-doc-cleanup.md) | fresh agent 视角全库文档审计：40 条发现（A 矛盾 11 / B 过期死链 16 / C 术语噪音 13），核心病灶 = 骨架叙事落后实现；待 REVIEW 拍板后拆 change |
 
-（无其他活跃 plan）
+（空）
 
-**Next available plan ID: CLS-012**（移入 `_closed_plans/` 时分配）
+**Next available plan ID: CLS-013**（移入 `_closed_plans/` 时分配）
 
 ## 已归档（移至 `_done/_closed_plans/`）
 
@@ -40,6 +39,8 @@
 | CLS-005 entry-surface | establish-entry-surface（已 archive；六子命令 + 渲染 + EV2 证据） | 2026-10-03 |
 | CLS-006 wiring-structure | remove-graph-layer + establish-embedded-wiring + pin-subagent-knobs（均已 archive；决策 5 以 posture + 守卫处置） | 2026-10-03 |
 | CLS-007 stream-adapter-and-live-view | fix-stream-adapter（已 archive；真实流形状适配 + journal 聚合 + token 内联直播） | 2026-10-03 |
+| CLS-008 deep-run-postmortem | 深研究真跑复盘（已 archive；skill 装载/完整流水线/崩溃检测实证 + framework_error 人话终态守卫） | 2026-10-03 |
+| CLS-009 queued-triple | 三连击（已 archive；land-final-report + refine-slim-restart + ci-integration-lane 全落地） | 2026-10-04 |
 | CLS-010 test-doctrine-borrows | 测试战略采纳路线图 v3 全量版（文件先期归档，账本行补记） | 2026-10-04 |
 | CLS-011 agent-playbook-and-minimal-release | ratify-agent-playbook-and-minimal-release（已 archive；两层启动面 + 发布面两件套 + 冷启动守卫） | 2026-10-04 |
 
@@ -66,3 +67,4 @@
 ## 落地关联
 计划如何变成 `openspec/changes/` 里的 change（或已被哪个 change 吸收）。
 ```
+| CLS-012 fresh-agent-doc-cleanup | remove-requirement-id-tracking + catch-up-doc-truthfulness（均已 archive；40 条审计发现全量处置，四项规范语义留待各自 change） | 2026-10-04 |

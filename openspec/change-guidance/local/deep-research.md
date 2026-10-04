@@ -9,12 +9,13 @@ composition without changing portable core or profiles.
 
 ## Context Expansion Gate
 
-A possible future use is not enough to expand scope.
-
+Expansion discipline: [`../core/change-practice.md`](../core/change-practice.md)
+(change admission). Adjacent seams start from `domain/` for typed
+meaning, `engine/` for deterministic policy, `agents/` for model-facing cognition,
 ## Context And Seams
 
-A possible future use is not enough to expand scope. Start from `domain/` for typed
-meaning, `engine/` for deterministic policy, `agents/` for model-facing cognition,
+Start from `domain/` for typed meaning, `engine/` for deterministic policy,
+`agents/` for model-facing cognition,
 and `runtime/` for DeerFlow binding, composition, I/O, and persistence.
 
 - **cognitive-program:** capability/prompt/context/feedback.
@@ -35,24 +36,11 @@ produced for a declared lane is what a gate may verify.
 
 ## Delivery Lanes
 
-Harness-owned lanes live in `deep_research_harness/proof-lanes.toml`; `make proof LANE=<lane>`
-records a receipt for one and `make proof-status` reports what went stale. Governance checks
-are governance-owned and are not harness lanes.
-
-| Surface | Harness lane (receipt-backed) |
-| --- | --- |
-| Application behavior, typed contracts, gates | `make verify` (`UV_OFFLINE=1`) |
-| Interactive TUI and the debugger workbench | `make debugger-proof` |
-| Guards that must be able to fail | `make mutation-check` |
-
-| Governance check (not a harness lane) | Command |
-| --- | --- |
-| Published docs and guidance | `python3 openspec/governance/check_doc_hygiene.py` |
-| Design, admission, and closeout receipts | `python3 openspec/governance/check_project_gate.py --phase closeout` |
-
-Escalate to a human only for product direction or scope, reserved areas
-(`.agents/skills/`, `.env`, gitignored local conveniences), irreversible or
-out-of-bounds actions, spec-semantics adjudication, or an explicit review request.
+Harness-owned lanes land with their owning change; today the harness surface is
+`make verify` (application unit gate, offline stdlib) and `make smoke` (integration,
+requires `uv sync`). Receipt discipline and completion criteria live in
+[`deep_research_harness/playbook/run-research.md`](../../../deep_research_harness/playbook/run-research.md).
+Governance checks are governance-owned and are not harness lanes.
 
 ## Information Map
 

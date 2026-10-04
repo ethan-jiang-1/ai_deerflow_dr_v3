@@ -1,8 +1,7 @@
 # Deep Research Product
 
-The Deep Research Product helps people obtain research outcomes. (v3 skeleton — this
-glossary carries the stable product vocabulary; runtime facts are not defined here and
-do not exist yet.)
+The Deep Research Product helps people obtain research outcomes. This glossary carries
+the stable product vocabulary; runtime facts stay with their owning code and specs.
 
 ## Language
 
@@ -24,10 +23,15 @@ runs. It owns no durable run state and holds no registry that can authorize or r
 a run.
 _Avoid_: the research agent, the model, the pipeline
 
-**Entry Interface**:
-A user-facing or host-facing surface through which a run starts or is observed.
-(v3 surfaces are pending; the vocabulary side and the operational side must stay
-name-mapped in the same change that defines either.)
+**Gate**:
+Two senses, kept distinct by context: the admission gate machine (`engine/gate.py`,
+renders pass/blocked for a run) and a quality gate (a lane that must exit zero, e.g.
+`make verify`). Writing prefers "admission gate" for the machine.
+_Avoid_: using the bare word for both in one sentence
+
+**Entry Surface**:
+A user-facing or host-facing surface through which a run starts or is observed —
+the closed six-verb CLI plus the make lanes (owner: `entry-surface` capability).
 _Avoid_: an internal module boundary
 
-> 词汇的权威随 owning spec 落地；本文件在骨架期只登记承重词，避免第二权威。
+> 词汇的权威随 owning spec 落地；本文件只登记承重词，避免第二权威。

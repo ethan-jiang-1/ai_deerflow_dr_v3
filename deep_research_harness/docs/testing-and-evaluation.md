@@ -1,6 +1,6 @@
 # Testing and Evaluation（测试思想与车道）
 
-> 本文是"怎么测"问题的第一答处（参照 DeerFlow 自测体系的 digest：`/Users/bowhead/deer-flow/_digest/test-strategy/`，本仓沿用其纪律并按 v3 规模裁剪）。纪律不在口头——每条规矩都有钉住它的测试或在账的借鉴项。
+> 本文是"怎么测"问题的第一答处（参照 DeerFlow 自测体系的 digest——已收入 `_backlog/_reference/test-strategy/`，本仓沿用其纪律并按 v3 规模裁剪）。纪律不在口头——每条规矩都有钉住它的测试或在账的借鉴项。
 
 ## 一句话策略
 

@@ -76,5 +76,5 @@ rather than inventing a receipt that makes uncertainty look complete.
 Start with the owning specification, closest implementation, and lowest responsible
 evidence seam. Before opening an adjacent module or upstream source, name the
 interface, authority, compatibility, or observed-failure question it must answer.
-A possible future use is not enough to expand scope. If local evidence still cannot
-identify an owner, clarify admission instead of scanning unrelated code.
+If local evidence still cannot identify an owner, clarify admission instead of
+scanning unrelated code.

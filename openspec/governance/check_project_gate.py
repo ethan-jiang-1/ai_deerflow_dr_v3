@@ -129,7 +129,7 @@ def run_closeout(
     all_zero = True
     for name in names:
         script = _component_script(root, name)
-        # The proof-receipt checker runs in enforce mode at closeout (PRS-009): a
+        # The proof-receipt checker runs in enforce mode at closeout: a
         # missing or stale receipt for a touched surface is a failure, not a warning.
         arguments = [sys.executable, str(script)]
         if name == "check_proof_receipts.py":

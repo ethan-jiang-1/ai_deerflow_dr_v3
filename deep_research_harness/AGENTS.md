@@ -5,10 +5,10 @@ application does not depend on the repository's development-governance framework
 `deerflow/` is a read-only upstream runtime framework: use its public API, never modify
 or source-browse it for ordinary application work.
 
-v3 is a rewrite in progress: the research cognition engine is DeerFlow's native deep
-research capability (lead agent + `deep-research` skill + subagent delegation), and the
-harness keeps the deterministic, inspectable parts. Layers below are scaffolding until
-their owning changes fill them; the ownership boundaries are already binding.
+v3's research cognition engine is DeerFlow's native deep research capability (lead agent
++ `deep-research` skill + subagent delegation), and the harness keeps the deterministic,
+inspectable parts. The `agents/` layer is the one still-empty owner (see Non-Model Work);
+the other ownership boundaries are binding today.
 
 ## Application Focus
 
@@ -60,8 +60,8 @@ numbered route below plus the explicit Non-Model Work branch.
 | What proves composition/admission? | The closest unit/contract test for that owner |
 | Who admits state, routes, and effects? | The `engine/` and `runtime/` owners behind it |
 
-Implementations arrive with their owning changes; this table stays layer-level until
-then and must not invent file paths that do not exist.
+The bounded-role contracts live with their owning code as it lands; this table stays
+layer-level and must not invent file paths that do not exist.
 
 ## Non-Model Work
 
@@ -94,9 +94,8 @@ cognition is not causal. Do not invent a capability, prompt, or repair loop.
 
 `make verify` is the application unit gate: the stdlib unittest suite under `tests/`
 (`PYTHONPATH=src`, zero external dependencies, offline-safe). It exits non-zero on any
-failure and never reads, imports, executes, or links OpenSpec content. The narrowest
-relevant command for domain/runtime rules is the suite itself; the admission-machinery,
-CLI, and receipt lanes arrive with their owning changes.
+failure and never reads, imports, executes, or links OpenSpec content. Lane separation
+is explicit: `tests/integration/` is exercised by `make smoke`, not by `make verify`.
 
 ## Structural Authority
 

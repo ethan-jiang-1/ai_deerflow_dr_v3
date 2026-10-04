@@ -1,14 +1,20 @@
 # Runtime Architecture
 
-> 骨架占位。权威边界（Run Bundle、evidence、sandbox、public-control）随
-> run-bundle 生命周期 change 与接线 change 充实；本文件届时成为运行时权威边界文档。
+> 运行时与权威边界的摘要面；每个事实的权威是其 owning spec 与代码（`src/deerflow_deep_research/`）。
+> 这里只缓存跨文件的边界图，不复制细节。
 
-v3 的方向性事实（详见根目录 boundary plan）：
+## 边界图
 
-- 研究认知引擎 = DeerFlow 原生能力：lead agent 加载 `deep-research` skill，按需派生
-  subagent；框架侧没有静态研究图。
-- Harness 保留：Run Bundle 生命周期（start/resume/status/cancel/refine）、确定性控制
-  边界（validator / evidence ledger / gate）、显式组成（`all_real` / `fixture` / `mixed`）、
-  可观察可操作。
-- DeerFlow 是宿主运行时，不 import 本包；接线形态（反射工具 / controller skill / 薄外层）
-  由首个接线 change 定义。
+- **研究认知引擎 = DeerFlow 原生能力**：lead agent 加载 `deep-research` skill，按需派生
+  subagent；框架侧没有静态研究图。harness 经 `runtime/client.py` 的显式绑定进入框架公共
+  面（`make_stream_fn` 是唯一 stream 缝，per-call recursion limit）。
+- **Harness 保留**：Run Bundle 生命周期（create/status/watch/cancel/refine/inspect 六动词，
+  `cli.py`）、确定性控制边界（`engine/` validator / ledger / gate + `runtime/admission.py`）、
+  journal 与 final report 投影、显式组成记录（`domain/bundle.py`：`fixture` / `mixed` /
+  `all_real`；公开路由固定 `all_real`，fixture 配方如实报 `fixture`，`mixed` 为声明未接线的
+  枚举成员——去留见其 owning change）。
+- **DeerFlow 是宿主运行时，不 import 本包**；接线形态（embedded binding）由
+  establish-embedded-wiring 定案，受 `check_harness_dependency_direction.py` 守护。
+- **权威事实源**：Run Bundle 合同 = `run-bundle` spec；验收收口 = `run-admission` spec；
+  入口面 = `entry-surface` spec。boundary 决策的历史推敲见
+  [`_backlog/_done/_closed_plans/`](../../_backlog/_done/_closed_plans/README.md)。

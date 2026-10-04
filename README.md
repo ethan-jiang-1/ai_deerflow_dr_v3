@@ -12,19 +12,19 @@
 - **实现路线反转**：v2 逐节点手搓研究图（bootstrap → wave0/1/2 → …）；v3 **消化并借力 DeerFlow v2.1.0
   原生的 Deep Research 能力**——lead agent + `deep-research` skill（四阶段研究方法论）+ subagent 委派
   系统，harness 退守"运行底座 + 确定性控制边界"。能力盘点见
-  [`_backlog/_reference/deerflow-native-deep-research.md`](_backlog/_reference/deerflow-native-deep-research.md)。
+  [`_backlog/_reference/deerflow/deerflow-native-deep-research.md`](_backlog/_reference/deerflow/deerflow-native-deep-research.md)。
 
 DeerFlow 是宿主运行时，**不 import 本包**；触达方式（反射工具 / controller skill / 或更薄的接线）由首个 change 定义。
 
-> **当前状态：骨架。** 目录结构、治理机器、账本 ritual 已就位；`openspec/specs/` 为空，应用代码为壳。
-> 边界已定（六裁决，见 `_done/_closed_plans/` 的 digest plan 修订节）；实现从三份衍生 plan 各自经用户拍板后的 change 开始——入口：[`_backlog/plans/README.md`](_backlog/plans/README.md)。
+> **当前状态：已实现核心。** specs 主干 9 个能力落地、29 个 changes 归档（活跃为空）、六动词 CLI 与 112-test 单元门禁在跑。
+> 边界已定（六裁决，见 [`_backlog/_done/_closed_plans/`](_backlog/_done/_closed_plans/README.md)）；新方向按 [`_backlog/plans/README.md`](_backlog/plans/README.md) 的卡片模板立 plan 入账。
 
 ## 布局
 
 ```
 deep_research_harness/    ★ 你的应用（deep research runtime，基于 deerflow 的 API 构建）
 deerflow/                 被 leverage 的框架（submodule 锁 commit `ceebf97f`，ethan 分支，= 上游 v2.1.0；只读）
-openspec/                 设计规格（openspec CLI 管理；specs 从零开始，changes/ 为空）
+openspec/                 设计规格（openspec CLI 管理；specs 主干已建立，changes/ 仅含 archive/）
 _backlog/                 任务账本（plans / bugs 两类 + _done 归档 + _reference 分析）
 .agents/skills/           openspec 技能（Codex 通用入口，项目自有）
 （grillme 技能集由全局 ~/.claude/skills、~/.agents/skills 提供）
@@ -40,13 +40,13 @@ _backlog/                 任务账本（plans / bugs 两类 + _done 归档 + _r
 
 ```bash
 cd deep_research_harness
-make install              # 骨架期占位（uv sync）
-make verify               # 骨架期占位（无测试，响亮提示后通过）
+make install              # 有意 no-op（harness 零外部依赖；环境准备用 uv sync）
+make verify               # 单元门禁：stdlib unittest 套件，任一失败非零退出
 ```
 
 ## 给 Coding Agent
 
-见 [AGENTS.md](AGENTS.md)——重点是：应用是主角，框架只 leverage 不改；骨架期先读第一个 plan 再动手。
+见 [AGENTS.md](AGENTS.md)——重点是：应用是主角，框架只 leverage 不改；当前该做什么看 [`_backlog/README.md`](_backlog/README.md) 的知识地图。
 
 ## 备注
 

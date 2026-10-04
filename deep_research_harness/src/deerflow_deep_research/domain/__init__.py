@@ -1,1 +1,1 @@
-"""domain layer (skeleton)."""
+"""domain layer: typed meaning, invariants, pure data contracts."""

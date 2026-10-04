@@ -6,8 +6,7 @@ contract = "project-structure-inventory"
 # declared kind. Group names are declared keys (existence + uniqueness only).
 # See project-structure.toml [inventory].
 #
-# v3 骨架期：本清单钉住"骨架本身必须存在"的最小集合。
-# 实现文件随各自 change 的 spec 增补，不在骨架期预登记。
+# 实现文件随各自 change 的清单增补登记；未登记的路径不构成本清单的承诺。
 
 [paths.repo-skeleton]
 files = [

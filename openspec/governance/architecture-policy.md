@@ -76,7 +76,7 @@ and declared lock together; the checker verifies that consistency but cannot app
 the bump, recover a mismatch, or determine compatibility.
 
 The generated block is bounded by the markers declared in the registry. It names the
-registry, source root, test root, ownership layers, node grammar, and validation
+registry, source root, test root, ownership layers, and validation
 command; it deliberately does not repeat the required-path inventory. Text outside
 those markers is human-authored and may explain the structure, but it cannot override
 the generated locator or the registry. The TOML manifest (`project-structure.toml`
