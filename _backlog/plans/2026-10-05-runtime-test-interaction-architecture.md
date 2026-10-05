@@ -1,7 +1,7 @@
 # Plan: Runtime / Test / Interaction / Agent Loop 结构与控制面重整
 
 > 类型: 架构设计 / 可驾驭性整理 | 更新: 2026-10-05
-> 状态: Phase 0–4 归档（五个 change）；Phase 5 八项已全部裁决（2026-10-05 七轮，见该节逐项记录）——一项待立 change（evidence 物化）；refine 前台重跑与 state 交付事实已落地，其余维持现状已记录
+> 状态: Phase 0–4 归档（五个 change）；Phase 5 八项已全部裁决（2026-10-05 七轮，见该节逐项记录）——三项行为 change 全部落地（refine 前台重跑、state 交付事实、evidence 物化）；Phase 5 收官，其余维持现状已记录
 > 目标: 让产品驱动者和新 Coding Agent 不必先做代码考古，就能定位运行入口、研究 loop、skill、Run Bundle、测试资产和调试工具。
 
 ## 1. 背景
@@ -387,7 +387,7 @@ tests/
 - `completed` 与 final admission 是否合并或建立更强终态合同；
   **裁决：正交模型**（进程 status 与交付 disposition 分开记，交付事实进 state.json，终态规则不动——已落地 `state-delivery-disposition`）
 - evidence 是否由每次搜索自动物化；
-  **裁决：完整物化到独立目录**（evidence/ 合同不动；引用复核从不可能变可直读——待立 change）
+  **裁决：完整物化到独立目录**（evidence/ 合同不动；引用复核从不可能变可直读——已落地 `materialize-search-evidence`）
 - 多用户服务、worker、认证、备份恢复和部署面；
   **裁决：维持源码两件套形态**（单机单操作者；服务化需要真实多用户驱动再按 Program 形式立项）
 - 真实模型研究质量、引用真实性、充分性和统计评估；
