@@ -15,7 +15,7 @@ from typing import Callable
 
 from ..domain import bundle, clarification, journal_policy
 from ..domain.state_machine import BundleState, rule_clarification_step, rule_run_terminal
-from .bundle import bundle_state
+from .bundle import bundle_state, search_log
 from .bundle.journal import append_entry
 
 AUTO_REPLY_PREFIX = "[非交互模式·系统自动应答] "
@@ -62,6 +62,7 @@ def _consume_turn(
     message: str,
     thread_id: str,
     on_event: Callable[[object], None] | None = None,
+    recorder: "search_log.SearchLog | None" = None,
 ) -> tuple[list[clarification.TerminalToolCall], set[str], str | None, str | None, str]:
     """One stream turn: journal tool/subagent events, and derive the terminal picture
     from the final ``values`` snapshot (complete message list) with streamed chunks as
@@ -101,6 +102,11 @@ def _consume_turn(
                         )
                         for call in calls
                     ]
+                    if recorder is not None:
+                        for call in calls:
+                            recorder.note_call(
+                                str(call.get("id", "")), str(call.get("name", "")), _json_arguments(call)
+                            )
                     # The framework's error-handling middleware disguises a model-call
                     # failure as a normal AI message (deerflow_error_fallback marker):
                     # the terminal picture must carry it (wiring plan, error-fallback
@@ -114,6 +120,10 @@ def _consume_turn(
                     answered_id = str(_msg_field(message_item, "tool_call_id", "") or "")
                     if answered_id and not _is_framework_clarification_echo(message_item, answered_id):
                         values_answered.add(answered_id)
+                        if recorder is not None:
+                            recorder.note_result(
+                                answered_id, str(_msg_field(message_item, "content", "") or "")
+                            )
         elif event_type == "messages-tuple":
             # The real stream's data IS the message chunk (flat dict, token-grained —
             # verified by the live dump; see the plan's protocol notes).
@@ -129,6 +139,10 @@ def _consume_turn(
                             arguments=_json_arguments(call),
                         )
                     )
+                    if recorder is not None:
+                        recorder.note_call(
+                            str(call.get("id", "")), str(call.get("name", "")), _json_arguments(call)
+                        )
                 text = str(chunk.get("content", "") or "")
                 if text:
                     turn_text.append(text)
@@ -136,6 +150,8 @@ def _consume_turn(
                 answered_id = str(chunk.get("tool_call_id", "") or "")
                 if answered_id and not _is_framework_clarification_echo(chunk, answered_id):
                     answered.add(answered_id)
+                    if recorder is not None:
+                        recorder.note_result(answered_id, str(chunk.get("content", "") or ""))
         elif event_type == "custom":
             _journal(handle, "subagent", str(data.get("event", "subagent_event")), dict(data))
         elif event_type == "end":
@@ -243,6 +259,7 @@ def run_research(
     re-invoke the client on the same thread with a provenance-marked reply."""
 
     state = bundle_state.read_state(handle)
+    recorder = search_log.SearchLog(handle, generation=state.generation)
     if state.generation > 1:
         # Generation N>1 runs over its own direction document — resending the
         # original problem would be a lie about what the run researched.
@@ -253,7 +270,7 @@ def run_research(
         message = (handle.root / bundle.request_problem_relative()).read_text(encoding="utf-8").strip()
 
     try:
-        return _drive(handle, stream_fn, on_event, state, message)
+        return _drive(handle, stream_fn, on_event, state, message, recorder)
     except Exception as exc:  # framework/stream failure: loud terminal, material preserved
         fresh = bundle_state.read_state(handle)
         failed = rule_run_terminal(fresh, "failed-resume")
@@ -262,10 +279,10 @@ def run_research(
         return written
 
 
-def _drive(handle, stream_fn, on_event, state, message):
+def _drive(handle, stream_fn, on_event, state, message, recorder):
     while True:
         tool_calls, answered, stop_reason, fallback_error_type, final_text = _consume_turn(
-            handle, stream_fn, message, state.thread_id, on_event
+            handle, stream_fn, message, state.thread_id, on_event, recorder
         )
         detected = clarification.unanswered_ask_clarification(
             clarification.TerminalObservation(

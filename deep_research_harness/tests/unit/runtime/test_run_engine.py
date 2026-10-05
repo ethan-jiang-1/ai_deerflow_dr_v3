@@ -296,6 +296,27 @@ class RunEngineTest(unittest.TestCase):
         self.assertEqual(refined_again.status, "active")
 
 
+    def test_search_turn_materializes_readable_search_log(self) -> None:
+        import json as _json
+
+        def stream_fn(message: str):
+            yield _chunk_event(_ai(tool_calls=[{
+                "id": "call-s1", "name": "web_search",
+                "args": {"query": "无人机 认证壁垒"},
+            }]))
+            yield _chunk_event(_tool_result("call-s1"))
+            yield _event("values", title="t", messages=[_ai("带引用的最终报告")])
+            yield _chunk_event(_ai("带引用的最终报告"))
+            yield _event("end")
+
+        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        self.assertEqual(result.status, "completed")
+        path = self.handle.root / "diagnostics" / "searches" / "gen1-001-web_search.json"
+        self.assertTrue(path.is_file(), "the search turn must be materialized")
+        payload = _json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(payload["arguments"], {"query": "无人机 认证壁垒"})
+
+
 def journal_mod_entries(handle):
     from deerflow_deep_research.runtime.bundle import journal as journal_mod
 

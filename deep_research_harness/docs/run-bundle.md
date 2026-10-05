@@ -34,6 +34,7 @@ status 发现 active 但 owner 已死：转 failed-resume
 | `final/report-genN.md` | admission（validator 先裁决） | 通过准入的最终报告投影 | 不等于模型写的所有 sandbox 文件都进入 final |
 | `diagnostics/journal.jsonl` | [run_engine](../src/deerflow_deep_research/runtime/run_engine.py) / [journal](../src/deerflow_deep_research/runtime/bundle/journal.py) | 事件时间线：聚合工具名、回答尾部摘要、subagent 事件、终态、准入 disposition | 不是每次搜索的完整参数与结果 |
 | `diagnostics/assembly-snapshot.json` | [snapshot middleware](../src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py) | 首次模型调用的 system prompt、可见工具、模型名、pin | 不是全部轮次上下文；不能独自证明 skill 原文实际被读取 |
+| `diagnostics/searches/` | [search_log](../src/deerflow_deep_research/runtime/bundle/search_log.py) | 每次 web_search/web_fetch 的可直读记录：query/URL + 完整结果 + 时间戳（`gen{N}-{seq}-{tool}.json`，call_id 去重） | 是过程诊断不是已接纳证据；引用复核的物理基础，但不自动比对真实性 |
 
 ## 一次 run 的证据关联
 
@@ -44,6 +45,7 @@ status 发现 active 但 owner 已死：转 failed-resume
 state.json（thread_id、composition、pin、终态）
   → diagnostics/assembly-snapshot.json   这次装配了什么（模型、可见工具、pin）
   → checkpoint.sqlite                    按 thread 存的完整消息/工具结果
+  → diagnostics/searches/                每次搜索/抓取的可直读记录（query + 完整结果）
   → diagnostics/journal.jsonl            事件时间线：tool 调用、subagent、
                                          终态、admission disposition
   → evidence/submissions.jsonl           提交哈希链（可验证完整性）

@@ -28,7 +28,7 @@ skill 在本项目里是三个不同的对象，不能混为一谈：
 | --- | --- | --- |
 | **声明可用** | 框架 native surface 可加载；本地 [SOP 快照](skills/deep-research/README.md) 仅供阅读（含来源 pin/hash） | 快照不是运行时配置，改它不改变行为 |
 | **运行中实际加载** | 不强制：binding 传 `available_skills=None`，lead agent 自行决定 | 要证明实际加载，看工具调用记录 + checkpoint 消息 + [snapshot](../src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py)；方法见下节 |
-| **质量评估** | 无自动化统计评估（引文真实性、充分性、覆盖度） | 显式 base 真实梯 + 人工评审；fixture 结果不证明研究质量 |
+| **质量评估** | 无自动化统计评估（引文真实性、充分性、覆盖度）；每次搜索已物化到 [diagnostics/searches/](run-bundle.md) 可直读复核 | 显式 base 真实梯 + 人工评审（引用核对用 searches/ 文件）；fixture 结果不证明研究质量 |
 
 把 skill 变成强制、可验收的运行时合同是独立的产品/认知策略决策（2026-10-05
 计划 Phase 5），不在当前实现内。
@@ -112,7 +112,7 @@ validator 检查 kind、文件名、producer、非空和重复 hash，**不验�
 判断 skill 加载：先看是否出现读取 deep-research 原文的工具调用及结果；journal 只有名称时，再看 checkpoint 消息。
 判断委派：看 task 调用和 subagent 事件/结果；仅有 subagent_enabled=True 不足以证明实际委派。
 判断完成：status 的 `delivery:` 行直接回答交付（admitted/rejected/no-answer；未记录时用 journal disposition + final/ 文件 belt）；run_engine 先写终态再经 CAS 补写交付事实，空回答记 no-answer，重复内容记 rejected。
-判断质量：再评审引用、交叉验证、范围、假设与不确定性；fixture 的直接回答不能证明真实研究。
+判断质量：再评审引用、交叉验证、范围、假设与不确定性——报告声称的来源可在 diagnostics/searches/ 的可直读记录里核对；fixture 的直接回答不能证明真实研究。
 
 ## 改什么、测什么
 

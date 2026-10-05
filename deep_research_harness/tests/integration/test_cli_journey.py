@@ -39,7 +39,18 @@ def _cli(*arguments: str, env: dict | None = None) -> subprocess.CompletedProces
 @unittest.skipUnless(_FRAMEWORK_AVAILABLE, "deerflow environment required: run `uv sync` in deep_research_harness/")
 class CliJourneyTest(unittest.TestCase):
     def test_create_watch_status_refine_inspect(self) -> None:
-        created = _cli("create", "研究 A 国无人机供应链的认证壁垒", "--config", "fixture")
+        # Round-4 ruling: the create script walks a real web_search tool call
+        # through the fake provider so the journey proves search materialization.
+        created = _cli(
+            "create", "研究 A 国无人机供应链的认证壁垒", "--config", "fixture",
+            env={"DEERFLOW_FAKE_SCRIPT": json.dumps([
+                {"content": "", "tool_calls": [{
+                    "id": "call-s1", "name": "web_search",
+                    "args": {"query": "无人机 认证壁垒"},
+                }]},
+                {"content": "Fixture answer with cited sources."},
+            ])},
+        )
         self.assertEqual(created.returncode, 0, created.stderr)
         match = re.search(r"bundle ([0-9a-f-]{36}) started", created.stdout)
         self.assertIsNotNone(match, created.stdout)
@@ -54,6 +65,13 @@ class CliJourneyTest(unittest.TestCase):
         self.assertTrue(report.read_text(encoding="utf-8").strip())
         entries = [json.loads(line) for line in (bundle_dirs[0] / "evidence/submissions.jsonl").read_text(encoding="utf-8").splitlines()]
         self.assertTrue(any(e["kind"] == "final_report" and e["disposition"] == "admit" and e["artifact_path"] == "final/report-gen1.md" for e in entries))
+
+        # Round-4 ruling: the search result is materialized readable.
+        search_log = bundle_dirs[0] / "diagnostics" / "searches" / "gen1-001-web_search.json"
+        self.assertTrue(search_log.is_file(), created.stdout)
+        search_payload = json.loads(search_log.read_text(encoding="utf-8"))
+        self.assertEqual(search_payload["arguments"], {"query": "无人机 认证壁垒"})
+        self.assertIn("Canned search results", search_payload["content"])
 
         watched = _cli("watch", bundle_id)
         self.assertEqual(watched.returncode, 0, watched.stderr)

@@ -197,7 +197,7 @@ make create PROBLEM="研究问题" CONFIG=base   # 真实模型，需凭证
   跨机器恢复、滚动升级协调；
 - skill 强制加载（当前 `available_skills=None`，实际加载需证据判断）；
 - 真实研究质量的自动化统计评估（引文真实性、充分性）；
-- evidence 自动物化（搜索结果不自动进入 evidence）。
+- evidence 自动物化（搜索结果已物化到 `diagnostics/searches/` 可直读复核，但仍不自动进入 evidence/ 准入）。
 
 对外发布前需要补齐的服务化决策清单见
 [架构计划](../../_backlog/plans/2026-10-05-runtime-test-interaction-architecture.md)。
