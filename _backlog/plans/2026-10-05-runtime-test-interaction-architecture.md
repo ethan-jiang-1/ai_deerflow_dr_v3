@@ -467,7 +467,7 @@ tests/
 - [ ] `make verify` exit 0，且 unit + contract 的收集范围有新鲜输出。
 - [ ] `make smoke` exit 0；无测试被意外 skip；真实框架合同仍执行。
 - [ ] architecture checker exit 0，四层 ownership 和 import direction 不漂移。
-- [ ] dependency direction checker exit 0，receipt/历史文本不产生误报。
+- [x] dependency direction checker exit 0，receipt/历史文本不产生误报。（2026-10-05 经 `exempt-receipts-from-dependency-guard` 落地：结构化回执豁免 + gitignore 锚定 + 回执跟踪登记）
 - [ ] doc hygiene 和 link/command consistency checks exit 0。
 - [ ] `git diff --check` exit 0。
 - [ ] `git diff --exit-code HEAD -- deerflow` exit 0。

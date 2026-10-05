@@ -16,7 +16,7 @@
 
 DeerFlow 是宿主运行时，**不 import 本包**；本应用通过 [嵌入式 client binding](deep_research_harness/src/deerflow_deep_research/runtime/client.py) 消费其公开接口。
 
-> **当前状态：已实现核心。** specs 主干 11 个能力落地、35 个 changes 归档（实际清单见 `openspec/specs/` 与 `openspec/changes/`）、六动词 CLI 与单元门禁在跑。
+> **当前状态：已实现核心。** specs 主干 12 个能力落地、36 个 changes 归档（实际清单见 `openspec/specs/` 与 `openspec/changes/`）、六动词 CLI 与单元门禁在跑。
 > 边界已定（六裁决，见 [`_backlog/_done/_closed_plans/`](_backlog/_done/_closed_plans/README.md)）；新方向按 [`_backlog/plans/README.md`](_backlog/plans/README.md) 的卡片模板立 plan 入账。
 
 ## 布局
