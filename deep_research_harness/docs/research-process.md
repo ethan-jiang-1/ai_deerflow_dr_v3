@@ -33,6 +33,28 @@ skill 在本项目里是三个不同的对象，不能混为一谈：
 把 skill 变成强制、可验收的运行时合同是独立的产品/认知策略决策（2026-10-05
 计划 Phase 5），不在当前实现内。
 
+## binding knobs：实际默认值与证据
+
+每个装配旋钮的实际值、裁决处与锁定它的测试（守卫
+[test_binding_doc_guard](../tests/unit/runtime/test_binding_doc_guard.py)
+锁本表值与代码常量一致）：
+
+| knob | 实际默认值 | 裁决 owner | 测试证据 |
+| --- | --- | --- | --- |
+| `config_path` | 显式解析 checked-in config（`base`/`fixture`），拒绝框架自动发现；env 钉 `DEER_FLOW_CONFIG_PATH` | [adapters/client](../src/deerflow_deep_research/runtime/adapters/client.py) `resolve_config_path` | [mirror](../tests/contract/test_wiring_mirror.py) 配置解析负例 |
+| `checkpointer` | Bundle SQLite，经框架自有工厂 `SqliteSaver.from_conn_string + setup` | [adapters/client](../src/deerflow_deep_research/runtime/adapters/client.py) `bundle_checkpointer`（seam 镜像：[contracts](../src/deerflow_deep_research/runtime/adapters/contracts/client_surface.py) `CHECKPOINTER_SEAM`） | [smoke](../tests/integration/test_wiring_smoke.py)（真 saver 多轮） |
+| `model_name` | `None`（用 config 声明的模型）；可显式覆盖 | [adapters/client](../src/deerflow_deep_research/runtime/adapters/client.py) `build_client` | [mirror](../tests/contract/test_wiring_mirror.py) |
+| `thinking_enabled` | `thinking_enabled=True` | [contracts/client_surface](../src/deerflow_deep_research/runtime/adapters/contracts/client_surface.py) `CONSUMED_DEFAULTS` | [mirror](../tests/contract/test_wiring_mirror.py) binding-defaults 断言 |
+| `subagent_enabled` | `subagent_enabled=True` | 同上 | mirror + [posture 守卫](../tests/unit/runtime/test_subagent_posture.py) |
+| `plan_mode` | `plan_mode=False` | 同上 | mirror |
+| `available_skills` | `available_skills=None`（完整 skill 面，不强制选择） | 同上 | mirror |
+| `middlewares` | 空；`snapshot_dir` 给定时注入 assembly-snapshot middleware（第一位） | [adapters/client](../src/deerflow_deep_research/runtime/adapters/client.py) `build_client` | [smoke](../tests/integration/test_wiring_smoke.py)（snapshot 落盘） |
+| `thread_id` | state.json 的 thread；per-call 注入 | [adapters/client](../src/deerflow_deep_research/runtime/adapters/client.py) `make_stream_fn` | mirror 转发断言 |
+| `recursion_limit` | `recursion_limit=1000`（per-call 覆盖；AppConfig 顶层 `300` **不被**嵌入式路径消费——疤痕） | [adapters/client](../src/deerflow_deep_research/runtime/adapters/client.py) `DEEP_RESEARCH_RECURSION_LIMIT` | mirror `CONSUMED_STREAM_KWARGS` + 转发断言 |
+
+改任何一个 knob：先改事实源（CONSUMED_DEFAULTS / client 常量），同步本表
+（守卫会红逼你同步），再跑 mirror + smoke。
+
 ## 方法论长什么样
 
 下面是 [本地 skill 原文快照](skills/deep-research/SKILL.md#research-methodology) 的中文导航，不是独立 prompt 或硬 gate；[SOP 阅读入口](skills/deep-research/README.md) 解释了来源、加载和未来调整边界：

@@ -1,0 +1,207 @@
+{
+  "revision": "bcdb13081f4ab700d0abdcb2fce86ec0e659860a",
+  "completed_at": "2026-10-05T14:31:37.479230+00:00",
+  "scope": "Phase 4 observability: binding knob table (actual defaults, owners, test evidence) in research-process.md; run-evidence traceability recipe in run-bundle.md; new binding-doc guard locks documented knob values against the code constants; no behavior change",
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "openspec/tests/governance",
+        "-q"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "[check_project_specs.py] exit=0\n[check_project_architecture.py] exit=0\n[check_change_guidance.py] exit=0\n[check_harness_dependency_direction.py] exit=0\n[check_ci_governance.py] exit=0\n[check_proof_receipts.py] exit=0\nOpenSpec governance closeout passed: every registered component checker exited 0.\n[check_project_specs.py] exit=1\n[check_project_architecture.py] exit=0\n[check_change_guidance.py] exit=0\n[check_harness_dependency_direction.py] exit=0\n[check_ci_governance.py] exit=0\n[check_proof_receipts.py] exit=0\n[check_project_specs.py] exit=0\n[check_project_architecture.py] exit=1\n[check_change_guidance.py] exit=0\n[check_harness_dependency_direction.py] exit=0\n[check_ci_governance.py] exit=0\n[check_proof_receipts.py] exit=0\n[change-guidance] exit=0\n[delta-specs] exit=1\n[strict-validation] exit=0\n[change-guidance] exit=0\n[delta-specs] exit=0\n[strict-validation] exit=0\nOpenSpec planning admission passed for change demo-change.\nAll project specs valid: 1 main spec files under openspec/specs, 0 violations.\nAll project specs valid: 1 main spec files under openspec/specs, 0 violations.\n",
+      "stderr": "OpenSpec governance closeout failed: at least one component checker exited non-zero.\nOpenSpec governance closeout failed: at least one component checker exited non-zero.\nGate inventory is empty: no component checkers registered.\nGate inventory references missing checker(s): check_change_guidance.py\nOpenSpec planning admission failed for change demo-change.\n--phase plan requires --change <name>.\n----------------------------------------------------------------------\nRan 72 tests in 5.659s\n\nOK (skipped=1)\n"
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_doc_hygiene.py"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "doc-layer hygiene passed.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_doc_hygiene.py",
+        "--self-test"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "doc-hygiene self-test passed.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_change_guidance.py"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "Change Guidance governance passed.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_project_architecture.py"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "Architecture governance passed for /Users/bowhead/ai_deerflow_dr_v3\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_project_specs.py"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "All project specs valid: 12 main spec files under openspec/specs, 0 violations.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_release_face.py"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "release-face guard passed.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_harness_dependency_direction.py"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "Harness dependency direction passed.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_project_gate.py",
+        "--phase",
+        "closeout"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "[check_project_specs.py] exit=0\n  All project specs valid: 12 main spec files under openspec/specs, 0 violations.\n[check_project_architecture.py] exit=0\n  Architecture governance passed for /Users/bowhead/ai_deerflow_dr_v3\n[check_change_guidance.py] exit=0\n  Change Guidance governance passed.\n[check_harness_dependency_direction.py] exit=0\n  Harness dependency direction passed.\n[check_ci_governance.py] exit=0\n  CI governance passed for /Users/bowhead/ai_deerflow_dr_v3\n[check_proof_receipts.py] exit=0\n  proof receipts: no selected change (mode=enforce)\nOpenSpec governance closeout passed: every registered component checker exited 0.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_project_gate.py",
+        "--phase",
+        "plan",
+        "--change",
+        "document-binding-knobs-and-run-evidence"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "[change-guidance] exit=0\n  Change Guidance governance passed.\n[delta-specs] exit=0\n  Selected change document-binding-knobs-and-run-evidence delta specs valid: 0 spec file(s), 0 violations.\n[strict-validation] exit=0\n  Change 'document-binding-knobs-and-run-evidence' is valid\n  \u2139 [INFO] file: skip_specs is set in .openspec.yaml: change declares no spec-level behavior changes, zero deltas accepted\nOpenSpec planning admission passed for change document-binding-knobs-and-run-evidence.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "make",
+        "verify"
+      ],
+      "cwd": "deep_research_harness",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "PYTHONPATH=src python3 -m unittest discover -s tests\n[verify] harness unittest gate passed.\n",
+      "stderr": "....................................................................................................................................\n----------------------------------------------------------------------\nRan 132 tests in 0.503s\n\nOK\n"
+    },
+    {
+      "command": [
+        "make",
+        "smoke"
+      ],
+      "cwd": "deep_research_harness",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "UV_CACHE_DIR=$(pwd)/../.uv-cache uv sync && UV_CACHE_DIR=$(pwd)/../.uv-cache uv run --no-sync python -m unittest discover -s tests/integration -v\n",
+      "stderr": "Resolved 224 packages in 8ms\nAudited 202 packages in 0.24ms\nlanggraph 1.2.12 is newer than the version (1.2.9) the InMemorySaver delta-history patch was validated against; re-inspect the upstream override before relying on the patch.\ntest_create_watch_status_refine_inspect (test_cli_journey.CliJourneyTest.test_create_watch_status_refine_inspect) ... ok\ntest_unknown_verb_and_missing_bundle_fail_loudly (test_cli_journey.CliJourneyTest.test_unknown_verb_and_missing_bundle_fail_loudly) ... ok\ntest_different_inputs_differ (test_replay_model.NormalizationTest.test_different_inputs_differ) ... ok\ntest_volatile_content_is_stripped (test_replay_model.NormalizationTest.test_volatile_content_is_stripped) ... ok\ntest_miss_fails_loudly_with_known_keys (test_replay_model.RecordReplayTest.test_miss_fails_loudly_with_known_keys) ... ok\ntest_record_then_replay_serves_the_recorded_output (test_replay_model.RecordReplayTest.test_record_then_replay_serves_the_recorded_output) ... ok\ntest_contract_mirror_matches_the_real_surface (test_wiring_smoke.WiringSmokeTest.test_contract_mirror_matches_the_real_surface) ... ok\ntest_multi_turn_run_completes_with_readable_checkpoint (test_wiring_smoke.WiringSmokeTest.test_multi_turn_run_completes_with_readable_checkpoint) ... ok\ntest_raising_model_fails_loud_via_the_framework_fallback (test_wiring_smoke.WiringSmokeTest.test_raising_model_fails_loud_via_the_framework_fallback) ... LLM call failed after 1 attempt(s): deliberate fixture failure\nTraceback (most recent call last):\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deerflow/backend/packages/harness/deerflow/agents/middlewares/llm_error_handling_middleware.py\", line 806, in wrap_model_call\n    response = self._bounded_model_call_sync(request, handler)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deerflow/backend/packages/harness/deerflow/agents/middlewares/llm_error_handling_middleware.py\", line 572, in _bounded_model_call_sync\n    return handler(request)\n           ^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain/agents/factory.py\", line 347, in inner_handler\n    inner_result = inner(req, handler)\n                   ^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain/agents/factory.py\", line 357, in composed\n    outer_result = outer(request, inner_handler)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deerflow/backend/packages/harness/deerflow/agents/middlewares/tool_receipt_middleware.py\", line 178, in wrap_model_call\n    return self._stamp_citing_ledger(handler(prepared), receipts)\n                                     ^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain/agents/factory.py\", line 347, in inner_handler\n    inner_result = inner(req, handler)\n                   ^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain/agents/factory.py\", line 357, in composed\n    outer_result = outer(request, inner_handler)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deerflow/backend/packages/harness/deerflow/agents/middlewares/read_before_write_middleware.py\", line 354, in wrap_model_call\n    return handler(self._elide_blocked_payloads(request))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain/agents/factory.py\", line 347, in inner_handler\n    inner_result = inner(req, handler)\n                   ^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain/agents/factory.py\", line 357, in composed\n    outer_result = outer(request, inner_handler)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deerflow/backend/packages/harness/deerflow/agents/middlewares/dynamic_context_middleware.py\", line 753, in wrap_model_call\n    response = handler(request)\n               ^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain/agents/factory.py\", line 347, in inner_handler\n    inner_result = inner(req, handler)\n                   ^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain/agents/factory.py\", line 357, in composed\n    outer_result = outer(request, inner_handler)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deerflow/backend/packages/harness/deerflow/agents/middlewares/skill_activation_middleware.py\", line 582, in wrap_model_call\n    return handler(prepared)\n           ^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain/agents/factory.py\", line 347, in inner_handler\n    inner_result = inner(req, handler)\n                   ^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain/agents/factory.py\", line 357, in composed\n    outer_result = outer(request, inner_handler)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deerflow/backend/packages/harness/deerflow/agents/middlewares/skill_tool_policy_middleware.py\", line 315, in wrap_model_call\n    return handler(self._filter_model_request(request, policy=policy, refresh_decision=True))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain/agents/factory.py\", line 347, in inner_handler\n    inner_result = inner(req, handler)\n                   ^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain/agents/factory.py\", line 357, in composed\n    outer_result = outer(request, inner_handler)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deerflow/backend/packages/harness/deerflow/agents/middlewares/durable_context_middleware.py\", line 304, in wrap_model_call\n    return handler(self._inject(request))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain/agents/factory.py\", line 347, in inner_handler\n    inner_result = inner(req, handler)\n                   ^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain/agents/factory.py\", line 357, in composed\n    outer_result = outer(request, inner_handler)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deerflow/backend/packages/harness/deerflow/agents/middlewares/system_message_coalescing_middleware.py\", line 152, in wrap_model_call\n    return handler(self._maybe_coalesce(request))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain/agents/factory.py\", line 347, in inner_handler\n    inner_result = inner(req, handler)\n                   ^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain/agents/factory.py\", line 357, in composed\n    outer_result = outer(request, inner_handler)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deerflow/backend/packages/harness/deerflow/agents/middlewares/loop_detection_middleware.py\", line 918, in wrap_model_call\n    return handler(self._inject_warnings(request, warnings))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain/agents/factory.py\", line 347, in inner_handler\n    inner_result = inner(req, handler)\n                   ^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deerflow/backend/packages/harness/deerflow/agents/middlewares/terminal_response_middleware.py\", line 205, in wrap_model_call\n    return handler(self._augment_request(request))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain/agents/factory.py\", line 1506, in _execute_model_sync\n    output = model_.invoke(messages)\n             ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py\", line 488, in invoke\n    self.generate_prompt(\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py\", line 1877, in generate_prompt\n    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py\", line 1684, in generate\n    self._generate_with_cache(\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py\", line 2022, in _generate_with_cache\n    result = self._generate(\n             ^^^^^^^^^^^^^^^\n  File \"/Users/bowhead/ai_deerflow_dr_v3/deep_research_harness/src/deerflow_deep_research/runtime/fixtures/__init__.py\", line 57, in _generate\n    raise RuntimeError(str(item[\"raise\"]))\nRuntimeError: deliberate fixture failure\nok\n\n----------------------------------------------------------------------\nRan 9 tests in 2.216s\n\nOK\n"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--exit-code",
+        "HEAD",
+        "--",
+        "deerflow"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "file_sha256": {
+    "deep_research_harness/docs/research-process.md": "f03a39c2d89d1c41dbf7f69119f2d6aa1333ec41f217e0684e9f0f194d58e9ff",
+    "deep_research_harness/docs/run-bundle.md": "c395c3f4ea9969edbb5585718f97000ec1895661863c2f288db144d07caf4f01",
+    "deep_research_harness/tests/unit/runtime/test_binding_doc_guard.py": "b80e9d90494f080329b4a6dfa05416d78c259c2f79ff32319ed00dafa1105645",
+    "openspec/changes/document-binding-knobs-and-run-evidence/proposal.md": "60262aba0e131f1692e84a26ee7de943a205cd0a4625641970c7e8159eddb2f4",
+    "openspec/changes/document-binding-knobs-and-run-evidence/design.md": "64edc2dc4793c73e02496cd870b679cd84d96d8c5fa17f7255c8ab755d762701",
+    "openspec/changes/document-binding-knobs-and-run-evidence/tasks.md": "d947dd3bb32de4e9042797628848cfd0a898c85862a8049b0efaf28a8e4ce9b7"
+  },
+  "working_tree": {
+    "dirty": true,
+    "entries": [
+      "M deep_research_harness/docs/research-process.md",
+      " M deep_research_harness/docs/run-bundle.md",
+      "?? deep_research_harness/tests/unit/runtime/test_binding_doc_guard.py",
+      "?? openspec/changes/document-binding-knobs-and-run-evidence/"
+    ]
+  },
+  "observations": [
+    "red-first proven: the binding-doc guard was written before the knob table and failed red naming the missing ruled pair 'thinking_enabled=True' and the missing run-bundle traceability heading; after the two doc sections landed the guard went green",
+    "the guard imports DEEP_RESEARCH_RECURSION_LIMIT and CONSUMED_DEFAULTS from the adapters modules and asserts the doc carries every key=value pair verbatim - a future knob change without a doc sync turns verify red",
+    "knob values sourced from contracts/client_surface.py CONSUMED_DEFAULTS (thinking True, subagent True, plan_mode False, available_skills None) and adapters/client.py DEEP_RESEARCH_RECURSION_LIMIT=1000 (per-call; AppConfig top-level 300 not consumed by the embedded path - the scar)",
+    "traceability recipe documents the correlation keys honestly: same bundle directory + state.json thread_id + journal entries; no cross-file foreign key exists or is claimed",
+    "make smoke not owed (no smoke surface touched: only docs + unit test) but run as belt-and-braces: 9 green",
+    "all 5 tasks complete; tasks.md digest refreshed after final marks"
+  ],
+  "unverified": [
+    "no CI run performed locally (GitHub Actions governance workflow runs on push)",
+    "no real-model (base ladder) run"
+  ]
+}

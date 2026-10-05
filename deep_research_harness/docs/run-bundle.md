@@ -35,6 +35,35 @@ status 发现 active 但 owner 已死：转 failed-resume
 | `diagnostics/journal.jsonl` | [run_engine](../src/deerflow_deep_research/runtime/run_engine.py) / [journal](../src/deerflow_deep_research/runtime/bundle/journal.py) | 事件时间线：聚合工具名、回答尾部摘要、subagent 事件、终态、准入 disposition | 不是每次搜索的完整参数与结果 |
 | `diagnostics/assembly-snapshot.json` | [snapshot middleware](../src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py) | 首次模型调用的 system prompt、可见工具、模型名、pin | 不是全部轮次上下文；不能独自证明 skill 原文实际被读取 |
 
+## 一次 run 的证据关联
+
+同一 Bundle 目录 + `state.json` 的 `thread_id` 是全部关联键——文件之间没有
+机器外键，靠目录归属与 journal 条目对齐。按时间顺序走一遍：
+
+```text
+state.json（thread_id、composition、pin、终态）
+  → diagnostics/assembly-snapshot.json   这次装配了什么（模型、可见工具、pin）
+  → checkpoint.sqlite                    按 thread 存的完整消息/工具结果
+  → diagnostics/journal.jsonl            事件时间线：tool 调用、subagent、
+                                         终态、admission disposition
+  → evidence/submissions.jsonl           提交哈希链（可验证完整性）
+  → final/report-genN.md                 通过准入的报告投影
+```
+
+每步能推出 / 不能推出什么：
+
+| 走到这一步 | 能推出 | 不能推出 |
+| --- | --- | --- |
+| state.json | 状态、generation、thread、composition、pin | 质量；报告是否已被 admit |
+| assembly-snapshot | 本次可见工具与模型、prompt 首帧 | skill 原文实际被读取 |
+| checkpoint | 实际消息流与工具结果 | 完整供应商请求/响应日志 |
+| journal | 事件顺序、准入 disposition、终态原因 | 每次搜索的完整参数 |
+| submissions 链 | 提交内容的完整性与顺序 | 未提交内容（搜索不自动物化） |
+| final | 通过准入的交付物 | 质量、未采纳的 sandbox 文件 |
+
+`inspect` 是把以上一次看全的入口（journal 时间线 + 已接纳统计 + 装配快照）；
+判断"完成"仍需三查（下节），判断"质量"需真实梯 + 人工评审。
+
 ## 状态 ≠ 交付 ≠ 质量
 
 判断一次运行"完成"要**三查**，缺一不可：
