@@ -1,6 +1,6 @@
 # Closed Plans Index — 已完成 plan 归档
 
-> 最后更新: 2026-10-06（runtime-test-interaction-architecture 关闭：CLS-014） | `_backlog/_done/_closed_plans/` — 已完成 plan 的归档目录。
+> 最后更新: 2026-10-06（agent-friendly-repository-map 关闭：CLS-015；活跃队列清空） | `_backlog/_done/_closed_plans/` — 已完成 plan 的归档目录。
 > 接收来自 [`../../plans/`](../../plans/) 的 plan。`_` 前缀 = coding agent 默认忽略。
 >
 > **plan 完成后文件名不变，位置即状态。** 移入时分配 `CLS-NNN` 序号（Closed），按完成时间递增。
@@ -32,6 +32,7 @@ plan 完成后从 `_backlog/plans/` 通过 `git mv` 移入本目录：
 | CLS-011 | 2026-10-04 | [2026-10-04-agent-playbook-and-minimal-release.md](2026-10-04-agent-playbook-and-minimal-release.md) | agent 启动面 + 最小发布面全落地（ratify-agent-playbook-and-minimal-release 归档：COMMANDS 菜单+playbook/ 两层、发布面两件套、冷启动守卫红先绿后、全动词旅程回执） |
 | CLS-012 | 2026-10-04 | [2026-10-04-fresh-agent-doc-cleanup.md](2026-10-04-fresh-agent-doc-cleanup.md) | fresh agent 全库文档审计（40 条发现）：catch-up-doc-truthfulness + remove-requirement-id-tracking 两 change 归档（narrative catch-up + 两条红先绿后守卫 + req 追踪体系退役）；A11/B4/agents 空层三项规范语义留待各自 change（B11 lane 装置已由 land-proof-lane-registry 落地拆除） |
 | CLS-013 | 2026-10-04 | [2026-10-04-doc-hygiene-second-sweep.md](2026-10-04-doc-hygiene-second-sweep.md) | 第二轮文档卫生审计 26 条全处置：账本 ritual 修正直落（B2-B5/A4）+ 同名 change 归档（19 条声明层修复；A5/C2/C3 与计数钉死形态 defer 给操作者与后续治理 change；依赖方向守卫新抓三处跨树链接即改即绿） |
-| CLS-014 | 2026-10-06 | [2026-10-05-runtime-test-interaction-architecture.md](2026-10-05-runtime-test-interaction-architecture.md) | Runtime/Test/Interaction/AgentLoop 结构与控制面重整主计划：Phase 0–4 五 change 归档 + Phase 5 八项裁决收官（三项落地、五项维持现状已记录）；2026-10-06 §8 验收清单正式执行全勾（verify/smoke/7 checker/git 检查全 0，11c29fe）；assembly/execution 采有原则退让（entry.py/run_engine.py 平铺，单文件不满足建目录原则）；后续结构维护由 agent-friendly-repository-map 常驻卡承接 |
+| CLS-014 | 2026-10-06 | [2026-10-05-runtime-test-interaction-architecture.md](2026-10-05-runtime-test-interaction-architecture.md) | Runtime/Test/Interaction/AgentLoop 结构与控制面重整主计划：Phase 0–4 五 change 归档 + Phase 5 八项裁决收官（三项落地、五项维持现状已记录）；2026-10-06 §8 验收清单正式执行全勾（verify/smoke/7 checker/git 检查全 0，11c29fe）；assembly/execution 采有原则退让（entry.py/run_engine.py 平铺，单文件不满足建目录原则）；后续结构维护由应用 docs/README.md 的地图维护触发条件承接（CLS-015） |
+| CLS-015 | 2026-10-06 | [2026-10-05-agent-friendly-repository-map.md](2026-10-05-agent-friendly-repository-map.md) | Agent-friendly Repo 持续整理维护卡：两轮结构整理落地（clarify-application-surfaces + relocate-runs-and-clarify-structure）；触发表由 docs/README.md "地图维护触发条件"节吸收，活跃队列不再留常驻卡（回执 json 随卡归档） |
 
-**Next available plan ID: CLS-015**
+**Next available plan ID: CLS-016**

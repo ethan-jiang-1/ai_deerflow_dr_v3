@@ -1,7 +1,7 @@
 # Plan: Agent-friendly Repo 持续整理
 
-> 类型: 分析 / 维护计划 | 更新: 2026-10-06
-> 当前阶段: 导航与结构整理已落地（clarify-application-surfaces + relocate-runs-and-clarify-structure）；本卡转为常驻维护入口，按触发条件同轮回写。
+> 类型: 分析 / 维护计划 | 更新: 2026-10-06（关闭：CLS-015）
+> 关闭原因: 触发表已由 `deep_research_harness/docs/README.md` 的"地图维护触发条件"节吸收（活跃队列不留常驻卡）；待裁决项均在 CLS-014 归档记录与 known-limitations 挂号。本文件保留为历史记录。
 
 ## 背景 / 现状
 

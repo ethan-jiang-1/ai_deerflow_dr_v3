@@ -1,6 +1,6 @@
 # Plans — plan/分析文档索引
 
-> 最后更新: 2026-10-06（runtime-test-interaction-architecture 关闭归 CLS-014；活跃仅余常驻维护卡） | `_backlog/plans/` — 活跃 plan 在此（顶层），
+> 最后更新: 2026-10-06（维护卡关闭归 CLS-015，触发条件并入应用 docs/README；活跃队列为空） | `_backlog/plans/` — 活跃 plan 在此（顶层），
 > 完成的普通 plan 移入 [`../_done/_closed_plans/`](../_done/_closed_plans/)。
 >
 > **plan 没有编号，文件名即标识。完成后文件名不变，位置即状态。**
@@ -23,9 +23,10 @@
 
 | Plan | 一句话 |
 |------|--------|
-| [2026-10-05-agent-friendly-repository-map](2026-10-05-agent-friendly-repository-map.md) | 导航已落地；按源对象、绑定、测试、fixture、发布变化触发同轮维护 |
 
-**Next available plan ID: CLS-015**（移入 `_closed_plans/` 时分配）
+**Next available plan ID: CLS-016**（移入 `_closed_plans/` 时分配）
+
+当前**无活跃 plan**。地图维护触发条件已并入应用 [docs/README.md](../../deep_research_harness/docs/README.md)；结构重整决策记录见 CLS-014 归档。新 plan 按下方模板立卡。
 
 ## 已归档（移至 `_done/_closed_plans/`）
 
