@@ -12,7 +12,8 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from deerflow_deep_research.runtime import bundle_actions, entry
+from deerflow_deep_research.runtime import entry
+from deerflow_deep_research.runtime.bundle import bundle_actions
 from deerflow_deep_research.runtime.interaction import cli
 
 HARNESS = Path(__file__).resolve().parents[2]
@@ -48,7 +49,8 @@ class EntryCompositionTest(unittest.TestCase):
                 entry.resolve_bundle(scopes, "ffffffff-ffff-ffff-ffff-ffffffffffff")
 
     def test_foreground_assembly_forwards_bundle_config_pin_and_live_sink(self):
-        from deerflow_deep_research.runtime import client, run_engine
+        from deerflow_deep_research.runtime import run_engine
+        from deerflow_deep_research.runtime.adapters import client
 
         handle = SimpleNamespace(root=Path("/bundle"))
         saver, stream, sink, result = object(), object(), object(), object()

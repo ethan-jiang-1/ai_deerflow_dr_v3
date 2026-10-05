@@ -8,12 +8,12 @@
 | 你的问题 | 点这里 | 它是什么 |
 | --- | --- | --- |
 | 研究方法到底写在哪？ | [本地 SOP 阅读入口](skills/deep-research/README.md)、[完整 SKILL.md](skills/deep-research/SKILL.md) | Harness 中的原文快照，含来源 pin/hash；运行时仍由框架加载，不是本仓 coding-agent skill |
-| 谁让 lead agent 跑起来？ | [本应用 client binding](../src/deerflow_deep_research/runtime/client.py#L68) | 构造嵌入式 DeerFlowClient，注入 checkpointer 与 snapshot middleware |
-| 哪些认知能力打开了？ | [binding defaults](../src/deerflow_deep_research/runtime/contracts/client_surface.py#L32) | thinking/subagent 开启、plan mode 关闭、available_skills=None；并非强制每次调用 deep-research |
+| 谁让 lead agent 跑起来？ | [本应用 client binding](../src/deerflow_deep_research/runtime/adapters/client.py#L68) | 构造嵌入式 DeerFlowClient，注入 checkpointer 与 snapshot middleware |
+| 哪些认知能力打开了？ | [binding defaults](../src/deerflow_deep_research/runtime/adapters/contracts/client_surface.py#L32) | thinking/subagent 开启、plan mode 关闭、available_skills=None；并非强制每次调用 deep-research |
 | 使用什么模型和 Web 工具？ | [base.yaml](../config/base.yaml)、[fixture.yaml](../config/fixture.yaml) | 真实梯与脚本梯的具体 provider/tool 声明 |
-| 如何委派子代理？ | [框架说明](../../deerflow/backend/AGENTS.md#architecture)、[本应用 posture](../src/deerflow_deep_research/runtime/subagent_posture.py) | 框架提供 task 委派，本应用当前没有声明 custom subagent 类型 |
+| 如何委派子代理？ | [框架说明](../../deerflow/backend/AGENTS.md#architecture)、[本应用 posture](../src/deerflow_deep_research/runtime/adapters/subagent_posture.py) | 框架提供 task 委派，本应用当前没有声明 custom subagent 类型 |
 | 研究结果如何回到应用？ | [run_research](../src/deerflow_deep_research/runtime/run_engine.py#L203) | 消费 stream，处理续答/失败/取消，投影最后回答到报告准入 |
-| 这次模型看到了什么？ | [snapshot middleware](../src/deerflow_deep_research/runtime/snapshot_middleware.py#L16) | 第一次模型调用的 system prompt、可见工具、模型名、pin |
+| 这次模型看到了什么？ | [snapshot middleware](../src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py#L16) | 第一次模型调用的 system prompt、可见工具、模型名、pin |
 
 上游说明的 [lead_agent 目录定位](../../deerflow/backend/AGENTS.md#project-structure) 指向
 [agent.py](../../deerflow/backend/packages/harness/deerflow/agents/lead_agent/agent.py) 和
@@ -27,7 +27,7 @@ skill 在本项目里是三个不同的对象，不能混为一谈：
 | 状态列 | 当前值 | 证据 / 入口 |
 | --- | --- | --- |
 | **声明可用** | 框架 native surface 可加载；本地 [SOP 快照](skills/deep-research/README.md) 仅供阅读（含来源 pin/hash） | 快照不是运行时配置，改它不改变行为 |
-| **运行中实际加载** | 不强制：binding 传 `available_skills=None`，lead agent 自行决定 | 要证明实际加载，看工具调用记录 + checkpoint 消息 + [snapshot](../src/deerflow_deep_research/runtime/snapshot_middleware.py)；方法见下节 |
+| **运行中实际加载** | 不强制：binding 传 `available_skills=None`，lead agent 自行决定 | 要证明实际加载，看工具调用记录 + checkpoint 消息 + [snapshot](../src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py)；方法见下节 |
 | **质量评估** | 无自动化统计评估（引文真实性、充分性、覆盖度） | 显式 base 真实梯 + 人工评审；fixture 结果不证明研究质量 |
 
 把 skill 变成强制、可验收的运行时合同是独立的产品/认知策略决策（2026-10-05
@@ -71,12 +71,12 @@ cli create → runtime/interaction/cli.py
   -> stream events -> run_engine -> 状态 / journal / 最后回答准入
 ```
 
-嵌入式 stream 的有效递归上限以 [make_stream_fn](../src/deerflow_deep_research/runtime/client.py#L18) 的 per-call 参数为准。
+嵌入式 stream 的有效递归上限以 [make_stream_fn](../src/deerflow_deep_research/runtime/adapters/client.py#L18) 的 per-call 参数为准。
 配置顶层虽然写着 `300`，当前 binding 注入 `1000`；不要只改 YAML 就以为改变了此路径。
 这是图步数上限，不等于搜索次数、token 预算或研究充分程度。
 
 “模型提议、代码裁决”目前具体落在 [产物 validator](../src/deerflow_deep_research/engine/validator.py)
-和 [submit_artifact](../src/deerflow_deep_research/runtime/admission.py)。
+和 [submit_artifact](../src/deerflow_deep_research/runtime/bundle/admission.py)。
 validator 检查 kind、文件名、producer、非空和重复 hash，**不验证引文真实、观点全面或事实正确**。
 本应用也没有把每次搜索结果自动提交成 evidence artifact；不能把有 journal/checkpoint 理解成“已建立完整证据库”。
 [gate](../src/deerflow_deep_research/engine/gate.py) 已可按 admit 数量推导 pass/blocked，但当前 run_engine 不把它作为四阶段调度图。

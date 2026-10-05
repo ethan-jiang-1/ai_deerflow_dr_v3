@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from deerflow_deep_research.domain import bundle
-from deerflow_deep_research.runtime import bundle_actions, bundle_state
+from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
 
 _PIN = "c" * 40
 _FIXED_NOW = datetime(2026, 10, 4, 12, 0, tzinfo=timezone.utc)

@@ -15,8 +15,8 @@ from typing import Callable
 
 from ..domain import bundle, clarification, journal_policy
 from ..domain.state_machine import BundleState, rule_clarification_step, rule_run_terminal
-from . import bundle_state
-from .journal import append_entry
+from .bundle import bundle_state
+from .bundle.journal import append_entry
 
 AUTO_REPLY_PREFIX = "[非交互模式·系统自动应答] "
 
@@ -159,7 +159,7 @@ def _submit_final_report(handle: BundleHandle, generation: int, final_text: str)
     text = (final_text or "").strip()
     if not text:
         return
-    from .admission import submit_artifact
+    from .bundle.admission import submit_artifact
     from ..engine.validator import ArtifactSubmission
 
     submit_artifact(

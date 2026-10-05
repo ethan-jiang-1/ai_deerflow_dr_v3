@@ -55,6 +55,8 @@ files = [
   "deep_research_harness/src/deerflow_deep_research/domain/__init__.py",
   "deep_research_harness/src/deerflow_deep_research/engine/__init__.py",
   "deep_research_harness/src/deerflow_deep_research/runtime/__init__.py",
+  "deep_research_harness/src/deerflow_deep_research/runtime/adapters/__init__.py",
+  "deep_research_harness/src/deerflow_deep_research/runtime/bundle/__init__.py",
   "deep_research_harness/tests/README.md",
   "openspec/config.yaml",
   "openspec/CONTEXT.md",
@@ -98,12 +100,12 @@ files = [
 files = [
   "deep_research_harness/config/base.yaml",
   "deep_research_harness/config/fixture.yaml",
-  "deep_research_harness/src/deerflow_deep_research/runtime/client.py",
+  "deep_research_harness/src/deerflow_deep_research/runtime/adapters/client.py",
   "deep_research_harness/src/deerflow_deep_research/runtime/run_engine.py",
-  "deep_research_harness/src/deerflow_deep_research/runtime/snapshot_middleware.py",
+  "deep_research_harness/src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py",
 ]
 directories = [
-  "deep_research_harness/src/deerflow_deep_research/runtime/contracts",
+  "deep_research_harness/src/deerflow_deep_research/runtime/adapters/contracts",
   "deep_research_harness/src/deerflow_deep_research/runtime/fixtures",
 ]
 

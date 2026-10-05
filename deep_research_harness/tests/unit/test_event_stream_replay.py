@@ -15,7 +15,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from deerflow_deep_research.domain import bundle
-from deerflow_deep_research.runtime import bundle_actions, bundle_state, run_engine
+from deerflow_deep_research.runtime import run_engine
+from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
 
 FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "replay" / "real-small-stream.json"
 _PIN = "c" * 40
@@ -65,7 +66,7 @@ class EventStreamReplayTest(unittest.TestCase):
         self.assertIn("tampered_tool", calls, "tampered tool_calls must surface in the journal")
 
     def _journal(self):
-        from deerflow_deep_research.runtime import journal as journal_mod
+        from deerflow_deep_research.runtime.bundle import journal as journal_mod
 
         return journal_mod.read_entries(self.handle)
 

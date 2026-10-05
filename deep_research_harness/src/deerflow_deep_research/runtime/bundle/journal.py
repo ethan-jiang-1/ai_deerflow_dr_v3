@@ -13,8 +13,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from ..domain import bundle, journal_policy
-from ..domain.journal_policy import JournalEntry, select_compaction_keep, select_retained
+from ...domain import bundle, journal_policy
+from ...domain.journal_policy import JournalEntry, select_compaction_keep, select_retained
 from . import atomic
 from .bundle_state import BundleHandle, check_lease
 

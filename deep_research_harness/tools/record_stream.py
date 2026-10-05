@@ -14,8 +14,9 @@ from pathlib import Path
 HARNESS_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(HARNESS_ROOT / "src"))
 
-from deerflow_deep_research.runtime import bundle_actions, entry  # noqa: E402
-from deerflow_deep_research.runtime import client as cb  # noqa: E402
+from deerflow_deep_research.runtime import entry
+from deerflow_deep_research.runtime.bundle import bundle_actions  # noqa: E402
+from deerflow_deep_research.runtime.adapters import client as cb  # noqa: E402
 
 DEFAULT_PROBLEM = "用三句话说明 EASA UAS 开放类别的核心限制"
 DEFAULT_OUTPUT = HARNESS_ROOT / "tests/fixtures/replay/real-small-stream.json"

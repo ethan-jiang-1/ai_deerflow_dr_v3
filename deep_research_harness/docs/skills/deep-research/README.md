@@ -20,7 +20,7 @@
 
 Skill 提供模型执行研究时的方法：怎么展开、深挖、补反例、检查充分性、综合回答。它是研究 SOP 的重要控制面。
 
-工具权限、子代理可用性、递归上限、取消、状态转换和产物准入由框架配置及 Harness 代码负责。文字中的“必须”需要模型遵循；当前 Harness 没有把四阶段检查全部接成硬 gate。当前 [client binding](../../../src/deerflow_deep_research/runtime/client.py) 使用 `available_skills=None`，并没有显式要求每次读取这份 skill。具体运行是否加载、是否照做，要看工具调用与 checkpoint；方法见 [研究过程地图](../../research-process.md#怎样看到某一次真的发生了什么)。
+工具权限、子代理可用性、递归上限、取消、状态转换和产物准入由框架配置及 Harness 代码负责。文字中的“必须”需要模型遵循；当前 Harness 没有把四阶段检查全部接成硬 gate。当前 [client binding](../../../src/deerflow_deep_research/runtime/adapters/client.py) 使用 `available_skills=None`，并没有显式要求每次读取这份 skill。具体运行是否加载、是否照做，要看工具调用与 checkpoint；方法见 [研究过程地图](../../research-process.md#怎样看到某一次真的发生了什么)。
 
 ## 将来调整在哪里
 

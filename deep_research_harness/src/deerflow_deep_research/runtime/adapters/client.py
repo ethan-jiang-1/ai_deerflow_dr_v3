@@ -10,7 +10,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 from pathlib import Path
 
-from ..domain import bundle
+from ...domain import bundle
 from .contracts import client_surface
 
 CONFIG_NAMES: tuple[str, ...] = ("base", "fixture")

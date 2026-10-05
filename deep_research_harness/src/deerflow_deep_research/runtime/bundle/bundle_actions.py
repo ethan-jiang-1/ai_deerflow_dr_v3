@@ -15,8 +15,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
 
-from ..domain import bundle, journal_policy, state_machine
-from ..domain.state_machine import BundleState, RefineRecord
+from ...domain import bundle, journal_policy, state_machine
+from ...domain.state_machine import BundleState, RefineRecord
 from . import atomic, bundle_state
 from .bundle_state import BundleHandle, write_state
 from .journal import append_entry

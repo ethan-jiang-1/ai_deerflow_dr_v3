@@ -10,7 +10,9 @@ import subprocess
 from pathlib import Path
 
 from ..domain import bundle
-from . import bundle_state, client, run_engine
+from . import run_engine
+from .adapters import client
+from .bundle import bundle_state
 
 HARNESS_ROOT = Path(__file__).resolve().parents[3]
 CONFIG_ROOT = HARNESS_ROOT / "config"

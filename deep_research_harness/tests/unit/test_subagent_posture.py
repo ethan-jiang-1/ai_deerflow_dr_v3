@@ -14,7 +14,7 @@ import unittest
 from pathlib import Path
 
 from deerflow_deep_research.domain.state_machine import RuleViolation
-from deerflow_deep_research.runtime import subagent_posture
+from deerflow_deep_research.runtime.adapters import subagent_posture
 
 CONFIG_ROOT = Path(__file__).resolve().parents[2] / "config"
 

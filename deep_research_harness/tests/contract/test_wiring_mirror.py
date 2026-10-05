@@ -7,8 +7,8 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
-from deerflow_deep_research.runtime import client as client_binding
-from deerflow_deep_research.runtime.contracts import client_surface
+from deerflow_deep_research.runtime.adapters import client as client_binding
+from deerflow_deep_research.runtime.adapters.contracts import client_surface
 
 _REPO_ROOT = Path(__file__).resolve().parents[3]
 _CONFIG_ROOT = _REPO_ROOT / "deep_research_harness" / "config"
@@ -113,7 +113,7 @@ class StreamSeamMirrorTest(unittest.TestCase):
 
 class StreamFactoryTest(unittest.TestCase):
     def test_stream_fn_carries_the_recursion_limit_and_thread(self) -> None:
-        from deerflow_deep_research.runtime import client as cb
+        from deerflow_deep_research.runtime.adapters import client as cb
 
         recorded = {}
 

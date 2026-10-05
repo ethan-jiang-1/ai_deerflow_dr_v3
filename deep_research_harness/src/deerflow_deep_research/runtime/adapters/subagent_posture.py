@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import re
 
-from ..domain.state_machine import RuleViolation
+from ...domain.state_machine import RuleViolation
 
 POSTURE_MARK = "no custom subagent types"
 _NAME_RE = re.compile(r"^\s{4}- name:\s*(\S+)")

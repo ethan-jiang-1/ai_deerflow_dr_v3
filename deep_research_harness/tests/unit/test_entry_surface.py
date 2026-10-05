@@ -12,7 +12,8 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from deerflow_deep_research.domain import bundle, journal_policy
-from deerflow_deep_research.runtime import bundle_actions, bundle_state, run_engine
+from deerflow_deep_research.runtime import run_engine
+from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
 from deerflow_deep_research.runtime.interaction import render
 
 _PIN = "c" * 40
@@ -96,7 +97,7 @@ class EngineHookTest(unittest.TestCase):
             yield _event("end")
 
         run_engine.run_research(self.handle, stream_fn=stream_fn)
-        from deerflow_deep_research.runtime import journal as journal_mod
+        from deerflow_deep_research.runtime.bundle import journal as journal_mod
 
         entries = journal_mod.read_entries(self.handle)
         self.assertTrue(any(e.category == "terminal" and e.event == "run_completed" for e in entries))

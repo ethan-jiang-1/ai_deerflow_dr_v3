@@ -13,8 +13,9 @@ import json
 import time
 
 from ...domain import bundle
-from .. import bundle_actions, bundle_state, run_engine
+from .. import run_engine
 from .. import entry as entrypoint
+from ..bundle import bundle_actions, bundle_state
 from . import render
 
 COMMANDS = ("create", "status", "watch", "cancel", "refine", "inspect")
@@ -84,7 +85,7 @@ def cmd_status(args) -> None:
     state = bundle_actions.status(handle)
     print(f"state: {state.status} (generation {state.generation}, revision {state.revision})")
     print(f"thread: {state.thread_id} | owner PID: {state.owner_pid} | composition: {state.composition}")
-    from deerflow_deep_research.runtime import journal as journal_mod
+    from deerflow_deep_research.runtime.bundle import journal as journal_mod
 
     entries = journal_mod.read_entries(handle)
     for entry in entries[-5:]:
@@ -122,8 +123,8 @@ def cmd_inspect(args) -> None:
     handle = entrypoint.resolve_bundle(entrypoint.SCOPES_ROOT, args.bundle_id)
     state = bundle_state.read_state(handle)
     print(f"state: {state.status} (generation {state.generation}, composition {state.composition})")
-    from deerflow_deep_research.runtime import journal as journal_mod
-    from deerflow_deep_research.runtime.admission import read_admitted_counts
+    from deerflow_deep_research.runtime.bundle import journal as journal_mod
+    from deerflow_deep_research.runtime.bundle.admission import read_admitted_counts
 
     print("--- journal timeline ---")
     for entry in journal_mod.read_entries(handle):

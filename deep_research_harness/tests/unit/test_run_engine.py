@@ -12,7 +12,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from deerflow_deep_research.domain import bundle, journal_policy
-from deerflow_deep_research.runtime import bundle_actions, bundle_state
+from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
 from deerflow_deep_research.runtime import run_engine
 
 _PIN = "c" * 40
@@ -223,7 +223,7 @@ class RunEngineTest(unittest.TestCase):
         report = self.handle.root / "final" / f"report-gen{result.generation}.md"
         self.assertTrue(report.is_file(), report)
         self.assertIn("最终简报全文内容", report.read_text(encoding="utf-8"))
-        from deerflow_deep_research.runtime.ledger import read_ledger
+        from deerflow_deep_research.runtime.bundle.ledger import read_ledger
         entries = read_ledger(self.handle)
         self.assertTrue(any(e.disposition == "admit" and e.kind == "final_report" for e in entries))
 
@@ -239,7 +239,7 @@ class RunEngineTest(unittest.TestCase):
         self.assertEqual(list((self.handle.root / "final").iterdir()), [], "no report file on a failed run")
 
 def journal_mod_entries(handle):
-    from deerflow_deep_research.runtime import journal as journal_mod
+    from deerflow_deep_research.runtime.bundle import journal as journal_mod
 
     return journal_mod.read_entries(handle)
 

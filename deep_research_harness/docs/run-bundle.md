@@ -26,14 +26,14 @@ status 发现 active 但 owner 已死：转 failed-resume
 
 | 对象 | 谁写 | 是什么 / 能看出什么 | 不能推出什么 |
 | --- | --- | --- | --- |
-| `state.json` | [bundle_state](../src/deerflow_deep_research/runtime/bundle_state.py) | 运行状态唯一权威：状态、generation、thread、composition、pin | completed ≠ 报告必然被 admit ≠ 研究质量达标 |
+| `state.json` | [bundle_state](../src/deerflow_deep_research/runtime/bundle/bundle_state.py) | 运行状态唯一权威：状态、generation、thread、composition、pin | completed ≠ 报告必然被 admit ≠ 研究质量达标 |
 | `request/problem.txt`、`request/refine-N.txt` | bundle_actions | 原始问题与各代方向 | — |
-| `checkpoint.sqlite` | 框架 checkpointer（经 [client](../src/deerflow_deep_research/runtime/client.py) 注入） | DeerFlow / LangGraph 的 thread 上下文：消息与工具结果 | 不是完整供应商原始请求/响应日志；查看需框架 checkpointer |
+| `checkpoint.sqlite` | 框架 checkpointer（经 [client](../src/deerflow_deep_research/runtime/adapters/client.py) 注入） | DeerFlow / LangGraph 的 thread 上下文：消息与工具结果 | 不是完整供应商原始请求/响应日志；查看需框架 checkpointer |
 | `work/` | 运行工作区 | 中间产物 | 不是已接纳证据 |
-| `evidence/` | [admission](../src/deerflow_deep_research/runtime/admission.py) | 通过准入的证据与 `submissions.jsonl` 哈希链 | 搜索结果**不自动物化**进 evidence；有此目录 ≠ 完整证据库 |
+| `evidence/` | [admission](../src/deerflow_deep_research/runtime/bundle/admission.py) | 通过准入的证据与 `submissions.jsonl` 哈希链 | 搜索结果**不自动物化**进 evidence；有此目录 ≠ 完整证据库 |
 | `final/report-genN.md` | admission（validator 先裁决） | 通过准入的最终报告投影 | 不等于模型写的所有 sandbox 文件都进入 final |
-| `diagnostics/journal.jsonl` | [run_engine](../src/deerflow_deep_research/runtime/run_engine.py) / [journal](../src/deerflow_deep_research/runtime/journal.py) | 事件时间线：聚合工具名、回答尾部摘要、subagent 事件、终态、准入 disposition | 不是每次搜索的完整参数与结果 |
-| `diagnostics/assembly-snapshot.json` | [snapshot middleware](../src/deerflow_deep_research/runtime/snapshot_middleware.py) | 首次模型调用的 system prompt、可见工具、模型名、pin | 不是全部轮次上下文；不能独自证明 skill 原文实际被读取 |
+| `diagnostics/journal.jsonl` | [run_engine](../src/deerflow_deep_research/runtime/run_engine.py) / [journal](../src/deerflow_deep_research/runtime/bundle/journal.py) | 事件时间线：聚合工具名、回答尾部摘要、subagent 事件、终态、准入 disposition | 不是每次搜索的完整参数与结果 |
+| `diagnostics/assembly-snapshot.json` | [snapshot middleware](../src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py) | 首次模型调用的 system prompt、可见工具、模型名、pin | 不是全部轮次上下文；不能独自证明 skill 原文实际被读取 |
 
 ## 状态 ≠ 交付 ≠ 质量
 

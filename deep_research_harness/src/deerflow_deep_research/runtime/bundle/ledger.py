@@ -15,8 +15,8 @@ import json
 from dataclasses import dataclass, replace
 from typing import Any
 
-from ..domain.state_machine import RuleViolation
-from ..engine.verdicts import DISPOSITIONS, ValidatorVerdict
+from ...domain.state_machine import RuleViolation
+from ...engine.verdicts import DISPOSITIONS, ValidatorVerdict
 from . import atomic
 from .bundle_state import BundleHandle, check_lease
 

@@ -22,9 +22,9 @@ try:
 except ImportError:  # pragma: no cover — environments without the framework
     _FRAMEWORK_AVAILABLE = False
 
-from deerflow_deep_research.runtime import bundle_actions, bundle_state
-from deerflow_deep_research.runtime import client as client_binding
-from deerflow_deep_research.runtime import journal as journal_mod
+from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
+from deerflow_deep_research.runtime.adapters import client as client_binding
+from deerflow_deep_research.runtime.bundle import journal as journal_mod
 from deerflow_deep_research.runtime import run_engine
 
 

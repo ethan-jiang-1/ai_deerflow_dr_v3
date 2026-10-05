@@ -13,8 +13,8 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
-from ..domain import bundle
-from ..domain.state_machine import BundleState
+from ...domain import bundle
+from ...domain.state_machine import BundleState
 from . import atomic
 
 
