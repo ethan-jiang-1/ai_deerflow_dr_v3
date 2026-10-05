@@ -166,8 +166,10 @@ venv.bak/
 # Application-owned OpenSpec config under deep_research_harness/ is tracked.
 !deep_research_harness/openspec/config.yaml
 
-# Runtime-materialized profile root (configure.py writes the public skill here)
-skills/
+# Runtime-materialized profile root (configure.py writes the public skill here);
+# anchored to the repo root so it cannot swallow tracked skill snapshots such as
+# deep_research_harness/docs/skills/.
+/skills/
 # Re-include the committed agent skill set (tracked delivery artifacts)
 !.agents/skills/
 !.agents/skills/**

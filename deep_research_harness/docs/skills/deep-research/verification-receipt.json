@@ -1,0 +1,84 @@
+{
+  "revision": "f2284210a9d3becb3dc253388b6cecdc3a907ed0",
+  "completed_at": "2026-10-05T09:36:26.977467+00:00",
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_doc_hygiene.py"
+      ],
+      "exit_code": 0,
+      "stdout": "doc-layer hygiene passed.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_doc_hygiene.py",
+        "--self-test"
+      ],
+      "exit_code": 0,
+      "stdout": "doc-hygiene self-test passed.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_project_gate.py",
+        "--phase",
+        "closeout"
+      ],
+      "exit_code": 0,
+      "stdout": "[check_project_specs.py] exit=0\n  All project specs valid: 11 main spec files under openspec/specs, 0 violations.\n[check_project_architecture.py] exit=0\n  Architecture governance passed for /Users/bowhead/ai_deerflow_dr_v3\n[check_change_guidance.py] exit=0\n  Change Guidance governance passed.\n[check_harness_dependency_direction.py] exit=0\n  Harness dependency direction passed.\n[check_ci_governance.py] exit=0\n  CI governance passed for /Users/bowhead/ai_deerflow_dr_v3\n[check_proof_receipts.py] exit=0\n  proof receipts: no selected change (mode=enforce)\nOpenSpec governance closeout passed: every registered component checker exited 0.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "HEAD",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--exit-code",
+        "HEAD",
+        "--",
+        "deerflow"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "file_sha256": {
+    "deep_research_harness/docs/README.md": "9cd807661d020d6c7c54a3e70db29d1169fc54fb2b0d809bed984bdfe538ca52",
+    "deep_research_harness/docs/repository-map.md": "25fc8e6d903d050b3bc5b8f105e2a11351b8ddf94c15de4e2fadd4d2622a4150",
+    "deep_research_harness/docs/research-process.md": "b0373a7cd7eac94689ce3d3802fd14f79379ac935634511228c029aa5de084f8",
+    "deep_research_harness/docs/runtime-map.md": "a556b3c3642359cb54f9911b18e2cb627c1cfac64a5aaa4a31d420d324ce830c",
+    "deep_research_harness/docs/skills/deep-research/LICENSE": "b23dff4d4bac8d17b6efaaa7e88c2b730149c4dda45699ce676b719cfdffe7e1",
+    "deep_research_harness/docs/skills/deep-research/README.md": "18eeaeba6b035f51278594b593886f6f60f63a892804354ac4cdd8ce16065f45",
+    "deep_research_harness/docs/skills/deep-research/SKILL.md": "04712f4daa7937cc1f8dabc1a086a9549e670eb3fa3f1a8d30abdc3ea8b31a79",
+    "deep_research_harness/docs/skills/deep-research/provenance.json": "5284dd76efcf667a6ea902e9a9cad4303fcbe86de31a92d56716985142354f46",
+    "openspec/governance/check_doc_hygiene.py": "8f73e4eae0e9c6362285ee67862a24dc40d2cc57d4124256078b5c09794093a1",
+    "openspec/governance/required-paths.toml": "98c15c0ac0992d0ff94eab39dbde70dca43e1ec776cb21100c42a02b4c130a3c"
+  },
+  "observations": [
+    "SOP and license byte-identical to upstream source",
+    "source pin/hash match provenance",
+    "docs index -> research map -> local guide -> full SOP journey resolves",
+    "SOP section anchors resolve",
+    "upstream gitlink unchanged"
+  ],
+  "unverified": [
+    "No local runtime activation requested or performed",
+    "No live research-quality evaluation performed"
+  ],
+  "scope": "Documentation-only local snapshot, existing runtime behavior preserved"
+}

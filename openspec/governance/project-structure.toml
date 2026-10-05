@@ -3,7 +3,8 @@ contract = "project-structure"
 # establish-project-structure 建立）；CIG-001 = CI/hook 接受路径文件的
 # owner（随 add-ci-governance 登记）；DOB-001 = 入口层预算闸的 owner
 #（随 add-doc-budget-gate 登记，无新增结构路径——预算表在 doc-hygiene
-# checker 内声明）。
+# checker 内声明）；DEP-001 = harness→治理依赖方向守卫的 owner（随
+# exempt-receipts-from-dependency-guard 登记，验证回执为结构化豁免证据）。
 
 [upstream_gitlink]
 path = "deerflow"

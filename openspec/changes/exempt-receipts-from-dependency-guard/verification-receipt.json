@@ -1,0 +1,185 @@
+{
+  "revision": "f4259e7e63b18a231b71832d21288700ffc7dfb3",
+  "completed_at": "2026-10-05T12:40:26.241258+00:00",
+  "scope": "governance checker receipt exemption + gitignore anchoring + evidence tracking; no harness runtime code changed",
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "openspec/tests/governance",
+        "-q"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "[check_project_specs.py] exit=0\n[check_project_architecture.py] exit=0\n[check_change_guidance.py] exit=0\n[check_harness_dependency_direction.py] exit=0\n[check_ci_governance.py] exit=0\n[check_proof_receipts.py] exit=0\nOpenSpec governance closeout passed: every registered component checker exited 0.\n[check_project_specs.py] exit=1\n[check_project_architecture.py] exit=0\n[check_change_guidance.py] exit=0\n[check_harness_dependency_direction.py] exit=0\n[check_ci_governance.py] exit=0\n[check_proof_receipts.py] exit=0\n[check_project_specs.py] exit=0\n[check_project_architecture.py] exit=1\n[check_change_guidance.py] exit=0\n[check_harness_dependency_direction.py] exit=0\n[check_ci_governance.py] exit=0\n[check_proof_receipts.py] exit=0\n[change-guidance] exit=0\n[delta-specs] exit=1\n[strict-validation] exit=0\n[change-guidance] exit=0\n[delta-specs] exit=0\n[strict-validation] exit=0\nOpenSpec planning admission passed for change demo-change.\nAll project specs valid: 1 main spec files under openspec/specs, 0 violations.\nAll project specs valid: 1 main spec files under openspec/specs, 0 violations.\n",
+      "stderr": "OpenSpec governance closeout failed: at least one component checker exited non-zero.\nOpenSpec governance closeout failed: at least one component checker exited non-zero.\nGate inventory is empty: no component checkers registered.\nGate inventory references missing checker(s): check_change_guidance.py\nOpenSpec planning admission failed for change demo-change.\n--phase plan requires --change <name>.\n----------------------------------------------------------------------\nRan 72 tests in 5.180s\n\nOK (skipped=1)\n"
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_harness_dependency_direction.py"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "Harness dependency direction passed.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_project_gate.py",
+        "--phase",
+        "closeout"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "[check_project_specs.py] exit=0\n  All project specs valid: 11 main spec files under openspec/specs, 0 violations.\n[check_project_architecture.py] exit=0\n  Architecture governance passed for /Users/bowhead/ai_deerflow_dr_v3\n[check_change_guidance.py] exit=0\n  Change Guidance governance passed.\n[check_harness_dependency_direction.py] exit=0\n  Harness dependency direction passed.\n[check_ci_governance.py] exit=0\n  CI governance passed for /Users/bowhead/ai_deerflow_dr_v3\n[check_proof_receipts.py] exit=0\n  proof receipts: no selected change (mode=enforce)\nOpenSpec governance closeout passed: every registered component checker exited 0.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_project_gate.py",
+        "--phase",
+        "plan",
+        "--change",
+        "exempt-receipts-from-dependency-guard"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "[change-guidance] exit=0\n  Change Guidance governance passed.\n[delta-specs] exit=0\n  Selected change exempt-receipts-from-dependency-guard delta specs valid: 1 spec file(s), 0 violations.\n[strict-validation] exit=0\n  Change 'exempt-receipts-from-dependency-guard' is valid\nOpenSpec planning admission passed for change exempt-receipts-from-dependency-guard.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_doc_hygiene.py"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "doc-layer hygiene passed.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_project_architecture.py"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "Architecture governance passed for /Users/bowhead/ai_deerflow_dr_v3\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "check-ignore",
+        "deep_research_harness/docs/skills/deep-research/verification-receipt.json"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 1,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "check-ignore",
+        "skills/x"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "skills/x\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--exit-code",
+        "HEAD",
+        "--",
+        "deerflow"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "make",
+        "verify"
+      ],
+      "cwd": "deep_research_harness",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "PYTHONPATH=src python3 -m unittest discover -s tests\n[verify] harness unittest gate passed.\n",
+      "stderr": ".............................................................................................................................\n----------------------------------------------------------------------\nRan 125 tests in 0.463s\n\nOK\n"
+    }
+  ],
+  "file_sha256": {
+    "openspec/governance/check_harness_dependency_direction.py": "5463d848161b84a3ac84f4024f3f9044c38db58612431597df17cf1e88c703a5",
+    "openspec/tests/governance/test_harness_dependency_direction.py": "c6b2637538dd95814f7407d211962cabac43163b06da65dc12f35a5e9f551f56",
+    ".gitignore": "006b9d0c634b505787f1d6053ad09a6f4160287a3d4308d880bf9be6fa117ecb",
+    "openspec/governance/required-paths.toml": "9178742adb984d5645532b1cca8be6162387b50558a7c0cf2042169724f85571",
+    "openspec/governance/project-structure.toml": "09c1252693381d40c39e8e2ab7932fead01cfd6d025ecde5ef1d58d6b4f5480f",
+    "openspec/governance/README.md": "80919590ac06be9e286f07a303e74bdc4158d3bce1119e91bccb45f3176b105e",
+    "deep_research_harness/docs/skills/deep-research/verification-receipt.json": "124e8783d5edc0abf8e4ec4d7c9de8547da25e13dc1a6af53e53e532586b1565",
+    "openspec/changes/exempt-receipts-from-dependency-guard/proposal.md": "9682015437f91e1754ebc27ed552829c6032972326dfcc92a4e7948470076be7",
+    "openspec/changes/exempt-receipts-from-dependency-guard/design.md": "e1da86c1066695f8ec431184d2ae90976b8618ff454db6c434988749b6cac60f",
+    "openspec/changes/exempt-receipts-from-dependency-guard/tasks.md": "69b2903440c9dd87903c9e49f729d47c55d621c085ed6a608fe7ab7babf5239f",
+    "openspec/changes/exempt-receipts-from-dependency-guard/specs/dependency-direction/spec.md": "36e5f770cca9a8903794d9d0cac5e1ca65ed7e655817889f7c084191984aec9d"
+  },
+  "working_tree": {
+    "dirty": true,
+    "entries": [
+      "M .gitignore",
+      "A  deep_research_harness/docs/skills/deep-research/verification-receipt.json",
+      " M openspec/governance/README.md",
+      " M openspec/governance/check_harness_dependency_direction.py",
+      " M openspec/governance/project-structure.toml",
+      " M openspec/governance/required-paths.toml",
+      "?? openspec/changes/exempt-receipts-from-dependency-guard/",
+      "?? openspec/tests/governance/test_harness_dependency_direction.py"
+    ]
+  },
+  "observations": [
+    "red-first proven before the exemption shipped: the new unittest ran on the pre-fix checker with exactly two failures - fixture (a) test_valid_receipt_with_governance_argv_exits_zero and the real-tree assertion test_real_repository_tree_exits_zero - both with 'forbidden downstream dependency openspec/' naming the receipt; all four planted-violation controls were green pre-fix and stayed green post-fix",
+    "the structural predicate gained the non-empty checks conjunct during implementation: {checks: [], notes: ... openspec/ ...} passes the naive every-item rule vacuously; proposal/spec/design/tasks were synchronized before the checker change landed",
+    "the skills receipt was staged byte-identical (git add, no content edit); its deletion now fails architecture governance via required-paths.toml",
+    "gitignore anchoring verified both directions: docs/skills path not ignored (check-ignore exit 1), hypothetical root skills/x still ignored (exit 0), .agents/skills unaffected",
+    "make smoke not run and not owed: proof-lanes.toml surfaces cover harness src/tests/cli/tools; this change touches none of them",
+    "all 8 tasks complete at receipt time; receipt regenerated after final checkbox marks so every recorded digest is current"
+  ],
+  "unverified": [
+    "no CI run performed locally (GitHub Actions governance workflow runs on push)",
+    "no make smoke execution (not owed: no proof-lane surface touched)",
+    "no harness runtime behavior claimed beyond the existing make verify suite"
+  ]
+}
