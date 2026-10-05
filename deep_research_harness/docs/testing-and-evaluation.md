@@ -1,6 +1,8 @@
 # Testing and Evaluation（测试思想与车道）
 
-> 本文是"怎么测"问题的第一答处（参照 DeerFlow 自测体系的 digest——已收入 `_backlog/_reference/test-strategy/`，本仓沿用其纪律并按 v3 规模裁剪）。纪律不在口头——每条规矩都有钉住它的测试或在账的借鉴项。
+> 找测试文件、接口、样本来源与最小红绿命令，先读 [测试资产地图](../tests/README.md)。本文是车道策略参考。
+>
+> 车道纪律参照已消化的测试战略分析；本文不以测试数或目录位置代替行为证据。
 
 ## 一句话策略
 
@@ -12,16 +14,16 @@
 | --- | --- | --- | --- |
 | Application unit gate | `make verify`（stdlib，UV_OFFLINE=1 兼容） | domain 纯规则、runtime 物化（CAS/lease/journal/删除语义）、admission、mirror/配置解析、subagent posture | 不证明真实模型行为、不证明跨进程协议 |
 | Integration smoke | `make smoke`（需 uv sync；CI 已接入） | 嵌入式 client + sync saver 多轮 + 有界澄清续答 + checkpoint 可读 + 装配快照 + CLI 全旅程 + 契约对比真实面 + **报告落 final/** | 不证明真实模型的研究质量（脚本模型钉死输出） |
-| Real ladder（真实外部 API） | `make create … --config base`（需 key；显式 opt-in） | 真模型、真 skill、真 agent 循环、真 token 消耗 | 慢、花钱、非确定——永不进默认 CI；单次通过不构成统计结论 |
+| Real ladder（真实外部 API） | `make create PROBLEM="…" CONFIG=base`（需 key；显式 opt-in） | 真模型/agent 循环/token；skill 可用，实际加载看 checkpoint 证据 | 慢、花钱、非确定——永不进默认 CI；单次通过不构成统计结论 |
 | Governance checks（非 harness lane） | 聚合治理门禁（repo 根治理目录 README） | 结构/需求/specs/指导/依赖方向 | 不证明产品运行时行为 |
 
 ## 确定性 LLM 替身阶梯（借鉴 DeerFlow 四级谱系，按需补齐）
 
 | 级 | 状态 | 机制 | 用途 |
 | --- | --- | --- | --- |
-| 1 剧本模型 | ✅ `runtime/fixtures.ScriptedChatModel`（BaseChatModel 子类 + `DEERFLOW_FAKE_SCRIPT`） | 预编程消息序列（含 tool_calls 与 raise 动作），真图真中间件真 checkpointer 照跑 | 验证引擎/绑定/入口的行为契约（毫秒级、零 fixture） |
-| 2 真实事件流回放 | ✅ `tests/fixtures/replay/real-small-stream.json`（1386 真实事件）+ 回放测试 | 真实形状（含真 tool_calls）永久进回归——扁平 chunk 疤的机械化防复发 |
-| 3 内容寻址模型回放（级 2 完全体） | ✅ `runtime/fixtures/replay_model.py` + `tests/fixtures/replay/real-model-io.jsonl`（真实 DeepSeek I/O） | 真模型 I/O 按归一化哈希确定性回放；miss 响亮点名 |
+| 1 剧本模型 | ✅ [ScriptedChatModel](../src/deerflow_deep_research/runtime/fixtures/__init__.py) + `DEERFLOW_FAKE_SCRIPT` | 预编程消息（含 tool_calls 与 raise），框架 smoke 保留真图/中间件/checkpointer | 零凭证验证绑定/入口合同，不证明研究质量 |
+| 2 记录事件流回放 | ✅ [事件记录](../tests/fixtures/replay/real-small-stream.json) + [回放测试](../tests/unit/test_event_stream_replay.py) | 记录形状经真实 Harness pump 回放，不重跑模型/工具 | 锁定 flat chunk 适配与 journal 回归 |
+| 3 内容寻址模型回放 | ✅ [机制实现](../src/deerflow_deep_research/runtime/fixtures/replay_model.py) + [机制测试](../tests/integration/test_replay_model.py) | 临时脚本录制/回放与 miss 诊断；[留存模型样本](../tests/fixtures/replay/real-model-io.jsonl) 未被现有测试消费 | 不保留完整模型协议；尚无真实模型记录接入图的旅程证明 |
 | 4 行为断言（live 面） | ⬜ 未规划 | 对真实运行的 trace 断言（工具选择/token/时长） | 显式 opt-in 的质量观察 |
 
 替身选型纪律（借鉴）：**替身只替换"贵的与不确定的"（模型、时间、外部凭证），不替换"被测语义本身"**——无 fake-redis 类的先例，我们同样无假 checkpointer。

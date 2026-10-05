@@ -30,12 +30,12 @@
    python3 cli.py status <bundle_id>
    python3 cli.py watch <bundle_id>        # 终态 run：渲染历史后退出
    python3 cli.py inspect <bundle_id>
-   python3 cli.py refine <bundle_id> "补充方向"   # generation+1 重跑（按需）
+   python3 cli.py refine <bundle_id> "补充方向"   # 创建 generation+1；不自动执行研究（按需）
    python3 cli.py cancel <bundle_id>       # 协作终止（按需）
    ```
 
    完成判据：exit 0；status 打印状态与 journal 摘要；watch 对已终态 run 渲染历史后
-   退出；inspect 打印 journal 时间线与已采证据计数；refine 打印新 generation 已启动。
+   退出；inspect 打印 journal 时间线与已采证据计数；refine 创建新 generation 并返回 active，不代表已执行研究。
 
 4. **交回回执**：命令 + 退出码 + 终态行。只报本会话实际执行过的 run——没跑过的命令
    不得当作结果报告。

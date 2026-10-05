@@ -4,7 +4,7 @@
 .PHONY: install verify test smoke create watch status record-stream
 
 install:
-	@echo "[install] nothing to install: the harness has no external dependencies."
+	@echo "[install] no-op: use uv sync for runtime and integration dependencies."
 	@echo "[install] environment preparation is: uv sync (see COMMANDS.md)."
 
 # tests/integration is deliberately a directory without __init__.py, so unittest
@@ -19,9 +19,9 @@ verify: test
 smoke:
 	UV_CACHE_DIR=$$(pwd)/../.uv-cache uv sync && UV_CACHE_DIR=$$(pwd)/../.uv-cache uv run --no-sync python -m unittest discover -s tests/integration -v
 
-# Integration fixture recording (real API, explicit opt-in).
+# Stream recording; CONFIG defaults to fixture, real API requires CONFIG=base.
 record-stream:
-	UV_CACHE_DIR=$$(pwd)/../.uv-cache uv run --no-sync python -m tests.integration.record_stream "$(PROBLEM)" $(CONFIG)
+	UV_CACHE_DIR=$$(pwd)/../.uv-cache uv run --no-sync python tools/record_stream.py "$(PROBLEM)" $(CONFIG)
 
 # Human entry surface (six verbs over the substrate). See COMMANDS.md.
 CONFIG ?= fixture

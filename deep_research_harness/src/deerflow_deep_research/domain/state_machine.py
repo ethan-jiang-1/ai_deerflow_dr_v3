@@ -167,7 +167,7 @@ def rule_refine(
         state.status in TERMINAL_STATUSES,
         state.status,
         "refine",
-        "refinement re-runs a terminal bundle as the next generation",
+        "refinement enters the next generation of a terminal bundle",
     )
     if not direction_text.strip():
         raise RuleViolation("refine requires non-empty direction text")

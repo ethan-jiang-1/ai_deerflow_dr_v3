@@ -12,23 +12,24 @@ python3 cli.py create "研究问题…" --config base      # real 梯（$VAR 凭
 python3 cli.py watch <bundle_id>    # journal 投影，终态即退出
 python3 cli.py status <bundle_id>   # 状态 + journal 摘要 + owner PID 活性
 python3 cli.py cancel <bundle_id>   # 记录取消请求（泵协作终止）
-python3 cli.py refine <bundle_id> "方向文本"   # generation+1 重跑
+python3 cli.py refine <bundle_id> "方向文本"   # 创建 generation+1；当前命令不自动运行
 python3 cli.py inspect <bundle_id>  # journal 时间线 + 已采证据 + 装配快照
 ```
 
-- 跑一个研究 / 展示结果 / 重跑：过程、完成判据与坑 → [playbook/run-research.md](playbook/run-research.md)
+- 跑一个研究 / 展示结果 / 下一代方向：过程、完成判据与坑 → [playbook/run-research.md](playbook/run-research.md)
 
 ## 测试 lane
 
 ```bash
-make install   # 有意 no-op（harness 零外部依赖）；环境准备 = uv sync
-make test      # unittest 套件（stdlib，离线可跑）
+make install   # 有意 no-op；运行/集成依赖由 uv sync 准备
+make test      # unit + contract 套件（stdlib，离线可跑）
 make verify    # 应用单元门禁 = make test 的 gate 形态；任一测试失败即非零退出
 make smoke     # 集成 lane（需先 uv sync：框架依赖环境）
-make record-stream PROBLEM="…"   # 集成 fixture 录制（真实 API，显式 opt-in）
+make record-stream PROBLEM="…" CONFIG=base   # 真实 API 事件录制；省略 CONFIG 则录制 fixture
 ```
 
 `make verify` 只承载 harness 自身测试，不读、不引、不执行任何 OpenSpec 内容。
+录制工具与副作用见 [tools/README.md](tools/README.md)；入口与目录职责见 [控制地图](README.md)。
 
 ## 能干什么（一段话答「HELP」）
 

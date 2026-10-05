@@ -1,49 +1,63 @@
 # DeerFlow Deep Research Harness (v3)
 
-This independent Python project is the downstream **Deep Research Harness** for DeerFlow
-2.1. It is a *runtime harness*, not a single question-to-report pipeline: it is the stable
-execution and control environment that creates, drives, and disposes of research runs.
+这是基于 DeerFlow 2.1 的研究运行与控制底座。DeerFlow 的 lead agent、skill 和工具驱动动态研究；Harness 管理每次研究的 Run Bundle、状态、journal、checkpoint 和最终报告准入。当前运行形态是单机前台 CLI。
 
-**v3 rewrite, implemented core.** The philosophy carries over from v2; the implementation
-route is inverted — v3 borrows DeerFlow's native deep research capability instead of
-hand-building the research graph (full telling: root `README.md`). This harness keeps:
+## 从问题到报告
 
-- **Run Bundles.** Each run gets an independently deletable durable record — delete a
-  Bundle and the Harness keeps working, while that run becomes permanently unavailable.
-  The Harness owns no durable run state.
-- **Explicit composition.** Public host routes are fixed to `all_real`; fixture recipes
-  report `fixture`; the same workflow can be exercised with zero credentials. Fixture
-  adapters live only in the runtime fixtures package (excluded from the production wheel).
-- **Models propose, code disposes.** Candidate work, evidence, and routes are admitted
-  only by deterministic owners (validators, ledger, gates).
-
-## Entry Surfaces
-
-The entry surface is live: the six-verb CLI (`create` / `status` / `watch` / `cancel` /
-`refine` / `inspect`) over the run-bundle substrate, plus the make lanes (`test`,
-`verify`, `smoke`, `create`, …). The menu with one line per command — and routing to the
-procedure playbook — is [`COMMANDS.md`](COMMANDS.md).
-
-## Quick Start
-
-```bash
-make verify    # application unit gate: stdlib unittest suite, offline-safe
-make create PROBLEM="研究问题"   # zero-credential fixture research run
+```text
+cli.py（稳定启动入口）
+  -> runtime/interaction/cli.py（参数、交互、输出）
+  -> bundle_actions.start（创建 Bundle）
+  -> runtime/entry.run_foreground（配置、client、SQLite 装配）
+  -> DeerFlow lead agent <-> 模型 / 工具 / 按需 subagent
+  -> run_engine（消费事件、有限续答、取消、终态）
+  -> validator + admission + ledger（最终回答准入）
+  -> scopes/d_YYYYMMDD/<bundle-id>/final/report-genN.md
 ```
 
-Requires Python 3.12+, `uv`, and the sibling DeerFlow gitlink at `../deerflow`
-(submodule, already declared in `[tool.uv.sources]`). The release face is exactly this
-tree plus that gitlink; a deterministic guard (`check_release_face.py` in the
-repository's governance suite) fails loudly when the face is violated.
+状态、checkpoint、journal 和已接纳产物持久保存在各自 Bundle 中，没有额外的集中式运行状态库。删除一个 Bundle 会永久失去该运行，其余运行仍可使用。`completed` 还需结合准入结果和报告文件判断产物是否交付；validator 检查产物合同，不验证研究事实质量。
 
 ## Reading Map
 
-| Need | Start here |
+| 你要驾驭什么 | 放在哪里 / 直接入口 |
 | --- | --- |
-| Scope, layers, and boundaries | [`AGENTS.md`](AGENTS.md) |
-| 边界、分层与所有权（v3 为何存在、harness 留什么） | [AGENTS.md 引言段](AGENTS.md) |
-| Runtime and authority boundaries | [`docs/runtime-architecture.md`](docs/runtime-architecture.md) |
-| Local commands and profiles | [`docs/local-operations.md`](docs/local-operations.md) |
-| How to prove a change | [`docs/testing-and-evaluation.md`](docs/testing-and-evaluation.md) |
-| Product vocabulary | [`CONTEXT.md`](CONTEXT.md) |
-| Documentation index | [`docs/README.md`](docs/README.md) |
+| 交互：六动词、直播输出、journal 投影 | [CLI 实现](src/deerflow_deep_research/runtime/interaction/cli.py)、[共享渲染](src/deerflow_deep_research/runtime/interaction/render.py) |
+| 运行：装配、流、可信 I/O、持久化 | [entry](src/deerflow_deep_research/runtime/entry.py)、[runtime 对象地图](docs/repository-map.md) |
+| 规则：状态合同、validator、gate | [state_machine](src/deerflow_deep_research/domain/state_machine.py)、[validator](src/deerflow_deep_research/engine/validator.py) |
+| 研究认知：skill、模型、工具、委派 | [研究过程地图](docs/research-process.md)、[base 配置](config/base.yaml) |
+| 验证：离线规则/合同、框架 smoke、输入样本 | [tests](tests/README.md)、[fixtures](tests/fixtures/README.md) |
+| 开发操作：显式录制与诊断 | [tools](tools/README.md) |
+| 运行数据：每次研究的状态、证据和报告 | [Bundle 路径合同](src/deerflow_deep_research/domain/bundle.py)；本地 scopes 被 gitignore |
+| 开发治理：设计准入、结构登记、任务账本 | 仓库根 OpenSpec / backlog；不参与产品运行 |
+| 权威边界与策略参考 | [runtime architecture](docs/runtime-architecture.md)、[local operations](docs/local-operations.md)、[testing](docs/testing-and-evaluation.md)、[词汇](CONTEXT.md) |
+
+源码仍有 `domain / engine / agents / runtime` 四个所有权层；`agents` 当前仅包入口。上游 `deerflow/`（包括它的 scripts）是锁定的只读框架。我们自己的可执行开发工具放 tools，不把它们混进产品入口或测试 runner。
+
+## 运行与观察
+
+在本目录执行。离线验证只需 stdlib；运行与集成需 Python 3.12+、uv、兄弟目录的 DeerFlow submodule 和首次 `uv sync`。`make install` 是提示环境准备方法的 no-op。
+
+```bash
+make verify                              # 离线 unit + contract 门禁
+uv sync                                  # 准备 DeerFlow 运行依赖
+make create PROBLEM="研究问题"            # 默认 fixture，零凭证
+make create PROBLEM="研究问题" CONFIG=base # 真实模型/外部工具，需凭证
+python3 cli.py status <bundle_id>         # 当前状态和近期 journal
+python3 cli.py watch <bundle_id>          # 观察 journal，终态退出
+python3 cli.py inspect <bundle_id>        # 时间线、已采证据、装配快照
+```
+
+`cancel` 记录请求，由运行泵协作终止。`refine` 进入下一代 active，目前不自动执行研究。完整命令见 [COMMANDS](COMMANDS.md)，操作旅程见 [playbook](playbook/run-research.md)。
+
+fixture 配置加载 [runtime fixture providers](src/deerflow_deep_research/runtime/fixtures/__init__.py)，base 记录 `all_real`，fixture 记录 `fixture`；`mixed` 是尚未接线的枚举。provider 代码随当前 Python package 打包，wheel 仍不包含完整 CLI/config/兄弟布局，发布面是源码 checkout + 锁定 submodule。
+
+## 改一处，先证明哪一层
+
+| 改动对象 | 最小起点 | 扩大验证 |
+| --- | --- | --- |
+| 纯规则 / 准入 / 本地落盘 / stream 适配 | tests/unit 中对应 owner 文件 | `make verify` |
+| 配置 / 接口镜像 / thread 与递归上限转发 | `tests.contract.test_wiring_mirror` | `make verify`，真实绑定加 smoke |
+| CLI / client / checkpoint 接线 | `tests.unit.test_entry_composition` 或对应 integration 文件 | `make smoke`（脚本模型 + 真框架） |
+| 真实研究策略与质量 | 明确认知 owner 和评审标准 | 显式 base 运行；不进入默认 CI |
+
+不要把端到端当唯一定位手段。逐文件选择见 [测试资产地图](tests/README.md)，运行数据、发布形态及局限见 [运行态总图](docs/runtime-map.md)。Coding Agent 从 [AGENTS](AGENTS.md) 选择 owner，其余参考见 [文档索引](docs/README.md)。

@@ -12,7 +12,7 @@ from pathlib import Path
 HARNESS = Path(__file__).resolve().parents[2]
 COMMANDS = (HARNESS / "COMMANDS.md").read_text(encoding="utf-8")
 MAKEFILE = (HARNESS / "Makefile").read_text(encoding="utf-8")
-CLI = (HARNESS / "cli.py").read_text(encoding="utf-8")
+CLI = (HARNESS / "src/deerflow_deep_research/runtime/interaction/cli.py").read_text(encoding="utf-8")
 REGISTER = (HARNESS / "docs" / "quality-register.md").read_text(encoding="utf-8")
 
 

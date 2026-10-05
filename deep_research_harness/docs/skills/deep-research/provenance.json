@@ -1,0 +1,11 @@
+{
+  "source_repository": "https://github.com/bytedance/deer-flow",
+  "source_commit": "ceebf97fc31afbbfe2aadf7c8d82b03c3742d5d7",
+  "source_path": "skills/public/deep-research/SKILL.md",
+  "sha256": "04712f4daa7937cc1f8dabc1a086a9549e670eb3fa3f1a8d30abdc3ea8b31a79",
+  "license": "MIT",
+  "purpose": "Harness-local reading and SOP review snapshot",
+  "runtime_active": false,
+  "content_modified": false,
+  "sync_policy": "Explicit review when upstream pin changes; no automatic overwrite"
+}

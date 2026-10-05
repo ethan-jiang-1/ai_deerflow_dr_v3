@@ -25,4 +25,7 @@ sentinel = "OK"
 surfaces = [
   "deep_research_harness/tests/integration/**",
   "deep_research_harness/cli.py",
+  "deep_research_harness/src/deerflow_deep_research/runtime/entry.py",
+  "deep_research_harness/src/deerflow_deep_research/runtime/interaction/**",
+  "deep_research_harness/tools/**",
 ]

@@ -12,11 +12,11 @@
 - **实现路线反转**：v2 逐节点手搓研究图（bootstrap → wave0/1/2 → …）；v3 **消化并借力 DeerFlow v2.1.0
   原生的 Deep Research 能力**——lead agent + `deep-research` skill（四阶段研究方法论）+ subagent 委派
   系统，harness 退守"运行底座 + 确定性控制边界"。能力盘点见
-  [`_backlog/_reference/deerflow/deerflow-native-deep-research.md`](_backlog/_reference/deerflow/deerflow-native-deep-research.md)。
+  [应用内研究过程地图](deep_research_harness/docs/research-process.md)；历史分析另存账本参考。
 
-DeerFlow 是宿主运行时，**不 import 本包**；触达方式（反射工具 / controller skill / 或更薄的接线）由首个 change 定义。
+DeerFlow 是宿主运行时，**不 import 本包**；本应用通过 [嵌入式 client binding](deep_research_harness/src/deerflow_deep_research/runtime/client.py) 消费其公开接口。
 
-> **当前状态：已实现核心。** specs 主干 11 个能力落地、34 个 changes 归档（活跃为空；以 `openspec/specs/` 与 `openspec/changes/archive/` 实际清单为准）、六动词 CLI 与单元门禁在跑。
+> **当前状态：已实现核心。** specs 主干 11 个能力落地、35 个 changes 归档（实际清单见 `openspec/specs/` 与 `openspec/changes/`）、六动词 CLI 与单元门禁在跑。
 > 边界已定（六裁决，见 [`_backlog/_done/_closed_plans/`](_backlog/_done/_closed_plans/README.md)）；新方向按 [`_backlog/plans/README.md`](_backlog/plans/README.md) 的卡片模板立 plan 入账。
 
 ## 布局
@@ -24,7 +24,7 @@ DeerFlow 是宿主运行时，**不 import 本包**；触达方式（反射工�
 ```
 deep_research_harness/    ★ 你的应用（deep research runtime，基于 deerflow 的 API 构建）
 deerflow/                 被 leverage 的框架（submodule 锁 commit `ceebf97f`，ethan 分支，= 上游 v2.1.0；只读）
-openspec/                 设计规格（openspec CLI 管理；specs 主干已建立，changes/ 仅含 archive/）
+openspec/                 设计规格（openspec CLI 管理；specs 主干已建立，changes/ 为活跃变更及 archive/）
 _backlog/                 任务账本（plans / bugs 两类 + _done 归档 + _reference 分析）
 .agents/skills/           openspec 技能（Codex 通用入口，项目自有）
 （grillme 技能集由全局 ~/.claude/skills、~/.agents/skills 提供）
@@ -40,9 +40,18 @@ _backlog/                 任务账本（plans / bugs 两类 + _done 归档 + _r
 
 ```bash
 cd deep_research_harness
-make install              # 有意 no-op（harness 零外部依赖；环境准备用 uv sync）
+make install              # 有意 no-op（运行依赖由 uv sync 准备）
 make verify               # 单元门禁：stdlib unittest 套件，任一失败非零退出
 ```
+
+## 从哪里看
+
+先读 [应用控制地图](deep_research_harness/README.md)：入口 → 运行链 → 目录职责 → 最小测试。
+
+- [Repo 地图](deep_research_harness/docs/repository-map.md)：文件夹对象、代码 owner 与首次阅读路径。
+- [研究过程地图](deep_research_harness/docs/research-process.md)：skill 原文、lead agent 绑定、工具与运行证据。
+- [测试资产地图](deep_research_harness/tests/README.md)：每份测试证明什么、样本来源与最小红绿路径。
+- [运行态总图](deep_research_harness/docs/runtime-map.md)：当前运行、发布形态与质量车道。
 
 ## 给 Coding Agent
 
@@ -52,4 +61,4 @@ make verify               # 单元门禁：stdlib unittest 套件，任一失败
 
 - `deerflow/` submodule 需 `git clone --recurse-submodules` 或 `git submodule update --init` 才完整。
 - 框架运行时基座：submodule 锁在 commit `ceebf97f`（ethan 分支，= 上游 v2.1.0，2026-09-24 发布）。
-  声明锁与契约测试锚（v2 的 `CURRENT_DEERFLOW_PIN` 模式）将在首个治理 change 中建立。
+  声明锁已在 [结构 registry](openspec/governance/project-structure.toml)，接口证据见 [测试资产地图](deep_research_harness/tests/README.md)。

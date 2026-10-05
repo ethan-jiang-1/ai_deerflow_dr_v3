@@ -105,6 +105,11 @@ DOC_LAYER_DOCS: tuple[str, ...] = (
     "deep_research_harness/docs/known-limitations.md",
     "deep_research_harness/docs/quality-register.md",
     "deep_research_harness/docs/runtime-architecture.md",
+    "deep_research_harness/docs/runtime-map.md",
+    "deep_research_harness/docs/repository-map.md",
+    "deep_research_harness/docs/research-process.md",
+    "deep_research_harness/docs/skills/deep-research/README.md",
+    "deep_research_harness/docs/skills/deep-research/SKILL.md",
     "deep_research_harness/docs/testing-and-evaluation.md",
 )
 
@@ -287,6 +292,9 @@ STALE_MARKER_FILES: tuple[str, ...] = (
     "deep_research_harness/docs/known-limitations.md",
     "deep_research_harness/docs/quality-register.md",
     "deep_research_harness/docs/runtime-architecture.md",
+    "deep_research_harness/docs/runtime-map.md",
+    "deep_research_harness/docs/repository-map.md",
+    "deep_research_harness/docs/research-process.md",
     "deep_research_harness/docs/testing-and-evaluation.md",
     "deep_research_harness/tests/README.md",
     "deep_research_harness/src/deerflow_deep_research/__init__.py",

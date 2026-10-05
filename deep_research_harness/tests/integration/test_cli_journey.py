@@ -41,6 +41,15 @@ class CliJourneyTest(unittest.TestCase):
         bundle_id = match.group(1)
         self.assertIn("run completed", created.stdout)
 
+        # Observe the accepted product artifact as well as the printed terminal state.
+        bundle_dirs = list((HARNESS_ROOT / "scopes").glob(f"d_*/{bundle_id}"))
+        self.assertEqual(len(bundle_dirs), 1)
+        report = bundle_dirs[0] / "final/report-gen1.md"
+        self.assertTrue(report.is_file(), created.stdout)
+        self.assertTrue(report.read_text(encoding="utf-8").strip())
+        entries = [json.loads(line) for line in (bundle_dirs[0] / "evidence/submissions.jsonl").read_text(encoding="utf-8").splitlines()]
+        self.assertTrue(any(e["kind"] == "final_report" and e["disposition"] == "admit" and e["artifact_path"] == "final/report-gen1.md" for e in entries))
+
         watched = _cli("watch", bundle_id)
         self.assertEqual(watched.returncode, 0, watched.stderr)
         self.assertIn("run completed", watched.stdout)  # already-terminal: history + exit

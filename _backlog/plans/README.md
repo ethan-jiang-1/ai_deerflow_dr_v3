@@ -1,6 +1,6 @@
 # Plans — plan/分析文档索引
 
-> 最后更新: 2026-10-04（doc-hygiene-second-sweep 关闭：CLS-013；活跃列表空） | `_backlog/plans/` — 活跃 plan 在此（顶层），
+> 最后更新: 2026-10-05（新增 Agent-friendly Repo 持续整理计划） | `_backlog/plans/` — 活跃 plan 在此（顶层），
 > 完成的普通 plan 移入 [`../_done/_closed_plans/`](../_done/_closed_plans/)。
 >
 > **plan 没有编号，文件名即标识。完成后文件名不变，位置即状态。**
@@ -23,6 +23,7 @@
 
 | Plan | 一句话 |
 |------|--------|
+| [2026-10-05-agent-friendly-repository-map](2026-10-05-agent-friendly-repository-map.md) | 导航已落地；按源对象、绑定、测试、fixture、发布变化触发同轮维护 |
 
 **Next available plan ID: CLS-014**（移入 `_closed_plans/` 时分配）
 

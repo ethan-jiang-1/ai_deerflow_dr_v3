@@ -1,6 +1,6 @@
 # _backlog — 计划与缺陷账本（plans / bugs）
 
-> 最后更新: 2026-10-04（doc-hygiene-second-sweep 关闭：CLS-012；活跃 plans 清零） | 本目录追踪本仓库的设计推敲、上游分析与缺陷。
+> 最后更新: 2026-10-05（新增 Agent-friendly Repo 持续整理计划） | 本目录追踪本仓库的设计推敲、上游分析与缺陷。
 > 活跃工作走 OpenSpec（`openspec/changes/`）；本目录是 **分析与决策记录 + 缺陷池**，不是运行时真相。
 >
 > **本文件是 `_backlog` 的规矩手册。** 搬迁流程在下面定死，今后大家都遵循这里头定的规矩。
@@ -51,7 +51,7 @@ _backlog/
 
 > 📖 **想看全局状态、历史决策、查阅指南** → [`_done/README.md`](_done/README.md)
 >
-> 📖 **想看当前该做什么、依赖关系、执行顺序** → `_backlog/plans/` 已清零（CLS-004/005/006：bundle-contract、entry-surface、wiring-structure 全部消费完毕；v3 骨架期完成，新方向按 plans 卡片模板新建）
+> 📖 **想看当前该做什么、依赖关系、执行顺序** → [plans 索引](plans/README.md)；当前保留 Agent-friendly Repo 持续整理计划，后续产品行为另走 owning change。
 
 ---
 

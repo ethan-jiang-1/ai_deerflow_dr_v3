@@ -55,6 +55,7 @@ TOP_LEVEL_NAMESPACE_WHITELIST = {
     "httpx",
     "httpx_sse",
     "openai",
+    "yaml",  # Existing CLI configuration reader, now inside runtime entry assembly.
 }
 
 

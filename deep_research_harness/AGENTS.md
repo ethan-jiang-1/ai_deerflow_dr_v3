@@ -61,8 +61,7 @@ Application authority for the cognition-versus-code contract — the portable no
 | What proves composition/admission? | The closest unit/contract test for that owner |
 | Who admits state, routes, and effects? | The `engine/` and `runtime/` owners behind it |
 
-The bounded-role contracts live with their owning code as it lands; this table stays
-layer-level and must not invent file paths that do not exist.
+Bounded-role contracts land with owning code; this table invents no paths.
 
 ## Non-Model Work
 
@@ -74,11 +73,14 @@ cognition is not causal. Do not invent a capability, prompt, or repair loop.
 
 | Need | Read first |
 | --- | --- |
-| Product use, quick start, commands and targets | [`README.md`](README.md), [`COMMANDS.md`](COMMANDS.md), [`Makefile`](Makefile) |
-| Runtime and authority boundaries | [`docs/runtime-architecture.md`](docs/runtime-architecture.md) |
-| Local commands and profiles | [`docs/local-operations.md`](docs/local-operations.md) |
-| How do I prove a change (lanes, receipts)? | [`docs/testing-and-evaluation.md`](docs/testing-and-evaluation.md) |
-| Documentation index | [`docs/README.md`](docs/README.md) |
+| Operate / locate owners | [Start](README.md), [Repo map](docs/repository-map.md) |
+| Research skill, binding, tools, run evidence | [Research map](docs/research-process.md) |
+| Add/fix tests; pick interface, fixture, red-green lane | [Test assets](tests/README.md) |
+| Runtime, release, authority | [Runtime map](docs/runtime-map.md) |
+| Run commands | [Menu](COMMANDS.md), [Makefile](Makefile) |
+| Local ops | [Operations](docs/local-operations.md) |
+| Evidence policy | [Testing](docs/testing-and-evaluation.md) |
+| Other docs | [Index](docs/README.md) |
 
 ## Boundaries
 
@@ -94,7 +96,7 @@ cognition is not causal. Do not invent a capability, prompt, or repair loop.
 
 `make verify` = the application unit gate (semantic owner: `COMMANDS.md`): stdlib
 unittest under `tests/`, `PYTHONPATH=src`, offline-safe, non-zero on any failure.
-Lane separation: `tests/integration/` belongs to `make smoke`.
+`unit/` + `contract/` enter verify; `integration/` belongs to `make smoke`.
 
 ## Structural Authority
 

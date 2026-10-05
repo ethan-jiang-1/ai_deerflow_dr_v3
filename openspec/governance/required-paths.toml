@@ -40,6 +40,13 @@ files = [
   "deep_research_harness/docs/README.md",
   "deep_research_harness/docs/local-operations.md",
   "deep_research_harness/docs/runtime-architecture.md",
+  "deep_research_harness/docs/runtime-map.md",
+  "deep_research_harness/docs/repository-map.md",
+  "deep_research_harness/docs/research-process.md",
+  "deep_research_harness/docs/skills/deep-research/README.md",
+  "deep_research_harness/docs/skills/deep-research/SKILL.md",
+  "deep_research_harness/docs/skills/deep-research/LICENSE",
+  "deep_research_harness/docs/skills/deep-research/provenance.json",
   "deep_research_harness/docs/testing-and-evaluation.md",
   "deep_research_harness/pyproject.toml",
   "deep_research_harness/src/deerflow_deep_research/__about__.py",
@@ -104,7 +111,16 @@ directories = [
 files = [
   "deep_research_harness/cli.py",
   "deep_research_harness/docs/known-limitations.md",
-  "deep_research_harness/src/deerflow_deep_research/runtime/render.py",
+  "deep_research_harness/src/deerflow_deep_research/runtime/entry.py",
+  "deep_research_harness/src/deerflow_deep_research/runtime/interaction/__init__.py",
+  "deep_research_harness/src/deerflow_deep_research/runtime/interaction/cli.py",
+  "deep_research_harness/src/deerflow_deep_research/runtime/interaction/render.py",
+  "deep_research_harness/tests/unit/test_entry_composition.py",
+  "deep_research_harness/tests/contract/__init__.py",
+  "deep_research_harness/tests/contract/test_wiring_mirror.py",
+  "deep_research_harness/tests/fixtures/README.md",
+  "deep_research_harness/tools/README.md",
+  "deep_research_harness/tools/record_stream.py",
 ]
 
 [paths.agent-playbook]

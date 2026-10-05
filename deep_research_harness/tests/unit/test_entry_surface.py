@@ -12,7 +12,8 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from deerflow_deep_research.domain import bundle, journal_policy
-from deerflow_deep_research.runtime import bundle_actions, bundle_state, render, run_engine
+from deerflow_deep_research.runtime import bundle_actions, bundle_state, run_engine
+from deerflow_deep_research.runtime.interaction import render
 
 _PIN = "c" * 40
 _FIXED_NOW = datetime(2026, 10, 3, 12, 0, tzinfo=timezone.utc)
