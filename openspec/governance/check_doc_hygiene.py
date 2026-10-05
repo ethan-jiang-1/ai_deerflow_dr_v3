@@ -85,9 +85,9 @@ DOC_BUDGETS: dict[str, int] = {
     "AGENTS.md": 2425,
     # Root Claude entry stub; must stay a thin AGENTS.md import, never a copy.
     "CLAUDE.md": 400,
-    # Module change map incl. generated structure block (6863 chars measured post
-    # doc-hygiene-second-sweep; ratcheted down from 6864).
-    "deep_research_harness/AGENTS.md": 6863,
+    # Module change map incl. generated structure block (6854 chars measured
+    # post establish-operator-control-map; ratcheted down from 6863).
+    "deep_research_harness/AGENTS.md": 6854,
     # Module Claude entry stub (253 chars at adoption).
     "deep_research_harness/CLAUDE.md": 400,
     # The largest resident-injection layer (11436 chars post
@@ -101,12 +101,11 @@ DOC_LAYER_DOCS: tuple[str, ...] = (
     # v3 skeleton inventory: the doc layer grows with its owning changes; every
     # docs/**/*.md on disk must be listed here and every entry must exist.
     "deep_research_harness/docs/README.md",
+    "deep_research_harness/docs/control-map.md",
     "deep_research_harness/docs/local-operations.md",
     "deep_research_harness/docs/known-limitations.md",
     "deep_research_harness/docs/quality-register.md",
-    "deep_research_harness/docs/runtime-architecture.md",
-    "deep_research_harness/docs/runtime-map.md",
-    "deep_research_harness/docs/repository-map.md",
+    "deep_research_harness/docs/run-bundle.md",
     "deep_research_harness/docs/research-process.md",
     "deep_research_harness/docs/skills/deep-research/README.md",
     "deep_research_harness/docs/skills/deep-research/SKILL.md",
@@ -291,9 +290,8 @@ STALE_MARKER_FILES: tuple[str, ...] = (
     "deep_research_harness/docs/local-operations.md",
     "deep_research_harness/docs/known-limitations.md",
     "deep_research_harness/docs/quality-register.md",
-    "deep_research_harness/docs/runtime-architecture.md",
-    "deep_research_harness/docs/runtime-map.md",
-    "deep_research_harness/docs/repository-map.md",
+    "deep_research_harness/docs/control-map.md",
+    "deep_research_harness/docs/run-bundle.md",
     "deep_research_harness/docs/research-process.md",
     "deep_research_harness/docs/testing-and-evaluation.md",
     "deep_research_harness/tests/README.md",
@@ -650,7 +648,7 @@ def _self_test() -> list[str]:
             errors.append("self-test: docs-layer missing trailing newline not detected")
 
         # Rule 3 negative (docs-layer): non-UTF-8 bytes.
-        bad = base / "deep_research_harness/docs/runtime-architecture.md"
+        bad = base / "deep_research_harness/docs/control-map.md"
         bad.write_bytes(b"\xff\xfe binary")
         if not any(
             "non-UTF-8 docs-layer document" in v

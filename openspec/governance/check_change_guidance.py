@@ -43,7 +43,7 @@ CLAUDE_GUIDE_PATH = Path("deep_research_harness/CLAUDE.md")
 README_PATH = Path("deep_research_harness/README.md")
 DOCS_INDEX_PATH = Path("deep_research_harness/docs/README.md")
 FOCUSED_DOC_PATHS = (
-    Path("deep_research_harness/docs/runtime-architecture.md"),
+    Path("deep_research_harness/docs/control-map.md"),
     Path("deep_research_harness/docs/local-operations.md"),
     Path("deep_research_harness/docs/testing-and-evaluation.md"),
 )
@@ -227,7 +227,7 @@ INFORMATION_MAP_POLICY_ANCHORS = (
     "## Reader Roles",
     "## Line Budgets",
     "deep_research_harness/docs/README.md",
-    "runtime-architecture.md",
+    "control-map.md",
     "local-operations.md",
     "testing-and-evaluation.md",
     "word-count",

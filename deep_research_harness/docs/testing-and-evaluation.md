@@ -15,7 +15,29 @@
 | Application unit gate | `make verify`（stdlib，UV_OFFLINE=1 兼容） | domain 纯规则、runtime 物化（CAS/lease/journal/删除语义）、admission、mirror/配置解析、subagent posture | 不证明真实模型行为、不证明跨进程协议 |
 | Integration smoke | `make smoke`（需 uv sync；CI 已接入） | 嵌入式 client + sync saver 多轮 + 有界澄清续答 + checkpoint 可读 + 装配快照 + CLI 全旅程 + 契约对比真实面 + **报告落 final/** | 不证明真实模型的研究质量（脚本模型钉死输出） |
 | Real ladder（真实外部 API） | `make create PROBLEM="…" CONFIG=base`（需 key；显式 opt-in） | 真模型/agent 循环/token；skill 可用，实际加载看 checkpoint 证据 | 慢、花钱、非确定——永不进默认 CI；单次通过不构成统计结论 |
+| 发布冷启动 | `git clone --recursive` → `uv sync` → `make verify` → fixture `make create` | 发布面没有偷偷依赖开发工作区；随行代码与兄弟布局完整 | 不证明真实 API 质量、多用户服务能力 |
 | Governance checks（非 harness lane） | 聚合治理门禁（repo 根治理目录 README） | 结构/需求/specs/指导/依赖方向 | 不证明产品运行时行为 |
+
+## 三种质量对象
+
+1. **研究引擎质量**：角度是否充分、事实是否有来源、报告是否有洞察——由真实梯 +
+   评审负责，当前**没有自动化统计评估**。
+2. **Harness 控制质量**：状态诚实、失败可见、证据经 validator、ledger 可验证、
+   运行可检查——由 unit + smoke 负责，大部分可离线确定性验证。
+3. **发布质量**：全新环境能否按发布说明跑起来——由冷启动 lane 负责；它证明
+   "能启动并完成 fixture"，不冒充研究质量验收。
+
+## 最小车道选择
+
+不要从真实端到端开始；按问题选最小车道，再按风险扩大：
+
+```text
+规则 / 状态 / 文件 / 准入问题      → make verify
+DeerFlow 接线 / 事件 / checkpoint → make smoke
+真实模型 / skill / 外部工具质量    → base 真实梯（显式 opt-in）
+发布布局 / 新机器冷启动           → 冷启动 lane
+代码结构 / 依赖方向 / 发布面       → governance checker
+```
 
 ## 确定性 LLM 替身阶梯（借鉴 DeerFlow 四级谱系，按需补齐）
 

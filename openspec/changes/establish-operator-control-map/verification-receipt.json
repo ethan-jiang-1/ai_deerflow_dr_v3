@@ -1,0 +1,220 @@
+{
+  "revision": "b07f0631135222058c3584b8a0ad5e09ebc6bb0b",
+  "completed_at": "2026-10-05T13:41:06.227974+00:00",
+  "scope": "doc-layer consolidation: single control map + run-bundle map; legacy repository-map/runtime-map/runtime-architecture deleted; registries, routing surfaces and AGENTS budget ratchet (6863->6854) synchronized; no runtime code, command semantics, or spec behavior changed",
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "openspec/tests/governance",
+        "-q"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "[check_project_specs.py] exit=0\n[check_project_architecture.py] exit=0\n[check_change_guidance.py] exit=0\n[check_harness_dependency_direction.py] exit=0\n[check_ci_governance.py] exit=0\n[check_proof_receipts.py] exit=0\nOpenSpec governance closeout passed: every registered component checker exited 0.\n[check_project_specs.py] exit=1\n[check_project_architecture.py] exit=0\n[check_change_guidance.py] exit=0\n[check_harness_dependency_direction.py] exit=0\n[check_ci_governance.py] exit=0\n[check_proof_receipts.py] exit=0\n[check_project_specs.py] exit=0\n[check_project_architecture.py] exit=1\n[check_change_guidance.py] exit=0\n[check_harness_dependency_direction.py] exit=0\n[check_ci_governance.py] exit=0\n[check_proof_receipts.py] exit=0\n[change-guidance] exit=0\n[delta-specs] exit=1\n[strict-validation] exit=0\n[change-guidance] exit=0\n[delta-specs] exit=0\n[strict-validation] exit=0\nOpenSpec planning admission passed for change demo-change.\nAll project specs valid: 1 main spec files under openspec/specs, 0 violations.\nAll project specs valid: 1 main spec files under openspec/specs, 0 violations.\n",
+      "stderr": "OpenSpec governance closeout failed: at least one component checker exited non-zero.\nOpenSpec governance closeout failed: at least one component checker exited non-zero.\nGate inventory is empty: no component checkers registered.\nGate inventory references missing checker(s): check_change_guidance.py\nOpenSpec planning admission failed for change demo-change.\n--phase plan requires --change <name>.\n----------------------------------------------------------------------\nRan 72 tests in 4.250s\n\nOK (skipped=1)\n"
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_doc_hygiene.py"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "doc-layer hygiene passed.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_doc_hygiene.py",
+        "--self-test"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "doc-hygiene self-test passed.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_change_guidance.py"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "Change Guidance governance passed.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_project_architecture.py"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "Architecture governance passed for /Users/bowhead/ai_deerflow_dr_v3\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_project_specs.py"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "All project specs valid: 12 main spec files under openspec/specs, 0 violations.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_release_face.py"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "release-face guard passed.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_harness_dependency_direction.py"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "Harness dependency direction passed.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_project_gate.py",
+        "--phase",
+        "closeout"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "[check_project_specs.py] exit=0\n  All project specs valid: 12 main spec files under openspec/specs, 0 violations.\n[check_project_architecture.py] exit=0\n  Architecture governance passed for /Users/bowhead/ai_deerflow_dr_v3\n[check_change_guidance.py] exit=0\n  Change Guidance governance passed.\n[check_harness_dependency_direction.py] exit=0\n  Harness dependency direction passed.\n[check_ci_governance.py] exit=0\n  CI governance passed for /Users/bowhead/ai_deerflow_dr_v3\n[check_proof_receipts.py] exit=0\n  proof receipts: no selected change (mode=enforce)\nOpenSpec governance closeout passed: every registered component checker exited 0.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "openspec/governance/check_project_gate.py",
+        "--phase",
+        "plan",
+        "--change",
+        "establish-operator-control-map"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "[change-guidance] exit=0\n  Change Guidance governance passed.\n[delta-specs] exit=0\n  Selected change establish-operator-control-map delta specs valid: 0 spec file(s), 0 violations.\n[strict-validation] exit=0\n  Change 'establish-operator-control-map' is valid\n  \u2139 [INFO] file: skip_specs is set in .openspec.yaml: change declares no spec-level behavior changes, zero deltas accepted\nOpenSpec planning admission passed for change establish-operator-control-map.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "make",
+        "verify"
+      ],
+      "cwd": "deep_research_harness",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "PYTHONPATH=src python3 -m unittest discover -s tests\n[verify] harness unittest gate passed.\n",
+      "stderr": ".............................................................................................................................\n----------------------------------------------------------------------\nRan 125 tests in 0.417s\n\nOK\n"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--exit-code",
+        "HEAD",
+        "--",
+        "deerflow"
+      ],
+      "cwd": ".",
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "file_sha256": {
+    "deep_research_harness/docs/control-map.md": "52708479b9c87a11432b086e00ced0d8d4beefa04ea0a1d71e8e0de0c103355a",
+    "deep_research_harness/docs/run-bundle.md": "1feb166af454d0b8838ecb7b52383aaaf89db6065d439a75baf78bc511cde4af",
+    "deep_research_harness/docs/research-process.md": "6f41ffb17bc7d95bdefef64531f4e39c7458a9bc32883d1fca1d45087afd0a2f",
+    "deep_research_harness/docs/testing-and-evaluation.md": "43289f6e498a80f42ca8f1453054275e8d76045a77c6da11e42cab847f0de38a",
+    "deep_research_harness/docs/README.md": "6333dbaa6fcf58418fbf91b88acf3724a40f7dfef80525f17a11976104201d27",
+    "deep_research_harness/README.md": "ab70890f9f1657a5004d47228f559ca295a7fa87b749cdc56e69bc04c0af542f",
+    "deep_research_harness/AGENTS.md": "904a8729d0ddf79c377dca1b429da57f1526debbe8ced7290949fb171081fd7d",
+    "README.md": "d64542a29201e523da0d51c9f179699ff239cf553416a82713c5e68ca6a95ac8",
+    "openspec/change-guidance/local/deep-research.md": "2c83189e37b2e849ad3b0bf5d5b371b75b0dd367898a437ba52c5d1e7c3a3fb5",
+    "openspec/governance/check_doc_hygiene.py": "efb0d4675cbd25359287de9df4e0411dd20103c4e693e6a355f37c0f2707fdd1",
+    "openspec/governance/check_change_guidance.py": "878af9e6297325b58e954ccf6b1ae09b189ad351fdb211f6fc82c81b6f7ddce1",
+    "openspec/governance/required-paths.toml": "9554ca37fd9781c0e2afbbe4fbf44a3b2b7cd98238fcec20d24e6cfe8f41fe7f",
+    "openspec/tests/governance/test_project_gate.py": "369d7bba623657668e2c5babb8a80324e127d7ae41622b4e199793662150eccf",
+    "openspec/changes/establish-operator-control-map/proposal.md": "8987b47b7dc8e93b5f0784082325129616ac1524693b3d9ded346d5597d667e4",
+    "openspec/changes/establish-operator-control-map/design.md": "19869efaa9aaf6eb96ff9457923ef8a6ee9cf0c8c21dcb1df9df81a9cbd430ce",
+    "openspec/changes/establish-operator-control-map/tasks.md": "0e22a9cac7efd0365fa3178a4e7233a4e5947be61eb0cf6e67f6ed5eea52e52a"
+  },
+  "working_tree": {
+    "dirty": true,
+    "entries": [
+      "M README.md",
+      " M deep_research_harness/AGENTS.md",
+      " M deep_research_harness/README.md",
+      " M deep_research_harness/docs/README.md",
+      " D deep_research_harness/docs/repository-map.md",
+      " M deep_research_harness/docs/research-process.md",
+      " D deep_research_harness/docs/runtime-architecture.md",
+      " D deep_research_harness/docs/runtime-map.md",
+      " M deep_research_harness/docs/testing-and-evaluation.md",
+      " M openspec/change-guidance/local/deep-research.md",
+      " M openspec/governance/check_change_guidance.py",
+      " M openspec/governance/check_doc_hygiene.py",
+      " M openspec/governance/required-paths.toml",
+      " M openspec/tests/governance/test_project_gate.py",
+      "?? deep_research_harness/docs/control-map.md",
+      "?? deep_research_harness/docs/run-bundle.md",
+      "?? openspec/changes/establish-operator-control-map/"
+    ]
+  },
+  "observations": [
+    "red-first proven at task 1.3: with control-map.md and run-bundle.md on disk but unregistered, check_doc_hygiene.py exited 1 with 'docs-layer markdown not in registered scope' naming both files; after registry updates the only remaining red named exactly the three legacy docs, and deletion turned it green - the docs-layer registry is load-bearing",
+    "content mapping per design executed: runtime-map sections redistributed to control-map (spine/two loops/layers/walkthrough/verbs/tiers/routing/boundaries/release/not-implemented), run-bundle (artifact ownership), testing-and-evaluation (cold-start lane + three quality objects + minimal-lane chooser); repository-map tree and owner table merged into control-map sections 3/7; runtime-architecture boundaries into sections 2/8",
+    "focused-doc set renamed runtime-architecture.md -> control-map.md; app README and docs index link control-map.md; local policy Reader Roles row and checker anchors synchronized",
+    "AGENTS.md Information Map edited net-negative (6863 -> 6854 chars) and the DOC_BUDGETS ratchet lowered to 6854 - lowering is an ordinary edit",
+    "make smoke not run and not owed: proof-lanes.toml surfaces (src/**, tests/**, cli.py, tools/**) untouched by this change; no runtime behavior claimed",
+    "all 11 tasks complete at receipt time; receipt regenerated after final checkbox marks so every recorded digest is current"
+  ],
+  "unverified": [
+    "no CI run performed locally (GitHub Actions governance workflow runs on push)",
+    "no make smoke execution (not owed: no lane surface touched)",
+    "operator acceptance (three-hop reachability, two-loop comprehension) is a human reading claim, machine-verified only for links and registry consistency"
+  ]
+}

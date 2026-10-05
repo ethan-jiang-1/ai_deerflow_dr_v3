@@ -22,14 +22,14 @@ cli.py（稳定启动入口）
 | 你要驾驭什么 | 放在哪里 / 直接入口 |
 | --- | --- |
 | 交互：六动词、直播输出、journal 投影 | [CLI 实现](src/deerflow_deep_research/runtime/interaction/cli.py)、[共享渲染](src/deerflow_deep_research/runtime/interaction/render.py) |
-| 运行：装配、流、可信 I/O、持久化 | [entry](src/deerflow_deep_research/runtime/entry.py)、[runtime 对象地图](docs/repository-map.md) |
+| 运行：装配、流、可信 I/O、持久化 | [entry](src/deerflow_deep_research/runtime/entry.py)、[控制地图](docs/control-map.md) |
 | 规则：状态合同、validator、gate | [state_machine](src/deerflow_deep_research/domain/state_machine.py)、[validator](src/deerflow_deep_research/engine/validator.py) |
 | 研究认知：skill、模型、工具、委派 | [研究过程地图](docs/research-process.md)、[base 配置](config/base.yaml) |
 | 验证：离线规则/合同、框架 smoke、输入样本 | [tests](tests/README.md)、[fixtures](tests/fixtures/README.md) |
 | 开发操作：显式录制与诊断 | [tools](tools/README.md) |
-| 运行数据：每次研究的状态、证据和报告 | [Bundle 路径合同](src/deerflow_deep_research/domain/bundle.py)；本地 scopes 被 gitignore |
+| 运行数据：每次研究的状态、证据和报告 | [Run Bundle 地图](docs/run-bundle.md)、[Bundle 路径合同](src/deerflow_deep_research/domain/bundle.py)；本地 scopes 被 gitignore |
 | 开发治理：设计准入、结构登记、任务账本 | 仓库根 OpenSpec / backlog；不参与产品运行 |
-| 权威边界与策略参考 | [runtime architecture](docs/runtime-architecture.md)、[local operations](docs/local-operations.md)、[testing](docs/testing-and-evaluation.md)、[词汇](CONTEXT.md) |
+| 权威边界与策略参考 | [控制地图](docs/control-map.md)、[local operations](docs/local-operations.md)、[testing](docs/testing-and-evaluation.md)、[词汇](CONTEXT.md) |
 
 源码仍有 `domain / engine / agents / runtime` 四个所有权层；`agents` 当前仅包入口。上游 `deerflow/`（包括它的 scripts）是锁定的只读框架。我们自己的可执行开发工具放 tools，不把它们混进产品入口或测试 runner。
 
@@ -60,4 +60,4 @@ fixture 配置加载 [runtime fixture providers](src/deerflow_deep_research/runt
 | CLI / client / checkpoint 接线 | `tests.unit.test_entry_composition` 或对应 integration 文件 | `make smoke`（脚本模型 + 真框架） |
 | 真实研究策略与质量 | 明确认知 owner 和评审标准 | 显式 base 运行；不进入默认 CI |
 
-不要把端到端当唯一定位手段。逐文件选择见 [测试资产地图](tests/README.md)，运行数据、发布形态及局限见 [运行态总图](docs/runtime-map.md)。Coding Agent 从 [AGENTS](AGENTS.md) 选择 owner，其余参考见 [文档索引](docs/README.md)。
+不要把端到端当唯一定位手段。逐文件选择见 [测试资产地图](tests/README.md)，主链、两种 loop、发布形态及未实现清单见 [控制地图](docs/control-map.md)。Coding Agent 从 [AGENTS](AGENTS.md) 选择 owner，其余参考见 [文档索引](docs/README.md)。

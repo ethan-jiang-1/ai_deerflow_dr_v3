@@ -20,6 +20,19 @@
 [prompt.py](../../deerflow/backend/packages/harness/deerflow/agents/lead_agent/prompt.py)。
 这是定位链接，不表示本次重新审计了其内部实现。日常应用工作先看本应用绑定和公开说明；只有明确的 prompt-builder / 兼容性问题才按应用 coding guide 的授权范围深入，不修改上游。
 
+## skill 的三列状态
+
+skill 在本项目里是三个不同的对象，不能混为一谈：
+
+| 状态列 | 当前值 | 证据 / 入口 |
+| --- | --- | --- |
+| **声明可用** | 框架 native surface 可加载；本地 [SOP 快照](skills/deep-research/README.md) 仅供阅读（含来源 pin/hash） | 快照不是运行时配置，改它不改变行为 |
+| **运行中实际加载** | 不强制：binding 传 `available_skills=None`，lead agent 自行决定 | 要证明实际加载，看工具调用记录 + checkpoint 消息 + [snapshot](../src/deerflow_deep_research/runtime/snapshot_middleware.py)；方法见下节 |
+| **质量评估** | 无自动化统计评估（引文真实性、充分性、覆盖度） | 显式 base 真实梯 + 人工评审；fixture 结果不证明研究质量 |
+
+把 skill 变成强制、可验收的运行时合同是独立的产品/认知策略决策（2026-10-05
+计划 Phase 5），不在当前实现内。
+
 ## 方法论长什么样
 
 下面是 [本地 skill 原文快照](skills/deep-research/SKILL.md#research-methodology) 的中文导航，不是独立 prompt 或硬 gate；[SOP 阅读入口](skills/deep-research/README.md) 解释了来源、加载和未来调整边界：
@@ -71,14 +84,8 @@ validator 检查 kind、文件名、producer、非空和重复 hash，**不验�
 ## 怎样看到某一次真的发生了什么
 
 从 [命令菜单](../COMMANDS.md) 执行 `status` / `inspect`，保留 bundle id；用 [Bundle 路径合同](../src/deerflow_deep_research/domain/bundle.py) 找到该运行。
-
-| Bundle 内对象（运行时生成） | 看什么 | 不能推出什么 |
-| --- | --- | --- |
-| `state.json` | 状态、generation、thread、composition、pin | completed 不等于研究质量达标或报告必然被 admit |
-| `diagnostics/assembly-snapshot.json` | 首次调用的 system prompt 与工具列表 | 不是全部轮次上下文，也不能独自证明 skill 原文实际被读取 |
-| `diagnostics/journal.jsonl` | 聚合工具名、回答尾部摘要、subagent custom 事件、终态、准入 disposition | 不是每次搜索的完整参数和结果；inspect 也不会补出缺失内容 |
-| `checkpoint.sqlite` | 保存的 thread 消息与工具结果 | 不是完整供应商原始请求/响应日志；查看需使用框架 checkpointer |
-| `final/report-genN.md` | 通过准入的最终回答投影 | 不等于模型写出的所有 sandbox 文件都自动进入 final |
+每个 Bundle 内对象的权属（谁写、是什么、能看出什么、不能推出什么）见
+[Run Bundle 地图](run-bundle.md)；下面是认知侧的判断方法：
 
 判断 skill 加载：先看是否出现读取 deep-research 原文的工具调用及结果；journal 只有名称时，再看 checkpoint 消息。
 判断委派：看 task 调用和 subagent 事件/结果；仅有 subagent_enabled=True 不足以证明实际委派。

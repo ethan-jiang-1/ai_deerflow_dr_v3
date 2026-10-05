@@ -447,8 +447,8 @@ class RealChangeGuidancePlantedNegativeTest(unittest.TestCase):
             "deep_research_harness/docs/README.md",
         ),
         (
-            REPO_ROOT / "deep_research_harness" / "docs" / "runtime-architecture.md",
-            "deep_research_harness/docs/runtime-architecture.md",
+            REPO_ROOT / "deep_research_harness" / "docs" / "control-map.md",
+            "deep_research_harness/docs/control-map.md",
         ),
         (
             REPO_ROOT / "deep_research_harness" / "docs" / "local-operations.md",

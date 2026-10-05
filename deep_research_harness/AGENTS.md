@@ -73,10 +73,10 @@ cognition is not causal. Do not invent a capability, prompt, or repair loop.
 
 | Need | Read first |
 | --- | --- |
-| Operate / locate owners | [Start](README.md), [Repo map](docs/repository-map.md) |
+| Operate / locate owners | [Start](README.md), [Control map](docs/control-map.md) |
 | Research skill, binding, tools, run evidence | [Research map](docs/research-process.md) |
 | Add/fix tests; pick interface, fixture, red-green lane | [Test assets](tests/README.md) |
-| Runtime, release, authority | [Runtime map](docs/runtime-map.md) |
+| Run Bundle artifacts | [Run bundle](docs/run-bundle.md) |
 | Run commands | [Menu](COMMANDS.md), [Makefile](Makefile) |
 | Local ops | [Operations](docs/local-operations.md) |
 | Evidence policy | [Testing](docs/testing-and-evaluation.md) |

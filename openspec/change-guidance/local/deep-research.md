@@ -57,7 +57,7 @@ reader roles and line budgets here, while current facts and behavior remain in o
 | `deep_research_harness/AGENTS.md` | Coding agent | Select the smallest application seam |
 | `deep_research_harness/README.md` | Human/operator | Product and quick-start orientation |
 | `deep_research_harness/docs/README.md` | Human/operator | Focused runtime, operations, and testing routes |
-| `runtime-architecture.md` | Human/operator | Runtime and authority boundaries |
+| `control-map.md` | Human/operator | Control spine, two loops, owner routing |
 | `local-operations.md` | Operator | Commands and retained sessions |
 | `testing-and-evaluation.md` | Contributor/operator | Test and evaluation evidence |
 | `openspec/config.yaml` | OpenSpec author | Change authoring route |

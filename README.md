@@ -48,10 +48,10 @@ make verify               # 单元门禁：stdlib unittest 套件，任一失败
 
 先读 [应用控制地图](deep_research_harness/README.md)：入口 → 运行链 → 目录职责 → 最小测试。
 
-- [Repo 地图](deep_research_harness/docs/repository-map.md)：文件夹对象、代码 owner 与首次阅读路径。
+- [控制地图](deep_research_harness/docs/control-map.md)：唯一总图——主链、两种 loop、owner 路由、发布形态与未实现清单。
 - [研究过程地图](deep_research_harness/docs/research-process.md)：skill 原文、lead agent 绑定、工具与运行证据。
 - [测试资产地图](deep_research_harness/tests/README.md)：每份测试证明什么、样本来源与最小红绿路径。
-- [运行态总图](deep_research_harness/docs/runtime-map.md)：当前运行、发布形态与质量车道。
+- [Run Bundle 地图](deep_research_harness/docs/run-bundle.md)：持久化合同、artifact 权属与终态/交付/质量的区分。
 
 ## 给 Coding Agent
 
