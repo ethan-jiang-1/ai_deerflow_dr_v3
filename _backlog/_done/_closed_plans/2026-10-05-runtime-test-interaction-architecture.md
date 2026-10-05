@@ -1,7 +1,7 @@
 # Plan: Runtime / Test / Interaction / Agent Loop 结构与控制面重整
 
-> 类型: 架构设计 / 可驾驭性整理 | 更新: 2026-10-05
-> 状态: Phase 0–4 归档（五个 change）；Phase 5 八项已全部裁决（2026-10-05 七轮，见该节逐项记录）——三项行为 change 全部落地（refine 前台重跑、state 交付事实、evidence 物化）；Phase 5 收官，其余维持现状已记录
+> 类型: 架构设计 / 可驾驭性整理 | 更新: 2026-10-06
+> 状态: Phase 0–4 归档（五个 change）；Phase 5 八项已全部裁决（2026-10-05 七轮，见该节逐项记录）——三项行为 change 全部落地（refine 前台重跑、state 交付事实、evidence 物化）；Phase 5 收官，其余维持现状已记录。§8 验收清单已于 2026-10-06 正式执行（revision 11c29fe），assembly/execution 采有原则退让（见 §3.2 记录）；本 plan 关闭归档 CLS-014。
 > 目标: 让产品驱动者和新 Coding Agent 不必先做代码考古，就能定位运行入口、研究 loop、skill、Run Bundle、测试资产和调试工具。
 
 ## 1. 背景
@@ -131,7 +131,8 @@ Harness 的 binding 在 `runtime/client.py`：
 
 ### 2.4 Run Bundle 与运行状态
 
-每次研究的持久状态以 Bundle 为单位，路径合同由 `domain/bundle.py` 持有：
+每次研究的持久状态以 Bundle 为单位，路径合同由 `domain/bundle.py` 持有
+（2026-10-06 更新：存储根已由 `scopes/` 迁至**仓库根 `runs/`**，Bundle 内部布局不变，见 relocate-runs-and-clarify-structure；下图为历史记录）：
 
 ```text
 scopes/d_YYYYMMDD/<bundle-id>/
@@ -240,6 +241,8 @@ runtime/
 - fixtures provider 不与 `tests/fixtures` 样本混为一类。
 
 如果实证表明新增物理目录带来的 import churn 大于可读性收益，则保留文件位置、通过 `README` 和模块命名实现最小可读结构；这个退让必须记录理由，不是默认放弃。
+
+**退让裁决记录（2026-10-06，操作者确认）**：`entry.py` 与 `run_engine.py` 保留平铺，不建 `assembly/`、`execution/` 单文件目录。理由：本计划自己的迁移原则要求"有真实的两个以上消费者或独立测试 seam 才引入新目录"，一个只住单个模块的目录不达标；两个文件名已能直接表达装配/执行职责，控制地图按文件路由即可。runtime/ 现有子目录（interaction/ bundle/ adapters/ scripted/）均满足多文件职责群标准。若未来 execution 或 assembly 长出第二个真实模块，按 owning change 重新裁决。
 
 ### 3.3 显性化 agent binding，而不是复制宿主实现
 
@@ -401,7 +404,8 @@ tests/
 
 - `deerflow/` gitlink 不修改、不作为普通排查对象；
 - `python3 cli.py <verb>` 六个公开命令及其当前语义；
-- `scopes/d_YYYYMMDD/<bundle-id>/` 的 persisted path 和 Bundle schema，除非另有 migration change；
+- `scopes/d_YYYYMMDD/<bundle-id>/` 的 persisted path 和 Bundle schema，除非另有 migration change
+  （2026-10-06 已由 relocate-runs-and-clarify-structure 完成一次有 migration 的迁移：根改仓库根 `runs/`，schema 不变）；
 - `state.json` 单一运行状态 authority、revision CAS 和 lease 检查；
 - fixture zero-credential smoke 与 base 显式真实梯的区分；
 - unit/contract 默认门禁和 integration smoke 分离；
@@ -453,35 +457,41 @@ tests/
 
 ## 8. 验收清单
 
+> **验收执行记录（2026-10-06，revision 11c29fe）**：三张清单逐项核验并勾选。
+> 机器回执：`make verify` 0（160 tests）· `make smoke` 0（9 integration tests，无 skip）·
+> 7 个治理 checker 全 0 · `git diff --check` 0 · `git diff --exit-code HEAD -- deerflow` 0。
+> 操作者/Agent 项按当前导航事实核验（根 README 一屏地图、控制地图、Run Bundle 地图、
+> 测试资产地图均为现势版本且链接有效）。
+
 ### 操作者验收
 
-- [ ] 从应用 README 能在三跳内找到稳定启动命令。
-- [ ] 能画出“交互 -> 装配 -> DeerFlow loop -> Harness loop -> Bundle”的主链。
-- [ ] 能明确说出哪个 loop 属于 DeerFlow、哪个属于 Harness。
-- [ ] 能知道 skill 是参考快照、可用表面还是实际加载证据。
-- [ ] 能根据一个 Bundle 找到 state、checkpoint、journal、snapshot、evidence 和 final。
-- [ ] 能用 `status`、`watch`、`inspect` 分别观察不同信息，而不把它们当质量证明。
-- [ ] 能针对状态、binding、stream、admission、交互选择最小测试，而不是先跑真实 E2E。
+- [x] 从应用 README 能在三跳内找到稳定启动命令。（根 README 一屏地图 → harness README → COMMANDS.md，实为 1–2 跳）
+- [x] 能画出“交互 -> 装配 -> DeerFlow loop -> Harness loop -> Bundle”的主链。（根 README 与控制地图均内嵌主链图）
+- [x] 能明确说出哪个 loop 属于 DeerFlow、哪个属于 Harness。（控制地图 §2 职责表）
+- [x] 能知道 skill 是参考快照、可用表面还是实际加载证据。（研究过程地图“三列状态”表 + 判断方法）
+- [x] 能根据一个 Bundle 找到 state、checkpoint、journal、snapshot、evidence 和 final。（Run Bundle 地图 artifact 权属表；`runs/d_*/<id>/`）
+- [x] 能用 `status`、`watch`、`inspect` 分别观察不同信息，而不把它们当质量证明。（COMMANDS 语义 + Run Bundle 地图“不能推出什么”列）
+- [x] 能针对状态、binding、stream、admission、交互选择最小测试，而不是先跑真实 E2E。（根 README“改一处，先证明哪一层”表 + 测试资产地图）
 
 ### Coding Agent 验收
 
-- [ ] 新 Agent 读取 `AGENTS.md` 和应用 README 后能进入唯一控制地图。
-- [ ] 改纯规则、运行控制、binding、交互、测试资产时各有明确 owner 和最小命令。
-- [ ] 目录名能表达 interaction、assembly、execution、persistence、adapter、fixture 的职责。
-- [ ] 没有需要浏览整个 DeerFlow 源码才能理解 Harness 自己的 seam。
-- [ ] 没有重复的命令词汇、Bundle path authority 或测试收集规则。
+- [x] 新 Agent 读取 `AGENTS.md` 和应用 README 后能进入唯一控制地图。（AGENTS 信息表路由至 control-map）
+- [x] 改纯规则、运行控制、binding、交互、测试资产时各有明确 owner 和最小命令。（应用 AGENTS 的 Application Focus 表）
+- [x] 目录名能表达 interaction、assembly、execution、persistence、adapter、fixture 的职责。（interaction/ bundle/ adapters/ scripted/ 为职责群目录；entry.py/run_engine.py 平铺为 §3.2 记录的退让裁决）
+- [x] 没有需要浏览整个 DeerFlow 源码才能理解 Harness 自己的 seam。（binding knobs 表 + make_stream_fn 唯一 stream 缝 + mirror/smoke 锁定）
+- [x] 没有重复的命令词汇、Bundle path authority 或测试收集规则。（COMMANDS 唯一命令面；domain/bundle.py 唯一路径合同；collection guard 锁收集）
 
 ### 机器验收
 
-- [ ] `make verify` exit 0，且 unit + contract 的收集范围有新鲜输出。
-- [ ] `make smoke` exit 0；无测试被意外 skip；真实框架合同仍执行。
-- [ ] architecture checker exit 0，四层 ownership 和 import direction 不漂移。
+- [x] `make verify` exit 0，且 unit + contract 的收集范围有新鲜输出。（2026-10-06，11c29fe，160 tests）
+- [x] `make smoke` exit 0；无测试被意外 skip；真实框架合同仍执行。（9 tests，真框架 + CLI 子进程）
+- [x] architecture checker exit 0，四层 ownership 和 import direction 不漂移。
 - [x] dependency direction checker exit 0，receipt/历史文本不产生误报。（2026-10-05 经 `exempt-receipts-from-dependency-guard` 落地：结构化回执豁免 + gitignore 锚定 + 回执跟踪登记）
-- [ ] doc hygiene 和 link/command consistency checks exit 0。
-- [ ] `git diff --check` exit 0。
-- [ ] `git diff --exit-code HEAD -- deerflow` exit 0。
-- [ ] 测试 discovery 的 planted negative control 能变红后恢复为绿。
-- [ ] 新鲜 receipt 记录命令、退出码、revision 和已知 UNVERIFIED 空间。
+- [x] doc hygiene 和 link/command consistency checks exit 0。
+- [x] `git diff --check` exit 0。（2026-10-06 核验）
+- [x] `git diff --exit-code HEAD -- deerflow` exit 0。（2026-10-06 核验）
+- [x] 测试 discovery 的 planted negative control 能变红后恢复为绿。（collection guard 持有 planted-marker 断言并随 verify 常绿；负例红证随 group-unit-tests-by-owner 归档）
+- [x] 新鲜 receipt 记录命令、退出码、revision 和已知 UNVERIFIED 空间。（本节头部验收执行记录；UNVERIFIED 项见 known-limitations）
 
 ## 9. 落地关联
 

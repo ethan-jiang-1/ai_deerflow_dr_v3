@@ -204,7 +204,7 @@ make create PROBLEM="研究问题" CONFIG=base   # 真实模型，需凭证
 - evidence 自动物化（搜索结果已物化到 `diagnostics/searches/` 可直读复核，但仍不自动进入 evidence/ 准入）。
 
 对外发布前需要补齐的服务化决策清单见
-[架构计划](../../_backlog/plans/2026-10-05-runtime-test-interaction-architecture.md)。
+[架构计划](../../_backlog/_done/_closed_plans/2026-10-05-runtime-test-interaction-architecture.md)（已验收关闭，Phase 5 裁决记录在案）。
 
 ## 10. 质量车道怎么选
 
