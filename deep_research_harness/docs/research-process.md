@@ -111,7 +111,7 @@ validator 检查 kind、文件名、producer、非空和重复 hash，**不验�
 
 判断 skill 加载：先看是否出现读取 deep-research 原文的工具调用及结果；journal 只有名称时，再看 checkpoint 消息。
 判断委派：看 task 调用和 subagent 事件/结果；仅有 subagent_enabled=True 不足以证明实际委派。
-判断完成：同时检查终态、validation disposition 和报告文件；当前 run_engine 先写 completed/terminal，再提交报告，空回答不提交，重复内容可被拒绝。
+判断完成：status 的 `delivery:` 行直接回答交付（admitted/rejected/no-answer；未记录时用 journal disposition + final/ 文件 belt）；run_engine 先写终态再经 CAS 补写交付事实，空回答记 no-answer，重复内容记 rejected。
 判断质量：再评审引用、交叉验证、范围、假设与不确定性；fixture 的直接回答不能证明真实研究。
 
 ## 改什么、测什么

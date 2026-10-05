@@ -61,7 +61,7 @@ Bundle 规则合同在 [test_bundle_domain](domain/test_bundle_domain.py)，离�
 | COMMANDS、Makefile、CLI 动词清单一致 | [test_command_surface.py](interaction/test_command_surface.py) | 文本/正则检查，不执行命令 |
 | 命令菜单路由与 playbook 完成判据登记 | [test_agent_playbook.py](interaction/test_agent_playbook.py) | 文档检查，不证明旅程真的成功 |
 | **smoke**：多轮澄清、真实 fallback、SQLite、snapshot、构造接口合同 | [test_wiring_smoke.py](integration/test_wiring_smoke.py) | 真 DeerFlowClient/图/middleware/saver；脚本模型与 fake search |
-| **smoke**：create/watch/status/refine（跑完并 admit gen2 报告）/inspect/cancel（终态负例）、非法输入 | [test_cli_journey.py](integration/test_cli_journey.py) | 真 CLI 子进程/框架/落盘；检查非空报告及 ledger admit；fixture 模型，写应用 scopes |
+| **smoke**：create/watch/status（含 delivery 行）/refine（跑完并 admit gen2 报告）/inspect/cancel（终态负例）、非法输入 | [test_cli_journey.py](integration/test_cli_journey.py) | 真 CLI 子进程/框架/落盘；检查非空报告及 ledger admit；fixture 模型，写应用 scopes |
 | **smoke**：replay_key、录制后回放、miss 诊断 | [test_replay_model.py](integration/test_replay_model.py) | langchain 消息/JSONL/替身实现；临时脚本录制，不消费真实模型样本、不跑图 |
 
 CLI 旅程的 refine 断言第二代跑完且报告 admit；cancel 在旅程中是终态负例（正向接线在 unit 的 refine_foreground 文件）；仍不证明运行中中断。

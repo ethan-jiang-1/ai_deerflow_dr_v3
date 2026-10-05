@@ -152,17 +152,47 @@ def _consume_turn(
 
 
 
-def _submit_final_report(handle: BundleHandle, generation: int, final_text: str) -> None:
-    """A clean completion's final answer passes the admission hold point as a
-    final_report (models propose, code disposes); an empty answer never submits."""
+def _record_delivery(handle: BundleHandle, terminal: BundleState, final_text: str) -> BundleState:
+    """Submit the final answer, then record the orthogonal delivery fact in state.
+
+    The process fact (terminal) lands first; the delivery fact enriches it through
+    the same revision-CAS path. Mapping: ledger admit/replay -> admitted (replay is
+    reworked content that materialized), reject -> rejected, empty answer ->
+    no-answer. The fine-grained disposition stays in the journal and ledger; state
+    answers only "did this generation deliver?". A crash before the enrichment
+    write leaves delivery unrecorded (None) — honest, never a torn fact.
+    """
 
     text = (final_text or "").strip()
     if not text:
-        return
+        delivery, artifact = "no-answer", None
+    else:
+        entry = _submit_final_report(handle, terminal.generation, final_text)
+        if entry.disposition in {"admit", "replay"}:
+            delivery, artifact = "admitted", entry.artifact_path
+        else:
+            delivery, artifact = "rejected", None
+
+    from dataclasses import replace
+
+    fresh = bundle_state.read_state(handle)
+    enriched = replace(fresh, delivery=delivery, delivery_artifact=artifact)
+    return bundle_state.write_state(handle, fresh, enriched)
+
+
+def _submit_final_report(handle: BundleHandle, generation: int, final_text: str):
+    """A clean completion's final answer passes the admission hold point as a
+    final_report (models propose, code disposes); an empty answer never submits.
+
+    Returns the ledger entry carrying the fine-grained disposition."""
+
+    text = (final_text or "").strip()
+    if not text:
+        return None
     from .bundle.admission import submit_artifact
     from ..engine.validator import ArtifactSubmission
 
-    submit_artifact(
+    return submit_artifact(
         handle,
         ArtifactSubmission(
             kind="final_report",
@@ -271,7 +301,7 @@ def _drive(handle, stream_fn, on_event, state, message):
             state = rule_run_terminal(fresh, "completed")
             written = bundle_state.write_state(handle, fresh, state)
             _journal(handle, "terminal", "run_completed", {"generation": written.generation})
-            _submit_final_report(handle, written.generation, final_text)
+            written = _record_delivery(handle, written, final_text)
             return written
 
         last_question = tool_calls[-1].arguments if tool_calls else ""

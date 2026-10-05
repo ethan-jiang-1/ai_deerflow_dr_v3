@@ -220,5 +220,48 @@ class FreshThreadRefineTest(unittest.TestCase):
         self.assertEqual(refined.prior_thread_ids, ())
 
 
+class DeliveryDispositionTest(unittest.TestCase):
+    """The orthogonal delivered-fact: admitted/rejected/no-answer in state."""
+
+    def test_delivery_field_validates_and_roundtrips(self) -> None:
+        from dataclasses import replace
+
+        base = _active_state()
+        for delivery, artifact in (
+            ("admitted", "final/report-gen1.md"),
+            ("rejected", None),
+            ("no-answer", None),
+            (None, None),
+        ):
+            with self.subTest(delivery=delivery):
+                state = replace(base, delivery=delivery, delivery_artifact=artifact)
+                state.validate()
+                raw = state.to_dict()
+                self.assertEqual(raw["delivery"], delivery)
+                self.assertEqual(raw["delivery_artifact"], artifact)
+                loaded = state_machine.BundleState.from_dict(raw)
+                self.assertEqual(loaded.delivery, delivery)
+                self.assertEqual(loaded.delivery_artifact, artifact)
+
+    def test_delivery_validate_rules(self) -> None:
+        from dataclasses import replace
+
+        base = _active_state()
+        with self.assertRaises(RuleViolation):
+            replace(base, delivery="bogus").validate()
+        with self.assertRaises(RuleViolation):
+            replace(base, delivery="admitted", delivery_artifact=None).validate()
+        with self.assertRaises(RuleViolation):
+            replace(base, delivery="rejected", delivery_artifact="final/x.md").validate()
+
+    def test_pre_change_state_json_reads_as_not_recorded(self) -> None:
+        raw = _active_state().to_dict()
+        raw.pop("delivery", None)
+        raw.pop("delivery_artifact", None)
+        loaded = state_machine.BundleState.from_dict(raw)
+        self.assertIsNone(loaded.delivery)
+        self.assertIsNone(loaded.delivery_artifact)
+
+
 if __name__ == "__main__":
     unittest.main()

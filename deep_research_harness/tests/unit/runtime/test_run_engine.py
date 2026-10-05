@@ -258,6 +258,44 @@ class RunEngineTest(unittest.TestCase):
         self.assertIn("深挖成本侧证据", first_messages[0])
         self.assertNotIn("认证壁垒", first_messages[0], "generation 2 must not resend the original problem")
 
+    def _drive_to_completion(self, answer: str) -> "state_machine.BundleState":
+        def stream_fn(message: str):
+            yield _event("values", title="t", messages=[_ai(answer)])
+            yield _chunk_event(_ai(answer))
+            yield _event("end")
+
+        return run_engine.run_research(self.handle, stream_fn=stream_fn)
+
+    def test_clean_completion_records_admitted_delivery(self) -> None:
+        self._drive_to_completion("第一代报告内容")
+        final = bundle_state.read_state(self.handle)
+        self.assertEqual(final.status, "completed")
+        self.assertEqual(final.delivery, "admitted")
+        self.assertEqual(final.delivery_artifact, "final/report-gen1.md")
+
+    def test_empty_answer_records_no_answer_delivery(self) -> None:
+        self._drive_to_completion("   ")
+        final = bundle_state.read_state(self.handle)
+        self.assertEqual(final.status, "completed")
+        self.assertEqual(final.delivery, "no-answer")
+        self.assertIsNone(final.delivery_artifact)
+
+    def test_duplicate_refine_answer_records_rejected_delivery_and_stays_refinable(self) -> None:
+        from dataclasses import replace as _replace
+
+        first = self._drive_to_completion("完全相同的报告内容")
+        self.assertEqual(first.delivery, "admitted")
+        refined, _record = bundle_actions.refine(self.handle, "深挖成本侧")
+        second = self._drive_to_completion("完全相同的报告内容")  # duplicate hash vs gen 1
+        final = bundle_state.read_state(self.handle)
+        self.assertEqual(final.status, "completed")
+        self.assertEqual(final.delivery, "rejected")
+        self.assertIsNone(final.delivery_artifact)
+        # refine-after-rejected stays legal: the orthogonal model's point
+        refined_again, _r2 = bundle_actions.refine(self.handle, "换个角度")
+        self.assertEqual(refined_again.status, "active")
+
+
 def journal_mod_entries(handle):
     from deerflow_deep_research.runtime.bundle import journal as journal_mod
 

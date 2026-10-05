@@ -84,6 +84,14 @@ def cmd_status(args) -> None:
     handle = entrypoint.resolve_bundle(entrypoint.SCOPES_ROOT, args.bundle_id)
     state = bundle_actions.status(handle)
     print(f"state: {state.status} (generation {state.generation}, revision {state.revision})")
+    delivery = getattr(state, "delivery", None)
+    artifact = getattr(state, "delivery_artifact", None)
+    if delivery == "admitted":
+        print(f"delivery: admitted ({artifact})")
+    elif delivery in {"rejected", "no-answer"}:
+        print(f"delivery: {delivery}")
+    else:
+        print("delivery: (not recorded)")
     print(f"thread: {state.thread_id} | owner PID: {state.owner_pid} | composition: {state.composition}")
     from deerflow_deep_research.runtime.bundle import journal as journal_mod
 

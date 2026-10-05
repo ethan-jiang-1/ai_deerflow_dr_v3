@@ -62,6 +62,7 @@ class CliJourneyTest(unittest.TestCase):
         status = _cli("status", bundle_id)
         self.assertEqual(status.returncode, 0, status.stderr)
         self.assertIn("state: completed", status.stdout)
+        self.assertIn("delivery: admitted (final/report-gen1.md)", status.stdout)
 
         # Phase 5 round-2 ruling: refine drives the next generation to an honest
         # terminal in the foreground. A distinct scripted answer avoids the
@@ -80,6 +81,10 @@ class CliJourneyTest(unittest.TestCase):
         self.assertIn("cost-side", report2.read_text(encoding="utf-8"))
         entries2 = [json.loads(line) for line in (bundle_dirs[0] / "evidence/submissions.jsonl").read_text(encoding="utf-8").splitlines()]
         self.assertTrue(any(e["kind"] == "final_report" and e["disposition"] == "admit" and e["artifact_path"] == "final/report-gen2.md" for e in entries2))
+
+        status2 = _cli("status", bundle_id)
+        self.assertEqual(status2.returncode, 0, status2.stderr)
+        self.assertIn("delivery: admitted (final/report-gen2.md)", status2.stdout)
 
         inspected = _cli("inspect", bundle_id)
         self.assertEqual(inspected.returncode, 0, inspected.stderr)

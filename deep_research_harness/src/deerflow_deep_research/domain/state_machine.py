@@ -16,6 +16,8 @@ from .bundle import COMPOSITIONS
 STATUSES: tuple[str, ...] = ("active", "completed", "cancelled", "failed-resume")
 TERMINAL_STATUSES: tuple[str, ...] = ("completed", "cancelled", "failed-resume")
 RUN_TERMINAL_OUTCOMES: tuple[str, ...] = ("completed", "cancelled", "failed-resume")
+# The orthogonal delivery fact (state-delivery-disposition): None = not recorded.
+DELIVERY_VALUES: tuple[str | None, ...] = (None, "admitted", "rejected", "no-answer")
 DEFAULT_AUTO_PROCEED_BOUND = 2
 _PIN_RE = re.compile(r"^[0-9a-f]{40}$")
 _SCHEMA_VERSION = 1
@@ -39,6 +41,12 @@ class BundleState:
     auto_proceed_count: int
     auto_proceed_bound: int
     prior_thread_ids: tuple[str, ...] = ()
+    # The orthogonal delivered-fact of the current generation's final answer:
+    # admitted (with artifact path) / rejected / no-answer; None = not recorded
+    # (pre-change state, non-completed terminal, or crash before enrichment).
+    # Terminal-status rules are unchanged by these values.
+    delivery: str | None = None
+    delivery_artifact: str | None = None
 
     def validate(self) -> "BundleState":
         if self.schema_version != _SCHEMA_VERSION:
@@ -66,6 +74,17 @@ class BundleState:
             )
         if self.auto_proceed_count < 0 or self.auto_proceed_bound < 0:
             raise RuleViolation("auto_proceed counters must be non-negative")
+        if self.delivery not in DELIVERY_VALUES:
+            raise RuleViolation(
+                f"delivery {self.delivery!r} is outside the closed set {DELIVERY_VALUES}"
+            )
+        if self.delivery == "admitted" and not (self.delivery_artifact or "").strip():
+            raise RuleViolation("delivery admitted requires a non-empty delivery_artifact path")
+        if self.delivery != "admitted" and self.delivery_artifact is not None:
+            raise RuleViolation(
+                "delivery_artifact is only allowed when delivery is admitted; "
+                f"got delivery {self.delivery!r} with artifact {self.delivery_artifact!r}"
+            )
         if self.status == "active" and self.auto_proceed_count > self.auto_proceed_bound:
             raise RuleViolation(
                 "auto_proceed_count exceeds the bound on an active bundle: "
@@ -90,6 +109,8 @@ class BundleState:
                 auto_proceed_count=int(raw["auto_proceed_count"]),
                 auto_proceed_bound=int(raw["auto_proceed_bound"]),
                 prior_thread_ids=tuple(str(x) for x in raw.get("prior_thread_ids", [])),
+                delivery=raw.get("delivery"),
+                delivery_artifact=raw.get("delivery_artifact"),
             ).validate()
         except KeyError as exc:
             raise RuleViolation(f"state.json is missing the field {exc.args[0]!r}") from exc
@@ -112,6 +133,8 @@ class BundleState:
             "auto_proceed_count": self.auto_proceed_count,
             "auto_proceed_bound": self.auto_proceed_bound,
             "prior_thread_ids": list(self.prior_thread_ids),
+            "delivery": self.delivery,
+            "delivery_artifact": self.delivery_artifact,
         }
 
 

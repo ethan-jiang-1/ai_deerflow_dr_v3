@@ -26,7 +26,7 @@ status 发现 active 但 owner 已死：转 failed-resume
 
 | 对象 | 谁写 | 是什么 / 能看出什么 | 不能推出什么 |
 | --- | --- | --- | --- |
-| `state.json` | [bundle_state](../src/deerflow_deep_research/runtime/bundle/bundle_state.py) | 运行状态唯一权威：状态、generation、thread、composition、pin | completed ≠ 报告必然被 admit ≠ 研究质量达标 |
+| `state.json` | [bundle_state](../src/deerflow_deep_research/runtime/bundle/bundle_state.py) | 运行状态唯一权威：状态、generation、thread、composition、pin、**交付 disposition**（admitted+路径/rejected/no-answer；None=未记录） | completed ≠ 质量达标；delivery 未记录（旧状态/写入前崩溃）仍需 belt 检查 |
 | `request/problem.txt`、`request/refine-N.txt` | bundle_actions | 原始问题与各代方向 | — |
 | `checkpoint.sqlite` | 框架 checkpointer（经 [client](../src/deerflow_deep_research/runtime/adapters/client.py) 注入） | DeerFlow / LangGraph 的 thread 上下文：消息与工具结果 | 不是完整供应商原始请求/响应日志；查看需框架 checkpointer |
 | `work/` | 运行工作区 | 中间产物 | 不是已接纳证据 |
@@ -66,11 +66,10 @@ state.json（thread_id、composition、pin、终态）
 
 ## 状态 ≠ 交付 ≠ 质量
 
-判断一次运行"完成"要**三查**，缺一不可：
+判断一次运行"交付了吗"主要**两查 state**（正交事实已在 state 里）：
 
-1. **终态**：`state.json` 到达 completed / cancelled / failed-resume；
-2. **准入结果**：validation disposition（空回答不提交，重复内容可被拒绝）；
-3. **交付物**：`final/` 里存在通过准入的报告文件。
+1. **终态**：`state.json` 的 status 到达 completed / cancelled / failed-resume；
+2. **交付行**：`delivery` 字段——admitted（含报告路径）/ rejected / no-answer；None = 未记录（变更前旧状态或写入前崩溃），此时用 belt：journal 的 validation disposition + `final/` 文件有无。
 
 当前 run engine **先写 terminal 再提交最终报告**，因此看到 completed 的瞬间报告
 可能还在准入流程中。质量达标（引用真实、覆盖充分）是第四件事，没有任何 lane
