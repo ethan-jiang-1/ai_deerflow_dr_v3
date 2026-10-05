@@ -1,6 +1,8 @@
 # base.yaml — real-run configuration (shape here, secrets as $VAR references).
-# Modeled on the framework's config.example.yaml active entries; the model entry is
-# UNVERIFIED until a real-key run (the wiring smoke proves the fixture path instead).
+# Modeled on the framework's config.example.yaml active entries. VERIFIED by a
+# real-key run on 2026-10-06 (bundle c7f0d36f, deepseek-flash + Tavily
+# search/fetch, admitted cited report; receipts in runs/d_20261005/). DDG/Jina
+# were replaced because both endpoints are unreachable from this network.
 config_version: 45
 # Deep research exceeds the framework default (100) at ~10 tool rounds.
 recursion_limit: 300
@@ -19,12 +21,12 @@ sandbox:
   allow_host_bash: false
 
 models:
-  - name: deepseek-chat
-    display_name: DeepSeek Chat
+  - name: deepseek-flash
+    display_name: DeepSeek Flash V4.1
     use: deerflow.models.patched_deepseek:PatchedChatDeepSeek
-    model: deepseek-chat
+    model: deepseek-flash
     api_key: $DEEPSEEK_API_KEY
-    supports_thinking: false
+    supports_thinking: true
 
 tool_groups:
   - name: web
@@ -32,11 +34,13 @@ tool_groups:
 tools:
   - name: web_search
     group: web
-    use: deerflow.community.ddg_search.tools:web_search_tool
+    use: deerflow.community.tavily.tools:web_search_tool
+    api_key: $TAVILY_API_KEY
     max_results: 5
   - name: web_fetch
     group: web
-    use: deerflow.community.jina_ai.tools:web_fetch_tool
+    use: deerflow.community.tavily.tools:web_fetch_tool
+    api_key: $TAVILY_API_KEY
     timeout: 10
 
 # Long research runs need compaction protection (plan decision 6: explicit, not default).
