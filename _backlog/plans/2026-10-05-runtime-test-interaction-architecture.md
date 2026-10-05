@@ -1,7 +1,7 @@
 # Plan: Runtime / Test / Interaction / Agent Loop 结构与控制面重整
 
 > 类型: 架构设计 / 可驾驭性整理 | 更新: 2026-10-05
-> 状态: Phase 0–3（红灯修复、控制地图、runtime 重整、测试按 owner 分组）已分别经 `exempt-receipts-from-dependency-guard`、`establish-operator-control-map`、`split-runtime-into-bundle-and-adapters`、`group-unit-tests-by-owner` 归档；Phase 4（binding/证据可观察性）与 Phase 5（行为决策）待拆分
+> 状态: Phase 0–4 全部归档（`exempt-receipts-from-dependency-guard`、`establish-operator-control-map`、`split-runtime-into-bundle-and-adapters`、`group-unit-tests-by-owner`、`document-binding-knobs-and-run-evidence`）；结构/可观察性部分完成，仅剩 Phase 5 行为决策（skill 强制、refine 自动重跑、worker 语义等）待人拍板
 > 目标: 让产品驱动者和新 Coding Agent 不必先做代码考古，就能定位运行入口、研究 loop、skill、Run Bundle、测试资产和调试工具。
 
 ## 1. 背景
