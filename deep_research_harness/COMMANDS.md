@@ -16,7 +16,7 @@ python3 cli.py refine <bundle_id> "方向文本"   # 创建 generation+1 并前�
 python3 cli.py inspect <bundle_id>  # journal 时间线 + 已采证据 + 装配快照
 ```
 
-- 跑一个研究 / 展示结果 / 下一代方向：过程、完成判据与坑 → [playbook/run-research.md](playbook/run-research.md)
+- 跑一个研究 / 展示结果 / 下一代方向：过程、完成判据与坑 → [docs/playbook/run-research.md](docs/playbook/run-research.md)
 
 ## 测试 lane
 

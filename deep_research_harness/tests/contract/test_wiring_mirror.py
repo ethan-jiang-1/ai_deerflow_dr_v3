@@ -90,7 +90,9 @@ class ConfigResolutionTest(unittest.TestCase):
 class FixtureSeamsTest(unittest.TestCase):
     def test_fixture_use_seams_point_at_harness_owned_fakes(self) -> None:
         fixture_text = (_CONFIG_ROOT / "fixture.yaml").read_text(encoding="utf-8")
-        self.assertIn("deerflow_deep_research.runtime.fixtures", fixture_text)
+        self.assertIn("deerflow_deep_research.runtime.scripted", fixture_text)
+        # The retired module name must not survive in the config.
+        self.assertNotIn("runtime.fixtures", fixture_text)
         for seam in ("use:",):
             self.assertIn(seam, fixture_text)
 

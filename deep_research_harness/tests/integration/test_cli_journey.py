@@ -58,7 +58,7 @@ class CliJourneyTest(unittest.TestCase):
         self.assertIn("run completed", created.stdout)
 
         # Observe the accepted product artifact as well as the printed terminal state.
-        bundle_dirs = list((HARNESS_ROOT / "scopes").glob(f"d_*/{bundle_id}"))
+        bundle_dirs = list((HARNESS_ROOT.parent / "runs").glob(f"d_*/{bundle_id}"))
         self.assertEqual(len(bundle_dirs), 1)
         report = bundle_dirs[0] / "final/report-gen1.md"
         self.assertTrue(report.is_file(), created.stdout)

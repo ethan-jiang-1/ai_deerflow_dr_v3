@@ -12,4 +12,4 @@
 
 ## 坑
 
-坑清单唯一持有处在 [`playbook/run-research.md`](../playbook/run-research.md) 的坑节（`--config` 被 make 吃掉、`.env` 保留区、smoke 响亮失败噪音等）；本文件不再复制，见坑即去 playbook。
+坑清单唯一持有处在 [`docs/playbook/run-research.md`](playbook/run-research.md) 的坑节（`--config` 被 make 吃掉、`.env` 保留区、smoke 响亮失败噪音等）；本文件不再复制，见坑即去 playbook。

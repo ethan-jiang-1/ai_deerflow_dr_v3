@@ -13,12 +13,12 @@ non-zero, naming the violated fact, whenever the face is broken:
 3. no harness runtime/CLI source file references development-face material
    (``openspec`` or ``_backlog``);
 4. every playbook routing target named by ``COMMANDS.md`` exists under
-   ``deep_research_harness/playbook/``.
+   ``deep_research_harness/docs/playbook/``.
 
 Usage: ``python3 openspec/governance/check_release_face.py [repo-root]``.
 The slow full cold-start lane (fresh two-piece checkout through ``uv sync``,
 ``make verify``, and a fixture run) is documented in
-``deep_research_harness/playbook/run-research.md`` as the on-demand release proof.
+``deep_research_harness/docs/playbook/run-research.md`` as the on-demand release proof.
 
 @impl RLF-001
 """
@@ -41,7 +41,7 @@ SCAN_PATTERNS = (
     re.compile(r"^\s*(from|import)\s+(openspec|_backlog)\b", re.MULTILINE),
     re.compile(r"[\"'`](openspec|_backlog)/"),
 )
-ROUTING_RE = re.compile(r"playbook/[\w.-]+\.md")
+ROUTING_RE = re.compile(r"docs/playbook/[\w.-]+\.md")
 
 
 def _repo_root(argv: list[str]) -> Path:
@@ -134,12 +134,12 @@ def _check_menu_routing(root: Path) -> list[str]:
     commands = root / HARNESS / "COMMANDS.md"
     if not commands.is_file():
         return [f"entry face missing: {HARNESS}/COMMANDS.md"]
-    playbook_dir = commands.parent / "playbook"
+    playbook_dir = commands.parent / "docs" / "playbook"
     for match in ROUTING_RE.findall(commands.read_text(encoding="utf-8")):
         if not (commands.parent / match).is_file():
             problems.append(
                 f"dangling menu routing target: {match} "
-                f"(expected under {HARNESS}/playbook/)"
+                f"(expected under {HARNESS}/docs/playbook/)"
             )
     if playbook_dir.is_dir():
         return problems

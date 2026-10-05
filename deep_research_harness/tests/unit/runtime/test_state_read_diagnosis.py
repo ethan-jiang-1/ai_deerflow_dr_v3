@@ -27,15 +27,15 @@ class DiagnosisFixtureTest(unittest.TestCase):
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self._tmp.cleanup)
-        self.scopes = Path(self._tmp.name) / "scopes"
+        self.runs = Path(self._tmp.name) / "runs"
         state = bundle_actions.start(
-            self.scopes,
+            self.runs,
             problem_text="诊断问题",
             composition="all_real",
             deerflow_pin=_PIN,
             now=_FIXED_NOW,
         )
-        self.root = self.scopes / _FIXED_BUCKET / state.thread_id
+        self.root = self.runs / _FIXED_BUCKET / state.thread_id
         self.handle = bundle_state.BundleHandle.open(self.root)
 
     def _move_root_away(self) -> None:

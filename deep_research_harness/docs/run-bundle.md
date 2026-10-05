@@ -15,7 +15,10 @@ refine：从终态 Bundle 创建下一代并前台跑完（消息 = 该代方向
 status 发现 active 但 owner 已死：转 failed-resume
 ```
 
-- 路径合同：`scopes/d_YYYYMMDD/<bundle-id>/`，`scopes/` 被 gitignore，不提交。
+- 路径合同：`runs/d_YYYYMMDD/<bundle-id>/`，根是**仓库根的 `runs/`**（应用子树
+  之外，`deep_research_harness/` 内不存运行数据）；`runs/` 被 gitignore，不提交。
+  环境变量 `DEEP_RESEARCH_RUNS_ROOT` 可重定向根（测试/工具/非默认 checkout）。
+  旧数据曾位于应用内 `scopes/`，已整体迁移；Bundle 记录不含绝对路径，搬移后照常可读。
 - **没有集中式 registry 或恢复库**：删除一个 Bundle 是永久删除，不影响其他运行。
 - `state.json` 是运行状态**唯一权威**：写入使用 revision CAS 与 directory lease；
   并发/跨进程语义只有本地有限测试（不是多用户 worker 证明）。
@@ -85,7 +88,7 @@ state.json（thread_id、composition、pin、终态）
 | `watch` | journal 投影直播，terminal 退出 | 不驱动研究 |
 | `inspect` | journal 时间线、已接纳产物统计、装配快照 | 是投影，不补出缺失内容 |
 
-命令语义权威：[COMMANDS](../COMMANDS.md)；操作旅程：[playbook](../playbook/run-research.md)。
+命令语义权威：[COMMANDS](../COMMANDS.md)；操作旅程：[playbook](playbook/run-research.md)。
 测试：Bundle 落盘 → [test_bundle_runtime](../tests/unit/runtime/test_bundle_runtime.py)；
 状态读取诊断 → [test_state_read_diagnosis](../tests/unit/runtime/test_state_read_diagnosis.py)；
 CLI 旅程（真实框架）→ [test_cli_journey](../tests/integration/test_cli_journey.py)。

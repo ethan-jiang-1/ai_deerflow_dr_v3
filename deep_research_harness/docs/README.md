@@ -11,6 +11,7 @@
 | [`research-process.md`](research-process.md) | ✅ Deep Research skill、lead agent、绑定与运行证据入口 |
 | [研究 SOP 本地入口](skills/deep-research/README.md) | ✅ 中文阅读路由、完整 skill 快照、来源与未来调整边界 |
 | [`local-operations.md`](local-operations.md) | ✅ 本地命令与环境的坑 |
+| [操作旅程 playbook](playbook/run-research.md) | ✅ 跑研究的步骤、完成判据与坑（COMMANDS 的路由目标） |
 | [`../tests/README.md`](../tests/README.md) | ✅ 测试资产、接口、样本来源、放置规则与最小红绿路径 |
 | [`testing-and-evaluation.md`](testing-and-evaluation.md) | ✅ lane 划分、替身阶梯与最小车道选择 |
 | [`quality-register.md`](quality-register.md) | ✅ 质量机器单一清单面（代码事实源 = `engine/machines.py`） |

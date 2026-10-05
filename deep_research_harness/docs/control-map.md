@@ -74,16 +74,20 @@ deep_research_harness/
 |-- cli.py                      稳定启动入口，转交交互实现
 |-- config/                     模型、工具和框架配置（base / fixture 两梯）
 |-- src/deerflow_deep_research/ 四个所有权层（见上表）
+|   `-- runtime/scripted/       脚本梯 providers（ScriptedChatModel、假搜索）
 |-- tests/                      unit / contract / integration / fixtures
 |-- tools/                      显式录制等开发操作，不是测试
-|-- scopes/                     本地 Run Bundle，gitignored
 |-- docs/                       按问题查阅的地图（本文件是总图）
-|   `-- skills/deep-research/   研究 SOP 原文快照（参考，不是运行时配置）
-|-- playbook/                   操作步骤与完成判据
+|   |-- skills/deep-research/   研究 SOP 原文快照（参考，不是运行时配置）
+|   `-- playbook/               操作步骤与完成判据
 `-- proof-lanes.toml            回执车道声明，不是测试 runner
+
+runs/                           （仓库根）本地 Run Bundle 数据，gitignored，
+                                应用子树之外；env DEEP_RESEARCH_RUNS_ROOT 可覆盖
 ```
 
 仓库根还有：`deerflow/`（锁定上游，**只读**，普通工作不修改不深读其内部）、
+`runs/`（每次研究的 Run Bundle 数据，gitignored）、
 OpenSpec 开发工作区（规范、准入与治理 checker）、`_backlog/`（计划与任务账本）。
 它们不属于发布运行时。本仓库的 coding agent 是**开发过程参与者**，不是产品运行
 节点：不代替 lead agent 搜索、不把提示词当运行时权限、不修改上游框架来"修好"
@@ -222,4 +226,4 @@ DeerFlow 接线 / 事件 / checkpoint → make smoke
 新增/搬迁/删除对象时更新 owning code/test、§7 路由表与结构 inventory；新增 docs
 登记文档 scope 与索引行。地图不能补出未接线能力，也不复制
 state/checkpoint/ledger 成第二事实源。AGENTS 保持短触发路由；操作旅程见
-[playbook](../playbook/run-research.md)。
+[playbook](playbook/run-research.md)。

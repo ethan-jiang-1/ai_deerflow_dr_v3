@@ -10,7 +10,7 @@ from pathlib import Path
 
 HARNESS = Path(__file__).resolve().parents[3]
 COMMANDS = HARNESS / "COMMANDS.md"
-PLAYBOOK = HARNESS / "playbook"
+PLAYBOOK = HARNESS / "docs" / "playbook"
 
 SIX_VERBS = ("create", "status", "watch", "cancel", "refine", "inspect")
 
@@ -33,7 +33,7 @@ class MenuCoversTheClosedSurfaceTest(unittest.TestCase):
 class MenuRoutesWithoutEmbeddingProcedureTest(unittest.TestCase):
     def test_every_routing_target_exists_under_playbook(self) -> None:
         text = COMMANDS.read_text(encoding="utf-8")
-        targets = re.findall(r"\((playbook/[\w.-]+\.md)\)", text)
+        targets = re.findall(r"\((docs/playbook/[\w.-]+\.md)\)", text)
         self.assertTrue(targets, "menu carries no routing lines")
         for target in targets:
             self.assertTrue(
@@ -57,7 +57,7 @@ class PlaybookContentDisciplineTest(unittest.TestCase):
 
     def test_playbook_commands_reference_the_menu_not_duplicates(self) -> None:
         text = (PLAYBOOK / "run-research.md").read_text(encoding="utf-8")
-        self.assertIn("../COMMANDS.md", text)
+        self.assertIn("../../COMMANDS.md", text)
         for verb in SIX_VERBS:
             self.assertIn(verb, text, f"playbook never exercises verb: {verb}")
 

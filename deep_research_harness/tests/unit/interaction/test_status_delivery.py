@@ -23,8 +23,8 @@ def _state(delivery, artifact=None):
 class StatusDeliveryLineTest(unittest.TestCase):
     def _print_status(self, state) -> str:
         fake_entrypoint = SimpleNamespace(
-            SCOPES_ROOT=Path("/scopes"),
-            resolve_bundle=lambda scopes, bid: "HANDLE",
+            runs_root=lambda: Path("/runs"),
+            resolve_bundle=lambda runs, bid: "HANDLE",
         )
         out = io.StringIO()
         with (

@@ -27,7 +27,7 @@ forbidden_shared_modules = ["utils", "helpers", "common"]
 
 [ignored_paths]
 path = "deep_research_harness/.gitignore"
-entries = [".venv/", ".pytest_cache/", ".ruff_cache/", "__pycache__/", ".deer-flow/", "scopes/"]
+entries = [".venv/", ".pytest_cache/", ".ruff_cache/", "__pycache__/", ".deer-flow/"]
 
 [inventory]
 path = "openspec/governance/required-paths.toml"

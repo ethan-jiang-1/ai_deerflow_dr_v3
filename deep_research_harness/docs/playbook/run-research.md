@@ -1,6 +1,6 @@
 # Playbook: run-research — 被使唤「跑起来 / 跑一个研究」时按此执行
 
-> 受众：执行 agent。动词清单只认 `../COMMANDS.md` 的入口面，本文件不复制——这里缓存
+> 受众：执行 agent。动词清单只认 `../../COMMANDS.md` 的入口面，本文件不复制——这里缓存
 > 的只有：执行序列、退出码级完成判据、environment 招供不了的坑、回执纪律。
 > 治理门禁属于仓库根的治理目录（读其 README 的 Checker 命令一节）。
 
@@ -24,7 +24,7 @@
 
    完成判据：exit 0，打印 `state: completed (generation 1, …)` 并给出 bundle id；留存 id。
 
-3. **展示 run**（被要求更多输出时；动词细节问 `../COMMANDS.md`）：
+3. **展示 run**（被要求更多输出时；动词细节问 `../../COMMANDS.md`）：
 
    ```bash
    python3 cli.py status <bundle_id>
@@ -61,7 +61,7 @@ make create PROBLEM="发布面冷启动证明"
 - `make create` 里裸写 `--config` 会被 make 本身吃掉（`unrecognized option`）。
   换梯走变量：`CONFIG=base`；`fixture` 是默认值。
 - real 梯（`CONFIG=base`）需要本目录 `.env` 凭证。凭证属用户保留区：缺了就问，绝不代建。
-- `make smoke` 需先 `uv sync`；`../.uv-cache` 一旦暖过，sync 只需毫秒级。
+- `make smoke` 需先 `uv sync`；`../../.uv-cache` 一旦暖过，sync 只需毫秒级。
 - smoke 里以 `RuntimeError: deliberate fixture failure` 收尾的 traceback 是响亮失败
   测试在通过——看退出码，别看噪音。
 - 常驻告警：`langgraph` 实装版本新于 InMemorySaver delta-history patch 验证过的版本；

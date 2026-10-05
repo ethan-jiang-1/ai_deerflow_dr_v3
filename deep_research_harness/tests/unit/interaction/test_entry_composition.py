@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import contextlib
 import io
+import os
 import subprocess
 import sys
 import tempfile
@@ -18,6 +19,25 @@ from deerflow_deep_research.runtime.interaction import cli
 
 HARNESS = Path(__file__).resolve().parents[3]
 PIN = "c" * 40
+
+
+class RunsRootResolutionTest(unittest.TestCase):
+    def test_default_runs_root_is_repository_root_outside_the_application(self):
+        from deerflow_deep_research.domain import bundle as domain_bundle
+
+        self.assertEqual(entry.RUNS_ROOT, HARNESS.parent / "runs")
+        self.assertEqual(entry.RUNS_ROOT.name, domain_bundle.RUNS_ROOT_NAME)
+        # The application subtree must not contain run-bundle data.
+        self.assertNotIn(HARNESS, entry.RUNS_ROOT.parents)
+
+    def test_env_override_redirects_runs_root_resolution(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.dict(os.environ, {entry.RUNS_ROOT_ENV: directory}):
+                self.assertEqual(entry.runs_root(), Path(directory))
+        # Without the override the repository default resolves.
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop(entry.RUNS_ROOT_ENV, None)
+            self.assertEqual(entry.runs_root(), entry.RUNS_ROOT)
 
 
 def without_framework(path: Path, *arguments: str):
@@ -41,12 +61,32 @@ runpy.run_path(sys.argv[0], run_name='__main__')
 class EntryCompositionTest(unittest.TestCase):
     def test_lookup_uses_bundle_bucket_contract_and_missing_is_explicit(self):
         with tempfile.TemporaryDirectory() as directory:
-            scopes = Path(directory)
-            state = bundle_actions.start(scopes, problem_text="question", composition="fixture", deerflow_pin=PIN)
-            handle = entry.resolve_bundle(scopes, state.thread_id)
+            runs = Path(directory)
+            state = bundle_actions.start(runs, problem_text="question", composition="fixture", deerflow_pin=PIN)
+            handle = entry.resolve_bundle(runs, state.thread_id)
             self.assertEqual(handle.root.name, state.thread_id)
             with self.assertRaisesRegex(SystemExit, "permanently unavailable"):
-                entry.resolve_bundle(scopes, "ffffffff-ffff-ffff-ffff-ffffffffffff")
+                entry.resolve_bundle(runs, "ffffffff-ffff-ffff-ffff-ffffffffffff")
+
+    def test_wholesale_relocated_bundle_stays_operable(self):
+        """Locks the migration-safety property: state records carry no absolute paths,
+        so a bundle directory moved wholesale (retired scopes/ root -> runs/) keeps
+        working under the new root."""
+        import shutil
+        from datetime import datetime, timezone
+
+        with tempfile.TemporaryDirectory() as old_root, tempfile.TemporaryDirectory() as new_root:
+            state = bundle_actions.start(
+                Path(old_root), problem_text="question", composition="fixture", deerflow_pin=PIN,
+                bundle_id="0f0e0d0c-0b0a-4938-8276-5f5d4e3d2c1b",
+                now=datetime(2026, 10, 3, tzinfo=timezone.utc),
+            )
+            # Move the whole date bucket (the one-time physical relocation shape).
+            shutil.move(str(Path(old_root) / "d_20261003"), str(Path(new_root) / "d_20261003"))
+            handle = entry.resolve_bundle(Path(new_root), state.thread_id)
+            observed = bundle_actions.status(handle)
+            self.assertEqual(observed.thread_id, state.thread_id)
+            self.assertEqual(observed.status, "active")
 
     def test_foreground_assembly_forwards_bundle_config_pin_and_live_sink(self):
         from deerflow_deep_research.runtime import run_engine
@@ -90,7 +130,7 @@ class EntryCompositionTest(unittest.TestCase):
 
         with (
             tempfile.TemporaryDirectory() as directory,
-            patch.object(entry, "SCOPES_ROOT", Path(directory)),
+            patch.object(entry, "RUNS_ROOT", Path(directory)),
             patch.object(entry, "read_pin", return_value=PIN),
             patch.object(entry, "run_foreground", side_effect=missing_dependency),
             contextlib.redirect_stdout(output),

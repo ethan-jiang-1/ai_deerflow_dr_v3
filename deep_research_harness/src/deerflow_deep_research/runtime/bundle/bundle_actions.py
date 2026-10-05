@@ -47,7 +47,7 @@ def _journal(handle: BundleHandle, category: str, event: str, detail: dict) -> N
 
 
 def start(
-    scopes_root: Path,
+    runs_root: Path,
     *,
     problem_text: str,
     composition: str,
@@ -78,9 +78,9 @@ def start(
         composition=composition,
     )
 
-    scopes = Path(scopes_root)
-    staging = scopes / bundle.staging_name(bid)
-    target = scopes / bucket / bid
+    runs = Path(runs_root)
+    staging = runs / bundle.staging_name(bid)
+    target = runs / bucket / bid
     try:
         staging.mkdir(mode=0o700, parents=True)  # an existing staging or bundle path fails loudly here
         for relative in bundle.subtree_dirs():

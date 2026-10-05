@@ -69,12 +69,12 @@ class EngineHookTest(unittest.TestCase):
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self._tmp.cleanup)
-        self.scopes = Path(self._tmp.name) / "scopes"
+        self.runs = Path(self._tmp.name) / "runs"
         self.state = bundle_actions.start(
-            self.scopes, problem_text="研究认证壁垒", composition="all_real",
+            self.runs, problem_text="研究认证壁垒", composition="all_real",
             deerflow_pin=_PIN, now=_FIXED_NOW,
         )
-        self.handle = bundle_state.BundleHandle.open(self.scopes / _FIXED_BUCKET / self.state.thread_id)
+        self.handle = bundle_state.BundleHandle.open(self.runs / _FIXED_BUCKET / self.state.thread_id)
 
     def test_on_event_receives_events_without_changing_rules(self) -> None:
         seen: list[str] = []

@@ -61,7 +61,7 @@ Bundle 规则合同在 [test_bundle_domain](domain/test_bundle_domain.py)，离�
 | COMMANDS、Makefile、CLI 动词清单一致 | [test_command_surface.py](interaction/test_command_surface.py) | 文本/正则检查，不执行命令 |
 | 命令菜单路由与 playbook 完成判据登记 | [test_agent_playbook.py](interaction/test_agent_playbook.py) | 文档检查，不证明旅程真的成功 |
 | **smoke**：多轮澄清、真实 fallback、SQLite、snapshot、构造接口合同 | [test_wiring_smoke.py](integration/test_wiring_smoke.py) | 真 DeerFlowClient/图/middleware/saver；脚本模型与 fake search |
-| **smoke**：create（含搜索物化）/watch/status（含 delivery 行）/refine（跑完并 admit gen2 报告）/inspect/cancel（终态负例）、非法输入 | [test_cli_journey.py](integration/test_cli_journey.py) | 真 CLI 子进程/框架/落盘；检查非空报告及 ledger admit；fixture 模型，写应用 scopes |
+| **smoke**：create（含搜索物化）/watch/status（含 delivery 行）/refine（跑完并 admit gen2 报告）/inspect/cancel（终态负例）、非法输入 | [test_cli_journey.py](integration/test_cli_journey.py) | 真 CLI 子进程/框架/落盘；检查非空报告及 ledger admit；fixture 模型，写仓库根 runs |
 | **smoke**：replay_key、录制后回放、miss 诊断 | [test_replay_model.py](integration/test_replay_model.py) | langchain 消息/JSONL/替身实现；临时脚本录制，不消费真实模型样本、不跑图 |
 
 CLI 旅程的 refine 断言第二代跑完且报告 admit；cancel 在旅程中是终态负例（正向接线在 unit 的 refine_foreground 文件）；仍不证明运行中中断。
@@ -74,8 +74,8 @@ CLI 旅程的 refine 断言第二代跑完且报告 admit；cancel 在旅程中�
 | [clarification-exhaustion.json](fixtures/recorded/clarification-exhaustion.json) | entry_surface 渲染 golden；样本自述来自脚本 run | 不执行澄清耗尽场景，也不代表真实模型行为 |
 | [real-small-stream.json](fixtures/replay/real-small-stream.json) | event_stream_replay 消费；锁定记录事件形状 | 有外部内容/工具回复；不是事实正确性的标准答案，录制元信息不完整 |
 | [real-model-io.jsonl](fixtures/replay/real-model-io.jsonl) | 留存模型输出样本；当前没有测试消费者 | 单条 key/output，缺原始输入/model/pin/录制命令；不能独立复核真实来源 |
-| [runtime/fixtures](../src/deerflow_deep_research/runtime/fixtures/__init__.py) | fixture 配置动态加载的 ScriptedChatModel / FakeWebSearchTool | 代码 provider，不是样本文件；最后脚本项会重复，循环上限由调用方负责 |
-| [replay_model.py](../src/deerflow_deep_research/runtime/fixtures/replay_model.py) | RecordingChatModel / ReplayChatModel 的内容寻址机制 | key 忽略 system 消息，输出只保存 content，不保留完整 tool_calls/usage 协议 |
+| [runtime/scripted](../src/deerflow_deep_research/runtime/scripted/__init__.py) | fixture 配置动态加载的 ScriptedChatModel / FakeWebSearchTool | 代码 provider，不是样本文件；最后脚本项会重复，循环上限由调用方负责 |
+| [replay_model.py](../src/deerflow_deep_research/runtime/scripted/replay_model.py) | RecordingChatModel / ReplayChatModel 的内容寻址机制 | key 忽略 system 消息，输出只保存 content，不保留完整 tool_calls/usage 协议 |
 | [record_stream.py](../tools/record_stream.py) | 显式记录 client.stream；不在自动收集中 | 外部调用/数据写入工具，不是安全脱敏器 |
 
 录制真实事件时必须明确选择 `CONFIG=base`；[Makefile](../Makefile) 的 CONFIG 默认 fixture，不能仅凭 target 名认定调用了真实 API。
@@ -93,7 +93,7 @@ CLI 旅程的 refine 断言第二代跑完且报告 admit；cancel 在旅程中�
 | 离线接口镜像/配置/转发合同 | 放 contract 并进入 verify；需要真实框架的比较仍放 integration |
 | 显式录制/诊断操作 | 放 [tools](../tools/README.md)，不与自动测试混放 |
 | 最小输入/记录样本 | 按消费方式放 fixtures/recorded 或 fixtures/replay；登记消费者与来源，不把样本当测试 |
-| YAML 可加载的模型/工具替身 | 放 runtime/fixtures；样本和配置加载代码分开，保持框架公开接口 |
+| YAML 可加载的模型/工具替身 | 放 runtime/scripted；样本和配置加载代码分开，保持框架公开接口 |
 | 结构/spec/发现规则 checker 的测试 | 留在其治理 owner；不让应用默认门禁依赖治理工作区 |
 
 ## 补测试的最短路径

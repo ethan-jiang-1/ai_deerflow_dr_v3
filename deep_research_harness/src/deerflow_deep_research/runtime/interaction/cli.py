@@ -60,9 +60,9 @@ def _live_renderer():
 def cmd_create(args) -> None:
     composition = "fixture" if args.config == "fixture" else "all_real"
     state = bundle_actions.start(
-        entrypoint.SCOPES_ROOT, problem_text=args.problem, composition=composition, deerflow_pin=entrypoint.read_pin()
+        entrypoint.runs_root(), problem_text=args.problem, composition=composition, deerflow_pin=entrypoint.read_pin()
     )
-    handle = entrypoint.resolve_bundle(entrypoint.SCOPES_ROOT, state.thread_id)
+    handle = entrypoint.resolve_bundle(entrypoint.runs_root(), state.thread_id)
     print(f"bundle {state.thread_id} started (config: {args.config}, composition: {state.composition})")
 
     try:
@@ -81,7 +81,7 @@ def cmd_create(args) -> None:
 
 
 def cmd_status(args) -> None:
-    handle = entrypoint.resolve_bundle(entrypoint.SCOPES_ROOT, args.bundle_id)
+    handle = entrypoint.resolve_bundle(entrypoint.runs_root(), args.bundle_id)
     state = bundle_actions.status(handle)
     print(f"state: {state.status} (generation {state.generation}, revision {state.revision})")
     delivery = getattr(state, "delivery", None)
@@ -102,7 +102,7 @@ def cmd_status(args) -> None:
 
 
 def cmd_watch(args) -> None:
-    handle = entrypoint.resolve_bundle(entrypoint.SCOPES_ROOT, args.bundle_id)
+    handle = entrypoint.resolve_bundle(entrypoint.runs_root(), args.bundle_id)
     journal_path = handle.root / bundle.journal_relative()
     position = 0
     while True:
@@ -115,13 +115,13 @@ def cmd_watch(args) -> None:
 
 
 def cmd_cancel(args) -> None:
-    handle = entrypoint.resolve_bundle(entrypoint.SCOPES_ROOT, args.bundle_id)
+    handle = entrypoint.resolve_bundle(entrypoint.runs_root(), args.bundle_id)
     result = bundle_actions.cancel(handle)
     print(f"cancellation requested (state: {result.status}, generation {result.generation})")
 
 
 def cmd_refine(args) -> None:
-    handle = entrypoint.resolve_bundle(entrypoint.SCOPES_ROOT, args.bundle_id)
+    handle = entrypoint.resolve_bundle(entrypoint.runs_root(), args.bundle_id)
     refined, record = bundle_actions.refine(handle, args.direction)
     print(f"generation {record.generation} started: {record.direction_text}")
     print(f"state: {refined.status}")
@@ -144,7 +144,7 @@ def cmd_refine(args) -> None:
 
 
 def cmd_inspect(args) -> None:
-    handle = entrypoint.resolve_bundle(entrypoint.SCOPES_ROOT, args.bundle_id)
+    handle = entrypoint.resolve_bundle(entrypoint.runs_root(), args.bundle_id)
     state = bundle_state.read_state(handle)
     print(f"state: {state.status} (generation {state.generation}, composition {state.composition})")
     from deerflow_deep_research.runtime.bundle import journal as journal_mod

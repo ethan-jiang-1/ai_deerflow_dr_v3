@@ -1,4 +1,4 @@
-"""Harness-owned fixture providers: a scripted chat model and a canned search tool.
+"""Harness-owned scripted-ladder providers: a scripted chat model and a canned search tool.
 
 The framework ships no fake models (verified), so the fixture configuration's `use:`
 seams point here. The scripted model subclasses the framework's chat-model base

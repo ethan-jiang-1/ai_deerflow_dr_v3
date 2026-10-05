@@ -110,6 +110,7 @@ DOC_LAYER_DOCS: tuple[str, ...] = (
     "deep_research_harness/docs/skills/deep-research/README.md",
     "deep_research_harness/docs/skills/deep-research/SKILL.md",
     "deep_research_harness/docs/testing-and-evaluation.md",
+    "deep_research_harness/docs/playbook/run-research.md",
 )
 
 ADR_FILE_RE = re.compile(r"^\d{4}-.*\.md$")

@@ -6,6 +6,7 @@ Framework and configuration dependencies are imported only for an actual run.
 
 from __future__ import annotations
 
+import os
 import subprocess
 from pathlib import Path
 
@@ -15,9 +16,25 @@ from .adapters import client
 from .bundle import bundle_state
 
 HARNESS_ROOT = Path(__file__).resolve().parents[3]
+REPO_ROOT = HARNESS_ROOT.parent
 CONFIG_ROOT = HARNESS_ROOT / "config"
-SCOPES_ROOT = HARNESS_ROOT / "scopes"
-DEERFLOW_DIR = HARNESS_ROOT.parent / "deerflow"
+# Run-bundle data lives outside the application subtree (the repository-root runs/
+# directory), so the application tree holds only product code, tests, docs, config,
+# and tools. The root *name* is owned by the domain path contract; this module only
+# anchors where it resolves from.
+RUNS_ROOT = REPO_ROOT / bundle.RUNS_ROOT_NAME
+RUNS_ROOT_ENV = "DEEP_RESEARCH_RUNS_ROOT"
+DEERFLOW_DIR = REPO_ROOT / "deerflow"
+
+
+def runs_root() -> Path:
+    """Resolve the runs root for this invocation.
+
+    The DEEP_RESEARCH_RUNS_ROOT environment variable redirects resolution (tests,
+    tools, non-default checkouts); without it the repository-root default applies.
+    """
+    override = os.environ.get(RUNS_ROOT_ENV)
+    return Path(override) if override else RUNS_ROOT
 
 
 def config_name_for_composition(composition: str) -> str:
@@ -49,16 +66,16 @@ def read_pin(deerflow_dir: Path = DEERFLOW_DIR) -> str:
         raise SystemExit(f"cannot resolve the deerflow pin: {exc}") from exc
 
 
-def resolve_bundle(scopes_root: Path, bundle_id: str) -> bundle_state.BundleHandle:
+def resolve_bundle(runs_root: Path, bundle_id: str) -> bundle_state.BundleHandle:
     """Locate a Bundle in the existing date-bucket layout."""
-    if scopes_root.is_dir():
-        for bucket_dir in sorted(scopes_root.iterdir()):
+    if runs_root.is_dir():
+        for bucket_dir in sorted(runs_root.iterdir()):
             candidate = bucket_dir / bundle_id
             if bundle.is_valid_bucket(bucket_dir.name) and candidate.is_dir():
                 return bundle_state.BundleHandle.open(candidate)
     raise SystemExit(
         f"bundle {bundle_id} is permanently unavailable: no such directory under "
-        f"{scopes_root} (deletion is permanent; there is no recovery path)"
+        f"{runs_root} (deletion is permanent; there is no recovery path)"
     )
 
 

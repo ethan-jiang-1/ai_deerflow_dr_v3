@@ -39,11 +39,11 @@ class AdmissionRuntimeTest(unittest.TestCase):
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self._tmp.cleanup)
-        self.scopes = Path(self._tmp.name) / "scopes"
+        self.runs = Path(self._tmp.name) / "runs"
         self.state = bundle_actions.start(
-            self.scopes, problem_text="p", composition="all_real", deerflow_pin=_PIN, now=_FIXED_NOW
+            self.runs, problem_text="p", composition="all_real", deerflow_pin=_PIN, now=_FIXED_NOW
         )
-        self.handle = bundle_state.BundleHandle.open(self.scopes / _FIXED_BUCKET / self.state.thread_id)
+        self.handle = bundle_state.BundleHandle.open(self.runs / _FIXED_BUCKET / self.state.thread_id)
 
     def _ledger_path(self) -> Path:
         return self.handle.root / "evidence" / "submissions.jsonl"

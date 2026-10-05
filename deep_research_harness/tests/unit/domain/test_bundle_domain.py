@@ -37,12 +37,17 @@ class BundleContractTest(unittest.TestCase):
         self.assertFalse(bundle.is_valid_bundle_id("short"))
 
     def test_bundle_layout_paths(self) -> None:
-        root = bundle.bundle_dir("scopes", "d_20261003", "0f0e0d0c-0b0a-4938-8276-5f5d4e3d2c1b")
-        self.assertEqual(root.as_posix(), "scopes/d_20261003/0f0e0d0c-0b0a-4938-8276-5f5d4e3d2c1b")
+        root = bundle.bundle_dir(bundle.RUNS_ROOT_NAME, "d_20261003", "0f0e0d0c-0b0a-4938-8276-5f5d4e3d2c1b")
+        self.assertEqual(root.as_posix(), "runs/d_20261003/0f0e0d0c-0b0a-4938-8276-5f5d4e3d2c1b")
         self.assertEqual(bundle.state_relative().as_posix(), "state.json")
         self.assertEqual(bundle.checkpoint_relative().as_posix(), "checkpoint.sqlite")
         self.assertEqual(bundle.journal_relative().as_posix(), "diagnostics/journal.jsonl")
         self.assertEqual(bundle.staging_name("abc"), ".staging-abc")
+
+    def test_runs_root_name_is_the_single_declared_name(self) -> None:
+        self.assertEqual(bundle.RUNS_ROOT_NAME, "runs")
+        # The retired v3 name must not survive as a second declaration.
+        self.assertFalse(hasattr(bundle, "SCOPE_ROOT"))
 
 
 class StateMachineRulesTest(unittest.TestCase):

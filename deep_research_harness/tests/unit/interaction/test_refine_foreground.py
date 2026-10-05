@@ -32,8 +32,8 @@ class RefineForegroundWiringTest(unittest.TestCase):
         record = SimpleNamespace(generation=2, direction_text="深挖成本侧证据")
 
         fake_entrypoint = SimpleNamespace(
-            SCOPES_ROOT=Path("/scopes"), CONFIG_ROOT=Path("/config"),
-            resolve_bundle=lambda scopes, bid: "HANDLE",
+            runs_root=lambda: Path("/runs"), CONFIG_ROOT=Path("/config"),
+            resolve_bundle=lambda runs, bid: "HANDLE",
             read_pin=lambda: "p" * 40,
             config_name_for_composition=lambda c: {"fixture": "fixture", "all_real": "base"}[c],
             run_foreground=lambda handle, **kw: calls.append({"handle": handle, **kw})
@@ -61,8 +61,8 @@ class RefineForegroundWiringTest(unittest.TestCase):
         record = SimpleNamespace(generation=2, direction_text="d")
 
         fake_entrypoint = SimpleNamespace(
-            SCOPES_ROOT=Path("/scopes"), CONFIG_ROOT=Path("/config"),
-            resolve_bundle=lambda scopes, bid: "HANDLE",
+            runs_root=lambda: Path("/runs"), CONFIG_ROOT=Path("/config"),
+            resolve_bundle=lambda runs, bid: "HANDLE",
             read_pin=lambda: "p" * 40,
             config_name_for_composition=lambda c: {"fixture": "fixture", "all_real": "base"}[c],
             run_foreground=lambda handle, **kw: calls.append({"handle": handle, **kw})
@@ -103,8 +103,8 @@ class CancelPositiveWiringTest(unittest.TestCase):
     def test_cmd_cancel_records_request(self) -> None:
         cancelled = SimpleNamespace(status="active", generation=1, revision=2)
         fake_entrypoint = SimpleNamespace(
-            SCOPES_ROOT=Path("/scopes"),
-            resolve_bundle=lambda scopes, bid: "HANDLE",
+            runs_root=lambda: Path("/runs"),
+            resolve_bundle=lambda runs, bid: "HANDLE",
         )
         args = SimpleNamespace(bundle_id="b1")
         out = io.StringIO()

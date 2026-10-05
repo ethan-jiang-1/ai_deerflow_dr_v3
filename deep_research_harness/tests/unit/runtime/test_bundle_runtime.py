@@ -26,7 +26,7 @@ class StartPublishTest(unittest.TestCase):
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self._tmp.cleanup)
-        self.scopes = Path(self._tmp.name) / "scopes"
+        self.runs = Path(self._tmp.name) / "runs"
 
     def _start(self, **overrides) -> tuple[state_machine.BundleState, bundle_state.BundleHandle]:
         kwargs: dict = {
@@ -36,8 +36,8 @@ class StartPublishTest(unittest.TestCase):
             "now": _FIXED_NOW,
         }
         kwargs.update(overrides)
-        state = bundle_actions.start(self.scopes, **kwargs)
-        root = self.scopes / _FIXED_BUCKET / state.thread_id
+        state = bundle_actions.start(self.runs, **kwargs)
+        root = self.runs / _FIXED_BUCKET / state.thread_id
         return state, bundle_state.BundleHandle.open(root)
 
     def test_start_materializes_exactly_the_declared_contract(self) -> None:
@@ -58,7 +58,7 @@ class StartPublishTest(unittest.TestCase):
         with self.assertRaises(RuleViolation) as ctx:
             self._start(composition="half_real")
         self.assertIn("half_real", str(ctx.exception))
-        self.assertFalse(self.scopes.exists() and any(self.scopes.iterdir()))
+        self.assertFalse(self.runs.exists() and any(self.runs.iterdir()))
 
     def test_start_fails_loud_on_bundle_collision(self) -> None:
         fixed_id = "0f0e0d0c-0b0a-4938-8276-5f5d4e3d2c1b"
@@ -73,11 +73,11 @@ class StateStoreTest(unittest.TestCase):
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self._tmp.cleanup)
-        self.scopes = Path(self._tmp.name) / "scopes"
+        self.runs = Path(self._tmp.name) / "runs"
         state = bundle_actions.start(
-            self.scopes, problem_text="p", composition="all_real", deerflow_pin=_PIN, now=_FIXED_NOW
+            self.runs, problem_text="p", composition="all_real", deerflow_pin=_PIN, now=_FIXED_NOW
         )
-        self.handle = bundle_state.BundleHandle.open(self.scopes / _FIXED_BUCKET / state.thread_id)
+        self.handle = bundle_state.BundleHandle.open(self.runs / _FIXED_BUCKET / state.thread_id)
 
     def test_conflicting_write_is_rejected_naming_revisions(self) -> None:
         writer_a = bundle_state.read_state(self.handle)
@@ -112,7 +112,7 @@ class CrashTransferTest(unittest.TestCase):
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self._tmp.cleanup)
-        self.scopes = Path(self._tmp.name) / "scopes"
+        self.runs = Path(self._tmp.name) / "runs"
 
     def _start(self, **overrides) -> tuple[state_machine.BundleState, bundle_state.BundleHandle]:
         kwargs: dict = {
@@ -122,8 +122,8 @@ class CrashTransferTest(unittest.TestCase):
             "now": _FIXED_NOW,
         }
         kwargs.update(overrides)
-        state = bundle_actions.start(self.scopes, **kwargs)
-        handle = bundle_state.BundleHandle.open(self.scopes / _FIXED_BUCKET / state.thread_id)
+        state = bundle_actions.start(self.runs, **kwargs)
+        handle = bundle_state.BundleHandle.open(self.runs / _FIXED_BUCKET / state.thread_id)
         return state, handle
 
     def test_dead_owner_transfers_to_failed_resume_with_terminal_entry(self) -> None:
@@ -148,11 +148,11 @@ class JournalTest(unittest.TestCase):
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self._tmp.cleanup)
-        self.scopes = Path(self._tmp.name) / "scopes"
+        self.runs = Path(self._tmp.name) / "runs"
         state = bundle_actions.start(
-            self.scopes, problem_text="p", composition="all_real", deerflow_pin=_PIN, now=_FIXED_NOW
+            self.runs, problem_text="p", composition="all_real", deerflow_pin=_PIN, now=_FIXED_NOW
         )
-        self.handle = bundle_state.BundleHandle.open(self.scopes / _FIXED_BUCKET / state.thread_id)
+        self.handle = bundle_state.BundleHandle.open(self.runs / _FIXED_BUCKET / state.thread_id)
 
     def _entry(self, index: int, category: str = "model_tool") -> journal_policy.JournalEntry:
         return journal_policy.JournalEntry(
@@ -198,11 +198,11 @@ class RefineAndCancelTest(unittest.TestCase):
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self._tmp.cleanup)
-        self.scopes = Path(self._tmp.name) / "scopes"
+        self.runs = Path(self._tmp.name) / "runs"
         self.state = bundle_actions.start(
-            self.scopes, problem_text="p", composition="all_real", deerflow_pin=_PIN, now=_FIXED_NOW
+            self.runs, problem_text="p", composition="all_real", deerflow_pin=_PIN, now=_FIXED_NOW
         )
-        self.handle = bundle_state.BundleHandle.open(self.scopes / _FIXED_BUCKET / self.state.thread_id)
+        self.handle = bundle_state.BundleHandle.open(self.runs / _FIXED_BUCKET / self.state.thread_id)
 
     def test_cancel_records_the_request(self) -> None:
         result = bundle_actions.cancel(self.handle)
@@ -238,10 +238,10 @@ class RefineAndCancelTest(unittest.TestCase):
 
     def test_refine_takes_calling_process_as_owner(self) -> None:
         state = bundle_actions.start(
-            self.scopes, problem_text="p", composition="all_real", deerflow_pin=_PIN,
+            self.runs, problem_text="p", composition="all_real", deerflow_pin=_PIN,
             owner_pid=12345, now=_FIXED_NOW,  # a dead create-process pid
         )
-        handle = bundle_state.BundleHandle.open(self.scopes / _FIXED_BUCKET / state.thread_id)
+        handle = bundle_state.BundleHandle.open(self.runs / _FIXED_BUCKET / state.thread_id)
         done = state_machine.rule_run_terminal(state, "completed")
         bundle_state.write_state(handle, state, done)
         refined, _record = bundle_actions.refine(handle, "深挖成本侧证据")

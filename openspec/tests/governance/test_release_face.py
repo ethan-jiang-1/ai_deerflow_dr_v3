@@ -32,7 +32,7 @@ deerflow-harness = { path = "../deerflow/backend/packages/harness", editable = t
 COMMANDS = """\
 # COMMANDS
 
-- `python3 cli.py create "..."` — details: playbook/run-research.md
+- `python3 cli.py create "..."` — details: docs/playbook/run-research.md
 """
 
 
@@ -64,12 +64,12 @@ def _build_compliant_tree(root: Path, head_sha: str) -> None:
     )
     harness = root / HARNESS
     (harness / "src/pkg").mkdir(parents=True)
-    (harness / "playbook").mkdir()
+    (harness / "docs/playbook").mkdir(parents=True)
     (harness / "pyproject.toml").write_text(PYPROJECT, encoding="utf-8")
     (harness / "src/pkg/mod.py").write_text("VALUE = 1\n", encoding="utf-8")
     (harness / "cli.py").write_text("print('hi')\n", encoding="utf-8")
     (harness / "COMMANDS.md").write_text(COMMANDS, encoding="utf-8")
-    (harness / "playbook/run-research.md").write_text("# run-research\n", encoding="utf-8")
+    (harness / "docs/playbook/run-research.md").write_text("# run-research\n", encoding="utf-8")
 
 
 def _fixture_tree() -> Path:

@@ -50,12 +50,12 @@ class WiringSmokeTest(unittest.TestCase):
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self._tmp.cleanup)
-        self.scopes = Path(self._tmp.name) / "scopes"
+        self.runs = Path(self._tmp.name) / "runs"
         self.state = bundle_actions.start(
-            self.scopes, problem_text="研究 A 国无人机供应链的认证壁垒", composition="fixture",
+            self.runs, problem_text="研究 A 国无人机供应链的认证壁垒", composition="fixture",
             deerflow_pin=_PIN, now=_FIXED_NOW,
         )
-        self.handle = bundle_state.BundleHandle.open(self.scopes / "d_20261003" / self.state.thread_id)
+        self.handle = bundle_state.BundleHandle.open(self.runs / "d_20261003" / self.state.thread_id)
 
     def test_multi_turn_run_completes_with_readable_checkpoint(self) -> None:
         os.environ["DEERFLOW_FAKE_SCRIPT"] = _SCRIPT_CONTINUATION

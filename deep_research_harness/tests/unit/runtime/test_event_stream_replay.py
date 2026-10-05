@@ -27,14 +27,14 @@ class EventStreamReplayTest(unittest.TestCase):
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self._tmp.cleanup)
-        self.scopes = Path(self._tmp.name) / "scopes"
+        self.runs = Path(self._tmp.name) / "runs"
         recorded = json.loads(FIXTURE.read_text(encoding="utf-8"))
         self.events = recorded["events"]
         state = bundle_actions.start(
-            self.scopes, problem_text=recorded["problem"], composition="all_real",
+            self.runs, problem_text=recorded["problem"], composition="all_real",
             deerflow_pin=_PIN, now=datetime(2026, 10, 3, 12, 0, tzinfo=timezone.utc),
         )
-        self.handle = bundle_state.BundleHandle.open(self.scopes / "d_20261003" / state.thread_id)
+        self.handle = bundle_state.BundleHandle.open(self.runs / "d_20261003" / state.thread_id)
 
     def _stream_fn(self):
         iterator = iter(self.events)

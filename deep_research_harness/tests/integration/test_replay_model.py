@@ -9,7 +9,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from deerflow_deep_research.runtime.fixtures.replay_model import (
+from deerflow_deep_research.runtime.scripted.replay_model import (
     ReplayChatModel,
     RecordingChatModel,
     replay_key,

@@ -12,7 +12,7 @@ cli.py（稳定启动入口）
   -> DeerFlow lead agent <-> 模型 / 工具 / 按需 subagent
   -> run_engine（消费事件、有限续答、取消、终态）
   -> validator + admission + ledger（最终回答准入）
-  -> scopes/d_YYYYMMDD/<bundle-id>/final/report-genN.md
+  -> ../runs/d_YYYYMMDD/<bundle-id>/final/report-genN.md   （仓库根 runs/，应用子树之外）
 ```
 
 状态、checkpoint、journal 和已接纳产物持久保存在各自 Bundle 中，没有额外的集中式运行状态库。删除一个 Bundle 会永久失去该运行，其余运行仍可使用。`completed` 还需结合准入结果和报告文件判断产物是否交付；validator 检查产物合同，不验证研究事实质量。
@@ -27,7 +27,7 @@ cli.py（稳定启动入口）
 | 研究认知：skill、模型、工具、委派 | [研究过程地图](docs/research-process.md)、[base 配置](config/base.yaml) |
 | 验证：离线规则/合同、框架 smoke、输入样本 | [tests](tests/README.md)、[fixtures](tests/fixtures/README.md) |
 | 开发操作：显式录制与诊断 | [tools](tools/README.md) |
-| 运行数据：每次研究的状态、证据和报告 | [Run Bundle 地图](docs/run-bundle.md)、[Bundle 路径合同](src/deerflow_deep_research/domain/bundle.py)；本地 scopes 被 gitignore |
+| 运行数据：每次研究的状态、证据和报告 | [Run Bundle 地图](docs/run-bundle.md)、[Bundle 路径合同](src/deerflow_deep_research/domain/bundle.py)；仓库根 `runs/`（gitignored，`DEEP_RESEARCH_RUNS_ROOT` 可覆盖） |
 | 开发治理：设计准入、结构登记、任务账本 | 仓库根 OpenSpec / backlog；不参与产品运行 |
 | 权威边界与策略参考 | [控制地图](docs/control-map.md)、[local operations](docs/local-operations.md)、[testing](docs/testing-and-evaluation.md)、[词汇](CONTEXT.md) |
 
@@ -47,9 +47,9 @@ python3 cli.py watch <bundle_id>          # 观察 journal，终态退出
 python3 cli.py inspect <bundle_id>        # 时间线、已采证据、装配快照
 ```
 
-`cancel` 记录请求，由运行泵协作终止。`refine` 进入下一代 active，目前不自动执行研究。完整命令见 [COMMANDS](COMMANDS.md)，操作旅程见 [playbook](playbook/run-research.md)。
+`cancel` 记录请求，由运行泵协作终止。`refine` 进入下一代 active，目前不自动执行研究。完整命令见 [COMMANDS](COMMANDS.md)，操作旅程见 [playbook](docs/playbook/run-research.md)。
 
-fixture 配置加载 [runtime fixture providers](src/deerflow_deep_research/runtime/fixtures/__init__.py)，base 记录 `all_real`，fixture 记录 `fixture`；`mixed` 是尚未接线的枚举。provider 代码随当前 Python package 打包，wheel 仍不包含完整 CLI/config/兄弟布局，发布面是源码 checkout + 锁定 submodule。
+fixture 配置加载 [runtime scripted providers](src/deerflow_deep_research/runtime/scripted/__init__.py)，base 记录 `all_real`，fixture 记录 `fixture`；`mixed` 是尚未接线的枚举。provider 代码随当前 Python package 打包，wheel 仍不包含完整 CLI/config/兄弟布局，发布面是源码 checkout + 锁定 submodule。
 
 ## 改一处，先证明哪一层
 

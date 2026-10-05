@@ -22,14 +22,14 @@ DEFAULT_PROBLEM = "用三句话说明 EASA UAS 开放类别的核心限制"
 DEFAULT_OUTPUT = HARNESS_ROOT / "tests/fixtures/replay/real-small-stream.json"
 
 
-def record(problem: str, config: str, *, scopes_root: Path, output: Path) -> int:
+def record(problem: str, config: str, *, runs_root: Path, output: Path) -> int:
     """Record to an explicit path; no lifecycle/admission completion is implied."""
     pin = entry.read_pin()
     state = bundle_actions.start(
-        scopes_root, problem_text=problem,
+        runs_root, problem_text=problem,
         composition="all_real" if config == "base" else "fixture", deerflow_pin=pin,
     )
-    handle = entry.resolve_bundle(scopes_root, state.thread_id)
+    handle = entry.resolve_bundle(runs_root, state.thread_id)
     events = []
     with cb.bundle_checkpointer(handle) as saver:
         client = cb.build_client(
@@ -55,9 +55,16 @@ def main(argv=None) -> int:
     parser.add_argument(
         "--output", type=Path, default=DEFAULT_OUTPUT, help="recording path (existing file is overwritten)",
     )
-    parser.add_argument("--scopes-root", type=Path, default=entry.SCOPES_ROOT, help="local Bundle data root")
+    parser.add_argument(
+        "--runs-root", type=Path, default=None,
+        help="local Bundle data root (default: DEEP_RESEARCH_RUNS_ROOT or repository-root runs/)",
+    )
     args = parser.parse_args(argv)
-    return record(args.problem, args.config, scopes_root=args.scopes_root, output=args.output)
+    return record(
+        args.problem, args.config,
+        runs_root=args.runs_root if args.runs_root is not None else entry.runs_root(),
+        output=args.output,
+    )
 
 
 if __name__ == "__main__":

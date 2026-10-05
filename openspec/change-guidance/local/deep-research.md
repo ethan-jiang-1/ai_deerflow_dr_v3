@@ -39,7 +39,7 @@ produced for a declared lane is what a gate may verify.
 Harness-owned lanes land with their owning change; today the harness surface is
 `make verify` (application unit gate, offline stdlib) and `make smoke` (integration,
 requires `uv sync`). Receipt discipline and completion criteria live in
-[`deep_research_harness/playbook/run-research.md`](../../../deep_research_harness/playbook/run-research.md).
+[`deep_research_harness/docs/playbook/run-research.md`](../../../deep_research_harness/docs/playbook/run-research.md).
 Governance checks are governance-owned and are not harness lanes.
 
 ## Information Map

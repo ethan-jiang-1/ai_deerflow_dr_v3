@@ -20,7 +20,7 @@ CHECKPOINT_FILENAME = "checkpoint.sqlite"
 JOURNAL_RELATIVE = PurePosixPath("diagnostics/journal.jsonl")
 UNANSWERED_QUESTIONS_RELATIVE = PurePosixPath("diagnostics/unanswered-clarifications.json")
 REQUEST_PROBLEM_FILENAME = "problem.txt"
-SCOPE_ROOT = "scopes"
+RUNS_ROOT_NAME = "runs"
 
 _STAGING_PREFIX = ".staging-"
 
@@ -48,12 +48,12 @@ def bucket_for_date(year: int, month: int, day: int) -> str:
     return f"d_{year:04d}{month:02d}{day:02d}"
 
 
-def bundle_dir(scopes_root: str, bucket: str, bundle_id: str) -> PurePosixPath:
+def bundle_dir(runs_root: str, bucket: str, bundle_id: str) -> PurePosixPath:
     if not is_valid_bucket(bucket):
-        raise ValueError(f"invalid scope bucket {bucket!r}: expected d_YYYYMMDD")
+        raise ValueError(f"invalid run bucket {bucket!r}: expected d_YYYYMMDD")
     if not is_valid_bundle_id(bundle_id):
         raise ValueError(f"invalid bundle id {bundle_id!r}: expected UUID4")
-    return PurePosixPath(scopes_root) / bucket / bundle_id
+    return PurePosixPath(runs_root) / bucket / bundle_id
 
 
 def subtree_dirs() -> tuple[PurePosixPath, ...]:
