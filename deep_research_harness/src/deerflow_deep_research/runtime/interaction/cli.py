@@ -117,6 +117,22 @@ def cmd_refine(args) -> None:
     refined, record = bundle_actions.refine(handle, args.direction)
     print(f"generation {record.generation} started: {record.direction_text}")
     print(f"state: {refined.status}")
+    # Phase 5 round-2 ruling: the next generation runs now, in the foreground,
+    # over its own direction document, continuing the bundle's composition ladder.
+    config_name = entrypoint.config_name_for_composition(refined.composition)
+    try:
+        result = entrypoint.run_foreground(
+            handle, config_root=entrypoint.CONFIG_ROOT, config_name=config_name,
+            thread_id=refined.thread_id, pin=entrypoint.read_pin(), on_event=_live_renderer(),
+        )
+    except ImportError as exc:
+        raise SystemExit(
+            f"refine requires the deerflow environment (missing module: {exc.name}). "
+            "Remedy: run `uv sync` inside deep_research_harness/, then "
+            "`uv run python3 cli.py refine …`."
+        ) from exc
+    print(_terminal_line(result))
+    print(f"state: {result.status} (generation {result.generation}, revision {result.revision})")
 
 
 def cmd_inspect(args) -> None:

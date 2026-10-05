@@ -24,10 +24,15 @@ except ImportError:  # pragma: no cover
 HARNESS_ROOT = Path(__file__).resolve().parents[2]
 
 
-def _cli(*arguments: str) -> subprocess.CompletedProcess:
+def _cli(*arguments: str, env: dict | None = None) -> subprocess.CompletedProcess:
+    import os
+
+    merged = dict(os.environ)
+    if env:
+        merged.update(env)
     return subprocess.run(
         [sys.executable, "cli.py", *arguments],
-        cwd=HARNESS_ROOT, capture_output=True, text=True, timeout=120,
+        cwd=HARNESS_ROOT, capture_output=True, text=True, timeout=120, env=merged,
     )
 
 
@@ -58,10 +63,23 @@ class CliJourneyTest(unittest.TestCase):
         self.assertEqual(status.returncode, 0, status.stderr)
         self.assertIn("state: completed", status.stdout)
 
-        refined = _cli("refine", bundle_id, "深挖成本侧证据")
+        # Phase 5 round-2 ruling: refine drives the next generation to an honest
+        # terminal in the foreground. A distinct scripted answer avoids the
+        # admission validator's duplicate-hash rejection against generation 1.
+        refined = _cli(
+            "refine", bundle_id, "深挖成本侧证据",
+            env={"DEERFLOW_FAKE_SCRIPT": json.dumps(
+                [{"content": "Refined fixture answer: cost-side evidence summary."}]
+            )},
+        )
         self.assertEqual(refined.returncode, 0, refined.stderr)
         self.assertIn("generation 2", refined.stdout)
-        self.assertIn("state: active", refined.stdout)
+        self.assertIn("state: completed", refined.stdout)
+        report2 = bundle_dirs[0] / "final/report-gen2.md"
+        self.assertTrue(report2.is_file(), refined.stdout)
+        self.assertIn("cost-side", report2.read_text(encoding="utf-8"))
+        entries2 = [json.loads(line) for line in (bundle_dirs[0] / "evidence/submissions.jsonl").read_text(encoding="utf-8").splitlines()]
+        self.assertTrue(any(e["kind"] == "final_report" and e["disposition"] == "admit" and e["artifact_path"] == "final/report-gen2.md" for e in entries2))
 
         inspected = _cli("inspect", bundle_id)
         self.assertEqual(inspected.returncode, 0, inspected.stderr)
@@ -69,9 +87,12 @@ class CliJourneyTest(unittest.TestCase):
         self.assertIn("admitted evidence", inspected.stdout)
         self.assertIn("assembly snapshot", inspected.stdout)
 
+        # Negative control: the refined generation is terminal, so cancel must
+        # fail loudly naming the active-only precondition (positive cancel wiring
+        # is pinned in tests/unit/interaction/test_refine_foreground.py).
         cancelled = _cli("cancel", bundle_id)
-        self.assertEqual(cancelled.returncode, 0, cancelled.stderr)
-        self.assertIn("cancellation requested", cancelled.stdout)
+        self.assertNotEqual(cancelled.returncode, 0)
+        self.assertIn("active", cancelled.stderr)
 
     def test_unknown_verb_and_missing_bundle_fail_loudly(self) -> None:
         unknown = _cli("teleport", "x")

@@ -12,7 +12,7 @@ python3 cli.py create "研究问题…" --config base      # real 梯（$VAR 凭
 python3 cli.py watch <bundle_id>    # journal 投影，终态即退出
 python3 cli.py status <bundle_id>   # 状态 + journal 摘要 + owner PID 活性
 python3 cli.py cancel <bundle_id>   # 记录取消请求（泵协作终止）
-python3 cli.py refine <bundle_id> "方向文本"   # 创建 generation+1；当前命令不自动运行
+python3 cli.py refine <bundle_id> "方向文本"   # 创建 generation+1 并前台跑完该代（延续 composition 梯）
 python3 cli.py inspect <bundle_id>  # journal 时间线 + 已采证据 + 装配快照
 ```
 

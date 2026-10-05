@@ -20,6 +20,23 @@ SCOPES_ROOT = HARNESS_ROOT / "scopes"
 DEERFLOW_DIR = HARNESS_ROOT.parent / "deerflow"
 
 
+def config_name_for_composition(composition: str) -> str:
+    """Map a bundle's declared composition to the config ladder that continues it.
+
+    Refine continues the bundle's own ladder — a real-model run must not silently
+    drop to the fixture ladder, and no fresh ladder choice is offered. Values with
+    no wired ladder (the declared-but-unwired `mixed`) fail loudly naming the value.
+    """
+
+    mapping = {"fixture": "fixture", "all_real": "base"}
+    if composition not in mapping:
+        raise ValueError(
+            f"composition {composition!r} has no wired config ladder; "
+            "refine cannot continue it (declared but unwired)"
+        )
+    return mapping[composition]
+
+
 def read_pin(deerflow_dir: Path = DEERFLOW_DIR) -> str:
     """Read the upstream checkout revision using Git metadata only."""
     try:

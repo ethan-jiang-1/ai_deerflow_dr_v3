@@ -11,7 +11,7 @@ create：创建 Bundle，前台驱动运行
   -> active：run_engine 消费 stream，写 journal/checkpoint
   -> terminal：completed / cancelled / failed-resume（domain 终态规则）
 
-refine：从终态 Bundle 创建下一代 active（写入方向，不自动执行研究）
+refine：从终态 Bundle 创建下一代并前台跑完（消息 = 该代方向文档，owner = 调用进程）
 status 发现 active 但 owner 已死：转 failed-resume
 ```
 

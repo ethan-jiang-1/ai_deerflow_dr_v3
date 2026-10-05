@@ -236,5 +236,19 @@ class RefineAndCancelTest(unittest.TestCase):
         self.assertIn("先前材料摘要", seed.read_text(encoding="utf-8"))
 
 
+    def test_refine_takes_calling_process_as_owner(self) -> None:
+        state = bundle_actions.start(
+            self.scopes, problem_text="p", composition="all_real", deerflow_pin=_PIN,
+            owner_pid=12345, now=_FIXED_NOW,  # a dead create-process pid
+        )
+        handle = bundle_state.BundleHandle.open(self.scopes / _FIXED_BUCKET / state.thread_id)
+        done = state_machine.rule_run_terminal(state, "completed")
+        bundle_state.write_state(handle, state, done)
+        refined, _record = bundle_actions.refine(handle, "深挖成本侧证据")
+        self.assertEqual(refined.owner_pid, os.getpid(),
+                         "the refined generation's owner must be the calling process, "
+                         "not the inherited dead pid of the create process")
+
+
 if __name__ == "__main__":
     unittest.main()

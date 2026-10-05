@@ -213,8 +213,14 @@ def run_research(
     re-invoke the client on the same thread with a provenance-marked reply."""
 
     state = bundle_state.read_state(handle)
-    problem = (handle.root / bundle.request_problem_relative()).read_text(encoding="utf-8").strip()
-    message = problem
+    if state.generation > 1:
+        # Generation N>1 runs over its own direction document — resending the
+        # original problem would be a lie about what the run researched.
+        message = (
+            handle.root / bundle.refine_request_relative(state.generation)
+        ).read_text(encoding="utf-8").strip()
+    else:
+        message = (handle.root / bundle.request_problem_relative()).read_text(encoding="utf-8").strip()
 
     try:
         return _drive(handle, stream_fn, on_event, state, message)

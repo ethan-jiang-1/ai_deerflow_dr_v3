@@ -61,10 +61,10 @@ Bundle 规则合同在 [test_bundle_domain](domain/test_bundle_domain.py)，离�
 | COMMANDS、Makefile、CLI 动词清单一致 | [test_command_surface.py](interaction/test_command_surface.py) | 文本/正则检查，不执行命令 |
 | 命令菜单路由与 playbook 完成判据登记 | [test_agent_playbook.py](interaction/test_agent_playbook.py) | 文档检查，不证明旅程真的成功 |
 | **smoke**：多轮澄清、真实 fallback、SQLite、snapshot、构造接口合同 | [test_wiring_smoke.py](integration/test_wiring_smoke.py) | 真 DeerFlowClient/图/middleware/saver；脚本模型与 fake search |
-| **smoke**：create/watch/status/refine/inspect/cancel、报告准入、非法输入 | [test_cli_journey.py](integration/test_cli_journey.py) | 真 CLI 子进程/框架/落盘；检查非空报告及 ledger admit；fixture 模型，写应用 scopes |
+| **smoke**：create/watch/status/refine（跑完并 admit gen2 报告）/inspect/cancel（终态负例）、非法输入 | [test_cli_journey.py](integration/test_cli_journey.py) | 真 CLI 子进程/框架/落盘；检查非空报告及 ledger admit；fixture 模型，写应用 scopes |
 | **smoke**：replay_key、录制后回放、miss 诊断 | [test_replay_model.py](integration/test_replay_model.py) | langchain 消息/JSONL/替身实现；临时脚本录制，不消费真实模型样本、不跑图 |
 
-CLI 旅程的 refine 只断言 generation 2 active，cancel 只断言请求已记录；它不证明第二代完成或运行中中断。
+CLI 旅程的 refine 断言第二代跑完且报告 admit；cancel 在旅程中是终态负例（正向接线在 unit 的 refine_foreground 文件）；仍不证明运行中中断。
 真实构造合同目前对比参数**名称**；离线 contract mirror 断言不能替代真实接口对比，也不证明所有 defaults/类型/事件 schema。
 
 ## 样本数据与可配置替身分开放
@@ -130,7 +130,7 @@ CLI smoke 会留下 gitignored Run Bundle，运行前知晓此副作用；不要
 
 - 真实模型的研究充分性、引文真实性、工具选择、token/延迟质量没有自动化统计验收。
 - 真实模型 JSONL 尚未接入完整图回放；事件流回放也不证明新模型能再生成同样的过程。
-- CLI journey 不覆盖 active watch 持续观察、refine 再执行至完成、in-flight cancel；这些若成为需求，先明确合同。
+- CLI journey 不覆盖 active watch 持续观察、in-flight cancel；refine 再执行至完成已覆盖。这些若成为需求，先明确合同。
 - CAS/lease 与 rewrite 测试是本地有限实验，不是多用户 worker / 跨机器恢复证明。
 - 治理 checker 的测试另在仓库治理面；应用 verify 不 import 它们。发布冷启动仍是一条独立证据，不由测试目录名自动提供。
 

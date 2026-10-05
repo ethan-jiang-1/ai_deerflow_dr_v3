@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
 
-from deerflow_deep_research.domain import bundle, journal_policy
+from deerflow_deep_research.domain import bundle, journal_policy, state_machine
 from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
 from deerflow_deep_research.runtime import run_engine
 
@@ -238,10 +238,31 @@ class RunEngineTest(unittest.TestCase):
         self.assertEqual(result.status, "failed-resume")
         self.assertEqual(list((self.handle.root / "final").iterdir()), [], "no report file on a failed run")
 
+    def test_generation_two_message_is_the_refine_direction(self) -> None:
+        done = state_machine.rule_run_terminal(self.state, "completed")
+        bundle_state.write_state(self.handle, self.state, done)
+        refined, _record = bundle_actions.refine(self.handle, "深挖成本侧证据")
+
+        first_messages: list[str] = []
+
+        def stream_fn(message: str):
+            first_messages.append(message)
+            yield _event("values", title="t")
+            yield _chunk_event(_ai("第二代报告内容"))
+            yield _event("end")
+
+        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        self.assertEqual(result.status, "completed")
+        self.assertEqual(result.generation, 2)
+        self.assertTrue(first_messages, "the stream must have been called")
+        self.assertIn("深挖成本侧证据", first_messages[0])
+        self.assertNotIn("认证壁垒", first_messages[0], "generation 2 must not resend the original problem")
+
 def journal_mod_entries(handle):
     from deerflow_deep_research.runtime.bundle import journal as journal_mod
 
     return journal_mod.read_entries(handle)
+
 
 
 if __name__ == "__main__":

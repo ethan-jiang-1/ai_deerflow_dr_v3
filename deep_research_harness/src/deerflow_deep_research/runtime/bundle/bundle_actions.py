@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import os
 import uuid
+from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
@@ -148,6 +149,11 @@ def refine(
     state = bundle_state.read_state(handle)
     next_thread = str(_uuid.uuid4()) if fresh_context is not None else None
     refined, record = state_machine.rule_refine(state, direction_text, next_thread_id=next_thread)
+    # The refined generation's owner is the calling process (the action-layer
+    # pattern of `start`): with refine driving the run in the foreground, a
+    # status probe during the run must see the live process, not the inherited
+    # dead pid of the original create process.
+    refined = replace(refined, owner_pid=os.getpid())
     written = write_state(handle, state, refined)
     atomic.atomic_write_text(
         handle.root / bundle.refine_request_relative(record.generation), direction_text

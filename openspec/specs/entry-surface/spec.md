@@ -20,7 +20,11 @@ state authority. `create` SHALL start a bundle (configuration selected explicitl
 view; `status` SHALL report state, journal summary, and owner-PID liveness; `watch`
 SHALL render the journal projection until the run reaches a terminal state, then exit;
 `cancel` SHALL record the cancellation request; `refine` SHALL require non-empty
-direction text and enter the next generation; `inspect` SHALL render the journal
+direction text, enter the next generation, and then drive the run engine in the
+foreground over that generation's direction document — continuing the bundle's
+declared composition ladder (no fresh ladder choice; an unwired composition SHALL
+fail loudly naming it) — ending at a typed terminal state with the same terminal
+output and environment-remedy behavior as `create`; `inspect` SHALL render the journal
 timeline, the admitted evidence, the assembly snapshot, and the checkpoint thread
 summary when the framework is available. Any other command SHALL be rejected loudly
 naming the legal set.
@@ -31,6 +35,13 @@ naming the legal set.
   requested
 - **THEN** each verb produces the substrate's declared behavior, and the unknown verb
   fails naming the legal command set
+
+#### Scenario: Refined generation runs to an honest terminal
+
+- **WHEN** `refine` runs on a terminal fixture bundle with direction text
+- **THEN** the next generation is created, the run engine is driven in the foreground
+  over the direction document, and the command exits after printing a typed terminal
+  state for that generation
 
 ### Requirement: One rendering vocabulary serves the live view and the projection
 

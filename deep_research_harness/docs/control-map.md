@@ -124,7 +124,7 @@ OpenSpec 开发工作区（规范、准入与治理 checker）、`_backlog/`（�
 | `watch` | 投影 journal，遇 terminal 退出 | 不驱动研究 |
 | `status` | 读 state、journal 摘要、owner PID 存活 | 不证明质量 |
 | `cancel` | **只记录**取消请求 | 由运行泵在下个检查点协作终止 |
-| `refine` | 创建下一代 active 并写入方向 | **不自动执行研究**（"generation+1 started" ≠ 跑完） |
+| `refine` | 创建下一代并**前台跑完该代**（消息 = 该代方向文档，梯 = bundle 自声明延续） | 不是后台提交；耗时与 create 同级 |
 | `inspect` | journal 时间线、已接纳产物、装配快照 | 是诊断投影，不是第二事实源 |
 
 ## 6. 配置两梯
@@ -196,7 +196,6 @@ make create PROBLEM="研究问题" CONFIG=base   # 真实模型，需凭证
   owner 接管、外部数据库/对象存储、部署镜像（systemd/Compose/Helm）、备份与
   跨机器恢复、滚动升级协调；
 - skill 强制加载（当前 `available_skills=None`，实际加载需证据判断）；
-- `refine` 自动重跑（只创建下一代）；
 - 真实研究质量的自动化统计评估（引文真实性、充分性）；
 - evidence 自动物化（搜索结果不自动进入 evidence）。
 

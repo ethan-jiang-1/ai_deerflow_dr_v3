@@ -30,12 +30,12 @@
    python3 cli.py status <bundle_id>
    python3 cli.py watch <bundle_id>        # 终态 run：渲染历史后退出
    python3 cli.py inspect <bundle_id>
-   python3 cli.py refine <bundle_id> "补充方向"   # 创建 generation+1；不自动执行研究（按需）
+   python3 cli.py refine <bundle_id> "补充方向"   # 创建 generation+1 并前台跑完该代（按需）
    python3 cli.py cancel <bundle_id>       # 协作终止（按需）
    ```
 
    完成判据：exit 0；status 打印状态与 journal 摘要；watch 对已终态 run 渲染历史后
-   退出；inspect 打印 journal 时间线与已采证据计数；refine 创建新 generation 并返回 active，不代表已执行研究。
+   退出；inspect 打印 journal 时间线与已采证据计数；refine 创建新 generation 并当场跑完该代，落到类型化终态。
 
 4. **交回回执**：命令 + 退出码 + 终态行。只报本会话实际执行过的 run——没跑过的命令
    不得当作结果报告。
@@ -80,7 +80,7 @@ make create PROBLEM="发布面冷启动证明"
   `make create PROBLEM="发布面冷启动随行回执"` exit 0
   （`state: completed (generation 1, revision 2)`）。
 - 全动词旅程回执（2026-10-04）：create exit 0（bundle `fe3f0fcf-…`，completed g1）→
-  watch exit 0（历史渲染后退出）→ refine exit 0（generation 2 active）→
+  watch exit 0（历史渲染后退出）→ refine exit 0（generation 2 completed，报告 admit）→
   cancel exit 0（cancellation requested, generation 2）。
 - 冷启动 lane 回执（2026-10-04，本 change apply 时）：本仓库 `git clone -q --recursive .`
   至 /tmp → `uv sync` exit 0 → `UV_OFFLINE=1 make verify` exit 0（unittest gate passed）→
