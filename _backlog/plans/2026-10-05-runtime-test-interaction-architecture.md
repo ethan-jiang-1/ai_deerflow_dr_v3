@@ -1,7 +1,7 @@
 # Plan: Runtime / Test / Interaction / Agent Loop 结构与控制面重整
 
 > 类型: 架构设计 / 可驾驭性整理 | 更新: 2026-10-05
-> 状态: Phase 0–4 归档（五个 change）；Phase 5 八项已全部裁决（2026-10-05 七轮，见该节逐项记录）——三项待立 change（refine 前台重跑、state 记录交付、evidence 物化），其余维持现状已记录
+> 状态: Phase 0–4 归档（五个 change）；Phase 5 八项已全部裁决（2026-10-05 七轮，见该节逐项记录）——两项待立 change（state 记录交付、evidence 物化）；refine 前台重跑已落地，其余维持现状已记录
 > 目标: 让产品驱动者和新 Coding Agent 不必先做代码考古，就能定位运行入口、研究 loop、skill、Run Bundle、测试资产和调试工具。
 
 ## 1. 背景
@@ -381,7 +381,7 @@ tests/
 - deep-research skill 是否强制加载、版本如何锁定、怎样验收实际执行；
   **裁决：维持现状**（`available_skills=None`，可观察不保证；三列状态表 + 判断方法已交付）
 - `refine` 是创建待运行 generation，还是立即前台重跑；
-  **裁决：立即前台重跑**（复用 create 执行链；消除"下一代僵尸 + status 伪 crash 记录"——待立 change）
+  **裁决：立即前台重跑**（复用 create 执行链；消除"下一代僵尸 + status 伪 crash 记录"——已落地 `refine-foreground-rerun`）
 - active/watch/cancel 的跨进程 worker 语义；
   **裁决：维持前台模型**（单机前台 CLI；worker 仅在服务化立项时作为子任务）
 - `completed` 与 final admission 是否合并或建立更强终态合同；
