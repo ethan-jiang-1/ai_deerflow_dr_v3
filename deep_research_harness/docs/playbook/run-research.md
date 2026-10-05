@@ -60,7 +60,13 @@ make create PROBLEM="发布面冷启动证明"
 
 - `make create` 里裸写 `--config` 会被 make 本身吃掉（`unrecognized option`）。
   换梯走变量：`CONFIG=base`；`fixture` 是默认值。
-- real 梯（`CONFIG=base`）需要本目录 `.env` 凭证。凭证属用户保留区：缺了就问，绝不代建。
+- real 梯（`CONFIG=base`）需要**仓库根** `.env` 凭证（`KEY=VALUE`，如
+  `DEEPSEEK_API_KEY` / `TAVILY_API_KEY`，对应 config 里的 `$VAR` 引用）。框架启动
+  时由 python-dotenv 向上发现并加载仓库根 `.env`（应用自身不读 `.env`）；显式
+  export 同样有效。凭证属用户保留区：缺了就问，绝不代建。
+- real 梯 run 中单个工具调用失败（如某个 URL 抓取 BadRequest）会打出完整
+  traceback 噪音；lead agent 会自行换路恢复。判据看终态与 delivery 行，不看
+  中途噪音。
 - `make smoke` 需先 `uv sync`；`../../.uv-cache` 一旦暖过，sync 只需毫秒级。
 - smoke 里以 `RuntimeError: deliberate fixture failure` 收尾的 traceback 是响亮失败
   测试在通过——看退出码，别看噪音。

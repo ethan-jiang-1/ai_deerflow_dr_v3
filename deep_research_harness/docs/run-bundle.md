@@ -15,7 +15,9 @@ refine：从终态 Bundle 创建下一代并前台跑完（消息 = 该代方向
 status 发现 active 但 owner 已死：转 failed-resume
 ```
 
-- 路径合同：`runs/d_YYYYMMDD/<bundle-id>/`，根是**仓库根的 `runs/`**（应用子树
+- 路径合同：`runs/d_YYYYMMDD/<bundle-id>/`（日期桶按 **UTC** 分组——本地时区晚间
+  创建的 run 会落在"昨天"的桶里，找新 bundle 用 mtime 或 status 的 thread id），
+  根是**仓库根的 `runs/`**（应用子树
   之外，`deep_research_harness/` 内不存运行数据）；`runs/` 被 gitignore，不提交。
   环境变量 `DEEP_RESEARCH_RUNS_ROOT` 可重定向根（测试/工具/非默认 checkout）。
   旧数据曾位于应用内 `scopes/`，已整体迁移；Bundle 记录不含绝对路径，搬移后照常可读。
