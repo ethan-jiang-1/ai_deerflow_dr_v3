@@ -18,7 +18,7 @@ from deerflow_deep_research.domain import bundle
 from deerflow_deep_research.runtime import run_engine
 from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
 
-FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "replay" / "real-small-stream.json"
+FIXTURE = Path(__file__).resolve().parents[2] / "fixtures" / "replay" / "real-small-stream.json"
 _PIN = "c" * 40
 
 

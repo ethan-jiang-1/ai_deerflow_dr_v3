@@ -95,7 +95,7 @@ validator 检查 kind、文件名、producer、非空和重复 hash，**不验�
 ## 改什么、测什么
 
 - 改绑定/配置：先 [mirror 单元测试](../tests/contract/test_wiring_mirror.py)，再 [真实框架 fixture smoke](../tests/integration/test_wiring_smoke.py)。
-- 改 stream 适配/终态：先 [run_engine 测试](../tests/unit/test_run_engine.py)，真实形状问题再用 [事件回放测试](../tests/unit/test_event_stream_replay.py)。
+- 改 stream 适配/终态：先 [run_engine 测试](../tests/unit/runtime/test_run_engine.py)，真实形状问题再用 [事件回放测试](../tests/unit/runtime/test_event_stream_replay.py)。
 - 改模型研究策略：先明确是产品自有角色还是上游方法论；不能顺手改只读 skill。真实效果需显式真实梯观察，不靠脚本模型证明。
 - 新增证据/质量 gate：这是产品合同与接线变更，不是多写一条 doc；走 owning change 并确认被测接口。
 

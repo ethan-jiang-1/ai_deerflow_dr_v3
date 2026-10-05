@@ -19,7 +19,7 @@ from deerflow_deep_research.runtime.interaction import render
 _PIN = "c" * 40
 _FIXED_NOW = datetime(2026, 10, 3, 12, 0, tzinfo=timezone.utc)
 _FIXED_BUCKET = "d_20261003"
-_GOLDEN = Path(__file__).resolve().parents[2] / "tests" / "fixtures" / "recorded" / "clarification-exhaustion.json"
+_GOLDEN = Path(__file__).resolve().parents[3] / "tests" / "fixtures" / "recorded" / "clarification-exhaustion.json"
 
 
 def _event(event_type: str, **data) -> SimpleNamespace:

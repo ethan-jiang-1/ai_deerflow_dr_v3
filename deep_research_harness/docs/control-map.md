@@ -144,19 +144,19 @@ OpenSpec 开发工作区（规范、准入与治理 checker）、`_backlog/`（�
 
 | 对象 / 你要改变什么 | 直接入口 | 最小证据 |
 | --- | --- | --- |
-| Bundle 状态、generation、终态 | [state_machine](../src/deerflow_deep_research/domain/state_machine.py) | [test_bundle_domain](../tests/unit/test_bundle_domain.py) |
-| 澄清上限、journal 词汇、artifact 合同 | domain 的 clarification / journal_policy / admission | 同上、[test_admission_engine](../tests/unit/test_admission_engine.py) |
-| 创建、取消、refine、owner 存活 | [bundle_actions](../src/deerflow_deep_research/runtime/bundle/bundle_actions.py) | [test_bundle_runtime](../tests/unit/test_bundle_runtime.py) |
-| state 读取 / revision / 目录 identity | [bundle_state](../src/deerflow_deep_research/runtime/bundle/bundle_state.py) | [test_state_read_diagnosis](../tests/unit/test_state_read_diagnosis.py) |
-| 产物是否合法、阶段 admit 数量 | engine 的 validator / gate / verdicts | [test_admission_engine](../tests/unit/test_admission_engine.py)（gate 不等于已接入四阶段图） |
-| 准入落盘、账本、原子写入 | runtime 的 admission / ledger / atomic | [test_admission_runtime](../tests/unit/test_admission_runtime.py) |
-| stream / 续答 / 错误 / 最终回答投影 | [run_engine](../src/deerflow_deep_research/runtime/run_engine.py)、[journal](../src/deerflow_deep_research/runtime/bundle/journal.py) | [test_run_engine](../tests/unit/test_run_engine.py)、[事件回放](../tests/unit/test_event_stream_replay.py) |
-| checkout 定位与前台装配 | [entry](../src/deerflow_deep_research/runtime/entry.py) | [test_entry_composition](../tests/unit/test_entry_composition.py) |
-| CLI 解析、文案、直播/观察 | [interaction cli](../src/deerflow_deep_research/runtime/interaction/cli.py)、[render](../src/deerflow_deep_research/runtime/interaction/render.py) | [test_entry_surface](../tests/unit/test_entry_surface.py)、[CLI 旅程](../tests/integration/test_cli_journey.py) |
+| Bundle 状态、generation、终态 | [state_machine](../src/deerflow_deep_research/domain/state_machine.py) | [test_bundle_domain](../tests/unit/domain/test_bundle_domain.py) |
+| 澄清上限、journal 词汇、artifact 合同 | domain 的 clarification / journal_policy / admission | 同上、[test_admission_engine](../tests/unit/engine/test_admission_engine.py) |
+| 创建、取消、refine、owner 存活 | [bundle_actions](../src/deerflow_deep_research/runtime/bundle/bundle_actions.py) | [test_bundle_runtime](../tests/unit/runtime/test_bundle_runtime.py) |
+| state 读取 / revision / 目录 identity | [bundle_state](../src/deerflow_deep_research/runtime/bundle/bundle_state.py) | [test_state_read_diagnosis](../tests/unit/runtime/test_state_read_diagnosis.py) |
+| 产物是否合法、阶段 admit 数量 | engine 的 validator / gate / verdicts | [test_admission_engine](../tests/unit/engine/test_admission_engine.py)（gate 不等于已接入四阶段图） |
+| 准入落盘、账本、原子写入 | runtime 的 admission / ledger / atomic | [test_admission_runtime](../tests/unit/runtime/test_admission_runtime.py) |
+| stream / 续答 / 错误 / 最终回答投影 | [run_engine](../src/deerflow_deep_research/runtime/run_engine.py)、[journal](../src/deerflow_deep_research/runtime/bundle/journal.py) | [test_run_engine](../tests/unit/runtime/test_run_engine.py)、[事件回放](../tests/unit/runtime/test_event_stream_replay.py) |
+| checkout 定位与前台装配 | [entry](../src/deerflow_deep_research/runtime/entry.py) | [test_entry_composition](../tests/unit/interaction/test_entry_composition.py) |
+| CLI 解析、文案、直播/观察 | [interaction cli](../src/deerflow_deep_research/runtime/interaction/cli.py)、[render](../src/deerflow_deep_research/runtime/interaction/render.py) | [test_entry_surface](../tests/unit/interaction/test_entry_surface.py)、[CLI 旅程](../tests/integration/test_cli_journey.py) |
 | client 装配 / checkpoint / 递归上限 | [client](../src/deerflow_deep_research/runtime/adapters/client.py)、[接口镜像](../src/deerflow_deep_research/runtime/adapters/contracts/client_surface.py) | [test_wiring_mirror](../tests/contract/test_wiring_mirror.py)、[smoke](../tests/integration/test_wiring_smoke.py) |
-| prompt/tool 装配观测、委派声明 | [snapshot](../src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py)、[posture](../src/deerflow_deep_research/runtime/adapters/subagent_posture.py) | smoke、[test_subagent_posture](../tests/unit/test_subagent_posture.py) |
+| prompt/tool 装配观测、委派声明 | [snapshot](../src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py)、[posture](../src/deerflow_deep_research/runtime/adapters/subagent_posture.py) | smoke、[test_subagent_posture](../tests/unit/runtime/test_subagent_posture.py) |
 | 搜索、模型、摘要策略 | [base](../config/base.yaml)、[fixture](../config/fixture.yaml) | 配置 smoke；真实研究质量另评审 |
-| 质量机器登记、命令导航 | [machines](../src/deerflow_deep_research/engine/machines.py)、[quality register](quality-register.md)、[COMMANDS](../COMMANDS.md) | [test_admission_engine](../tests/unit/test_admission_engine.py)、[test_command_surface](../tests/unit/test_command_surface.py) |
+| 质量机器登记、命令导航 | [machines](../src/deerflow_deep_research/engine/machines.py)、[quality register](quality-register.md)、[COMMANDS](../COMMANDS.md) | [test_admission_engine](../tests/unit/engine/test_admission_engine.py)、[test_command_surface](../tests/unit/interaction/test_command_surface.py) |
 | 事件录制、样本来源/消费者 | [tools](../tools/README.md)、[fixtures](../tests/fixtures/README.md) | 显式录制 + 对应 replay 测试 |
 | 未来 harness model role | [agents 包](../src/deerflow_deep_research/agents/__init__.py) | 先定义角色合同再放代码；空包不代表实现 |
 

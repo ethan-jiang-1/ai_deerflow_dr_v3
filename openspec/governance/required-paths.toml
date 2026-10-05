@@ -118,7 +118,7 @@ files = [
   "deep_research_harness/src/deerflow_deep_research/runtime/interaction/__init__.py",
   "deep_research_harness/src/deerflow_deep_research/runtime/interaction/cli.py",
   "deep_research_harness/src/deerflow_deep_research/runtime/interaction/render.py",
-  "deep_research_harness/tests/unit/test_entry_composition.py",
+  "deep_research_harness/tests/unit/interaction/test_entry_composition.py",
   "deep_research_harness/tests/contract/__init__.py",
   "deep_research_harness/tests/contract/test_wiring_mirror.py",
   "deep_research_harness/tests/fixtures/README.md",

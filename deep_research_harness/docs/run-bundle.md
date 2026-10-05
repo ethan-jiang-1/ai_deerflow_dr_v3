@@ -56,6 +56,6 @@ status 发现 active 但 owner 已死：转 failed-resume
 | `inspect` | journal 时间线、已接纳产物统计、装配快照 | 是投影，不补出缺失内容 |
 
 命令语义权威：[COMMANDS](../COMMANDS.md)；操作旅程：[playbook](../playbook/run-research.md)。
-测试：Bundle 落盘 → [test_bundle_runtime](../tests/unit/test_bundle_runtime.py)；
-状态读取诊断 → [test_state_read_diagnosis](../tests/unit/test_state_read_diagnosis.py)；
+测试：Bundle 落盘 → [test_bundle_runtime](../tests/unit/runtime/test_bundle_runtime.py)；
+状态读取诊断 → [test_state_read_diagnosis](../tests/unit/runtime/test_state_read_diagnosis.py)；
 CLI 旅程（真实框架）→ [test_cli_journey](../tests/integration/test_cli_journey.py)。

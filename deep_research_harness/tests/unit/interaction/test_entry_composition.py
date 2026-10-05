@@ -16,7 +16,7 @@ from deerflow_deep_research.runtime import entry
 from deerflow_deep_research.runtime.bundle import bundle_actions
 from deerflow_deep_research.runtime.interaction import cli
 
-HARNESS = Path(__file__).resolve().parents[2]
+HARNESS = Path(__file__).resolve().parents[3]
 PIN = "c" * 40
 
 

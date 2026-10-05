@@ -8,7 +8,7 @@ import re
 import unittest
 from pathlib import Path
 
-HARNESS = Path(__file__).resolve().parents[2]
+HARNESS = Path(__file__).resolve().parents[3]
 COMMANDS = HARNESS / "COMMANDS.md"
 PLAYBOOK = HARNESS / "playbook"
 

@@ -44,7 +44,7 @@ DeerFlow 接线 / 事件 / checkpoint → make smoke
 | 级 | 状态 | 机制 | 用途 |
 | --- | --- | --- | --- |
 | 1 剧本模型 | ✅ [ScriptedChatModel](../src/deerflow_deep_research/runtime/fixtures/__init__.py) + `DEERFLOW_FAKE_SCRIPT` | 预编程消息（含 tool_calls 与 raise），框架 smoke 保留真图/中间件/checkpointer | 零凭证验证绑定/入口合同，不证明研究质量 |
-| 2 记录事件流回放 | ✅ [事件记录](../tests/fixtures/replay/real-small-stream.json) + [回放测试](../tests/unit/test_event_stream_replay.py) | 记录形状经真实 Harness pump 回放，不重跑模型/工具 | 锁定 flat chunk 适配与 journal 回归 |
+| 2 记录事件流回放 | ✅ [事件记录](../tests/fixtures/replay/real-small-stream.json) + [回放测试](../tests/unit/runtime/test_event_stream_replay.py) | 记录形状经真实 Harness pump 回放，不重跑模型/工具 | 锁定 flat chunk 适配与 journal 回归 |
 | 3 内容寻址模型回放 | ✅ [机制实现](../src/deerflow_deep_research/runtime/fixtures/replay_model.py) + [机制测试](../tests/integration/test_replay_model.py) | 临时脚本录制/回放与 miss 诊断；[留存模型样本](../tests/fixtures/replay/real-model-io.jsonl) 未被现有测试消费 | 不保留完整模型协议；尚无真实模型记录接入图的旅程证明 |
 | 4 行为断言（live 面） | ⬜ 未规划 | 对真实运行的 trace 断言（工具选择/token/时长） | 显式 opt-in 的质量观察 |
 

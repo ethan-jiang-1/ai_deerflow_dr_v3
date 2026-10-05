@@ -12,7 +12,11 @@ tests/
 |-- __init__.py         unittest 递归发现的包标记
 |-- unit/
 |   |-- __init__.py     离线默认门禁的包标记
-|   `-- test_*.py       纯规则 + 本地真实落盘 + 协议替身 + 静态守卫
+|   |-- test_collection_guard.py   收集守卫：owner 标记齐全、integration 默认隔离
+|   |-- domain/         Bundle/status/clarification/journal 纯规则
+|   |-- engine/         validator/gate/machines 纯裁决
+|   |-- runtime/        Bundle 落盘、状态读取、准入落盘、运行泵、回放、posture
+|   `-- interaction/    渲染、命令面、playbook、entry 组合
 |-- integration/        无包标记；smoke 独立发现
 |   `-- test_*.py       框架依赖测试、真实 CLI 子进程、回放机制测试
 |-- contract/           有包标记；离线接口镜像/配置/转发测试进入 verify
@@ -21,8 +25,12 @@ tests/
     `-- replay/         事件流 / 模型输出记录
 ```
 
+**目录即 owner**：unit 下四个子包按被测 owner 分组，选择最小 seam 先看目录名；
+`test_collection_guard.py` 守护收集合同（owner 标记、integration 隔离、默认
+发现范围），新增/删除包标记都会变红。
+
 **目录与测试职责不是同一个维度。** unit 内含真实文件系统和有限并发测试；integration 内的模型回放测试并非完整端到端。
-Bundle 规则合同在 [test_bundle_domain](unit/test_bundle_domain.py)，离线接口镜像在 [test_wiring_mirror](contract/test_wiring_mirror.py)，真实 client 构造参数名对比在 [test_wiring_smoke](integration/test_wiring_smoke.py)。
+Bundle 规则合同在 [test_bundle_domain](domain/test_bundle_domain.py)，离线接口镜像在 [test_wiring_mirror](contract/test_wiring_mirror.py)，真实 client 构造参数名对比在 [test_wiring_smoke](integration/test_wiring_smoke.py)。
 目录按依赖和责任选择；需要真实框架的合同仍在 integration。录制操作已移到 [tools](../tools/README.md)，输入数据见 [fixtures](fixtures/README.md)。
 
 [Makefile](../Makefile) 决定实际收集方式：
@@ -39,19 +47,19 @@ Bundle 规则合同在 [test_bundle_domain](unit/test_bundle_domain.py)，离线
 
 | 要证明的行为 / 接口 | 测试资产 | 使用的真实部分与替身 |
 | --- | --- | --- |
-| Bundle 路径、状态转移、澄清、journal 纯规则 | [test_bundle_domain.py](unit/test_bundle_domain.py) | 真实 domain；手工状态/调用观察，无 I/O |
-| 创建、碰撞、cancel/refine、CAS、lease、journal 落盘 | [test_bundle_runtime.py](unit/test_bundle_runtime.py) | 临时目录/真实存储；固定时刻/pin、注入 liveness；含短命进程 |
-| 状态文件缺失/目录缺失分类、有限并发 rewrite | [test_state_read_diagnosis.py](unit/test_state_read_diagnosis.py) | 临时目录/线程；patch 制造读取竞态，不证明所有跨进程/文件系统情况 |
-| validator 结果、gate 数量推导、quality register 登记 | [test_admission_engine.py](unit/test_admission_engine.py) | 真实纯裁决；人工 submission/context 与文档 |
-| reject 不落内容、admit/replay、账本篡改、报告路径 | [test_admission_runtime.py](unit/test_admission_runtime.py) | 真实 validator/临时落盘/hash 链；人工产物 |
-| run_research 的续答、终态、fallback、取消与最终报告 | [test_run_engine.py](unit/test_run_engine.py) | 真实 Bundle/journal/admission；手写 stream_fn 事件，非真实 agent loop |
-| 前台装配、create 顺序/缺依赖 remedy、Bundle 查找、pin 失败、无框架 help/观察错误 | [test_entry_composition.py](unit/test_entry_composition.py) | 真入口/临时落盘/依赖阻断子进程与负例；client/saver/run_engine 协议替身，不执行模型 |
-| 文案、直播事件 callback、journal tail、golden 渲染 | [test_entry_surface.py](unit/test_entry_surface.py) | 真实 render/pump/临时文件；人工事件与 golden 样本，不执行 CLI |
-| 真实 flat 事件形状进入 pump、工具名进入 journal | [test_event_stream_replay.py](unit/test_event_stream_replay.py) | 固定记录流 + 真实 pump/落盘；不重跑模型、搜索和框架图 |
+| Bundle 路径、状态转移、澄清、journal 纯规则 | [test_bundle_domain.py](domain/test_bundle_domain.py) | 真实 domain；手工状态/调用观察，无 I/O |
+| 创建、碰撞、cancel/refine、CAS、lease、journal 落盘 | [test_bundle_runtime.py](runtime/test_bundle_runtime.py) | 临时目录/真实存储；固定时刻/pin、注入 liveness；含短命进程 |
+| 状态文件缺失/目录缺失分类、有限并发 rewrite | [test_state_read_diagnosis.py](runtime/test_state_read_diagnosis.py) | 临时目录/线程；patch 制造读取竞态，不证明所有跨进程/文件系统情况 |
+| validator 结果、gate 数量推导、quality register 登记 | [test_admission_engine.py](engine/test_admission_engine.py) | 真实纯裁决；人工 submission/context 与文档 |
+| reject 不落内容、admit/replay、账本篡改、报告路径 | [test_admission_runtime.py](runtime/test_admission_runtime.py) | 真实 validator/临时落盘/hash 链；人工产物 |
+| run_research 的续答、终态、fallback、取消与最终报告 | [test_run_engine.py](runtime/test_run_engine.py) | 真实 Bundle/journal/admission；手写 stream_fn 事件，非真实 agent loop |
+| 前台装配、create 顺序/缺依赖 remedy、Bundle 查找、pin 失败、无框架 help/观察错误 | [test_entry_composition.py](interaction/test_entry_composition.py) | 真入口/临时落盘/依赖阻断子进程与负例；client/saver/run_engine 协议替身，不执行模型 |
+| 文案、直播事件 callback、journal tail、golden 渲染 | [test_entry_surface.py](interaction/test_entry_surface.py) | 真实 render/pump/临时文件；人工事件与 golden 样本，不执行 CLI |
+| 真实 flat 事件形状进入 pump、工具名进入 journal | [test_event_stream_replay.py](runtime/test_event_stream_replay.py) | 固定记录流 + 真实 pump/落盘；不重跑模型、搜索和框架图 |
 | 配置解析、本地 client mirror、thread/递归上限转发 | [test_wiring_mirror.py](contract/test_wiring_mirror.py) | 本地代码/配置；FakeClient 记录调用，不 import 真 client |
-| subagent 配置 posture 与违规声明 | [test_subagent_posture.py](unit/test_subagent_posture.py) | stdlib checker + 真实/临时配置，不执行委派 |
-| COMMANDS、Makefile、CLI 动词清单一致 | [test_command_surface.py](unit/test_command_surface.py) | 文本/正则检查，不执行命令 |
-| 命令菜单路由与 playbook 完成判据登记 | [test_agent_playbook.py](unit/test_agent_playbook.py) | 文档检查，不证明旅程真的成功 |
+| subagent 配置 posture 与违规声明 | [test_subagent_posture.py](runtime/test_subagent_posture.py) | stdlib checker + 真实/临时配置，不执行委派 |
+| COMMANDS、Makefile、CLI 动词清单一致 | [test_command_surface.py](interaction/test_command_surface.py) | 文本/正则检查，不执行命令 |
+| 命令菜单路由与 playbook 完成判据登记 | [test_agent_playbook.py](interaction/test_agent_playbook.py) | 文档检查，不证明旅程真的成功 |
 | **smoke**：多轮澄清、真实 fallback、SQLite、snapshot、构造接口合同 | [test_wiring_smoke.py](integration/test_wiring_smoke.py) | 真 DeerFlowClient/图/middleware/saver；脚本模型与 fake search |
 | **smoke**：create/watch/status/refine/inspect/cancel、报告准入、非法输入 | [test_cli_journey.py](integration/test_cli_journey.py) | 真 CLI 子进程/框架/落盘；检查非空报告及 ledger admit；fixture 模型，写应用 scopes |
 | **smoke**：replay_key、录制后回放、miss 诊断 | [test_replay_model.py](integration/test_replay_model.py) | langchain 消息/JSONL/替身实现；临时脚本录制，不消费真实模型样本、不跑图 |
@@ -80,7 +88,7 @@ CLI 旅程的 refine 只断言 generation 2 active，cancel 只断言请求已�
 
 | 新资产的责任 | 放置规则 |
 | --- | --- |
-| stdlib 纯规则、本地可信落盘、注入 stream 的确定性行为 | 优先扩展已有 unit owner 文件；新 owner 才增加 `unit/test_<owner>.py` |
+| stdlib 纯规则、本地可信落盘、注入 stream 的确定性行为 | 优先扩展已有 unit owner 目录中的文件；新 owner 才建 `unit/<owner>/` 子包（需配 `__init__.py`，collection guard 会检查） |
 | 需要 DeerFlow/langchain 环境、真实图/checkpointer 或 CLI 子进程 | 扩展对应 integration 文件；新文件仍由 smoke 单独发现 |
 | 离线接口镜像/配置/转发合同 | 放 contract 并进入 verify；需要真实框架的比较仍放 integration |
 | 显式录制/诊断操作 | 放 [tools](../tools/README.md)，不与自动测试混放 |
@@ -103,11 +111,11 @@ CLI 旅程的 refine 只断言 generation 2 active，cancel 只断言请求已�
 
 ```bash
 # 单个离线文件
-PYTHONPATH=src python3 -m unittest tests.unit.test_run_engine -v
+PYTHONPATH=src python3 -m unittest tests.unit.runtime.test_run_engine -v
 # 单个合同文件
 PYTHONPATH=src python3 -m unittest tests.contract.test_wiring_mirror -v
 # 单个测试（下面是现存例子）
-PYTHONPATH=src python3 -m unittest tests.unit.test_bundle_domain.BundleContractTest -v
+PYTHONPATH=src python3 -m unittest tests.unit.domain.test_bundle_domain.BundleContractTest -v
 # 单个集成文件：不要 import integration 当包
 UV_CACHE_DIR="$PWD/../.uv-cache" uv run --no-sync python -m unittest discover -s tests/integration -p 'test_wiring_smoke.py' -v
 # 最后扩大验证

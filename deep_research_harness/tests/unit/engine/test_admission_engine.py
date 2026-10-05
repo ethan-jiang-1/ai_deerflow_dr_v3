@@ -13,7 +13,7 @@ from deerflow_deep_research.engine import gate, machines, validator, verdicts
 from deerflow_deep_research.engine.gate import GateRequirement
 from deerflow_deep_research.engine.validator import AdmissionContext, ArtifactSubmission
 
-_REGISTER = Path(__file__).resolve().parents[2] / "docs" / "quality-register.md"
+_REGISTER = Path(__file__).resolve().parents[3] / "docs" / "quality-register.md"
 
 
 def _submission(**overrides) -> ArtifactSubmission:

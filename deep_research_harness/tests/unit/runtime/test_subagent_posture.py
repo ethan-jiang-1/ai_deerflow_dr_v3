@@ -16,7 +16,7 @@ from pathlib import Path
 from deerflow_deep_research.domain.state_machine import RuleViolation
 from deerflow_deep_research.runtime.adapters import subagent_posture
 
-CONFIG_ROOT = Path(__file__).resolve().parents[2] / "config"
+CONFIG_ROOT = Path(__file__).resolve().parents[3] / "config"
 
 POSTURE_MARK = "no custom subagent types"
 
