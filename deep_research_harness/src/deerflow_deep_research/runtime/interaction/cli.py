@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import sys
 import time
 
 from ...domain import bundle
@@ -19,6 +21,33 @@ from ..bundle import bundle_actions, bundle_state
 from . import render
 
 COMMANDS = ("create", "status", "watch", "cancel", "refine", "inspect")
+
+INTERACTIVE_ENV = "DEEP_RESEARCH_INTERACTIVE"
+
+
+def _clarification_handler():
+    """Build the interactive clarification handler when the context allows prompting.
+
+    Gating: stdin is a TTY, or DEEP_RESEARCH_INTERACTIVE is set truthy (the override
+    exists so subprocess contexts can drive the prompt and users can force it on).
+    A non-interactive context gets no handler and the run engine keeps the bounded
+    automatic continuation — stdin is never read.
+    """
+
+    override = os.environ.get(INTERACTIVE_ENV, "").strip().lower()
+    interactive = sys.stdin.isatty() or override in {"1", "true", "yes", "on"}
+    if not interactive:
+        return None
+
+    def handler(question: str) -> str:
+        print(render.clarification_question(question))
+        print(render.CLARIFICATION_PROMPT_HINT)
+        try:
+            return input("> ").strip()
+        except EOFError:
+            return ""  # a closed stdin declines; the engine falls back to the auto-reply
+
+    return handler
 
 
 def _terminal_line(state) -> str:
@@ -69,6 +98,7 @@ def cmd_create(args) -> None:
         result = entrypoint.run_foreground(
             handle, config_root=entrypoint.CONFIG_ROOT, config_name=args.config,
             thread_id=state.thread_id, pin=entrypoint.read_pin(), on_event=_live_renderer(),
+            on_clarification=_clarification_handler(),
         )
     except ImportError as exc:
         raise SystemExit(
@@ -132,6 +162,7 @@ def cmd_refine(args) -> None:
         result = entrypoint.run_foreground(
             handle, config_root=entrypoint.CONFIG_ROOT, config_name=config_name,
             thread_id=refined.thread_id, pin=entrypoint.read_pin(), on_event=_live_renderer(),
+            on_clarification=_clarification_handler(),
         )
     except ImportError as exc:
         raise SystemExit(

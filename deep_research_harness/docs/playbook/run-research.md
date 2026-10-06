@@ -64,6 +64,10 @@ make create PROBLEM="发布面冷启动证明"
   `DEEPSEEK_API_KEY` / `TAVILY_API_KEY`，对应 config 里的 `$VAR` 引用）。框架启动
   时由 python-dotenv 向上发现并加载仓库根 `.env`（应用自身不读 `.env`）；显式
   export 同样有效。凭证属用户保留区：缺了就问，绝不代建。
+- agent 反问（`ask_clarification`）在交互上下文（stdin 是 TTY，或
+  `DEEP_RESEARCH_INTERACTIVE=1`）会现场问你：回答即继续（不耗自动应答预算），
+  回车留空 = 不答（回落自动应答并计预算）。headless（无 TTY 无覆盖）永不读
+  stdin，行为与从前一致（自动应答，上限 2 次，耗尽诚实失败）。
 - real 梯 run 中单个工具调用失败（如某个 URL 抓取 BadRequest）会打出完整
   traceback 噪音；lead agent 会自行换路恢复。判据看终态与 delivery 行，不看
   中途噪音。

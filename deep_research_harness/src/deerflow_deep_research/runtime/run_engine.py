@@ -251,12 +251,15 @@ def run_research(
     *,
     stream_fn: Callable[[str], object],
     on_event: Callable[[object], None] | None = None,
+    on_clarification: Callable[[str], str | None] | None = None,
 ) -> BundleState:
     """Drive one research run to an honest terminal state.
 
     Sinks: the journal (tool/subagent events), the state machine (terminal rules),
     and the diagnostics directory (unanswered questions). Continuation turns
-    re-invoke the client on the same thread with a provenance-marked reply."""
+    re-invoke the client on the same thread with a provenance-marked reply; with a
+    clarification hook the question is delivered to the human first and a
+    non-empty answer continues the run as the human's own words."""
 
     state = bundle_state.read_state(handle)
     recorder = search_log.SearchLog(handle, generation=state.generation)
@@ -270,7 +273,7 @@ def run_research(
         message = (handle.root / bundle.request_problem_relative()).read_text(encoding="utf-8").strip()
 
     try:
-        return _drive(handle, stream_fn, on_event, state, message, recorder)
+        return _drive(handle, stream_fn, on_event, on_clarification, state, message, recorder)
     except Exception as exc:  # framework/stream failure: loud terminal, material preserved
         fresh = bundle_state.read_state(handle)
         failed = rule_run_terminal(fresh, "failed-resume")
@@ -279,7 +282,7 @@ def run_research(
         return written
 
 
-def _drive(handle, stream_fn, on_event, state, message, recorder):
+def _drive(handle, stream_fn, on_event, on_clarification, state, message, recorder):
     while True:
         tool_calls, answered, stop_reason, fallback_error_type, final_text = _consume_turn(
             handle, stream_fn, message, state.thread_id, on_event, recorder
@@ -322,6 +325,19 @@ def _drive(handle, stream_fn, on_event, state, message, recorder):
             return written
 
         last_question = tool_calls[-1].arguments if tool_calls else ""
+        if on_clarification is not None:
+            question_text = clarification.question_text(last_question)
+            _journal(handle, "lifecycle", "clarification_asked", {"question": question_text})
+            answer = on_clarification(question_text)
+            if answer is not None and str(answer).strip():
+                # The human's own words continue the run — raw, no provenance prefix.
+                _journal(
+                    handle, "lifecycle", "clarification_answered", {"question": question_text},
+                )
+                message = str(answer).strip()
+                continue
+            # Declined (empty answer): fall back to the bounded automatic reply.
+            _journal(handle, "lifecycle", "clarification_declined", {"question": question_text})
         if state.auto_proceed_count < state.auto_proceed_bound:
             state = rule_clarification_step(state, detected=True)
             state = bundle_state.write_state(handle, bundle_state.read_state(handle), state)

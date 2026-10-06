@@ -83,6 +83,58 @@ class RunEngineTest(unittest.TestCase):
         self.assertIn("[非交互模式·系统自动应答]", turns[1])
         self.assertIn("范围选哪国市场", turns[1])
 
+    def test_interactive_answer_continues_without_consuming_bound(self) -> None:
+        turns: list[str] = []
+        asked: list[str] = []
+
+        def stream_fn(message: str):
+            turns.append(message)
+            if len(turns) == 1:
+                yield _chunk_event(_ai(tool_calls=[_ask_call("c1")]))
+                yield _event("end")
+            else:
+                yield _chunk_event(_ai("已对齐范围，继续研究"))
+                yield _event("end")
+
+        def on_clarification(question: str) -> str:
+            asked.append(question)
+            return "A 国，聚焦消费级无人机"
+
+        result = run_engine.run_research(
+            self.handle, stream_fn=stream_fn, on_clarification=on_clarification,
+        )
+        self.assertEqual(result.status, "completed")
+        self.assertEqual(asked, ["范围选哪国市场？"])
+        # The answer continues the run as the human's own words — no provenance prefix.
+        self.assertEqual(turns[1], "A 国，聚焦消费级无人机")
+        # An answered interactive round does not consume the auto bound.
+        self.assertEqual(result.auto_proceed_count, 0)
+        events = [e.event for e in journal_mod_entries(self.handle) if e.category == "lifecycle"]
+        self.assertIn("clarification_asked", events)
+        self.assertIn("clarification_answered", events)
+
+    def test_declined_interactive_question_falls_back_to_auto_reply(self) -> None:
+        turns: list[str] = []
+
+        def stream_fn(message: str):
+            turns.append(message)
+            if len(turns) == 1:
+                yield _chunk_event(_ai(tool_calls=[_ask_call("c1")]))
+                yield _event("end")
+            else:
+                yield _chunk_event(_ai("按假设继续"))
+                yield _event("end")
+
+        result = run_engine.run_research(
+            self.handle, stream_fn=stream_fn, on_clarification=lambda q: "   ",
+        )
+        self.assertEqual(result.status, "completed")
+        # A declined round consumes the auto bound exactly like a headless continuation.
+        self.assertEqual(result.auto_proceed_count, 1)
+        self.assertIn("[非交互模式·系统自动应答]", turns[1])
+        events = [e.event for e in journal_mod_entries(self.handle) if e.category == "lifecycle"]
+        self.assertIn("clarification_declined", events)
+
     def test_exhausted_bound_fails_loud_with_question_file(self) -> None:
         def stream_fn(message: str):
             yield _chunk_event(_ai(tool_calls=[_ask_call("c1")]))

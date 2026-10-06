@@ -89,3 +89,11 @@ def journal_line(entry) -> str:  # noqa: ANN001 — watch projection (journal en
     if entry.category == "exhaustion":
         return f"clarification bound exhausted ({detail.get('bound', '?')})"
     return f"{entry.category}: {entry.event}"
+
+
+CLARIFICATION_PROMPT_HINT = "（回车提交；留空 = 不答，让 agent 自行判断）"
+
+
+def clarification_question(question: str) -> str:
+    """The stable phrase for a clarification question delivered to the operator."""
+    return f"agent 想问你：{question}"

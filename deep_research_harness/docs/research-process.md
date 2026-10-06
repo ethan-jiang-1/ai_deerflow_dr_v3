@@ -33,6 +33,11 @@ skill 在本项目里是三个不同的对象，不能混为一谈：
 把 skill 变成强制、可验收的运行时合同是独立的产品/认知策略决策（2026-10-05
 计划 Phase 5），不在当前实现内。
 
+反问（clarification）是 agent 自己的判断：它认为问题含糊时用 `ask_clarification`
+工具发问。交互上下文（TTY 或 `DEEP_RESEARCH_INTERACTIVE=1`）里 harness 把问题递给
+操作者现场作答（答案原样续跑，不耗自动应答预算；留空拒答回落自动应答）；headless
+保持非交互自动应答（上限 2 轮）。判断权在模型，路由权在 harness——不设强制问卷。
+
 ## binding knobs：实际默认值与证据
 
 每个装配旋钮的实际值、裁决处与锁定它的测试（守卫

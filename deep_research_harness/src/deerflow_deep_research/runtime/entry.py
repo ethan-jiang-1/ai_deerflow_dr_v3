@@ -79,11 +79,16 @@ def resolve_bundle(runs_root: Path, bundle_id: str) -> bundle_state.BundleHandle
     )
 
 
-def run_foreground(handle, *, config_root: Path, config_name: str, thread_id: str, pin: str, on_event=None):
+def run_foreground(
+    handle, *, config_root: Path, config_name: str, thread_id: str, pin: str,
+    on_event=None, on_clarification=None,
+):
     """Assemble the configured client/saver and return the run engine's typed state.
 
     The caller creates the Bundle and owns presentation. Missing runtime dependencies
     propagate to that caller; run_engine retains all terminal and admission decisions.
+    `on_clarification` (interactive contexts) routes the agent's clarifying question
+    to the human; without it the engine keeps the bounded automatic continuation.
     """
     with client.bundle_checkpointer(handle) as saver:
         import yaml
@@ -96,5 +101,6 @@ def run_foreground(handle, *, config_root: Path, config_name: str, thread_id: st
             snapshot_dir=handle.root / "diagnostics", pin=pin,
         )
         return run_engine.run_research(
-            handle, stream_fn=client.make_stream_fn(bound_client, thread_id), on_event=on_event,
+            handle, stream_fn=client.make_stream_fn(bound_client, thread_id),
+            on_event=on_event, on_clarification=on_clarification,
         )
