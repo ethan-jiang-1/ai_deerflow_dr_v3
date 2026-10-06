@@ -1,6 +1,6 @@
 # Plans — plan/分析文档索引
 
-> 最后更新: 2026-10-07（plan-review-gate 关闭归 CLS-016；显性立卡纪律保留，队列复空） | `_backlog/plans/` — 活跃 plan 在此（顶层），
+> 最后更新: 2026-10-07（动态 review 立卡 clarification-channel-discipline） | `_backlog/plans/` — 活跃 plan 在此（顶层），
 > 完成的普通 plan 移入 [`../_done/_closed_plans/`](../_done/_closed_plans/)。
 >
 > **plan 没有编号，文件名即标识。完成后文件名不变，位置即状态。**
@@ -23,6 +23,7 @@
 
 | Plan | 一句话 |
 |------|--------|
+| [2026-10-07-clarification-channel-discipline](2026-10-07-clarification-channel-discipline.md) | 反问/计划双通道职责绑定 + 预算耗尽后静默吸收反问补 journal 事件（真梯动态 review 炸出） |
 
 **Next available plan ID: CLS-017**（移入 `_closed_plans/` 时分配）
 
