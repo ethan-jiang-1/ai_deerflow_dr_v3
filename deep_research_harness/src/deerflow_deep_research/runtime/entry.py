@@ -81,7 +81,7 @@ def resolve_bundle(runs_root: Path, bundle_id: str) -> bundle_state.BundleHandle
 
 def run_foreground(
     handle, *, config_root: Path, config_name: str, thread_id: str, pin: str,
-    on_event=None, on_clarification=None,
+    on_event=None, on_clarification=None, on_plan=None,
 ):
     """Assemble the configured client/saver and return the run engine's typed state.
 
@@ -102,5 +102,5 @@ def run_foreground(
         )
         return run_engine.run_research(
             handle, stream_fn=client.make_stream_fn(bound_client, thread_id),
-            on_event=on_event, on_clarification=on_clarification,
+            on_event=on_event, on_clarification=on_clarification, on_plan=on_plan,
         )

@@ -61,10 +61,12 @@ Bundle 规则合同在 [test_bundle_domain](domain/test_bundle_domain.py)，离�
 | COMMANDS、Makefile、CLI 动词清单一致 | [test_command_surface.py](interaction/test_command_surface.py) | 文本/正则检查，不执行命令 |
 | 命令菜单路由与 playbook 完成判据登记 | [test_agent_playbook.py](interaction/test_agent_playbook.py) | 文档检查，不证明旅程真的成功 |
 | 反问交互门控（TTY/env）、提示渲染、create/refine 接线 | [test_clarification_prompt.py](interaction/test_clarification_prompt.py) | patch stdin/env 的接线检查；handler 行为用假 input，不执行模型 |
+| 计划闸门门控、三路 handler（确认/修订/跳过/放弃）、create-only 接线 | [test_plan_prompt.py](interaction/test_plan_prompt.py) | patch stdin/env 与假 input；不执行模型 |
 | **smoke**：多轮澄清、真实 fallback、SQLite、snapshot、构造接口合同 | [test_wiring_smoke.py](integration/test_wiring_smoke.py) | 真 DeerFlowClient/图/middleware/saver；脚本模型与 fake search |
 | **smoke**：create（含搜索物化）/watch/status（含 delivery 行）/refine（跑完并 admit gen2 报告）/inspect/cancel（终态负例）、非法输入 | [test_cli_journey.py](integration/test_cli_journey.py) | 真 CLI 子进程/框架/落盘；检查非空报告及 ledger admit；fixture 模型，写仓库根 runs |
 | **smoke**：replay_key、录制后回放、miss 诊断 | [test_replay_model.py](integration/test_replay_model.py) | langchain 消息/JSONL/替身实现；临时脚本录制，不消费真实模型样本、不跑图 |
 | **smoke**：交互反问旅程（作答继续不耗预算 / 拒答回落自动应答） | [test_clarification_journey.py](integration/test_clarification_journey.py) | 真 CLI 子进程 + DEEP_RESEARCH_INTERACTIVE=1 + 管道 stdin；脚本模型伪造反问，零凭证 |
+| **smoke**：计划闸门旅程（确认注入+物化 / 修订附加意见） | [test_plan_journey.py](integration/test_plan_journey.py) | 真 CLI 子进程 + 管道 stdin；脚本模型先出计划轮再出报告，零凭证 |
 
 CLI 旅程的 refine 断言第二代跑完且报告 admit；cancel 在旅程中是终态负例（正向接线在 unit 的 refine_foreground 文件）；仍不证明运行中中断。
 真实构造合同目前对比参数**名称**；离线 contract mirror 断言不能替代真实接口对比，也不证明所有 defaults/类型/事件 schema。

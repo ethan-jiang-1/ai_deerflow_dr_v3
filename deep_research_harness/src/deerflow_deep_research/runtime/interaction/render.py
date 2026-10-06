@@ -97,3 +97,11 @@ CLARIFICATION_PROMPT_HINT = "（回车提交；留空 = 不答，让 agent 自�
 def clarification_question(question: str) -> str:
     """The stable phrase for a clarification question delivered to the operator."""
     return f"agent 想问你：{question}"
+
+
+PLAN_PROMPT_HINT = "（回车=确认计划 | 直接输入=附加修订意见 | s=跳过计划 | q=放弃本次运行）"
+
+
+def proposed_plan(plan: str) -> str:
+    """The stable phrase for the agent's proposed research plan."""
+    return "agent 的研究计划：\n" + plan

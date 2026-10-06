@@ -20,6 +20,14 @@ from .bundle.journal import append_entry
 
 AUTO_REPLY_PREFIX = "[非交互模式·系统自动应答] "
 
+# Plan-gate framing and continuations (stable constants; scripted tests pin them).
+PLAN_REQUEST_SUFFIX = (
+    "\n\n请先给出研究计划（研究角度、查询策略、来源类型），等待确认后再开始研究；"
+    "不要在此轮执行搜索。"
+)
+PLAN_CONFIRM_PREFIX = "研究计划已确认（或经用户修订）。严格按以下计划执行研究并产出最终报告：\n\n"
+PLAN_SKIP_MESSAGE = "跳过计划注入，按你自己的判断研究并产出最终报告。"
+
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -252,6 +260,7 @@ def run_research(
     stream_fn: Callable[[str], object],
     on_event: Callable[[object], None] | None = None,
     on_clarification: Callable[[str], str | None] | None = None,
+    on_plan: Callable[[str], str | None] | None = None,
 ) -> BundleState:
     """Drive one research run to an honest terminal state.
 
@@ -259,7 +268,9 @@ def run_research(
     and the diagnostics directory (unanswered questions). Continuation turns
     re-invoke the client on the same thread with a provenance-marked reply; with a
     clarification hook the question is delivered to the human first and a
-    non-empty answer continues the run as the human's own words."""
+    non-empty answer continues the run as the human's own words; with a plan hook
+    on a first-generation run the first plain-text turn is the proposed research
+    plan, gated by the human and injected as the continuation."""
 
     state = bundle_state.read_state(handle)
     recorder = search_log.SearchLog(handle, generation=state.generation)
@@ -271,9 +282,13 @@ def run_research(
         ).read_text(encoding="utf-8").strip()
     else:
         message = (handle.root / bundle.request_problem_relative()).read_text(encoding="utf-8").strip()
+        if on_plan is not None:
+            message = message + PLAN_REQUEST_SUFFIX
 
     try:
-        return _drive(handle, stream_fn, on_event, on_clarification, state, message, recorder)
+        return _drive(
+            handle, stream_fn, on_event, on_clarification, on_plan, state, message, recorder,
+        )
     except Exception as exc:  # framework/stream failure: loud terminal, material preserved
         fresh = bundle_state.read_state(handle)
         failed = rule_run_terminal(fresh, "failed-resume")
@@ -282,7 +297,8 @@ def run_research(
         return written
 
 
-def _drive(handle, stream_fn, on_event, on_clarification, state, message, recorder):
+def _drive(handle, stream_fn, on_event, on_clarification, on_plan, state, message, recorder):
+    awaiting_plan = on_plan is not None and state.generation == 1
     while True:
         tool_calls, answered, stop_reason, fallback_error_type, final_text = _consume_turn(
             handle, stream_fn, message, state.thread_id, on_event, recorder
@@ -295,6 +311,34 @@ def _drive(handle, stream_fn, on_event, on_clarification, state, message, record
         )
 
         if not detected:
+            if awaiting_plan:
+                plan_text = (final_text or "").strip()
+                if tool_calls or not plan_text:
+                    # The model researched despite the framing (or planned nothing):
+                    # degrade honestly, never force-block, fall through to today's rules.
+                    _journal(handle, "lifecycle", "plan_gate_degraded", {
+                        "reason": "researched" if tool_calls else "empty_plan",
+                    })
+                    awaiting_plan = False
+                else:
+                    _journal(handle, "lifecycle", "plan_proposed", {"plan_preview": plan_text[:200]})
+                    approved = on_plan(plan_text)
+                    if approved is not None and str(approved).strip():
+                        approved = str(approved).strip()
+                        event = "plan_confirmed" if approved == plan_text else "plan_amended"
+                        _journal(handle, "lifecycle", event, {"plan_preview": approved[:200]})
+                        from .bundle.atomic import atomic_write_text
+
+                        atomic_write_text(
+                            handle.root / bundle.plan_request_relative(state.generation),
+                            approved + "\n",
+                        )
+                        message = PLAN_CONFIRM_PREFIX + approved
+                    else:
+                        _journal(handle, "lifecycle", "plan_skipped", {})
+                        message = PLAN_SKIP_MESSAGE
+                    awaiting_plan = False
+                    continue
             fresh = bundle_state.read_state(handle)
             if fallback_error_type is not None:
                 # The framework disguised a model-call failure as a normal AI message:

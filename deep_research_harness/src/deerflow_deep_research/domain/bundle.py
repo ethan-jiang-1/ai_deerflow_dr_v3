@@ -80,6 +80,10 @@ def refine_request_relative(generation: int) -> PurePosixPath:
     return PurePosixPath("request") / f"refine-{generation}.txt"
 
 
+def plan_request_relative(generation: int) -> PurePosixPath:
+    return PurePosixPath("request") / f"plan-gen{generation}.md"
+
+
 def generation_context_relative(generation: int) -> PurePosixPath:
     return PurePosixPath("request") / f"generation-{generation}-context.md"
 

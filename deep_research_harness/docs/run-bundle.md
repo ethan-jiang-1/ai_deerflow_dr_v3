@@ -33,6 +33,7 @@ status 发现 active 但 owner 已死：转 failed-resume
 | --- | --- | --- | --- |
 | `state.json` | [bundle_state](../src/deerflow_deep_research/runtime/bundle/bundle_state.py) | 运行状态唯一权威：状态、generation、thread、composition、pin、**交付 disposition**（admitted+路径/rejected/no-answer；None=未记录） | completed ≠ 质量达标；delivery 未记录（旧状态/写入前崩溃）仍需 belt 检查 |
 | `request/problem.txt`、`request/refine-N.txt` | bundle_actions | 原始问题与各代方向 | — |
+| `request/plan-gen1.md` | [run_engine](../src/deerflow_deep_research/runtime/run_engine.py)（计划闸门） | 用户确认（或经修订）的研究计划：本次运行的范围合同 | 跳过/放弃/降级不产生此文件；物化的是已确认版，不是 agent 的全部计划尝试 |
 | `checkpoint.sqlite` | 框架 checkpointer（经 [client](../src/deerflow_deep_research/runtime/adapters/client.py) 注入） | DeerFlow / LangGraph 的 thread 上下文：消息与工具结果 | 不是完整供应商原始请求/响应日志；查看需框架 checkpointer |
 | `work/` | 运行工作区 | 中间产物 | 不是已接纳证据 |
 | `evidence/` | [admission](../src/deerflow_deep_research/runtime/bundle/admission.py) | 通过准入的证据与 `submissions.jsonl` 哈希链 | 搜索结果**不自动物化**进 evidence；有此目录 ≠ 完整证据库 |

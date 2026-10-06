@@ -50,6 +50,38 @@ def _clarification_handler():
     return handler
 
 
+def _plan_handler():
+    """Build the interactive plan-gate handler when the context allows prompting.
+
+    Same gate as the clarification handler (TTY or DEEP_RESEARCH_INTERACTIVE). The
+    operator confirms the plan (Enter), appends a revision note (typed text), skips
+    the injection (s), or aborts (q). A non-interactive context gets no handler and
+    the engine never enters a plan phase.
+    """
+
+    override = os.environ.get(INTERACTIVE_ENV, "").strip().lower()
+    interactive = sys.stdin.isatty() or override in {"1", "true", "yes", "on"}
+    if not interactive:
+        return None
+
+    def handler(plan: str):
+        print(render.proposed_plan(plan))
+        print(render.PLAN_PROMPT_HINT)
+        try:
+            line = input("> ").strip()
+        except EOFError:
+            return None  # a closed stdin skips the gate; the run proceeds without injection
+        if line == "s":
+            return None
+        if line == "q":
+            raise SystemExit("plan gate aborted by operator")
+        if not line:
+            return plan
+        return plan + "\n\n用户修订意见：" + line
+
+    return handler
+
+
 def _terminal_line(state) -> str:
     from types import SimpleNamespace
 
@@ -98,7 +130,7 @@ def cmd_create(args) -> None:
         result = entrypoint.run_foreground(
             handle, config_root=entrypoint.CONFIG_ROOT, config_name=args.config,
             thread_id=state.thread_id, pin=entrypoint.read_pin(), on_event=_live_renderer(),
-            on_clarification=_clarification_handler(),
+            on_clarification=_clarification_handler(), on_plan=_plan_handler(),
         )
     except ImportError as exc:
         raise SystemExit(

@@ -15,7 +15,7 @@ cli.py（稳定启动入口）
   -> ../runs/d_YYYYMMDD/<bundle-id>/final/report-genN.md   （仓库根 runs/，应用子树之外）
 ```
 
-状态、checkpoint、journal 和已接纳产物持久保存在各自 Bundle 中，没有额外的集中式运行状态库。删除一个 Bundle 会永久失去该运行，其余运行仍可使用。`completed` 还需结合准入结果和报告文件判断产物是否交付；validator 检查产物合同，不验证研究事实质量。
+交互上下文（TTY 或 `DEEP_RESEARCH_INTERACTIVE=1`）中 `create` 先经**计划确认闸门**（agent 交计划 → 操作者确认/修订/跳过 → 注入续跑，确认计划物化于 `request/plan-gen1.md`）；模型判断含糊时可先反问（答案原样续跑）。状态、checkpoint、journal 和已接纳产物持久保存在各自 Bundle 中，没有额外的集中式运行状态库。删除一个 Bundle 会永久失去该运行，其余运行仍可使用。`completed` 还需结合准入结果和报告文件判断产物是否交付；validator 检查产物合同，不验证研究事实质量。
 
 ## Reading Map
 

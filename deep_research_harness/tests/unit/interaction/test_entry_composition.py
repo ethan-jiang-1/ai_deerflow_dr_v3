@@ -112,7 +112,7 @@ class EntryCompositionTest(unittest.TestCase):
             snapshot_dir=Path("/bundle/diagnostics"), pin=PIN,
         )
         make_stream.assert_called_once_with("client", "thread")
-        run.assert_called_once_with(handle, stream_fn=stream, on_event=sink, on_clarification=None)
+        run.assert_called_once_with(handle, stream_fn=stream, on_event=sink, on_clarification=None, on_plan=None)
 
     def test_pin_failure_names_the_missing_framework_checkout(self):
         with patch.object(entry.subprocess, "run", side_effect=OSError("missing git")):
