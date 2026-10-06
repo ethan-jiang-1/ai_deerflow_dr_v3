@@ -1,6 +1,6 @@
 # Closed Plans Index — 已完成 plan 归档
 
-> 最后更新: 2026-10-06（agent-friendly-repository-map 关闭：CLS-015；活跃队列清空） | `_backlog/_done/_closed_plans/` — 已完成 plan 的归档目录。
+> 最后更新: 2026-10-07（plan-review-gate 关闭：CLS-016，两 change 落地含缺陷修复） | `_backlog/_done/_closed_plans/` — 已完成 plan 的归档目录。
 > 接收来自 [`../../plans/`](../../plans/) 的 plan。`_` 前缀 = coding agent 默认忽略。
 >
 > **plan 完成后文件名不变，位置即状态。** 移入时分配 `CLS-NNN` 序号（Closed），按完成时间递增。
@@ -34,5 +34,6 @@ plan 完成后从 `_backlog/plans/` 通过 `git mv` 移入本目录：
 | CLS-013 | 2026-10-04 | [2026-10-04-doc-hygiene-second-sweep.md](2026-10-04-doc-hygiene-second-sweep.md) | 第二轮文档卫生审计 26 条全处置：账本 ritual 修正直落（B2-B5/A4）+ 同名 change 归档（19 条声明层修复；A5/C2/C3 与计数钉死形态 defer 给操作者与后续治理 change；依赖方向守卫新抓三处跨树链接即改即绿） |
 | CLS-014 | 2026-10-06 | [2026-10-05-runtime-test-interaction-architecture.md](2026-10-05-runtime-test-interaction-architecture.md) | Runtime/Test/Interaction/AgentLoop 结构与控制面重整主计划：Phase 0–4 五 change 归档 + Phase 5 八项裁决收官（三项落地、五项维持现状已记录）；2026-10-06 §8 验收清单正式执行全勾（verify/smoke/7 checker/git 检查全 0，11c29fe）；assembly/execution 采有原则退让（entry.py/run_engine.py 平铺，单文件不满足建目录原则）；后续结构维护由应用 docs/README.md 的地图维护触发条件承接（CLS-015） |
 | CLS-015 | 2026-10-06 | [2026-10-05-agent-friendly-repository-map.md](2026-10-05-agent-friendly-repository-map.md) | Agent-friendly Repo 持续整理维护卡：两轮结构整理落地（clarify-application-surfaces + relocate-runs-and-clarify-structure）；触发表由 docs/README.md "地图维护触发条件"节吸收，活跃队列不再留常驻卡（回执 json 随卡归档） |
+| CLS-016 | 2026-10-07 | [2026-10-07-plan-review-gate.md](2026-10-07-plan-review-gate.md) | 计划确认闸门：agent 交计划、操作者审改确认后开跑；plan-review-gate 落地后真梯演示暴露检测缺陷（报告被误当计划），plan-marker-detection 以内容标记修复并固化回归；交互反问先行落地为 interactive-clarification |
 
-**Next available plan ID: CLS-016**
+**Next available plan ID: CLS-017**

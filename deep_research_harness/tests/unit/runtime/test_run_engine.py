@@ -136,6 +136,7 @@ class RunEngineTest(unittest.TestCase):
         self.assertIn("clarification_declined", events)
 
     _PLAN_TEXT = "研究计划：\n1. 广度探索认证壁垒的全景\n2. 深挖 A 国消费级法规"
+    _MARKED_PLAN = "<research-plan>\n" + _PLAN_TEXT + "\n</research-plan>"
 
     def test_plan_hook_gates_first_turn_and_injects_confirmed_plan(self) -> None:
         turns: list[str] = []
@@ -144,7 +145,7 @@ class RunEngineTest(unittest.TestCase):
         def stream_fn(message: str):
             turns.append(message)
             if len(turns) == 1:
-                yield _chunk_event(_ai(self._PLAN_TEXT))
+                yield _chunk_event(_ai(self._MARKED_PLAN))
                 yield _event("end")
             else:
                 yield _chunk_event(_ai("最终报告：按计划完成"))
@@ -178,7 +179,7 @@ class RunEngineTest(unittest.TestCase):
         def stream_fn(message: str):
             turns.append(message)
             if len(turns) == 1:
-                yield _chunk_event(_ai(self._PLAN_TEXT))
+                yield _chunk_event(_ai(self._MARKED_PLAN))
                 yield _event("end")
             else:
                 yield _chunk_event(_ai("最终报告"))
@@ -200,7 +201,7 @@ class RunEngineTest(unittest.TestCase):
         def stream_fn(message: str):
             turns.append(message)
             if len(turns) == 1:
-                yield _chunk_event(_ai(self._PLAN_TEXT))
+                yield _chunk_event(_ai(self._MARKED_PLAN))
                 yield _event("end")
             else:
                 yield _chunk_event(_ai("最终报告"))
@@ -216,27 +217,81 @@ class RunEngineTest(unittest.TestCase):
         events = [e.event for e in journal_mod_entries(self.handle) if e.category == "lifecycle"]
         self.assertIn("plan_skipped", events)
 
-    def test_researching_first_turn_degrades_the_plan_gate_honestly(self) -> None:
+    def test_markerless_report_turn_degrades_the_plan_gate_honestly(self) -> None:
+        """The real-ladder regression (bundle 58b5440e): a research turn ending in a
+        plain-text report has an empty terminal tool-call picture exactly like a plan
+        turn — only content markers can distinguish them."""
         turns: list[str] = []
 
         def stream_fn(message: str):
             turns.append(message)
-            yield _chunk_event(_ai(tool_calls=[
-                {"id": "t1", "name": "web_search", "args": {"query": "认证壁垒"}}
-            ]))
-            yield _chunk_event(_tool_result("t1"))
-            yield _chunk_event(_ai("一回合跑完的报告"))
-            yield _event("end")
+            if len(turns) == 1:
+                yield _chunk_event(_ai(tool_calls=[
+                    {"id": "t1", "name": "web_search", "args": {"query": "认证壁垒"}}
+                ]))
+                yield _chunk_event(_tool_result("t1"))
+                yield _chunk_event(_ai("一回合跑完的研究报告（无计划标记）"))
+                yield _event("end")
+            else:
+                yield _chunk_event(_ai("最终报告"))
+                yield _event("end")
 
         result = run_engine.run_research(
             self.handle, stream_fn=stream_fn, on_plan=lambda p: self.fail("gate must not fire"),
         )
-        # Nothing force-blocked: the run completed under today's rules in one turn.
+        # Nothing force-blocked: the run completed under today's rules in ONE turn —
+        # no spurious plan prompt on the report, no injected skip, no second pass.
         self.assertEqual(result.status, "completed")
         self.assertEqual(len(turns), 1)
         self.assertFalse((self.handle.root / "request" / "plan-gen1.md").exists())
         events = [e.event for e in journal_mod_entries(self.handle) if e.category == "lifecycle"]
         self.assertIn("plan_gate_degraded", events)
+
+    def test_markerless_plain_answer_also_degrades(self) -> None:
+        turns: list[str] = []
+
+        def stream_fn(message: str):
+            turns.append(message)
+            if len(turns) == 1:
+                yield _chunk_event(_ai("这不是计划，只是闲聊式回答"))
+                yield _event("end")
+            else:
+                yield _chunk_event(_ai("最终报告"))
+                yield _event("end")
+
+        result = run_engine.run_research(
+            self.handle, stream_fn=stream_fn, on_plan=lambda p: self.fail("gate must not fire"),
+        )
+        self.assertEqual(result.status, "completed")
+        self.assertEqual(len(turns), 1)
+        self.assertFalse((self.handle.root / "request" / "plan-gen1.md").exists())
+        events = [e.event for e in journal_mod_entries(self.handle) if e.category == "lifecycle"]
+        self.assertIn("plan_gate_degraded", events)
+
+    def test_markers_never_leak_into_hook_or_artifact(self) -> None:
+        received: list[str] = []
+        turns: list[str] = []
+
+        def stream_fn(message: str):
+            turns.append(message)
+            if len(turns) == 1:
+                yield _chunk_event(_ai(self._MARKED_PLAN))
+                yield _event("end")
+            else:
+                yield _chunk_event(_ai("最终报告"))
+                yield _event("end")
+
+        def on_plan(plan: str) -> str:
+            received.append(plan)
+            return plan
+
+        run_engine.run_research(self.handle, stream_fn=stream_fn, on_plan=on_plan)
+        self.assertEqual(received, [self._PLAN_TEXT])  # inner text only, no markers
+        plan_file = self.handle.root / "request" / "plan-gen1.md"
+        self.assertNotIn("research-plan", plan_file.read_text(encoding="utf-8"))
+        # The injected continuation carries the inner plan, not the markers.
+        self.assertIn(self._PLAN_TEXT, turns[1])
+        self.assertNotIn("<research-plan>", turns[1])
 
     def test_clarification_inside_plan_phase_composes(self) -> None:
         turns: list[str] = []
@@ -249,7 +304,7 @@ class RunEngineTest(unittest.TestCase):
                 yield _chunk_event(_ai(tool_calls=[_ask_call("c1")]))
                 yield _event("end")
             if len(turns) == 2:
-                yield _chunk_event(_ai(self._PLAN_TEXT))
+                yield _chunk_event(_ai(self._MARKED_PLAN))
                 yield _event("end")
             else:
                 yield _chunk_event(_ai("最终报告"))

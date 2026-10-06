@@ -43,6 +43,13 @@
 - [x] 4.2 Full gates: `make verify`, `make smoke`, all governance checkers, plan
   gate; fresh receipts; specs sync (entry-surface, deerflow-wiring MODIFIED;
   run-bundle ADDED); archive; root count follows
-- [ ] 4.3 Optional real-ladder demonstration: an interactive-context run observing
+- [x] 4.3 Optional real-ladder demonstration: an interactive-context run observing
   the plan turn, an amendment, and the resulting research shape (observation, not a
-  gate)
+  gate). Executed 2026-10-07 (bundle 58b5440e): the demonstration EXPOSED A REAL
+  DEFECT — the terminal picture carries only the final AI message's tool calls, so
+  a research turn ending in a plain-text report is structurally indistinguishable
+  from a plan turn; the gate fired on the finished report (journal plan_proposed/
+  plan_skipped at the END) and triggered a wasteful second research pass (36
+  searches total). Fix: marker-based plan detection (<research-plan> markers; no
+  marker -> honest degradation), landed as the plan-marker-detection change. The
+  interactive clarification itself worked live (asked, answered, scope locked).

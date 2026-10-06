@@ -1,6 +1,6 @@
 # Plans — plan/分析文档索引
 
-> 最后更新: 2026-10-07（新立 plan-review-gate：计划确认闸门，方向性工作恢复显性立卡） | `_backlog/plans/` — 活跃 plan 在此（顶层），
+> 最后更新: 2026-10-07（plan-review-gate 关闭归 CLS-016；显性立卡纪律保留，队列复空） | `_backlog/plans/` — 活跃 plan 在此（顶层），
 > 完成的普通 plan 移入 [`../_done/_closed_plans/`](../_done/_closed_plans/)。
 >
 > **plan 没有编号，文件名即标识。完成后文件名不变，位置即状态。**
@@ -23,9 +23,8 @@
 
 | Plan | 一句话 |
 |------|--------|
-| [2026-10-07-plan-review-gate](2026-10-07-plan-review-gate.md) | 计划确认闸门：agent 先交研究计划、用户审改确认后再开跑（interactive-clarification 的升级配套） |
 
-**Next available plan ID: CLS-016**（移入 `_closed_plans/` 时分配）
+**Next available plan ID: CLS-017**（移入 `_closed_plans/` 时分配）
 
 新方向性工作**必须显性立卡**（驾驭者要求，2026-10-07）：先立卡记录决策与取舍，再走 OpenSpec change 实施；完成后按上方 ritual 关闭归档。地图维护触发条件已并入应用 [docs/README.md](../../deep_research_harness/docs/README.md)；结构重整决策记录见 CLS-014 归档。
 

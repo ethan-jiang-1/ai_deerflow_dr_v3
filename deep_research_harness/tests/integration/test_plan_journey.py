@@ -27,7 +27,9 @@ HARNESS_ROOT = Path(__file__).resolve().parents[2]
 RUNS_ROOT = HARNESS_ROOT.parent / "runs"
 
 _PLAN = "研究计划：1) 广度探索无人机认证壁垒全景 2) 深挖 A 国消费级法规"
+_MARKED_PLAN = "<research-plan>\n" + _PLAN + "\n</research-plan>"
 _FINAL = "Fixture report produced under the confirmed plan."
+_FINAL_UNMARKED = "One-turn research report without any plan markers (the 58b5440e regression shape)."
 
 
 @unittest.skipUnless(_FRAMEWORK_AVAILABLE, "deerflow environment required: run `uv sync` in deep_research_harness/")
@@ -36,7 +38,7 @@ class PlanGateJourneyTest(unittest.TestCase):
         env = dict(os.environ)
         env.update({
             "DEERFLOW_FAKE_SCRIPT": json.dumps([
-                {"content": _PLAN},
+                {"content": _MARKED_PLAN},
                 {"content": _FINAL},
             ]),
             "DEEP_RESEARCH_INTERACTIVE": "1",
@@ -87,6 +89,37 @@ class PlanGateJourneyTest(unittest.TestCase):
         self.assertIn("plan_amended", journal)
         state = json.loads((bundle_dir / "state.json").read_text(encoding="utf-8"))
         self.assertEqual(state["status"], "completed")
+
+
+    def test_markerless_report_completes_without_gating(self) -> None:
+        """The real-ladder regression, scripted: a research turn ending in a plain
+        report must complete ungated — no plan prompt on the report, no second pass."""
+        env = dict(os.environ)
+        env.update({
+            "DEERFLOW_FAKE_SCRIPT": json.dumps([
+                {"content": _FINAL_UNMARKED},
+            ]),
+            "DEEP_RESEARCH_INTERACTIVE": "1",
+        })
+        result = subprocess.run(
+            [sys.executable, "cli.py", "create", "研究无人机供应链的认证壁垒", "--config", "fixture"],
+            cwd=HARNESS_ROOT, capture_output=True, text=True, timeout=120,
+            env=env, input="unused\n",  # must never be consumed
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn("agent 的研究计划", result.stdout)
+        self.assertIn("run completed", result.stdout)
+
+        bundle_dir = self._bundle_dir(result.stdout)
+        state = json.loads((bundle_dir / "state.json").read_text(encoding="utf-8"))
+        self.assertEqual(state["status"], "completed")
+        self.assertEqual(
+            (bundle_dir / "final" / "report-gen1.md").read_text(encoding="utf-8").strip(),
+            _FINAL_UNMARKED,
+        )
+        self.assertFalse((bundle_dir / "request" / "plan-gen1.md").exists())
+        journal = (bundle_dir / "diagnostics" / "journal.jsonl").read_text(encoding="utf-8")
+        self.assertIn("plan_gate_degraded", journal)
 
 
 if __name__ == "__main__":

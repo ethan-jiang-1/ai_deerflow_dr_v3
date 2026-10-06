@@ -21,9 +21,15 @@ from .bundle.journal import append_entry
 AUTO_REPLY_PREFIX = "[非交互模式·系统自动应答] "
 
 # Plan-gate framing and continuations (stable constants; scripted tests pin them).
+# Markers are the ONLY engagement signal: content structure, never behavioral
+# inference — a research turn ending in a plain-text report is indistinguishable
+# from a plan turn by tool calls alone (the 58b5440e real-ladder regression).
+PLAN_MARKER_OPEN = "<research-plan>"
+PLAN_MARKER_CLOSE = "</research-plan>"
 PLAN_REQUEST_SUFFIX = (
-    "\n\n请先给出研究计划（研究角度、查询策略、来源类型），等待确认后再开始研究；"
-    "不要在此轮执行搜索。"
+    "\n\n请先给出研究计划（研究角度、查询策略、来源类型），全文用 <research-plan> 和 "
+    "</research-plan> 标记包裹，然后停止等待确认；不要在此轮执行搜索。"
+    "如需先澄清问题，请直接提问，获得回答后请再次输出带标记的研究计划。"
 )
 PLAN_CONFIRM_PREFIX = "研究计划已确认（或经用户修订）。严格按以下计划执行研究并产出最终报告：\n\n"
 PLAN_SKIP_MESSAGE = "跳过计划注入，按你自己的判断研究并产出最终报告。"
@@ -297,6 +303,18 @@ def run_research(
         return written
 
 
+def _extract_plan(final_text: str) -> str | None:
+    """Deterministic plan detection: the inner text between the plan markers.
+
+    Returns None when the markers are absent or the inner text is empty — the honest
+    degradation signal. The terminal tool-call picture cannot distinguish a research
+    report from a plan (both end in plain text with no final-message tool calls)."""
+    if PLAN_MARKER_OPEN not in final_text or PLAN_MARKER_CLOSE not in final_text:
+        return None
+    inner = final_text.split(PLAN_MARKER_OPEN, 1)[1].split(PLAN_MARKER_CLOSE, 1)[0].strip()
+    return inner or None
+
+
 def _drive(handle, stream_fn, on_event, on_clarification, on_plan, state, message, recorder):
     awaiting_plan = on_plan is not None and state.generation == 1
     while True:
@@ -312,12 +330,12 @@ def _drive(handle, stream_fn, on_event, on_clarification, on_plan, state, messag
 
         if not detected:
             if awaiting_plan:
-                plan_text = (final_text or "").strip()
-                if tool_calls or not plan_text:
-                    # The model researched despite the framing (or planned nothing):
+                plan_text = _extract_plan(final_text or "")
+                if plan_text is None:
+                    # No plan markers (a report, a chatty answer, or nothing plan-shaped):
                     # degrade honestly, never force-block, fall through to today's rules.
                     _journal(handle, "lifecycle", "plan_gate_degraded", {
-                        "reason": "researched" if tool_calls else "empty_plan",
+                        "reason": "no_plan_markers",
                     })
                     awaiting_plan = False
                 else:

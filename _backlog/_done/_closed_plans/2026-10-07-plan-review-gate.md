@@ -1,7 +1,7 @@
 # Plan: 计划确认闸门（plan-review gate）
 
 > 类型: 架构设计 / 产品方向 | 更新: 2026-10-07
-> 状态: 已立项，由 OpenSpec change `plan-review-gate` 承接实施（交互反问已先行落地为 `interactive-clarification`，本计划是它的升级配套）
+> 状态: 关闭（CLS-016，2026-10-07）：plan-review-gate + plan-marker-detection 两 change 均落地归档；真梯演示暴露的检测缺陷已修复并固化为回归测试
 
 ## 背景 / 现状
 
@@ -44,6 +44,15 @@
 - [每跑多花一轮模型往返] → 交互上下文才启用；用户可用 s 跳过；deep 档跑前对齐省下的
   是整轮跑偏的研究成本。
 - [修订意见只是附加不是改写] → v1 取舍；真正的文本编辑器级修订等服务形态再议。
+
+## 真梯演示发现（2026-10-07，bundle 58b5440e）
+
+首轮落地后真梯演示暴露真缺陷：真实框架流的 terminal picture 只带最终消息的
+tool_calls，研究轮以纯文本报告收尾时与计划轮不可区分 → 闸门在结尾把报告当计划
+误触发（journal 末尾出现 plan_proposed/plan_skipped），并多烧一整轮研究。修复：
+计划请求框架要求 `<research-plan>` 标记包裹，引擎仅标记存在时触发闸门，无标记
+诚实降级——框架自身 `deerflow_error_fallback` 标记的同款手法。修复 change：
+`plan-marker-detection`。
 
 ## 落地关联
 

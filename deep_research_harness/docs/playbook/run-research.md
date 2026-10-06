@@ -68,6 +68,9 @@ make create PROBLEM="发布面冷启动证明"
   直接输入=附加修订意见、s=跳过注入、q=放弃；确认/修订的计划物化为
   `request/plan-gen1.md` 并注入线程续跑；模型无视框架直接开搜时闸门诚实降级
   （journal `plan_gate_degraded`），不硬拦。refine 不设闸门（方向文档即计划）。
+- 计划闸门的触发协议是内容标记：模型把计划包在 `<research-plan>` 标记里，
+  引擎见标记才触发；无标记的报告/闲答一律诚实降级（真梯回归 58b5440e 的教训：
+  tool-call 形状区分不了研究轮和计划轮）。
 - agent 反问（`ask_clarification`）在交互上下文（stdin 是 TTY，或
   `DEEP_RESEARCH_INTERACTIVE=1`）会现场问你：回答即继续（不耗自动应答预算），
   回车留空 = 不答（回落自动应答并计预算）。headless（无 TTY 无覆盖）永不读
