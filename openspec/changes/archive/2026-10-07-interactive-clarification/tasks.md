@@ -38,4 +38,9 @@
 - [x] 4.2 Full gates: `make verify`, `make smoke`, all governance checkers green;
   fresh receipts recorded; archive the change via the OpenSpec workflow
 - [x] 4.3 Optional real-ladder demonstration: a deliberately vague problem on the base
-  ladder to observe the agent actually asking (documented as observation, not a gate)
+  ladder to observe the agent actually asking (documented as observation, not a gate).
+  Executed 2026-10-07 (bundle c4ea25ba): the model judged the vague prompt clear
+  enough and did NOT ask — the judgment belongs to the model, by design; the
+  interactive path itself is proven by the two smoke journeys. Observation:
+  deepseek-flash's ask threshold is high; more aggressive asking would be a
+  cognitive/policy decision (skill or binding level), not a harness defect.
