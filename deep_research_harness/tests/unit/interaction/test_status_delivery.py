@@ -22,13 +22,13 @@ def _state(delivery, artifact=None):
 
 class StatusDeliveryLineTest(unittest.TestCase):
     def _print_status(self, state) -> str:
-        fake_entrypoint = SimpleNamespace(
+        fake_assembly = SimpleNamespace(
             runs_root=lambda: Path("/runs"),
             resolve_bundle=lambda runs, bid: "HANDLE",
         )
         out = io.StringIO()
         with (
-            mock.patch.object(cli, "entrypoint", fake_entrypoint),
+            mock.patch.object(cli, "assembly", fake_assembly),
             mock.patch.object(cli.bundle_actions, "status", return_value=state),
             mock.patch(
                 "deerflow_deep_research.runtime.bundle.journal.read_entries",

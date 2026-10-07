@@ -1,6 +1,6 @@
-"""The run engine: one stream iteration, three sinks, terminal honesty.
+"""The run pump: one stream iteration, three sinks, terminal honesty.
 
-Framework-free: the engine consumes any iterable of objects with ``type``/``data``
+Framework-free: the pump consumes any iterable of objects with ``type``/``data``
 attributes (the real StreamEvent shape) and a ``stream_fn(message)`` callable — the
 integration smoke supplies the real client; the unit lane supplies scripted events.
 Terminal decisions are the RUB-001 pure rules; this module never re-decides them.

@@ -8,7 +8,7 @@
 
 ```text
 create：创建 Bundle，前台驱动运行
-  -> active：run_engine 消费 stream，写 journal/checkpoint
+  -> active：pump 消费 stream，写 journal/checkpoint
   -> terminal：completed / cancelled / failed-resume（domain 终态规则）
 
 refine：从终态 Bundle 创建下一代并前台跑完（消息 = 该代方向文档，owner = 调用进程）
@@ -33,12 +33,12 @@ status 发现 active 但 owner 已死：转 failed-resume
 | --- | --- | --- | --- |
 | `state.json` | [bundle_state](../src/deerflow_deep_research/runtime/bundle/bundle_state.py) | 运行状态唯一权威：状态、generation、thread、composition、pin、**交付 disposition**（admitted+路径/rejected/no-answer；None=未记录） | completed ≠ 质量达标；delivery 未记录（旧状态/写入前崩溃）仍需 belt 检查 |
 | `request/problem.txt`、`request/refine-N.txt` | bundle_actions | 原始问题与各代方向 | — |
-| `request/plan-gen1.md` | [run_engine](../src/deerflow_deep_research/runtime/run_engine.py)（计划闸门） | 用户确认（或经修订）的研究计划：本次运行的范围合同 | 跳过/放弃/降级不产生此文件；物化的是已确认版，不是 agent 的全部计划尝试 |
+| `request/plan-gen1.md` | [pump](../src/deerflow_deep_research/runtime/pump.py)（计划闸门） | 用户确认（或经修订）的研究计划：本次运行的范围合同 | 跳过/放弃/降级不产生此文件；物化的是已确认版，不是 agent 的全部计划尝试 |
 | `checkpoint.sqlite` | 框架 checkpointer（经 [client](../src/deerflow_deep_research/runtime/adapters/client.py) 注入） | DeerFlow / LangGraph 的 thread 上下文：消息与工具结果 | 不是完整供应商原始请求/响应日志；查看需框架 checkpointer |
 | `work/` | 运行工作区 | 中间产物 | 不是已接纳证据 |
 | `evidence/` | [admission](../src/deerflow_deep_research/runtime/bundle/admission.py) | 通过准入的证据与 `submissions.jsonl` 哈希链 | 搜索结果**不自动物化**进 evidence；有此目录 ≠ 完整证据库 |
 | `final/report-genN.md` | admission（validator 先裁决） | 通过准入的最终报告投影 | 不等于模型写的所有 sandbox 文件都进入 final |
-| `diagnostics/journal.jsonl` | [run_engine](../src/deerflow_deep_research/runtime/run_engine.py) / [journal](../src/deerflow_deep_research/runtime/bundle/journal.py) | 事件时间线：聚合工具名、回答尾部摘要、subagent 事件、终态、准入 disposition | 不是每次搜索的完整参数与结果 |
+| `diagnostics/journal.jsonl` | [pump](../src/deerflow_deep_research/runtime/pump.py) / [journal](../src/deerflow_deep_research/runtime/bundle/journal.py) | 事件时间线：聚合工具名、回答尾部摘要、subagent 事件、终态、准入 disposition | 不是每次搜索的完整参数与结果 |
 | `diagnostics/assembly-snapshot.json` | [snapshot middleware](../src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py) | 首次模型调用的 system prompt、可见工具、模型名、pin | 不是全部轮次上下文；不能独自证明 skill 原文实际被读取 |
 | `diagnostics/searches/` | [search_log](../src/deerflow_deep_research/runtime/bundle/search_log.py) | 每次 web_search/web_fetch 的可直读记录：query/URL + 完整结果 + 时间戳（`gen{N}-{seq}-{tool}.json`，call_id 去重） | 是过程诊断不是已接纳证据；引用复核的物理基础，但不自动比对真实性 |
 

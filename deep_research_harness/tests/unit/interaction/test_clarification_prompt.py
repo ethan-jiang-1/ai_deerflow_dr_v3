@@ -90,7 +90,7 @@ class ClarificationWiringTest(unittest.TestCase):
     def test_create_passes_the_handler_through_run_foreground(self) -> None:
         sentinel = lambda q: "x"
         calls: list[dict] = []
-        fake_entrypoint = SimpleNamespace(
+        fake_assembly = SimpleNamespace(
             runs_root=lambda: "/runs",
             CONFIG_ROOT="/config",
             resolve_bundle=lambda runs, bid: "HANDLE",
@@ -100,7 +100,7 @@ class ClarificationWiringTest(unittest.TestCase):
         )
         args = SimpleNamespace(problem="问题", config="fixture")
         with (
-            mock.patch.object(cli, "entrypoint", fake_entrypoint),
+            mock.patch.object(cli, "assembly", fake_assembly),
             mock.patch.object(cli.bundle_actions, "start") as start,
             mock.patch.object(cli, "_clarification_handler", return_value=sentinel),
             contextlib.redirect_stdout(io.StringIO()),
@@ -116,7 +116,7 @@ class ClarificationWiringTest(unittest.TestCase):
         calls: list[dict] = []
         refined = SimpleNamespace(status="active", generation=2, composition="fixture", thread_id="t2")
         record = SimpleNamespace(generation=2, direction_text="深挖")
-        fake_entrypoint = SimpleNamespace(
+        fake_assembly = SimpleNamespace(
             runs_root=lambda: "/runs",
             CONFIG_ROOT="/config",
             resolve_bundle=lambda runs, bid: "HANDLE",
@@ -127,7 +127,7 @@ class ClarificationWiringTest(unittest.TestCase):
         )
         args = SimpleNamespace(bundle_id="b1", direction="深挖")
         with (
-            mock.patch.object(cli, "entrypoint", fake_entrypoint),
+            mock.patch.object(cli, "assembly", fake_assembly),
             mock.patch.object(cli.bundle_actions, "refine", return_value=(refined, record)),
             mock.patch.object(cli, "_clarification_handler", return_value=sentinel),
             contextlib.redirect_stdout(io.StringIO()),

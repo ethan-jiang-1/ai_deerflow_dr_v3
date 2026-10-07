@@ -72,15 +72,19 @@ def build_client(
     checkpointer,
     middlewares=None,
     model_name: str | None = None,
+    available_skills: object | None = None,
     snapshot_dir: Path | None = None,
     pin: str | None = None,
 ):
     """Construct the embedded DeerFlowClient with the ruled defaults.
 
-    When ``snapshot_dir`` is given, the assembly-snapshot middleware is injected
-    first (plan decision 4's escape hatch, first use). The framework import is
-    deliberately lazy: this function requires the deerflow-harness dependency; the
-    unit lane never calls it."""
+    ``available_skills`` is sourced from the owning ladder's declaration by the
+    assembly (resolve_skills) and passed through verbatim — never hard-coded
+    here; the default ``None`` is the unwired binding posture (deerflow-wiring
+    delta). When ``snapshot_dir`` is given, the assembly-snapshot middleware is
+    injected first (plan decision 4's escape hatch, first use). The framework
+    import is deliberately lazy: this function requires the deerflow-harness
+    dependency; the unit lane never calls it."""
 
     from deerflow.client import DeerFlowClient  # lazy: framework import
 
@@ -103,7 +107,7 @@ def build_client(
         thinking_enabled=True,
         subagent_enabled=True,
         plan_mode=False,
-        available_skills=None,
+        available_skills=available_skills,
         middlewares=injected,
     )
 

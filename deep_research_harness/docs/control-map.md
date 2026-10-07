@@ -43,10 +43,10 @@ Harness 不决定每一步搜什么，而是把一次研究运行装进可追踪
 
 | | DeerFlow 宿主 agent loop | Harness run loop |
 | --- | --- | --- |
-| 驱动者 | lead agent（框架，随行 `deerflow/`） | [run_engine](../src/deerflow_deep_research/runtime/run_engine.py)（本应用） |
+| 驱动者 | lead agent（框架，随行 `deerflow/`） | [pump](../src/deerflow_deep_research/runtime/pump.py)（本应用） |
 | 决定什么 | 查什么问题、用哪个工具、何时抓全文、是否派生 subagent、何时收束写报告 | 消费 stream 事件、有限自动续答（默认 ≤2 次）、取消/错误观察、终态判定、journal 投影、最终报告准入 |
 | 不决定什么 | 不能越过 Harness 准入把产物当已接受事实写入 final/evidence | 不决定每步搜什么；不复制 agent loop；不重新发明 domain 终态规则 |
-| 代码入口 | [client 绑定](../src/deerflow_deep_research/runtime/adapters/client.py)（`make_stream_fn` 是唯一 stream 缝，per-call recursion limit） | [run_engine](../src/deerflow_deep_research/runtime/run_engine.py) 消费 `_consume_turn` |
+| 代码入口 | [client 绑定](../src/deerflow_deep_research/runtime/adapters/client.py)（`make_stream_fn` 是唯一 stream 缝，per-call recursion limit） | [pump](../src/deerflow_deep_research/runtime/pump.py) 消费 `_consume_turn` |
 | 运行证据 | checkpoint.sqlite、assembly-snapshot、journal 里的 model/tool/subagent 事件 | state.json、journal.jsonl、admission ledger |
 
 由此必须持续区分四件**不是同一件事**的事（当前 run engine 先写 terminal 再提交报告）：
@@ -67,7 +67,7 @@ agent stream 结束  ≠  Harness state = completed  ≠  final report 被 admis
 | `agents` | 预留 Harness 自有 bounded model role；**当前为空**（空包不代表实现） | `src/deerflow_deep_research/agents/` |
 | `runtime` | 装配、DeerFlow binding、运行控制、持久化、交互、诊断 | `src/deerflow_deep_research/runtime/` |
 | 交互入口 | 稳定 launcher 转交六动词解析/输出；不承载状态规则 | `cli.py` → `runtime/interaction/cli.py` |
-| 运行装配 | 配置、pin、Bundle 查找、前台 client/saver 装配 | `runtime/entry.py` |
+| 运行装配 | 配置、pin、Bundle 查找、前台 client/saver 装配 | `runtime/assembly.py` |
 
 ```text
 deep_research_harness/
@@ -95,24 +95,18 @@ OpenSpec 开发工作区（规范、准入与治理 checker）、`_backlog/`（�
 
 ## 4. 一次 create 的真实路径
 
-当前 `cli.py create` 的实际执行链（不是计划中的理想流程）：
+入口链六环。本图是人读投影；**机械权威是锁链契约测试**
+[test_entry_chain](../tests/contract/test_entry_chain.py)——任何一环被替换、绕过或
+改名漏切，`make verify` 即红（离线 AST 断言，不锁行号，阶段内重构不误伤）：
 
 ```text
-1. 读取问题和 --config            runtime/interaction/cli.py
-2. 读取 DeerFlow git pin          runtime/entry.py::read_pin()
-3. 原子创建 Run Bundle            runtime/bundle/bundle_actions.py + domain/state_machine.py
-4. 打开 Bundle SQLite checkpointer   runtime/adapters/client.py::bundle_checkpointer
-5. 解析配置，构造 DeerFlowClient     runtime/entry.py::run_foreground → client.py::build_client
-6. 以一个 thread 启动 agent stream   runtime/adapters/client.py::make_stream_fn
-7. DeerFlow 内部循环（动态）          lead agent + skill + tools + subagents
-8. Harness 消费事件                 runtime/run_engine.py
-   ├─ model/tool/subagent 事件 → diagnostics/journal.jsonl
-   ├─ 最终 values snapshot 判断 turn 结果
-   ├─ 识别未回答的 ask_clarification
-   └─ 观察取消请求、模型 fallback、stop reason
-9. 需要时有限自动续答               默认最多 2 次，不进入新状态
-10. 终态                            completed / cancelled / failed-resume
-11. 完成时提交 final_report          runtime/bundle/admission.py（validator 先裁决）
+1. 稳定 launcher 转交六动词        cli.py → runtime/interaction/cli.py
+2. 原子创建 Run Bundle             runtime/bundle/bundle_actions.py（+ domain/state_machine.py）
+3. 前台装配                        runtime/assembly.py::run_foreground
+                                   （读 pin、开 checkpointer、build_client、make_stream_fn）
+4. DeerFlow 内部循环（动态）        lead agent + skill + tools + subagents
+5. Harness 运行泵                  runtime/pump.py（消费事件、有限续答、计划闸、取消、终态）
+6. 终态交付准入                     runtime/bundle/admission.py（validator 先裁决）→ final/
 ```
 
 每个 Bundle 里持久化了什么、谁写的、能看出什么 → [Run Bundle 地图](run-bundle.md)。
@@ -154,8 +148,8 @@ OpenSpec 开发工作区（规范、准入与治理 checker）、`_backlog/`（�
 | state 读取 / revision / 目录 identity | [bundle_state](../src/deerflow_deep_research/runtime/bundle/bundle_state.py) | [test_state_read_diagnosis](../tests/unit/runtime/test_state_read_diagnosis.py) |
 | 产物是否合法、阶段 admit 数量 | engine 的 validator / gate / verdicts | [test_admission_engine](../tests/unit/engine/test_admission_engine.py)（gate 不等于已接入四阶段图） |
 | 准入落盘、账本、原子写入 | runtime 的 admission / ledger / atomic | [test_admission_runtime](../tests/unit/runtime/test_admission_runtime.py) |
-| stream / 续答 / 错误 / 最终回答投影 | [run_engine](../src/deerflow_deep_research/runtime/run_engine.py)、[journal](../src/deerflow_deep_research/runtime/bundle/journal.py) | [test_run_engine](../tests/unit/runtime/test_run_engine.py)、[事件回放](../tests/unit/runtime/test_event_stream_replay.py) |
-| checkout 定位与前台装配 | [entry](../src/deerflow_deep_research/runtime/entry.py) | [test_entry_composition](../tests/unit/interaction/test_entry_composition.py) |
+| stream / 续答 / 错误 / 最终回答投影 | [pump](../src/deerflow_deep_research/runtime/pump.py)、[journal](../src/deerflow_deep_research/runtime/bundle/journal.py) | [test_run_engine](../tests/unit/runtime/test_run_engine.py)、[事件回放](../tests/unit/runtime/test_event_stream_replay.py) |
+| checkout 定位与前台装配 | [entry](../src/deerflow_deep_research/runtime/assembly.py) | [test_entry_composition](../tests/unit/interaction/test_entry_composition.py) |
 | CLI 解析、文案、直播/观察 | [interaction cli](../src/deerflow_deep_research/runtime/interaction/cli.py)、[render](../src/deerflow_deep_research/runtime/interaction/render.py) | [test_entry_surface](../tests/unit/interaction/test_entry_surface.py)、[CLI 旅程](../tests/integration/test_cli_journey.py) |
 | client 装配 / checkpoint / 递归上限 | [client](../src/deerflow_deep_research/runtime/adapters/client.py)、[接口镜像](../src/deerflow_deep_research/runtime/adapters/contracts/client_surface.py) | [test_wiring_mirror](../tests/contract/test_wiring_mirror.py)、[smoke](../tests/integration/test_wiring_smoke.py) |
 | prompt/tool 装配观测、委派声明 | [snapshot](../src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py)、[posture](../src/deerflow_deep_research/runtime/adapters/subagent_posture.py) | smoke、[test_subagent_posture](../tests/unit/runtime/test_subagent_posture.py) |

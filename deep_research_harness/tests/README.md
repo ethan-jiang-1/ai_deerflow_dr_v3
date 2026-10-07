@@ -19,7 +19,7 @@ tests/
 |   `-- interaction/    渲染、命令面、playbook、entry 组合
 |-- integration/        无包标记；smoke 独立发现
 |   `-- test_*.py       框架依赖测试、真实 CLI 子进程、回放机制测试
-|-- contract/           有包标记；离线接口镜像/配置/转发测试进入 verify
+|-- contract/           有包标记；离线接口镜像/配置/转发/链条组合测试进入 verify
 `-- fixtures/
     |-- recorded/       journal 渲染 golden 样本
     `-- replay/         事件流 / 模型输出记录
@@ -57,6 +57,7 @@ Bundle 规则合同在 [test_bundle_domain](domain/test_bundle_domain.py)，离�
 | 文案、直播事件 callback、journal tail、golden 渲染 | [test_entry_surface.py](interaction/test_entry_surface.py) | 真实 render/pump/临时文件；人工事件与 golden 样本，不执行 CLI |
 | 真实 flat 事件形状进入 pump、工具名进入 journal | [test_event_stream_replay.py](runtime/test_event_stream_replay.py) | 固定记录流 + 真实 pump/落盘；不重跑模型、搜索和框架图 |
 | 配置解析、本地 client mirror、thread/递归上限转发 | [test_wiring_mirror.py](contract/test_wiring_mirror.py) | 本地代码/配置；FakeClient 记录调用，不 import 真 client |
+| 入口链六环的组合关系被替换、绕过或改名漏切 | [test_entry_chain.py](contract/test_entry_chain.py) | stdlib AST 源码断言，零产品 import、不锁行号；阶段内重构不误伤，不证明运行时行为 |
 | subagent 配置 posture 与违规声明 | [test_subagent_posture.py](runtime/test_subagent_posture.py) | stdlib checker + 真实/临时配置，不执行委派 |
 | COMMANDS、Makefile、CLI 动词清单一致 | [test_command_surface.py](interaction/test_command_surface.py) | 文本/正则检查，不执行命令 |
 | 命令菜单路由与 playbook 完成判据登记 | [test_agent_playbook.py](interaction/test_agent_playbook.py) | 文档检查，不证明旅程真的成功 |

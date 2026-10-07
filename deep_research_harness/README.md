@@ -8,12 +8,15 @@
 cli.py（稳定启动入口）
   -> runtime/interaction/cli.py（参数、交互、输出）
   -> bundle_actions.start（创建 Bundle）
-  -> runtime/entry.run_foreground（配置、client、SQLite 装配）
+  -> runtime/assembly.run_foreground（配置、client、SQLite 装配）
   -> DeerFlow lead agent <-> 模型 / 工具 / 按需 subagent
-  -> run_engine（消费事件、有限续答、取消、终态）
+  -> runtime/pump.py（消费事件、有限续答、取消、终态）
   -> validator + admission + ledger（最终回答准入）
   -> ../runs/d_YYYYMMDD/<bundle-id>/final/report-genN.md   （仓库根 runs/，应用子树之外）
 ```
+
+链条的组合关系由 [锁链契约测试](tests/contract/test_entry_chain.py) 机械锁定（离线、
+AST 级、零产品 import）：任何一环被替换、绕过或改名漏切，`make verify` 即红。
 
 交互上下文（TTY 或 `DEEP_RESEARCH_INTERACTIVE=1`）中 `create` 先经**计划确认闸门**（agent 交计划 → 操作者确认/修订/跳过 → 注入续跑，确认计划物化于 `request/plan-gen1.md`）；模型判断含糊时可先反问（答案原样续跑）。状态、checkpoint、journal 和已接纳产物持久保存在各自 Bundle 中，没有额外的集中式运行状态库。删除一个 Bundle 会永久失去该运行，其余运行仍可使用。`completed` 还需结合准入结果和报告文件判断产物是否交付；validator 检查产物合同，不验证研究事实质量。
 
@@ -22,7 +25,7 @@ cli.py（稳定启动入口）
 | 你要驾驭什么 | 放在哪里 / 直接入口 |
 | --- | --- |
 | 交互：六动词、直播输出、journal 投影 | [CLI 实现](src/deerflow_deep_research/runtime/interaction/cli.py)、[共享渲染](src/deerflow_deep_research/runtime/interaction/render.py) |
-| 运行：装配、流、可信 I/O、持久化 | [entry](src/deerflow_deep_research/runtime/entry.py)、[控制地图](docs/control-map.md) |
+| 运行：装配、流、可信 I/O、持久化 | [assembly](src/deerflow_deep_research/runtime/assembly.py)、[控制地图](docs/control-map.md) |
 | 规则：状态合同、validator、gate | [state_machine](src/deerflow_deep_research/domain/state_machine.py)、[validator](src/deerflow_deep_research/engine/validator.py) |
 | 研究认知：skill、模型、工具、委派 | [研究过程地图](docs/research-process.md)、[base 配置](config/base.yaml) |
 | 验证：离线规则/合同、框架 smoke、输入样本 | [tests](tests/README.md)、[fixtures](tests/fixtures/README.md) |

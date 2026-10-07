@@ -15,8 +15,8 @@ import sys
 import time
 
 from ...domain import bundle
-from .. import run_engine
-from .. import entry as entrypoint
+from .. import pump
+from .. import assembly
 from ..bundle import bundle_actions, bundle_state
 from . import render
 
@@ -121,15 +121,15 @@ def _live_renderer():
 def cmd_create(args) -> None:
     composition = "fixture" if args.config == "fixture" else "all_real"
     state = bundle_actions.start(
-        entrypoint.runs_root(), problem_text=args.problem, composition=composition, deerflow_pin=entrypoint.read_pin()
+        assembly.runs_root(), problem_text=args.problem, composition=composition, deerflow_pin=assembly.read_pin()
     )
-    handle = entrypoint.resolve_bundle(entrypoint.runs_root(), state.thread_id)
+    handle = assembly.resolve_bundle(assembly.runs_root(), state.thread_id)
     print(f"bundle {state.thread_id} started (config: {args.config}, composition: {state.composition})")
 
     try:
-        result = entrypoint.run_foreground(
-            handle, config_root=entrypoint.CONFIG_ROOT, config_name=args.config,
-            thread_id=state.thread_id, pin=entrypoint.read_pin(), on_event=_live_renderer(),
+        result = assembly.run_foreground(
+            handle, config_root=assembly.CONFIG_ROOT, config_name=args.config,
+            thread_id=state.thread_id, pin=assembly.read_pin(), on_event=_live_renderer(),
             on_clarification=_clarification_handler(), on_plan=_plan_handler(),
         )
     except ImportError as exc:
@@ -143,7 +143,7 @@ def cmd_create(args) -> None:
 
 
 def cmd_status(args) -> None:
-    handle = entrypoint.resolve_bundle(entrypoint.runs_root(), args.bundle_id)
+    handle = assembly.resolve_bundle(assembly.runs_root(), args.bundle_id)
     state = bundle_actions.status(handle)
     print(f"state: {state.status} (generation {state.generation}, revision {state.revision})")
     delivery = getattr(state, "delivery", None)
@@ -164,11 +164,11 @@ def cmd_status(args) -> None:
 
 
 def cmd_watch(args) -> None:
-    handle = entrypoint.resolve_bundle(entrypoint.runs_root(), args.bundle_id)
+    handle = assembly.resolve_bundle(assembly.runs_root(), args.bundle_id)
     journal_path = handle.root / bundle.journal_relative()
     position = 0
     while True:
-        entries, reached_terminal, position = run_engine.tail_journal(journal_path, position)
+        entries, reached_terminal, position = pump.tail_journal(journal_path, position)
         for entry in entries:
             print(render.journal_line(entry))
         if reached_terminal:
@@ -177,23 +177,23 @@ def cmd_watch(args) -> None:
 
 
 def cmd_cancel(args) -> None:
-    handle = entrypoint.resolve_bundle(entrypoint.runs_root(), args.bundle_id)
+    handle = assembly.resolve_bundle(assembly.runs_root(), args.bundle_id)
     result = bundle_actions.cancel(handle)
     print(f"cancellation requested (state: {result.status}, generation {result.generation})")
 
 
 def cmd_refine(args) -> None:
-    handle = entrypoint.resolve_bundle(entrypoint.runs_root(), args.bundle_id)
+    handle = assembly.resolve_bundle(assembly.runs_root(), args.bundle_id)
     refined, record = bundle_actions.refine(handle, args.direction)
     print(f"generation {record.generation} started: {record.direction_text}")
     print(f"state: {refined.status}")
     # Phase 5 round-2 ruling: the next generation runs now, in the foreground,
     # over its own direction document, continuing the bundle's composition ladder.
-    config_name = entrypoint.config_name_for_composition(refined.composition)
+    config_name = assembly.config_name_for_composition(refined.composition)
     try:
-        result = entrypoint.run_foreground(
-            handle, config_root=entrypoint.CONFIG_ROOT, config_name=config_name,
-            thread_id=refined.thread_id, pin=entrypoint.read_pin(), on_event=_live_renderer(),
+        result = assembly.run_foreground(
+            handle, config_root=assembly.CONFIG_ROOT, config_name=config_name,
+            thread_id=refined.thread_id, pin=assembly.read_pin(), on_event=_live_renderer(),
             on_clarification=_clarification_handler(),
         )
     except ImportError as exc:
@@ -207,7 +207,7 @@ def cmd_refine(args) -> None:
 
 
 def cmd_inspect(args) -> None:
-    handle = entrypoint.resolve_bundle(entrypoint.runs_root(), args.bundle_id)
+    handle = assembly.resolve_bundle(assembly.runs_root(), args.bundle_id)
     state = bundle_state.read_state(handle)
     print(f"state: {state.status} (generation {state.generation}, composition {state.composition})")
     from deerflow_deep_research.runtime.bundle import journal as journal_mod

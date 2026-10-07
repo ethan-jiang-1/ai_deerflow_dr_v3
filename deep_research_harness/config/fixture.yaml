@@ -37,6 +37,14 @@ tools:
 summarization:
   enabled: true
 
+# Skill declaration slot (deerflow-wiring delta): absent = unwired posture — the
+# assembly resolves it to exactly None and the binding keeps the framework default.
+# Declaring a list of non-empty skill names passes them to the binding verbatim;
+# activation semantics (what actually loads, and how well) are owned by a separate
+# cognitive-program change, not by uncommenting this line.
+# skills:
+#   - deep-research
+
 # Subagent posture (wiring plan decision 5): no custom subagent types are declared —
 # DeerFlow's native deep-research delegation covers the research need. A future
 # declaration must arrive through an owning change and satisfy the depth self-check

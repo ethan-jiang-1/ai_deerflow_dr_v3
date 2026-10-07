@@ -12,7 +12,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from deerflow_deep_research.domain import bundle, journal_policy
-from deerflow_deep_research.runtime import run_engine
+from deerflow_deep_research.runtime import pump
 from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
 from deerflow_deep_research.runtime.interaction import render
 
@@ -85,7 +85,7 @@ class EngineHookTest(unittest.TestCase):
             ]})
             yield _event("end")
 
-        result = run_engine.run_research(
+        result = pump.run_research(
             self.handle, stream_fn=stream_fn, on_event=lambda event: seen.append(event.type)
         )
         self.assertEqual(result.status, "completed")
@@ -96,7 +96,7 @@ class EngineHookTest(unittest.TestCase):
             yield _event("messages-tuple", message={"type": "ai", "content": "结论"})
             yield _event("end")
 
-        run_engine.run_research(self.handle, stream_fn=stream_fn)
+        pump.run_research(self.handle, stream_fn=stream_fn)
         from deerflow_deep_research.runtime.bundle import journal as journal_mod
 
         entries = journal_mod.read_entries(self.handle)
@@ -112,11 +112,11 @@ class WatchTailTest(unittest.TestCase):
                 json.dumps({"ts": "t", "category": "terminal", "event": "run_completed", "detail": {"generation": 1}}),
             ]
             journal_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-            rendered, reached_terminal, _position = run_engine.tail_journal(journal_path, position=0)
+            rendered, reached_terminal, _position = pump.tail_journal(journal_path, position=0)
             self.assertTrue(reached_terminal)
             self.assertEqual(len(rendered), 2)
             # Already-terminal: renders history and exits, never waits.
-            rendered2, reached2, _pos2 = run_engine.tail_journal(journal_path, position=0)
+            rendered2, reached2, _pos2 = pump.tail_journal(journal_path, position=0)
             self.assertTrue(reached2)
             self.assertEqual(len(rendered2), 2)
 
@@ -127,7 +127,7 @@ class WatchTailTest(unittest.TestCase):
                 json.dumps({"ts": "t", "category": "lifecycle", "event": "started", "detail": {}}) + "\n",
                 encoding="utf-8",
             )
-            rendered, reached_terminal, _position = run_engine.tail_journal(journal_path, position=0)
+            rendered, reached_terminal, _position = pump.tail_journal(journal_path, position=0)
             self.assertFalse(reached_terminal)
             self.assertEqual(len(rendered), 1)
 

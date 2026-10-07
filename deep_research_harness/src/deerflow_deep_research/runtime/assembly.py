@@ -11,7 +11,7 @@ import subprocess
 from pathlib import Path
 
 from ..domain import bundle
-from . import run_engine
+from . import pump
 from .adapters import client
 from .bundle import bundle_state
 
@@ -79,28 +79,54 @@ def resolve_bundle(runs_root: Path, bundle_id: str) -> bundle_state.BundleHandle
     )
 
 
+def resolve_skills(config: dict) -> list[str] | None:
+    """Resolve the declared skill posture from a loaded ladder config.
+
+    Absent or null ``skills`` resolves to exactly ``None`` — the unwired binding
+    posture, never an empty list (an empty list would be a conscious declaration
+    of "no skills"). A declared value must be a list of non-empty skill names and
+    passes to the binding verbatim; activation semantics are not decided here.
+
+    @impl SKL-001
+    """
+
+    if "skills" not in config or config["skills"] is None:
+        return None
+    skills = config["skills"]
+    if not isinstance(skills, list) or not all(
+        isinstance(name, str) and name.strip() for name in skills
+    ):
+        raise ValueError(
+            f"config skills declaration must be a list of non-empty skill names, "
+            f"got {skills!r}"
+        )
+    return skills
+
+
 def run_foreground(
     handle, *, config_root: Path, config_name: str, thread_id: str, pin: str,
     on_event=None, on_clarification=None, on_plan=None,
 ):
-    """Assemble the configured client/saver and return the run engine's typed state.
+    """Assemble the configured client/saver and return the run pump's typed state.
 
     The caller creates the Bundle and owns presentation. Missing runtime dependencies
-    propagate to that caller; run_engine retains all terminal and admission decisions.
+    propagate to that caller; pump retains all terminal and admission decisions.
     `on_clarification` (interactive contexts) routes the agent's clarifying question
     to the human; without it the engine keeps the bounded automatic continuation.
     """
     with client.bundle_checkpointer(handle) as saver:
         import yaml
 
-        model_name = yaml.safe_load(
+        config = yaml.safe_load(
             client.resolve_config_path(config_root, config_name).read_text(encoding="utf-8")
-        )["models"][0]["name"]
+        )
         bound_client = client.build_client(
-            config_root, config_name, checkpointer=saver, model_name=model_name,
+            config_root, config_name, checkpointer=saver,
+            model_name=config["models"][0]["name"],
+            available_skills=resolve_skills(config),
             snapshot_dir=handle.root / "diagnostics", pin=pin,
         )
-        return run_engine.run_research(
+        return pump.run_research(
             handle, stream_fn=client.make_stream_fn(bound_client, thread_id),
             on_event=on_event, on_clarification=on_clarification, on_plan=on_plan,
         )

@@ -12,7 +12,7 @@
 | 哪些认知能力打开了？ | [binding defaults](../src/deerflow_deep_research/runtime/adapters/contracts/client_surface.py#L32) | thinking/subagent 开启、plan mode 关闭、available_skills=None；并非强制每次调用 deep-research |
 | 使用什么模型和 Web 工具？ | [base.yaml](../config/base.yaml)、[fixture.yaml](../config/fixture.yaml) | 真实梯与脚本梯的具体 provider/tool 声明 |
 | 如何委派子代理？ | [框架说明](../../deerflow/backend/AGENTS.md#architecture)、[本应用 posture](../src/deerflow_deep_research/runtime/adapters/subagent_posture.py) | 框架提供 task 委派，本应用当前没有声明 custom subagent 类型 |
-| 研究结果如何回到应用？ | [run_research](../src/deerflow_deep_research/runtime/run_engine.py#L203) | 消费 stream，处理续答/失败/取消，投影最后回答到报告准入 |
+| 研究结果如何回到应用？ | [run_research](../src/deerflow_deep_research/runtime/pump.py#L203) | 消费 stream，处理续答/失败/取消，投影最后回答到报告准入 |
 | 这次模型看到了什么？ | [snapshot middleware](../src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py#L16) | 第一次模型调用的 system prompt、可见工具、模型名、pin |
 
 上游说明的 [lead_agent 目录定位](../../deerflow/backend/AGENTS.md#project-structure) 指向
@@ -92,11 +92,11 @@ Harness 没有自动把 skill 的“3–5 个角度”等检查变成可阻断�
 
 ```text
 cli create → runtime/interaction/cli.py
-  -> Bundle → runtime/entry.run_foreground → SQLite checkpointer
+  -> Bundle → runtime/assembly.run_foreground → SQLite checkpointer
   -> build_client(config, subagent_enabled=True, available_skills=None)
   -> make_stream_fn(thread_id, recursion_limit=1000)
   -> DeerFlow lead agent <-> 模型、工具、按需委派
-  -> stream events -> run_engine -> 状态 / journal / 最后回答准入
+  -> stream events -> pump -> 状态 / journal / 最后回答准入
 ```
 
 嵌入式 stream 的有效递归上限以 [make_stream_fn](../src/deerflow_deep_research/runtime/adapters/client.py#L18) 的 per-call 参数为准。
@@ -107,7 +107,7 @@ cli create → runtime/interaction/cli.py
 和 [submit_artifact](../src/deerflow_deep_research/runtime/bundle/admission.py)。
 validator 检查 kind、文件名、producer、非空和重复 hash，**不验证引文真实、观点全面或事实正确**。
 本应用也没有把每次搜索结果自动提交成 evidence artifact；不能把有 journal/checkpoint 理解成“已建立完整证据库”。
-[gate](../src/deerflow_deep_research/engine/gate.py) 已可按 admit 数量推导 pass/blocked，但当前 run_engine 不把它作为四阶段调度图。
+[gate](../src/deerflow_deep_research/engine/gate.py) 已可按 admit 数量推导 pass/blocked，但当前 pump 不把它作为四阶段调度图。
 
 ## 怎样看到某一次真的发生了什么
 
@@ -117,13 +117,13 @@ validator 检查 kind、文件名、producer、非空和重复 hash，**不验�
 
 判断 skill 加载：先看是否出现读取 deep-research 原文的工具调用及结果；journal 只有名称时，再看 checkpoint 消息。
 判断委派：看 task 调用和 subagent 事件/结果；仅有 subagent_enabled=True 不足以证明实际委派。
-判断完成：status 的 `delivery:` 行直接回答交付（admitted/rejected/no-answer；未记录时用 journal disposition + final/ 文件 belt）；run_engine 先写终态再经 CAS 补写交付事实，空回答记 no-answer，重复内容记 rejected。
+判断完成：status 的 `delivery:` 行直接回答交付（admitted/rejected/no-answer；未记录时用 journal disposition + final/ 文件 belt）；pump 先写终态再经 CAS 补写交付事实，空回答记 no-answer，重复内容记 rejected。
 判断质量：再评审引用、交叉验证、范围、假设与不确定性——报告声称的来源可在 diagnostics/searches/ 的可直读记录里核对；fixture 的直接回答不能证明真实研究。
 
 ## 改什么、测什么
 
 - 改绑定/配置：先 [mirror 单元测试](../tests/contract/test_wiring_mirror.py)，再 [真实框架 fixture smoke](../tests/integration/test_wiring_smoke.py)。
-- 改 stream 适配/终态：先 [run_engine 测试](../tests/unit/runtime/test_run_engine.py)，真实形状问题再用 [事件回放测试](../tests/unit/runtime/test_event_stream_replay.py)。
+- 改 stream 适配/终态：先 [pump 测试](../tests/unit/runtime/test_run_engine.py)，真实形状问题再用 [事件回放测试](../tests/unit/runtime/test_event_stream_replay.py)。
 - 改模型研究策略：先明确是产品自有角色还是上游方法论；不能顺手改只读 skill。真实效果需显式真实梯观察，不靠脚本模型证明。
 - 新增证据/质量 gate：这是产品合同与接线变更，不是多写一条 doc；走 owning change 并确认被测接口。
 

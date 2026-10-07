@@ -101,7 +101,7 @@ files = [
   "deep_research_harness/config/base.yaml",
   "deep_research_harness/config/fixture.yaml",
   "deep_research_harness/src/deerflow_deep_research/runtime/adapters/client.py",
-  "deep_research_harness/src/deerflow_deep_research/runtime/run_engine.py",
+  "deep_research_harness/src/deerflow_deep_research/runtime/pump.py",
   "deep_research_harness/src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py",
 ]
 directories = [
@@ -114,13 +114,15 @@ directories = [
 files = [
   "deep_research_harness/cli.py",
   "deep_research_harness/docs/known-limitations.md",
-  "deep_research_harness/src/deerflow_deep_research/runtime/entry.py",
+  "deep_research_harness/src/deerflow_deep_research/runtime/assembly.py",
   "deep_research_harness/src/deerflow_deep_research/runtime/interaction/__init__.py",
   "deep_research_harness/src/deerflow_deep_research/runtime/interaction/cli.py",
   "deep_research_harness/src/deerflow_deep_research/runtime/interaction/render.py",
   "deep_research_harness/tests/unit/interaction/test_entry_composition.py",
   "deep_research_harness/tests/contract/__init__.py",
   "deep_research_harness/tests/contract/test_wiring_mirror.py",
+  "deep_research_harness/tests/contract/test_entry_chain.py",
+  "deep_research_harness/tests/contract/test_skill_declaration.py",
   "deep_research_harness/tests/fixtures/README.md",
   "deep_research_harness/tools/README.md",
   "deep_research_harness/tools/record_stream.py",

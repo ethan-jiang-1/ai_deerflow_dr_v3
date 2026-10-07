@@ -31,7 +31,7 @@ class RefineForegroundWiringTest(unittest.TestCase):
         refined = _fake_refined("all_real")
         record = SimpleNamespace(generation=2, direction_text="深挖成本侧证据")
 
-        fake_entrypoint = SimpleNamespace(
+        fake_assembly = SimpleNamespace(
             runs_root=lambda: Path("/runs"), CONFIG_ROOT=Path("/config"),
             resolve_bundle=lambda runs, bid: "HANDLE",
             read_pin=lambda: "p" * 40,
@@ -42,7 +42,7 @@ class RefineForegroundWiringTest(unittest.TestCase):
         args = SimpleNamespace(bundle_id="b1", direction="深挖成本侧证据")
         out = io.StringIO()
         with (
-            mock.patch.object(cli, "entrypoint", fake_entrypoint),
+            mock.patch.object(cli, "assembly", fake_assembly),
             mock.patch.object(cli.bundle_actions, "refine", return_value=(refined, record)),
             redirect_stdout(out),
         ):
@@ -60,7 +60,7 @@ class RefineForegroundWiringTest(unittest.TestCase):
         refined = _fake_refined("fixture")
         record = SimpleNamespace(generation=2, direction_text="d")
 
-        fake_entrypoint = SimpleNamespace(
+        fake_assembly = SimpleNamespace(
             runs_root=lambda: Path("/runs"), CONFIG_ROOT=Path("/config"),
             resolve_bundle=lambda runs, bid: "HANDLE",
             read_pin=lambda: "p" * 40,
@@ -70,7 +70,7 @@ class RefineForegroundWiringTest(unittest.TestCase):
         )
         args = SimpleNamespace(bundle_id="b1", direction="d")
         with (
-            mock.patch.object(cli, "entrypoint", fake_entrypoint),
+            mock.patch.object(cli, "assembly", fake_assembly),
             mock.patch.object(cli.bundle_actions, "refine", return_value=(refined, record)),
             redirect_stdout(io.StringIO()),
         ):
@@ -81,13 +81,13 @@ class RefineForegroundWiringTest(unittest.TestCase):
 
 class CompositionLadderMappingTest(unittest.TestCase):
     def test_composition_maps_to_config_name(self) -> None:
-        from deerflow_deep_research.runtime.entry import config_name_for_composition
+        from deerflow_deep_research.runtime.assembly import config_name_for_composition
 
         self.assertEqual(config_name_for_composition("fixture"), "fixture")
         self.assertEqual(config_name_for_composition("all_real"), "base")
 
     def test_unwired_composition_fails_loudly(self) -> None:
-        from deerflow_deep_research.runtime.entry import config_name_for_composition
+        from deerflow_deep_research.runtime.assembly import config_name_for_composition
 
         for composition in ("mixed", "bogus"):
             with self.subTest(composition=composition):
@@ -102,14 +102,14 @@ class CancelPositiveWiringTest(unittest.TestCase):
 
     def test_cmd_cancel_records_request(self) -> None:
         cancelled = SimpleNamespace(status="active", generation=1, revision=2)
-        fake_entrypoint = SimpleNamespace(
+        fake_assembly = SimpleNamespace(
             runs_root=lambda: Path("/runs"),
             resolve_bundle=lambda runs, bid: "HANDLE",
         )
         args = SimpleNamespace(bundle_id="b1")
         out = io.StringIO()
         with (
-            mock.patch.object(cli, "entrypoint", fake_entrypoint),
+            mock.patch.object(cli, "assembly", fake_assembly),
             mock.patch.object(cli.bundle_actions, "cancel", return_value=cancelled) as cancel,
             redirect_stdout(out),
         ):

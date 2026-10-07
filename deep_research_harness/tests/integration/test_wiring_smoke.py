@@ -25,7 +25,7 @@ except ImportError:  # pragma: no cover — environments without the framework
 from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
 from deerflow_deep_research.runtime.adapters import client as client_binding
 from deerflow_deep_research.runtime.bundle import journal as journal_mod
-from deerflow_deep_research.runtime import run_engine
+from deerflow_deep_research.runtime import pump
 
 
 def journal_entries(handle):
@@ -70,7 +70,7 @@ class WiringSmokeTest(unittest.TestCase):
                 pin=_PIN,
             )
             self.assertIsInstance(client, DeerFlowClient)
-            result = run_engine.run_research(
+            result = pump.run_research(
                 self.handle, stream_fn=lambda message: client.stream(message, thread_id=self.state.thread_id)
             )
         self.assertEqual(result.status, "completed")
@@ -99,7 +99,7 @@ class WiringSmokeTest(unittest.TestCase):
         self.addCleanup(os.environ.pop, "DEERFLOW_FAKE_SCRIPT", None)
         with client_binding.bundle_checkpointer(self.handle) as saver:
             client = client_binding.build_client(_CONFIG_ROOT, "fixture", checkpointer=saver)
-            result = run_engine.run_research(
+            result = pump.run_research(
                 self.handle, stream_fn=lambda message: client.stream(message, thread_id=self.state.thread_id)
             )
         self.assertEqual(result.status, "failed-resume")

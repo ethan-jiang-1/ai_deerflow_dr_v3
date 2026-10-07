@@ -1,0 +1,59 @@
+{
+  "revision": "7f0a5116b69a6f6cb69812aba3886ae0bc6a1623",
+  "completed_at": "2026-10-07T05:34:31+00:00",
+  "change": "2026-10-07-surface-runtime-structure",
+  "program": {
+    "workstream_order": ["chain-lock", "vocabulary-fix", "skill-slot"],
+    "candidate_budget": ["CHAIN-001", "VOC-001", "VOC-002", "SKL-001", "SKL-002"],
+    "shared_archive_invariant": "make verify + make smoke + architecture/doc/openspec gates all green; pre-existing 188 test IDs unchanged (zero removed, zero modified); 14 added (6 chain-lock + 8 skill guard)"
+  },
+  "scope": "entry chain locked by offline AST contract test (tests/contract/test_entry_chain.py, @impl CHAIN-001); vocabulary fix runtime/entry.py->assembly.py and runtime/run_engine.py->pump.py with 12 consumer files cut over (no shims); skill declaration slot: assembly.resolve_skills + build_client available_skills passthrough with default exactly None (config base/fixture.yaml document the slot, absent = unwired); control-map section 4 slimmed to routing with the chain test as the mechanical authority; manifest required-paths.toml updated (2 renames + 2 new contract tests); zero behavior change at the default posture",
+  "checks": [
+    {"command": ["make", "verify"], "cwd": "deep_research_harness", "expected_exit_code": 0, "exit_code": 0, "stdout": "[verify] harness unittest gate passed.", "stderr_summary": "Ran 202 tests - OK"},
+    {"command": ["make", "smoke"], "cwd": "deep_research_harness", "expected_exit_code": 0, "exit_code": 0, "stdout": "Ran 14 tests - OK", "stderr_summary": "framework fixture ladder; CLI journeys incl. create/watch/status/refine/inspect/cancel negative all ok"},
+    {"command": ["PYTHONPATH=src python3 -m unittest tests.contract.test_entry_chain"], "cwd": "deep_research_harness", "expected_exit_code": 0, "exit_code": 0, "stdout": "Ran 6 tests - OK"},
+    {"command": ["PYTHONPATH=src python3 -m unittest tests.contract.test_skill_declaration"], "cwd": "deep_research_harness", "expected_exit_code": 0, "exit_code": 0, "stdout": "Ran 8 tests - OK"},
+    {"command": ["python3 openspec/governance/check_project_architecture.py"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0, "stdout": "Architecture governance passed"},
+    {"command": ["python3 openspec/governance/check_doc_hygiene.py"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0, "stdout": "doc-layer hygiene passed."},
+    {"command": ["python3 openspec/governance/check_change_guidance.py"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0, "stdout": "Change Guidance governance passed."},
+    {"command": ["python3 openspec/governance/check_project_specs.py"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0, "stdout": "All project specs valid: 12 main spec files, 0 violations."},
+    {"command": ["python3 openspec/governance/check_project_gate.py --phase closeout"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0, "stdout": "OpenSpec governance closeout passed: every registered component checker exited 0."},
+    {"command": ["openspec validate 2026-10-07-surface-runtime-structure --strict"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0, "stdout": "Change is valid"},
+    {"command": ["git diff --check"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0, "stdout": ""},
+    {"command": ["git diff --exit-code HEAD -- deerflow"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0, "stdout": "", "note": "gitlink pointer 160000 ceebf97fc31afbbfe2aadf7c8d82b03c3742d5d7 unchanged; git -C deerflow status clean"}
+  ],
+  "test_ids": {
+    "baseline_before_change": 188,
+    "final": 202,
+    "added": 14,
+    "removed": 0,
+    "modified": 0,
+    "added_breakdown": "6 chain-lock (CHAIN-001) + 8 skill declaration guard (SKL-001/SKL-002)",
+    "capture_command": "PYTHONPATH=src python3 -m unittest discover -s tests -v"
+  },
+  "red_proof": {
+    "chain_lock": [
+      "mutation (a): cmd_create rerouted to pump.run_research, bypassing assembly -> link 2 red naming run_foreground missing (verb-leak assertion also fired)",
+      "mutation (b): run_foreground dropped make_stream_fn -> link 3 red naming the stream seam",
+      "mutation (c): _submit_final_report bypassed submit_artifact -> link 4 red naming the admission hold point"
+    ],
+    "skill_slot": [
+      "mutation 1: build_client hard-coded available_skills=None literal -> hard-code assertion red",
+      "mutation 2: absent-declaration resolution coerced to [] -> 3 default-posture assertions red",
+      "mutation 3: element type check swallowed -> 2 malformed-declaration assertions red"
+    ],
+    "vocabulary": "git mv before import cutover produced ImportError 'cannot import name entry/run_engine' in the owning test modules; restored by completing the cutover"
+  },
+  "observations": [
+    "chain lock is AST-level over call signatures: no line numbers, no product import; in-stage refactors do not false-fail (guarded by the behavior-preserving-refactor scenario)",
+    "assembly.run_foreground now forwards available_skills into build_client; the forwarding unit assertion in test_entry_composition was updated to include available_skills=None (declared-none posture pinned at the consumer level too)",
+    "control-map.md section 4 slimmed from an 11-step restatement to a six-link diagram routing to test_entry_chain as the mechanical authority; README keeps one human-readable chain diagram plus the lock pointer",
+    "manifest: entry-surface group now declares assembly.py; deerflow-wiring group declares pump.py; contract group declares both new guard tests",
+    "mid-workstream incident: git checkout -- <file> restored assembly.py/client.py from the git-mv-staged index and silently reverted WS2/WS3 edits; detected by post-restore test failure, both files reconstructed and re-proven green (lesson recorded: never use git checkout to undo mutations on files with unstaged intended changes)"
+  ],
+  "unverified": [
+    "real-ladder (base) skill activation behavior: the declaration slot ships unwired (None) by design; what the framework loads when a list is declared is owned by a future cognitive-program change and needs a credentialed real run",
+    "no CI run performed locally (GitHub Actions governance workflow runs on push)",
+    "smoke covers the fixture ladder only"
+  ]
+}

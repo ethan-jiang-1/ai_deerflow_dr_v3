@@ -123,7 +123,7 @@ class PlanWiringTest(unittest.TestCase):
             or SimpleNamespace(status="completed", generation=2, revision=8),
         )
         with (
-            mock.patch.object(cli, "entrypoint", fake_for_create),
+            mock.patch.object(cli, "assembly", fake_for_create),
             mock.patch.object(cli.bundle_actions, "start") as start,
             mock.patch.object(cli, "_clarification_handler", return_value=None),
             mock.patch.object(cli, "_plan_handler", return_value=sentinel),
@@ -134,7 +134,7 @@ class PlanWiringTest(unittest.TestCase):
         self.assertIs(create_calls[0].get("on_plan"), sentinel)
 
         with (
-            mock.patch.object(cli, "entrypoint", fake_for_refine),
+            mock.patch.object(cli, "assembly", fake_for_refine),
             mock.patch.object(cli.bundle_actions, "refine", return_value=(refined, record)),
             mock.patch.object(cli, "_clarification_handler", return_value=None),
             contextlib.redirect_stdout(io.StringIO()),

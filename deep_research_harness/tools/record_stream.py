@@ -14,7 +14,7 @@ from pathlib import Path
 HARNESS_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(HARNESS_ROOT / "src"))
 
-from deerflow_deep_research.runtime import entry
+from deerflow_deep_research.runtime import assembly
 from deerflow_deep_research.runtime.bundle import bundle_actions  # noqa: E402
 from deerflow_deep_research.runtime.adapters import client as cb  # noqa: E402
 
@@ -24,16 +24,16 @@ DEFAULT_OUTPUT = HARNESS_ROOT / "tests/fixtures/replay/real-small-stream.json"
 
 def record(problem: str, config: str, *, runs_root: Path, output: Path) -> int:
     """Record to an explicit path; no lifecycle/admission completion is implied."""
-    pin = entry.read_pin()
+    pin = assembly.read_pin()
     state = bundle_actions.start(
         runs_root, problem_text=problem,
         composition="all_real" if config == "base" else "fixture", deerflow_pin=pin,
     )
-    handle = entry.resolve_bundle(runs_root, state.thread_id)
+    handle = assembly.resolve_bundle(runs_root, state.thread_id)
     events = []
     with cb.bundle_checkpointer(handle) as saver:
         client = cb.build_client(
-            entry.CONFIG_ROOT, config, checkpointer=saver,
+            assembly.CONFIG_ROOT, config, checkpointer=saver,
             snapshot_dir=handle.root / "diagnostics", pin=pin,
         )
         for event in client.stream(problem, thread_id=state.thread_id):
@@ -62,7 +62,7 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
     return record(
         args.problem, args.config,
-        runs_root=args.runs_root if args.runs_root is not None else entry.runs_root(),
+        runs_root=args.runs_root if args.runs_root is not None else assembly.runs_root(),
         output=args.output,
     )
 

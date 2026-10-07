@@ -13,7 +13,7 @@ from types import SimpleNamespace
 
 from deerflow_deep_research.domain import bundle, journal_policy, state_machine
 from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
-from deerflow_deep_research.runtime import run_engine
+from deerflow_deep_research.runtime import pump
 
 _PIN = "c" * 40
 _FIXED_NOW = datetime(2026, 10, 3, 12, 0, tzinfo=timezone.utc)
@@ -61,7 +61,7 @@ class RunEngineTest(unittest.TestCase):
             yield _chunk_event(_ai("最终报告内容"))
             yield _event("end")
 
-        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        result = pump.run_research(self.handle, stream_fn=stream_fn)
         self.assertEqual(result.status, "completed")
 
     def test_unanswered_clarification_triggers_provenance_marked_continuation(self) -> None:
@@ -76,7 +76,7 @@ class RunEngineTest(unittest.TestCase):
                 yield _chunk_event(_ai("已按假设继续：A 国"))
                 yield _event("end")
 
-        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        result = pump.run_research(self.handle, stream_fn=stream_fn)
         self.assertEqual(result.status, "completed")
         self.assertEqual(result.auto_proceed_count, 1)
         self.assertEqual(len(turns), 2)
@@ -100,7 +100,7 @@ class RunEngineTest(unittest.TestCase):
             asked.append(question)
             return "A 国，聚焦消费级无人机"
 
-        result = run_engine.run_research(
+        result = pump.run_research(
             self.handle, stream_fn=stream_fn, on_clarification=on_clarification,
         )
         self.assertEqual(result.status, "completed")
@@ -125,7 +125,7 @@ class RunEngineTest(unittest.TestCase):
                 yield _chunk_event(_ai("按假设继续"))
                 yield _event("end")
 
-        result = run_engine.run_research(
+        result = pump.run_research(
             self.handle, stream_fn=stream_fn, on_clarification=lambda q: "   ",
         )
         self.assertEqual(result.status, "completed")
@@ -155,7 +155,7 @@ class RunEngineTest(unittest.TestCase):
             plans.append(plan)
             return plan  # confirm as-is
 
-        result = run_engine.run_research(self.handle, stream_fn=stream_fn, on_plan=on_plan)
+        result = pump.run_research(self.handle, stream_fn=stream_fn, on_plan=on_plan)
         self.assertEqual(result.status, "completed")
         # The hook received the proposed plan; the plan turn was NOT the report.
         self.assertEqual(plans, [self._PLAN_TEXT])
@@ -185,7 +185,7 @@ class RunEngineTest(unittest.TestCase):
                 yield _chunk_event(_ai("最终报告"))
                 yield _event("end")
 
-        result = run_engine.run_research(
+        result = pump.run_research(
             self.handle, stream_fn=stream_fn, on_plan=lambda p: amended,
         )
         self.assertEqual(result.status, "completed")
@@ -207,7 +207,7 @@ class RunEngineTest(unittest.TestCase):
                 yield _chunk_event(_ai("最终报告"))
                 yield _event("end")
 
-        result = run_engine.run_research(
+        result = pump.run_research(
             self.handle, stream_fn=stream_fn, on_plan=lambda p: None,
         )
         self.assertEqual(result.status, "completed")
@@ -236,7 +236,7 @@ class RunEngineTest(unittest.TestCase):
                 yield _chunk_event(_ai("最终报告"))
                 yield _event("end")
 
-        result = run_engine.run_research(
+        result = pump.run_research(
             self.handle, stream_fn=stream_fn, on_plan=lambda p: self.fail("gate must not fire"),
         )
         # Nothing force-blocked: the run completed under today's rules in ONE turn —
@@ -259,7 +259,7 @@ class RunEngineTest(unittest.TestCase):
                 yield _chunk_event(_ai("最终报告"))
                 yield _event("end")
 
-        result = run_engine.run_research(
+        result = pump.run_research(
             self.handle, stream_fn=stream_fn, on_plan=lambda p: self.fail("gate must not fire"),
         )
         self.assertEqual(result.status, "completed")
@@ -285,7 +285,7 @@ class RunEngineTest(unittest.TestCase):
             received.append(plan)
             return plan
 
-        run_engine.run_research(self.handle, stream_fn=stream_fn, on_plan=on_plan)
+        pump.run_research(self.handle, stream_fn=stream_fn, on_plan=on_plan)
         self.assertEqual(received, [self._PLAN_TEXT])  # inner text only, no markers
         plan_file = self.handle.root / "request" / "plan-gen1.md"
         self.assertNotIn("research-plan", plan_file.read_text(encoding="utf-8"))
@@ -318,7 +318,7 @@ class RunEngineTest(unittest.TestCase):
             plans.append(plan)
             return plan
 
-        result = run_engine.run_research(
+        result = pump.run_research(
             self.handle, stream_fn=stream_fn,
             on_clarification=on_clarification, on_plan=on_plan,
         )
@@ -335,7 +335,7 @@ class RunEngineTest(unittest.TestCase):
             yield _chunk_event(_ai("第一代报告"))
             yield _event("end")
 
-        run_engine.run_research(self.handle, stream_fn=first_run)
+        pump.run_research(self.handle, stream_fn=first_run)
         refined_state, _record = None, None
         from deerflow_deep_research.runtime.bundle import bundle_actions
         refined_state, _record = bundle_actions.refine(self.handle, "深挖竞品对比")
@@ -350,7 +350,7 @@ class RunEngineTest(unittest.TestCase):
             yield _chunk_event(_ai("第二代报告"))
             yield _event("end")
 
-        result = run_engine.run_research(
+        result = pump.run_research(
             self.handle, stream_fn=second_run, on_plan=lambda p: self.fail("refine must not gate"),
         )
         self.assertEqual(result.status, "completed")
@@ -362,7 +362,7 @@ class RunEngineTest(unittest.TestCase):
             yield _chunk_event(_ai(tool_calls=[_ask_call("c1")]))
             yield _event("end")
 
-        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        result = pump.run_research(self.handle, stream_fn=stream_fn)
         self.assertEqual(result.status, "failed-resume")
         self.assertEqual(result.auto_proceed_count, 2)
         questions = json.loads(
@@ -382,7 +382,7 @@ class RunEngineTest(unittest.TestCase):
             yield _chunk_event(_ai("结论"))
             yield _event("end")
 
-        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        result = pump.run_research(self.handle, stream_fn=stream_fn)
         self.assertEqual(result.status, "completed")
         entries = journal_mod_entries(self.handle)
         tool_turns = [e for e in entries if e.category == "model_tool" and e.event == "model_tool_call"]
@@ -395,7 +395,7 @@ class RunEngineTest(unittest.TestCase):
             yield _chunk_event(_ai("部分内容"))
             yield _event("end", stop_reason="token_capped")
 
-        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        result = pump.run_research(self.handle, stream_fn=stream_fn)
         self.assertEqual(result.status, "failed-resume")
         entries = journal_mod_entries(self.handle)
         self.assertTrue(any(e.category == "terminal" and e.event == "stop_reason" for e in entries))
@@ -407,7 +407,7 @@ class RunEngineTest(unittest.TestCase):
 
         # The cancel action records the request externally while the run streams.
         bundle_actions.cancel(self.handle)
-        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        result = pump.run_research(self.handle, stream_fn=stream_fn)
         self.assertEqual(result.status, "cancelled")
 
     def test_error_fallback_transfers_to_failed_resume(self) -> None:
@@ -421,7 +421,7 @@ class RunEngineTest(unittest.TestCase):
             yield _event("values", messages=[{"type": "human", "content": "q"}, fallback_ai])
             yield _event("end")
 
-        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        result = pump.run_research(self.handle, stream_fn=stream_fn)
         self.assertEqual(result.status, "failed-resume")
         entries = journal_mod_entries(self.handle)
         terminal = [e for e in entries if e.category == "terminal"]
@@ -445,7 +445,7 @@ class RunEngineTest(unittest.TestCase):
             yield _event("messages-tuple", message=fallback_ai)
             yield _event("end")
 
-        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        result = pump.run_research(self.handle, stream_fn=stream_fn)
         self.assertEqual(result.status, "failed-resume")
 
     def test_clean_run_has_no_fallback_behavior(self) -> None:
@@ -453,7 +453,7 @@ class RunEngineTest(unittest.TestCase):
             yield _chunk_event({"type": "ai", "content": "正常回答", "additional_kwargs": {}})
             yield _event("end")
 
-        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        result = pump.run_research(self.handle, stream_fn=stream_fn)
         self.assertEqual(result.status, "completed")
         entries = journal_mod_entries(self.handle)
         self.assertFalse(any(e.event == "llm_error_fallback" for e in entries))
@@ -465,7 +465,7 @@ class RunEngineTest(unittest.TestCase):
                 yield _chunk_event({"type": "ai", "content": token})
             yield _event("end")
 
-        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        result = pump.run_research(self.handle, stream_fn=stream_fn)
         self.assertEqual(result.status, "completed")
         entries = journal_mod_entries(self.handle)
         text_turns = [e for e in entries if e.category == "model_tool"]
@@ -479,7 +479,7 @@ class RunEngineTest(unittest.TestCase):
             yield _event("values", messages=[])
             raise RuntimeError("GraphRecursionError: limit reached")
 
-        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        result = pump.run_research(self.handle, stream_fn=stream_fn)
         self.assertEqual(result.status, "failed-resume")
         entries = journal_mod_entries(self.handle)
         self.assertTrue(any(e.category == "terminal" and e.event == "framework_error" for e in entries))
@@ -492,7 +492,7 @@ class RunEngineTest(unittest.TestCase):
             ])
             yield _event("end")
 
-        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        result = pump.run_research(self.handle, stream_fn=stream_fn)
         self.assertEqual(result.status, "completed")
         report = self.handle.root / "final" / f"report-gen{result.generation}.md"
         self.assertTrue(report.is_file(), report)
@@ -508,7 +508,7 @@ class RunEngineTest(unittest.TestCase):
             yield _event("values", messages=[{"type": "human", "content": "q"}, fallback_ai])
             yield _event("end")
 
-        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        result = pump.run_research(self.handle, stream_fn=stream_fn)
         self.assertEqual(result.status, "failed-resume")
         self.assertEqual(list((self.handle.root / "final").iterdir()), [], "no report file on a failed run")
 
@@ -525,7 +525,7 @@ class RunEngineTest(unittest.TestCase):
             yield _chunk_event(_ai("第二代报告内容"))
             yield _event("end")
 
-        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        result = pump.run_research(self.handle, stream_fn=stream_fn)
         self.assertEqual(result.status, "completed")
         self.assertEqual(result.generation, 2)
         self.assertTrue(first_messages, "the stream must have been called")
@@ -538,7 +538,7 @@ class RunEngineTest(unittest.TestCase):
             yield _chunk_event(_ai(answer))
             yield _event("end")
 
-        return run_engine.run_research(self.handle, stream_fn=stream_fn)
+        return pump.run_research(self.handle, stream_fn=stream_fn)
 
     def test_clean_completion_records_admitted_delivery(self) -> None:
         self._drive_to_completion("第一代报告内容")
@@ -583,7 +583,7 @@ class RunEngineTest(unittest.TestCase):
             yield _chunk_event(_ai("带引用的最终报告"))
             yield _event("end")
 
-        result = run_engine.run_research(self.handle, stream_fn=stream_fn)
+        result = pump.run_research(self.handle, stream_fn=stream_fn)
         self.assertEqual(result.status, "completed")
         path = self.handle.root / "diagnostics" / "searches" / "gen1-001-web_search.json"
         self.assertTrue(path.is_file(), "the search turn must be materialized")

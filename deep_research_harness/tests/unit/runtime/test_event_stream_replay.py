@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from deerflow_deep_research.domain import bundle
-from deerflow_deep_research.runtime import run_engine
+from deerflow_deep_research.runtime import pump
 from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
 
 FIXTURE = Path(__file__).resolve().parents[2] / "fixtures" / "replay" / "real-small-stream.json"
@@ -45,7 +45,7 @@ class EventStreamReplayTest(unittest.TestCase):
         return _stream
 
     def test_replayed_real_stream_lands_the_recorded_shape(self) -> None:
-        result = run_engine.run_research(self.handle, stream_fn=self._stream_fn())
+        result = pump.run_research(self.handle, stream_fn=self._stream_fn())
         self.assertEqual(result.status, "completed")  # the recorded run was a clean completion
         entries = self._journal()
         model_turns = [e for e in entries if e.category == "model_tool" and e.event == "model_tool_call"]
@@ -60,7 +60,7 @@ class EventStreamReplayTest(unittest.TestCase):
             if e["type"] == "messages-tuple" and isinstance(e["data"], dict) and e["data"].get("tool_calls"):
                 e["data"] = {**e["data"], "tool_calls": [{**tc, "name": "tampered_tool"} for tc in e["data"]["tool_calls"]]}
         self.events = tampered
-        run_engine.run_research(self.handle, stream_fn=self._stream_fn())
+        pump.run_research(self.handle, stream_fn=self._stream_fn())
         entries = self._journal()
         calls = [call for e in entries if e.category == "model_tool" for call in e.detail.get("calls", [])]
         self.assertIn("tampered_tool", calls, "tampered tool_calls must surface in the journal")
