@@ -51,7 +51,7 @@ _backlog/
 
 > 📖 **想看全局状态、历史决策、查阅指南** → [`_done/README.md`](_done/README.md)
 >
-> 📖 **想看当前该做什么、依赖关系、执行顺序** → [plans 索引](plans/README.md)；当前活跃计划包括 Agent-friendly Repo 导航维护，以及 Runtime / Test / Interaction / Agent Loop 结构与控制面重整；后续产品行为另走 owning change。
+> 📖 **想看当前该做什么、依赖关系、执行顺序** → [plans 索引](plans/README.md)；当前活跃计划包括 clarification-channel-discipline（反问/计划通道纪律）与 application-corpus-adoption（应用开发语料消化，产出质量验收为主事件）；后续产品行为另走 owning change。
 
 ---
 
