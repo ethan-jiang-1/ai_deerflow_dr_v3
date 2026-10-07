@@ -25,6 +25,29 @@ CONFIG_ROOT = HARNESS_ROOT / "config"
 RUNS_ROOT = REPO_ROOT / bundle.RUNS_ROOT_NAME
 RUNS_ROOT_ENV = "DEEP_RESEARCH_RUNS_ROOT"
 DEERFLOW_DIR = REPO_ROOT / "deerflow"
+# Framework runtime state (memory stores, skill projections, user data) lives
+# outside the application subtree, pinned via the framework's documented
+# DEER_FLOW_HOME seam — same discipline as runs/, never inside product code.
+FRAMEWORK_HOME = REPO_ROOT / ".deer-flow"
+FRAMEWORK_HOME_ENV = "DEER_FLOW_HOME"
+
+
+def pin_framework_home() -> Path:
+    """Pin the framework home to the repository root and return it.
+
+    Fails loudly if the resolution would land inside the application subtree.
+    Call before any framework import or client construction in a run.
+
+    @impl HOME-001
+    """
+
+    if FRAMEWORK_HOME == HARNESS_ROOT or HARNESS_ROOT in FRAMEWORK_HOME.parents:
+        raise SystemExit(
+            f"framework home {FRAMEWORK_HOME} resolved inside the application "
+            "subtree — refusing (runtime state never lives in product code)"
+        )
+    os.environ[FRAMEWORK_HOME_ENV] = str(FRAMEWORK_HOME)
+    return FRAMEWORK_HOME
 
 
 def runs_root() -> Path:
@@ -115,6 +138,7 @@ def run_foreground(
     to the human; without it the engine keeps the bounded automatic continuation.
     """
     with client.bundle_checkpointer(handle) as saver:
+        pin_framework_home()
         import yaml
 
         config = yaml.safe_load(

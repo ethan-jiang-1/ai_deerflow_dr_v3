@@ -1,0 +1,44 @@
+{
+  "revision": "78012f9",
+  "completed_at": "2026-10-07T17:30:00+00:00",
+  "change": "2026-10-07-pin-framework-home",
+  "scope": "framework home pinned outside the application subtree: assembly.FRAMEWORK_HOME = repo-root .deer-flow + pin_framework_home() (sets DEER_FLOW_HOME before framework import, SystemExit on in-subtree resolution); run_foreground pins before build_client; historical deep_research_harness/.deer-flow relocated whole (skills_view projection + users/default memory and facts preserved verbatim); repo-root .gitignore gains .deer-flow/ (runs/ precedent), app .gitignore and manifest [ignored_paths] entry removed in sync; guard tests/contract/test_framework_home.py pins env target, subtree boundary, and pin-before-client-construction ordering",
+  "checks": [
+    {"command": ["make", "verify"], "cwd": "deep_research_harness", "expected_exit_code": 0, "exit_code": 0, "stdout_summary": "Ran 223 tests - OK"},
+    {"command": ["make", "smoke"], "cwd": "deep_research_harness", "expected_exit_code": 0, "exit_code": 0, "stdout_summary": "Ran 15 tests - OK"},
+    {"command": ["python3 openspec/governance/check_change_guidance.py"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["python3 openspec/governance/check_project_architecture.py"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["python3 openspec/governance/check_doc_hygiene.py"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["python3 openspec/governance/check_project_specs.py"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["python3 openspec/governance/check_project_gate.py --phase closeout"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["openspec validate 2026-10-07-pin-framework-home --strict"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["git diff --check"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["git diff --exit-code HEAD -- deerflow"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0, "note": "gitlink pointer unchanged"}
+  ],
+  "test_ids": {
+    "baseline_before_change": 220,
+    "final": 223,
+    "added": 3,
+    "removed": 0,
+    "modified": 0,
+    "added_breakdown": "3 framework-home guard tests (env target + subtree boundary + AST call ordering)",
+    "capture_command": "PYTHONPATH=src python3 -m unittest discover -s tests -v"
+  },
+  "red_proof": [
+    "task 1.1: import of assembly.pin_framework_home failed (missing) before implementation"
+  ],
+  "empirical_observation": {
+    "write_landing": "after the pinned smoke run, repo-root .deer-flow/ contains .retrieval/ (memory-fts5 sqlite + shm/wal), .skills_view.projection.lock, skills_view/, users/ — and NO .deer-flow exists inside deep_research_harness/",
+    "note": "this closes the earlier 'unverified landing' caveat: the DEER_FLOW_HOME seam is honored by the embedded binding (first observed via the C-probe .df-probe artifact, re-confirmed under the pinned home)",
+    "smoke_duration_note": "smoke wall time rose ~14s -> ~78s once: the relocation changed the projection source signature, forcing a one-time full skill-view re-projection at the new home"
+  },
+  "observations": [
+    "the ignored_paths authority lives in project-structure.toml (not required-paths.toml); entries must exactly match deep_research_harness/.gitignore — updated in sync when the app .gitignore entry was removed",
+    "user data handling: users/default/memory.json and agents facts moved verbatim with the directory (user-approved relocation, C1 decision)",
+    "the pin guards ordering (before build_client => before lazy framework import) via AST call-order assertion"
+  ],
+  "unverified": [
+    "no real-model (base ladder) run; write-landing evidence is fixture-ladder smoke",
+    "no CI run performed locally"
+  ]
+}

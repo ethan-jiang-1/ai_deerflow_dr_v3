@@ -84,6 +84,8 @@ deep_research_harness/
 
 runs/                           （仓库根）本地 Run Bundle 数据，gitignored，
                                 应用子树之外；env DEEP_RESEARCH_RUNS_ROOT 可覆盖
+.deer-flow/                     （仓库根）框架运行态 home（memory 库、skill 投影、
+                                用户数据），gitignored；binding 经 DEER_FLOW_HOME 钉入
 ```
 
 仓库根还有：`deerflow/`（锁定上游，**只读**，普通工作不修改不深读其内部）、

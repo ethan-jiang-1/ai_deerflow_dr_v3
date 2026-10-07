@@ -60,6 +60,7 @@ Bundle 规则合同在 [test_bundle_domain](domain/test_bundle_domain.py)，离�
 | 入口链六环的组合关系被替换、绕过或改名漏切 | [test_entry_chain.py](contract/test_entry_chain.py) | stdlib AST 源码断言，零产品 import、不锁行号；阶段内重构不误伤，不证明运行时行为 |
 | 终态分类七类互斥、ambiguous 兜底、碰撞负例 | [test_diagnosis.py](unit/domain/test_diagnosis.py) | 真实纯分类器；手工 state/journal/presence 输入，无 I/O |
 | diagnose 渲染短语 + 只读边界（哈希对照）+ active 不分类 | [test_entry_surface.py](unit/interaction/test_entry_surface.py)（DiagnoseSurfaceTest） | 真 Bundle/临时目录；不执行模型 |
+| 框架 home pin：env 指向仓库根、子树外、pin 先于 build_client | [test_framework_home.py](contract/test_framework_home.py) | 真 pin 函数 + AST 调用顺序；不 import 框架 |
 | subagent 配置 posture 与违规声明 | [test_subagent_posture.py](runtime/test_subagent_posture.py) | stdlib checker + 真实/临时配置，不执行委派 |
 | COMMANDS、Makefile、CLI 动词清单一致 | [test_command_surface.py](interaction/test_command_surface.py) | 文本/正则检查，不执行命令 |
 | 命令菜单路由与 playbook 完成判据登记 | [test_agent_playbook.py](interaction/test_agent_playbook.py) | 文档检查，不证明旅程真的成功 |
