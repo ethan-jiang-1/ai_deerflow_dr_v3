@@ -9,7 +9,7 @@
 | --- | --- | --- |
 | 研究方法到底写在哪？ | [本地 SOP 阅读入口](skills/deep-research/README.md)、[完整 SKILL.md](skills/deep-research/SKILL.md) | Harness 中的原文快照，含来源 pin/hash；运行时仍由框架加载，不是本仓 coding-agent skill |
 | 谁让 lead agent 跑起来？ | [本应用 client binding](../src/deerflow_deep_research/runtime/adapters/client.py#L68) | 构造嵌入式 DeerFlowClient，注入 checkpointer 与 snapshot middleware |
-| 哪些认知能力打开了？ | [binding defaults](../src/deerflow_deep_research/runtime/adapters/contracts/client_surface.py#L32) | thinking/subagent 开启、plan mode 关闭、available_skills=None；并非强制每次调用 deep-research |
+| 哪些认知能力打开了？ | [binding defaults](../src/deerflow_deep_research/runtime/adapters/contracts/client_surface.py#L32) | thinking/subagent 开启、plan mode 关闭；`available_skills` 由两梯声明为窄面 `deep-research`（模型可见目录只有它；是否加载使用仍是 agent 决定） |
 | 使用什么模型和 Web 工具？ | [base.yaml](../config/base.yaml)、[fixture.yaml](../config/fixture.yaml) | 真实梯与脚本梯的具体 provider/tool 声明 |
 | 如何委派子代理？ | [框架说明](../../deerflow/backend/AGENTS.md#architecture)、[本应用 posture](../src/deerflow_deep_research/runtime/adapters/subagent_posture.py) | 框架提供 task 委派，本应用当前没有声明 custom subagent 类型 |
 | 研究结果如何回到应用？ | [run_research](../src/deerflow_deep_research/runtime/pump.py#L203) | 消费 stream，处理续答/失败/取消，投影最后回答到报告准入 |
@@ -27,7 +27,7 @@ skill 在本项目里是三个不同的对象，不能混为一谈：
 | 状态列 | 当前值 | 证据 / 入口 |
 | --- | --- | --- |
 | **声明可用** | 框架 native surface 可加载；本地 [SOP 快照](skills/deep-research/README.md) 仅供阅读（含来源 pin/hash） | 快照不是运行时配置，改它不改变行为 |
-| **运行中实际加载** | 不强制：binding 传 `available_skills=None`，lead agent 自行决定 | 要证明实际加载，看工具调用记录 + checkpoint 消息 + [snapshot](../src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py)；方法见下节 |
+| **运行中实际加载** | 目录面已收窄：两梯声明 `available_skills: [deep-research]`，snapshot 实证 prompt 索引恰含 deep-research（prompt 33589→22181 字节）；正文加载与否 agent 决定 | 要证明实际加载，看工具调用记录 + checkpoint 消息 + [snapshot](../src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py)；方法见下节 |
 | **质量评估** | 无自动化统计评估（引文真实性、充分性、覆盖度）；每次搜索已物化到 [diagnostics/searches/](run-bundle.md) 可直读复核 | 显式 base 真实梯 + 人工评审（引用核对用 searches/ 文件）；fixture 结果不证明研究质量 |
 
 把 skill 变成强制、可验收的运行时合同是独立的产品/认知策略决策（2026-10-05
@@ -53,7 +53,7 @@ skill 在本项目里是三个不同的对象，不能混为一谈：
 | `thinking_enabled` | `thinking_enabled=True` | [contracts/client_surface](../src/deerflow_deep_research/runtime/adapters/contracts/client_surface.py) `CONSUMED_DEFAULTS` | [mirror](../tests/contract/test_wiring_mirror.py) binding-defaults 断言 |
 | `subagent_enabled` | `subagent_enabled=True` | 同上 | mirror + [posture 守卫](../tests/unit/runtime/test_subagent_posture.py) |
 | `plan_mode` | `plan_mode=False` | 同上 | mirror |
-| `available_skills` | `available_skills=None`（完整 skill 面，不强制选择） | 同上 | mirror |
+| `available_skills` | 两梯声明 `[deep-research]`（窄面；缺省声明 = None = 框架全目录默认） | 同上 | mirror + [declaration guard](../tests/contract/test_skill_declaration.py) |
 | `middlewares` | 空；`snapshot_dir` 给定时注入 assembly-snapshot middleware（第一位） | [adapters/client](../src/deerflow_deep_research/runtime/adapters/client.py) `build_client` | [smoke](../tests/integration/test_wiring_smoke.py)（snapshot 落盘） |
 | `thread_id` | state.json 的 thread；per-call 注入 | [adapters/client](../src/deerflow_deep_research/runtime/adapters/client.py) `make_stream_fn` | mirror 转发断言 |
 | `recursion_limit` | `recursion_limit=1000`（per-call 覆盖；AppConfig 顶层 `300` **不被**嵌入式路径消费——疤痕） | [adapters/client](../src/deerflow_deep_research/runtime/adapters/client.py) `DEEP_RESEARCH_RECURSION_LIMIT` | mirror `CONSUMED_STREAM_KWARGS` + 转发断言 |

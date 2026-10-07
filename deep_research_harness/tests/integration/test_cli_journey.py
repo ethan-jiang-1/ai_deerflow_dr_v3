@@ -60,6 +60,16 @@ class CliJourneyTest(unittest.TestCase):
         # Observe the accepted product artifact as well as the printed terminal state.
         bundle_dirs = list((HARNESS_ROOT.parent / "runs").glob(f"d_*/{bundle_id}"))
         self.assertEqual(len(bundle_dirs), 1)
+        # Narrow-skill-surface: the model-visible catalog in the snapshot contains
+        # the research skill and nothing unrelated — the declaration chain end to
+        # end, and the deterministic tripwire for a silently dropped declaration.
+        snapshot = json.loads(
+            (bundle_dirs[0] / "diagnostics" / "assembly-snapshot.json").read_text(encoding="utf-8")
+        )
+        system_prompt = snapshot.get("system_prompt", "")
+        self.assertIn("deep-research", system_prompt)
+        self.assertNotIn("podcast-generation", system_prompt)
+        self.assertNotIn("ppt-generation", system_prompt)
         report = bundle_dirs[0] / "final/report-gen1.md"
         self.assertTrue(report.is_file(), created.stdout)
         self.assertTrue(report.read_text(encoding="utf-8").strip())

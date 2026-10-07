@@ -105,22 +105,25 @@ def resolve_bundle(runs_root: Path, bundle_id: str) -> bundle_state.BundleHandle
 def resolve_skills(config: dict) -> list[str] | None:
     """Resolve the declared skill posture from a loaded ladder config.
 
-    Absent or null ``skills`` resolves to exactly ``None`` — the unwired binding
-    posture, never an empty list (an empty list would be a conscious declaration
-    of "no skills"). A declared value must be a list of non-empty skill names and
-    passes to the binding verbatim; activation semantics are not decided here.
+    Reads the harness-owned ``available_skills`` key — NOT ``skills``, which the
+    framework's own AppConfig reserves for its SkillsConfig (paths/discovery).
+    Absent or null resolves to exactly ``None`` — the unwired binding posture
+    (full catalog default), never an empty list (an empty list would be a
+    conscious declaration of "no skills"). A declared value must be a list of
+    non-empty skill names and passes to the binding verbatim (the framework's
+    documented per-agent skill restriction list shape).
 
     @impl SKL-001
     """
 
-    if "skills" not in config or config["skills"] is None:
+    if "available_skills" not in config or config["available_skills"] is None:
         return None
-    skills = config["skills"]
+    skills = config["available_skills"]
     if not isinstance(skills, list) or not all(
         isinstance(name, str) and name.strip() for name in skills
     ):
         raise ValueError(
-            f"config skills declaration must be a list of non-empty skill names, "
+            f"config available_skills declaration must be a list of non-empty skill names, "
             f"got {skills!r}"
         )
     return skills

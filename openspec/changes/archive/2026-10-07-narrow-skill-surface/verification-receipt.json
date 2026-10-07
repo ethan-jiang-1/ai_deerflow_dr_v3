@@ -1,0 +1,39 @@
+{
+  "revision": "pending-commit",
+  "completed_at": "2026-10-07T19:30:00+00:00",
+  "change": "2026-10-07-narrow-skill-surface",
+  "scope": "both research ladders declare available_skills: [deep-research] (harness-owned config key — NOT the framework-reserved top-level skills section, which AppConfig validates as SkillsConfig for paths/discovery); the model-visible skill catalog index in the lead agent's system prompt narrows from ~30 entries to exactly deep-research; whether the agent loads and follows the skill remains the agent's decision (no forced usage, no tool grants); resolve_skills reads the available_skills key with the same strict shape rules (absent/null -> exactly None = framework full-catalog default); config-as-contract guard pins both ladders' declarations; fixture CLI journey asserts the narrowed catalog in the assembly snapshot (deep-research present, unrelated skills absent) — the deterministic tripwire for a silently dropped declaration",
+  "checks": [
+    {"command": ["make", "verify"], "cwd": "deep_research_harness", "expected_exit_code": 0, "exit_code": 0, "stdout_summary": "Ran 225 tests - OK"},
+    {"command": ["make", "smoke"], "cwd": "deep_research_harness", "expected_exit_code": 0, "exit_code": 0, "stdout_summary": "Ran 15 tests - OK (journey includes narrowed-catalog snapshot assertions)"},
+    {"command": ["python3 openspec/governance/check_change_guidance.py"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["python3 openspec/governance/check_project_architecture.py"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["python3 openspec/governance/check_doc_hygiene.py"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["python3 openspec/governance/check_project_specs.py"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["python3 openspec/governance/check_project_gate.py --phase closeout"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["openspec validate 2026-10-07-narrow-skill-surface --strict"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["git diff --check"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["git diff --exit-code HEAD -- deerflow"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0, "note": "gitlink pointer unchanged"}
+  ],
+  "test_ids": {
+    "baseline_before_change": 223,
+    "final": 225,
+    "added": 2,
+    "removed": 0,
+    "modified": 0,
+    "added_breakdown": "2 ladder-declaration config-as-contract tests (base and fixture each declare exactly [deep-research])",
+    "capture_command": "PYTHONPATH=src python3 -m unittest discover -s tests -v"
+  },
+  "red_proof": [
+    "task 1.1: ladder guard red before declaration (both ladders parsed as [] vs expected [deep-research]); first attempt used PyYAML which the offline contract lane cannot import — rewritten as stdlib text parse following the established raw-text config pin convention (test_wiring_mirror)",
+    "the framework rejected the initial top-level skills: list declaration with a pydantic ValidationError (skills is AppConfig-reserved for SkillsConfig) — the create journey went red exactly there, proving the journey bites on config-level drift; key renamed to available_skills (mirroring the constructor parameter) and the journey went green"
+  ],
+  "empirical_observation": {
+    "narrowed_catalog": "fixture create on the real CLI: system_prompt 22181 bytes (down from 33589 full-catalog), exactly 1 <skill> entry (deep-research); podcast-generation/ppt-generation/chart-visualization absent",
+    "key_collision_discovery": "the framework's public config.example.yaml documents both the reserved skills section (paths/discovery/deferred_discovery) and the per-agent skill restriction list shape (omitted/null = all skills, [] = none, [names] = only these) — our declaration uses that exact list shape via the public available_skills binding parameter, under the harness-owned available_skills config key"
+  },
+  "unverified": [
+    "usage-level quality — whether the lead agent actually loads and follows the deep-research methodology — needs credentialed real-ladder runs and human review (loading-level evidence is fixture-ladder and zero-credential)",
+    "no CI run performed locally"
+  ]
+}

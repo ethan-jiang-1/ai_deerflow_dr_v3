@@ -55,22 +55,22 @@ class DefaultPostureTest(unittest.TestCase):
         self.assertIsNone(resolve_skills({"models": []}))
 
     def test_explicit_null_resolves_to_none(self) -> None:
-        self.assertIsNone(resolve_skills({"skills": None}))
+        self.assertIsNone(resolve_skills({"available_skills": None}))
 
     def test_empty_list_is_a_conscious_declaration_not_the_default(self) -> None:
-        declared = resolve_skills({"skills": []})
+        declared = resolve_skills({"available_skills": []})
         self.assertIsNotNone(declared)
         self.assertEqual(declared, [])
 
     def test_declared_names_pass_through_verbatim(self) -> None:
-        self.assertEqual(resolve_skills({"skills": ["deep-research"]}), ["deep-research"])
+        self.assertEqual(resolve_skills({"available_skills": ["deep-research"]}), ["deep-research"])
 
     def test_malformed_declaration_fails_loudly_naming_the_field(self) -> None:
         for bad in ("deep-research", {"name": "deep-research"}, [""], [42], [None]):
             with self.subTest(bad=bad):
                 with self.assertRaises(ValueError) as ctx:
-                    resolve_skills({"skills": bad})
-                self.assertIn("skills", str(ctx.exception))
+                    resolve_skills({"available_skills": bad})
+                self.assertIn("available_skills", str(ctx.exception))
 
 
 class DeclarationSeamTest(unittest.TestCase):
@@ -121,6 +121,42 @@ class DeclarationSeamTest(unittest.TestCase):
             "skill-declaration seam broken: the assembly no longer owns the "
             "declaration resolver",
         )
+
+
+class LadderDeclarationTest(unittest.TestCase):
+    """The research ladders declare exactly the narrowed skill surface.
+
+    Config-as-contract: the narrowed-catalog decision is pinned here; changing
+    either ladder's declaration is an owning-change act (narrow-skill-surface)."""
+
+    def _declared(self, name: str) -> list[str]:
+        """Text-level parse (stdlib-only lane; raw-text config pins are the
+        established convention — test_wiring_mirror reads configs the same way)."""
+
+        import re
+
+        text = (HARNESS_ROOT / "config" / f"{name}.yaml").read_text(encoding="utf-8")
+        names: list[str] = []
+        in_skills = False
+        for line in text.splitlines():
+            if not line.strip() or line.lstrip().startswith("#"):
+                continue
+            if re.fullmatch(r"available_skills:\s*", line):
+                in_skills = True
+                continue
+            if in_skills:
+                m = re.fullmatch(r"\s+-\s+(\S+)\s*", line)
+                if m:
+                    names.append(m.group(1))
+                else:
+                    in_skills = False
+        return names
+
+    def test_base_declares_exactly_deep_research(self) -> None:
+        self.assertEqual(self._declared("base"), ["deep-research"])
+
+    def test_fixture_declares_exactly_deep_research(self) -> None:
+        self.assertEqual(self._declared("fixture"), ["deep-research"])
 
 
 if __name__ == "__main__":

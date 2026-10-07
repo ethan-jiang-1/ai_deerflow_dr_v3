@@ -196,7 +196,7 @@ make create PROBLEM="研究问题" CONFIG=base   # 真实模型，需凭证
 - HTTP / Web API、常驻 worker / job queue、多用户认证与租户隔离、多进程调度与
   owner 接管、外部数据库/对象存储、部署镜像（systemd/Compose/Helm）、备份与
   跨机器恢复、滚动升级协调；
-- skill 强制加载（当前 `available_skills=None`，实际加载需证据判断）；
+- skill 强制使用（目录面已收窄为 `deep-research` 并经 snapshot 实证，但 agent 是否加载遵循方法论仍无强制，需真实梯评审）；
 - 真实研究质量的自动化统计评估（引文真实性、充分性）；
 - evidence 自动物化（搜索结果已物化到 `diagnostics/searches/` 可直读复核，但仍不自动进入 evidence/ 准入）。
 
