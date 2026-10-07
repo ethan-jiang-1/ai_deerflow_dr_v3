@@ -1,0 +1,42 @@
+{
+  "revision": "a8fe53ade61f50729841c61994e4f3192249ff97",
+  "completed_at": "2026-10-07T08:07:46+00:00",
+  "change": "2026-10-07-operator-failure-diagnosis",
+  "scope": "seventh verb diagnose: offline pure classifier domain/diagnosis.py (DIAG-001) classifies terminal outcomes into the declared mutually-exclusive classes (model_call_failed with framework error_type, framework_crash with exception name, framework_stopped with stop reason, clarification_exhausted pointing at the unanswered-clarifications artifact, cancelled, owner_died via both the crash_detected journal event and the unobserved active+dead-PID state, completed_undelivered as the belt check) plus honest non-failure outputs (running, delivered) and an ambiguous refusal to guess on colliding terminal events; verb layer is read-only by contract (bundle_state.read_state, never bundle_actions.status which owns the crash-transfer write); render.diagnosis_lines three-element projection; COMMANDS.md and control-map/run-bundle verb tables updated to seven verbs; tests README registers the new assets",
+  "checks": [
+    {"command": ["make", "verify"], "cwd": "deep_research_harness", "expected_exit_code": 0, "exit_code": 0, "stdout_summary": "Ran 220 tests - OK"},
+    {"command": ["make", "smoke"], "cwd": "deep_research_harness", "expected_exit_code": 0, "exit_code": 0, "stdout_summary": "Ran 15 tests - OK (includes the new diagnose journey)"},
+    {"command": ["python3 openspec/governance/check_change_guidance.py"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["python3 openspec/governance/check_project_architecture.py"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["python3 openspec/governance/check_doc_hygiene.py"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["python3 openspec/governance/check_project_specs.py"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["python3 openspec/governance/check_project_gate.py --phase closeout"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["openspec validate 2026-10-07-operator-failure-diagnosis --strict"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["git diff --check"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0},
+    {"command": ["git diff --exit-code HEAD -- deerflow"], "cwd": ".", "expected_exit_code": 0, "exit_code": 0, "note": "gitlink pointer unchanged; deerflow worktree clean"}
+  ],
+  "test_ids": {
+    "baseline_before_change": 202,
+    "final": 220,
+    "added": 18,
+    "removed": 0,
+    "modified": 0,
+    "added_breakdown": "14 classifier tests (incl. crash_detected path, ambiguity and collision negatives) + 4 diagnose surface tests (phrases, read-only byte-identity, active non-classification); smoke journey +1 (raise model -> real CLI diagnose classifies model_call_failed)",
+    "capture_command": "PYTHONPATH=src python3 -m unittest discover -s tests -v"
+  },
+  "red_proof": [
+    "task 1.1: import of domain.diagnosis failed (module missing) before implementation",
+    "task 2.1: command-surface guard red after the CLI declared diagnose (declared set seven vs pinned six), then green once the pinned legal set grew with the approved delta and COMMANDS.md documented the verb",
+    "read-only boundary test drives a real cancelled bundle and asserts every artifact hash identical across cmd_diagnose"
+  ],
+  "observations": [
+    "discovery during apply: bundle_actions.status already writes the crash transfer as a terminal journal event (crash_detected) — owner death therefore has two detection paths (the journal event after any status observation, and the unobserved active+dead-PID state); the classifier covers both and diagnose uses read_state so it never performs the transfer itself",
+    "the domain rule refusing cancellation without a recorded request bit the journey setup (honest rule): the test records the cancellation request before the terminal rule",
+    "domain/diagnosis.py needs no individual manifest entry: the required domain/ directory registration covers it (same convention as state_machine.py); architecture checker confirms",
+    "root README archive-count ritual drifted (47 -> 48) on archiving the previous change and was caught by the doc-hygiene checker; fixed in the same round"
+  ],
+  "unverified": [
+    "no real-model (base ladder) run; the failure journey uses the scripted raise on the fixture ladder (zero credentials)",
+    "no CI run performed locally (GitHub Actions governance workflow runs on push)"
+  ]
+}

@@ -10,6 +10,7 @@ import unittest
 from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 from deerflow_deep_research.domain import bundle, journal_policy
 from deerflow_deep_research.runtime import pump
@@ -137,6 +138,103 @@ class GoldenReplayTest(unittest.TestCase):
         recorded = json.loads(_GOLDEN.read_text(encoding="utf-8"))
         rendered = [render.journal_line(_entry(e["category"], e["event"], e["detail"])) for e in recorded["entries"]]
         self.assertEqual(rendered, recorded["expected_lines"])
+
+
+class DiagnoseSurfaceTest(unittest.TestCase):
+    """The diagnose projection: stable phrases, read-only over a real bundle.
+
+    @impl DIAG-001"""
+
+    def test_diagnosis_lines_phrase_is_stable(self) -> None:
+        d = SimpleNamespace(
+            klass="model_call_failed",
+            stage="binding — DeerFlow model call (framework error-fallback)",
+            evidence=("diagnostics/journal.jsonl",),
+            detail="model call failed (error_type: rate_limit)",
+        )
+        out = render.diagnosis_lines(d)
+        self.assertIn("diagnosis: model_call_failed", out)
+        self.assertIn("stage: binding", out)
+        self.assertIn("evidence: diagnostics/journal.jsonl", out)
+        self.assertNotIn("（无", out)
+
+    def test_running_render_carries_the_no_evidence_phrase(self) -> None:
+        d = SimpleNamespace(
+            klass="running", stage="run pump process — still active",
+            evidence=(), detail="generation 1 is still running",
+        )
+        out = render.diagnosis_lines(d)
+        self.assertIn("diagnosis: running", out)
+        self.assertIn("（无——运行仍在进行）", out)
+
+    def test_diagnose_classifies_and_leaves_the_bundle_byte_identical(self) -> None:
+        import contextlib
+        import hashlib
+        import os
+        from io import StringIO
+
+        from deerflow_deep_research.domain.state_machine import rule_run_terminal
+        from deerflow_deep_research.runtime.bundle.journal import append_entry
+        from deerflow_deep_research.runtime.interaction import cli
+
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            state = bundle_actions.start(
+                root, problem_text="诊断对象", composition="fixture", deerflow_pin=_PIN
+            )
+            handle = bundle_state.BundleHandle.open(
+                next(
+                    bucket / state.thread_id
+                    for bucket in sorted(root.iterdir())
+                    if (bucket / state.thread_id).is_dir()
+                )
+            )
+            # Drive an honest cancelled terminal: request first (the domain rule
+            # refuses cancellation without one), then the terminal rule + entry.
+            from dataclasses import replace as dc_replace
+
+            fresh = bundle_state.read_state(handle)
+            bundle_state.write_state(handle, fresh, dc_replace(fresh, cancel_requested=True))
+            fresh = bundle_state.read_state(handle)
+            bundle_state.write_state(handle, fresh, rule_run_terminal(fresh, "cancelled"))
+            append_entry(handle, _entry("terminal", "run_cancelled", {"generation": 1}))
+
+            def tree_hashes() -> dict:
+                hashes = {}
+                for path in sorted(handle.root.rglob("*")):
+                    if path.is_file():
+                        hashes[str(path.relative_to(handle.root))] = hashlib.sha256(
+                            path.read_bytes()
+                        ).hexdigest()
+                return hashes
+
+            before = tree_hashes()
+            with patch.dict(os.environ, {"DEEP_RESEARCH_RUNS_ROOT": str(root)}):
+                out = StringIO()
+                with contextlib.redirect_stdout(out):
+                    cli.cmd_diagnose(SimpleNamespace(bundle_id=state.thread_id))
+            printed = out.getvalue()
+            self.assertEqual(tree_hashes(), before, "diagnose must not mutate any bundle artifact")
+            self.assertIn("diagnosis: cancelled", printed)
+            self.assertIn("stage: operator decision", printed)
+
+    def test_diagnose_reports_a_live_run_without_classification(self) -> None:
+        import contextlib
+        import os
+        from io import StringIO
+
+        from deerflow_deep_research.runtime.interaction import cli
+
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            state = bundle_actions.start(
+                root, problem_text="活跑", composition="fixture", deerflow_pin=_PIN
+            )
+            with patch.dict(os.environ, {"DEEP_RESEARCH_RUNS_ROOT": str(root)}):
+                out = StringIO()
+                with contextlib.redirect_stdout(out):
+                    cli.cmd_diagnose(SimpleNamespace(bundle_id=state.thread_id))
+            self.assertIn("diagnosis: running", out.getvalue())
 
 
 if __name__ == "__main__":

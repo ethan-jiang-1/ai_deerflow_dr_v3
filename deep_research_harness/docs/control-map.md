@@ -66,7 +66,7 @@ agent stream 结束  ≠  Harness state = completed  ≠  final report 被 admis
 | `engine` | 确定性裁决：validator、admission gate、质量机器 | `src/deerflow_deep_research/engine/` |
 | `agents` | 预留 Harness 自有 bounded model role；**当前为空**（空包不代表实现） | `src/deerflow_deep_research/agents/` |
 | `runtime` | 装配、DeerFlow binding、运行控制、持久化、交互、诊断 | `src/deerflow_deep_research/runtime/` |
-| 交互入口 | 稳定 launcher 转交六动词解析/输出；不承载状态规则 | `cli.py` → `runtime/interaction/cli.py` |
+| 交互入口 | 稳定 launcher 转交七动词解析/输出；不承载状态规则 | `cli.py` → `runtime/interaction/cli.py` |
 | 运行装配 | 配置、pin、Bundle 查找、前台 client/saver 装配 | `runtime/assembly.py` |
 
 ```text
@@ -100,7 +100,7 @@ OpenSpec 开发工作区（规范、准入与治理 checker）、`_backlog/`（�
 改名漏切，`make verify` 即红（离线 AST 断言，不锁行号，阶段内重构不误伤）：
 
 ```text
-1. 稳定 launcher 转交六动词        cli.py → runtime/interaction/cli.py
+1. 稳定 launcher 转交七动词        cli.py → runtime/interaction/cli.py
 2. 原子创建 Run Bundle             runtime/bundle/bundle_actions.py（+ domain/state_machine.py）
 3. 前台装配                        runtime/assembly.py::run_foreground
                                    （读 pin、开 checkpointer、build_client、make_stream_fn）
@@ -112,7 +112,7 @@ OpenSpec 开发工作区（规范、准入与治理 checker）、`_backlog/`（�
 每个 Bundle 里持久化了什么、谁写的、能看出什么 → [Run Bundle 地图](run-bundle.md)。
 研究认知侧（skill、模型、工具、委派）的实际证据 → [研究过程地图](research-process.md)。
 
-## 5. 六个动词到底做什么
+## 5. 七个动词到底做什么
 
 语义权威是 `entry-surface` spec 与 [COMMANDS](../COMMANDS.md)；这里是易误解点：
 
@@ -124,6 +124,7 @@ OpenSpec 开发工作区（规范、准入与治理 checker）、`_backlog/`（�
 | `cancel` | **只记录**取消请求 | 由运行泵在下个检查点协作终止 |
 | `refine` | 创建下一代并**前台跑完该代**（消息 = 该代方向文档，梯 = bundle 自声明延续） | 不是后台提交；耗时与 create 同级 |
 | `inspect` | journal 时间线、已接纳产物、装配快照 | 是诊断投影，不是第二事实源 |
+| `diagnose` | 终态分类（七类互斥）+ 断点环节 + 证据文件指针 | 只读投影，不改任何 Bundle 工件；不是生命周期权威 |
 
 ## 6. 配置两梯
 
@@ -165,7 +166,7 @@ OpenSpec 开发工作区（规范、准入与治理 checker）、`_backlog/`（�
   [client 绑定](../src/deerflow_deep_research/runtime/adapters/client.py) 的公开面进入
   （embedded binding，由 establish-embedded-wiring 定案，受
   `check_harness_dependency_direction.py` 守护：应用不反向依赖治理面）。
-- **Harness 保留**：Run Bundle 生命周期（六动词）、确定性控制边界（engine
+- **Harness 保留**：Run Bundle 生命周期（七动词）、确定性控制边界（engine
   validator/gate + runtime admission/ledger）、journal 与 final 报告投影、
   显式组成记录（`fixture` / `all_real` / `mixed`，`mixed` 为声明未接线枚举）。
 - **DeerFlow 是宿主运行时，不 import 本包**；本包也不 import 上游之外的治理面。

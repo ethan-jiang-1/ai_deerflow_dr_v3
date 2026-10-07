@@ -105,3 +105,18 @@ PLAN_PROMPT_HINT = "（回车=确认计划 | 直接输入=附加修订意见 | s
 def proposed_plan(plan: str) -> str:
     """The stable phrase for the agent's proposed research plan."""
     return "agent 的研究计划：\n" + plan
+
+
+def diagnosis_lines(d) -> str:  # noqa: ANN001 — diagnose projection (typed Diagnosis)
+    """The diagnose projection: class, owning stage, evidence pointers.
+
+    A read-only human projection over the classifier's typed result — never a
+    second state authority."""
+
+    evidence = ", ".join(d.evidence) if d.evidence else "（无——运行仍在进行）"
+    return (
+        f"diagnosis: {d.klass}\n"
+        f"  stage: {d.stage}\n"
+        f"  detail: {d.detail}\n"
+        f"  evidence: {evidence}"
+    )

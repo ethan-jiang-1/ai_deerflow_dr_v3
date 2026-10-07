@@ -14,6 +14,7 @@ python3 cli.py status <bundle_id>   # 状态 + journal 摘要 + owner PID 活性
 python3 cli.py cancel <bundle_id>   # 记录取消请求（泵协作终止）
 python3 cli.py refine <bundle_id> "方向文本"   # 创建 generation+1 并前台跑完该代（延续 composition 梯）
 python3 cli.py inspect <bundle_id>  # journal 时间线 + 已采证据 + 装配快照
+python3 cli.py diagnose <bundle_id> # 终态分类诊断（只读投影）：类别 + 断点环节 + 证据文件
 ```
 
 - 跑一个研究 / 展示结果 / 下一代方向：过程、完成判据与坑 → [docs/playbook/run-research.md](docs/playbook/run-research.md)

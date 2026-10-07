@@ -90,6 +90,7 @@ state.json（thread_id、composition、pin、终态）
 | `status` | state 摘要、近期 journal、owner PID 存活 | 不重放事件 |
 | `watch` | journal 投影直播，terminal 退出 | 不驱动研究 |
 | `inspect` | journal 时间线、已接纳产物统计、装配快照 | 是投影，不补出缺失内容 |
+| `diagnose` | 终态分类（七类互斥）、断点环节、证据文件指针 | 只读投影，不改任何工件；分类不是生命周期权威 |
 
 命令语义权威：[COMMANDS](../COMMANDS.md)；操作旅程：[playbook](playbook/run-research.md)。
 测试：Bundle 落盘 → [test_bundle_runtime](../tests/unit/runtime/test_bundle_runtime.py)；

@@ -24,7 +24,7 @@ AST 级、零产品 import）：任何一环被替换、绕过或改名漏切，
 
 | 你要驾驭什么 | 放在哪里 / 直接入口 |
 | --- | --- |
-| 交互：六动词、直播输出、journal 投影 | [CLI 实现](src/deerflow_deep_research/runtime/interaction/cli.py)、[共享渲染](src/deerflow_deep_research/runtime/interaction/render.py) |
+| 交互：七动词、直播输出、journal 投影 | [CLI 实现](src/deerflow_deep_research/runtime/interaction/cli.py)、[共享渲染](src/deerflow_deep_research/runtime/interaction/render.py) |
 | 运行：装配、流、可信 I/O、持久化 | [assembly](src/deerflow_deep_research/runtime/assembly.py)、[控制地图](docs/control-map.md) |
 | 规则：状态合同、validator、gate | [state_machine](src/deerflow_deep_research/domain/state_machine.py)、[validator](src/deerflow_deep_research/engine/validator.py) |
 | 研究认知：skill、模型、工具、委派 | [研究过程地图](docs/research-process.md)、[base 配置](config/base.yaml) |

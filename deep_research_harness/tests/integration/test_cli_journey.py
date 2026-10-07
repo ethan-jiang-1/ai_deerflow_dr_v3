@@ -117,6 +117,26 @@ class CliJourneyTest(unittest.TestCase):
         self.assertNotEqual(cancelled.returncode, 0)
         self.assertIn("active", cancelled.stderr)
 
+    def test_diagnose_classifies_a_real_failed_run(self) -> None:
+        # The scripted model raises; the framework's real error-fallback path
+        # turns it into an honest failed-resume. Zero credentials (fixture ladder).
+
+        # @impl DIAG-001
+        failed = _cli(
+            "create", "诊断旅程：真实模型调用失败", "--config", "fixture",
+            env={"DEERFLOW_FAKE_SCRIPT": json.dumps([{"raise": "deliberate journey failure"}])},
+        )
+        self.assertEqual(failed.returncode, 0, failed.stderr)
+        match = re.search(r"bundle ([0-9a-f-]{36}) started", failed.stdout)
+        self.assertIsNotNone(match, failed.stdout + failed.stderr)
+        bundle_id = match.group(1)
+        self.assertIn("run failed-resume", failed.stdout)
+
+        diagnosed = _cli("diagnose", bundle_id)
+        self.assertEqual(diagnosed.returncode, 0, diagnosed.stderr)
+        self.assertIn("diagnosis: model_call_failed", diagnosed.stdout)
+        self.assertIn("evidence: diagnostics/journal.jsonl", diagnosed.stdout)
+
     def test_unknown_verb_and_missing_bundle_fail_loudly(self) -> None:
         unknown = _cli("teleport", "x")
         self.assertNotEqual(unknown.returncode, 0)

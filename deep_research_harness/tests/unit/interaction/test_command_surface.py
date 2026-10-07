@@ -39,7 +39,8 @@ class CommandSurfaceTest(unittest.TestCase):
 
     def test_cli_subcommands_are_documented(self) -> None:
         self.assertEqual(
-            cli_declared_commands(), {"create", "status", "watch", "cancel", "refine", "inspect"}
+            cli_declared_commands(),
+            {"create", "status", "watch", "cancel", "refine", "inspect", "diagnose"}
         )
         for verb in cli_declared_commands():
             self.assertIn(verb, COMMANDS, f"subcommand {verb!r} undocumented in COMMANDS.md")

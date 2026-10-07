@@ -58,13 +58,15 @@ Bundle 规则合同在 [test_bundle_domain](domain/test_bundle_domain.py)，离�
 | 真实 flat 事件形状进入 pump、工具名进入 journal | [test_event_stream_replay.py](runtime/test_event_stream_replay.py) | 固定记录流 + 真实 pump/落盘；不重跑模型、搜索和框架图 |
 | 配置解析、本地 client mirror、thread/递归上限转发 | [test_wiring_mirror.py](contract/test_wiring_mirror.py) | 本地代码/配置；FakeClient 记录调用，不 import 真 client |
 | 入口链六环的组合关系被替换、绕过或改名漏切 | [test_entry_chain.py](contract/test_entry_chain.py) | stdlib AST 源码断言，零产品 import、不锁行号；阶段内重构不误伤，不证明运行时行为 |
+| 终态分类七类互斥、ambiguous 兜底、碰撞负例 | [test_diagnosis.py](unit/domain/test_diagnosis.py) | 真实纯分类器；手工 state/journal/presence 输入，无 I/O |
+| diagnose 渲染短语 + 只读边界（哈希对照）+ active 不分类 | [test_entry_surface.py](unit/interaction/test_entry_surface.py)（DiagnoseSurfaceTest） | 真 Bundle/临时目录；不执行模型 |
 | subagent 配置 posture 与违规声明 | [test_subagent_posture.py](runtime/test_subagent_posture.py) | stdlib checker + 真实/临时配置，不执行委派 |
 | COMMANDS、Makefile、CLI 动词清单一致 | [test_command_surface.py](interaction/test_command_surface.py) | 文本/正则检查，不执行命令 |
 | 命令菜单路由与 playbook 完成判据登记 | [test_agent_playbook.py](interaction/test_agent_playbook.py) | 文档检查，不证明旅程真的成功 |
 | 反问交互门控（TTY/env）、提示渲染、create/refine 接线 | [test_clarification_prompt.py](interaction/test_clarification_prompt.py) | patch stdin/env 的接线检查；handler 行为用假 input，不执行模型 |
 | 计划闸门门控、三路 handler（确认/修订/跳过/放弃）、create-only 接线 | [test_plan_prompt.py](interaction/test_plan_prompt.py) | patch stdin/env 与假 input；不执行模型 |
 | **smoke**：多轮澄清、真实 fallback、SQLite、snapshot、构造接口合同 | [test_wiring_smoke.py](integration/test_wiring_smoke.py) | 真 DeerFlowClient/图/middleware/saver；脚本模型与 fake search |
-| **smoke**：create（含搜索物化）/watch/status（含 delivery 行）/refine（跑完并 admit gen2 报告）/inspect/cancel（终态负例）、非法输入 | [test_cli_journey.py](integration/test_cli_journey.py) | 真 CLI 子进程/框架/落盘；检查非空报告及 ledger admit；fixture 模型，写仓库根 runs |
+| **smoke**：create（含搜索物化）/watch/status（含 delivery 行）/refine（跑完并 admit gen2 报告）/inspect/cancel（终态负例）/diagnose（raise 模型 → model_call_failed 分类）、非法输入 | [test_cli_journey.py](integration/test_cli_journey.py) | 真 CLI 子进程/框架/落盘；检查非空报告及 ledger admit；fixture 模型，写仓库根 runs |
 | **smoke**：replay_key、录制后回放、miss 诊断 | [test_replay_model.py](integration/test_replay_model.py) | langchain 消息/JSONL/替身实现；临时脚本录制，不消费真实模型样本、不跑图 |
 | **smoke**：交互反问旅程（作答继续不耗预算 / 拒答回落自动应答） | [test_clarification_journey.py](integration/test_clarification_journey.py) | 真 CLI 子进程 + DEEP_RESEARCH_INTERACTIVE=1 + 管道 stdin；脚本模型伪造反问，零凭证 |
 | **smoke**：计划闸门旅程（标记计划确认注入+物化 / 修订附加 / 无标记报告降级回归） | [test_plan_journey.py](integration/test_plan_journey.py) | 真 CLI 子进程 + 管道 stdin；脚本模型覆盖标记计划与 58b5440e 回归形状，零凭证 |

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Entry surface: six thin verbs over the run-bundle substrate.
+"""Entry surface: seven thin verbs over the run-bundle substrate.
 
 Presentation only — every command delegates to the runtime actions; this script owns
 no state authority (the owning spec lives in the repository's spec tree).
@@ -14,13 +14,13 @@ import os
 import sys
 import time
 
-from ...domain import bundle
+from ...domain import bundle, diagnosis as diagnosis_mod
 from .. import pump
 from .. import assembly
 from ..bundle import bundle_actions, bundle_state
 from . import render
 
-COMMANDS = ("create", "status", "watch", "cancel", "refine", "inspect")
+COMMANDS = ("create", "status", "watch", "cancel", "refine", "inspect", "diagnose")
 
 INTERACTIVE_ENV = "DEEP_RESEARCH_INTERACTIVE"
 
@@ -206,6 +206,39 @@ def cmd_refine(args) -> None:
     print(f"state: {result.status} (generation {result.generation}, revision {result.revision})")
 
 
+def _owner_alive(pid: int) -> bool:
+    """POSIX liveness probe: signal 0 exists only to ask whether the process does."""
+
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+
+def cmd_diagnose(args) -> None:
+    handle = assembly.resolve_bundle(assembly.runs_root(), args.bundle_id)
+    # Read-only by contract: read_state never performs the crash transfer that
+    # bundle_actions.status owns — diagnose classifies, it never mutates.
+    state = bundle_state.read_state(handle)
+    from deerflow_deep_research.runtime.bundle import journal as journal_mod
+
+    entries = journal_mod.read_entries(handle)
+    final_dir = handle.root / "final"
+    presence = diagnosis_mod.DiagnosticsPresence(
+        assembly_snapshot=(handle.root / "diagnostics" / "assembly-snapshot.json").is_file(),
+        unanswered_clarifications=(handle.root / bundle.UNANSWERED_QUESTIONS_RELATIVE).is_file(),
+        checkpoint=(handle.root / bundle.CHECKPOINT_FILENAME).is_file(),
+        final_report=final_dir.is_dir() and any(final_dir.iterdir()),
+    )
+    result = diagnosis_mod.classify(
+        state, entries, owner_alive=_owner_alive(state.owner_pid), diagnostics=presence,
+    )
+    print(render.diagnosis_lines(result))
+
+
 def cmd_inspect(args) -> None:
     handle = assembly.resolve_bundle(assembly.runs_root(), args.bundle_id)
     state = bundle_state.read_state(handle)
@@ -254,6 +287,10 @@ def main(argv=None) -> int:
     refine.add_argument("bundle_id")
     refine.add_argument("direction")
     refine.set_defaults(func=cmd_refine)
+
+    diagnose = sub.add_parser("diagnose", help="classify a bundle's terminal outcome (read-only)")
+    diagnose.add_argument("bundle_id")
+    diagnose.set_defaults(func=cmd_diagnose)
 
     args = parser.parse_args(argv)
     args.func(args)
