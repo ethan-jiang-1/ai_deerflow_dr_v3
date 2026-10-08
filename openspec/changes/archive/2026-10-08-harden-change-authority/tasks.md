@@ -51,8 +51,8 @@
 
 ## 6. 归档与回写
 
-- [ ] 6.1 archive → `openspec/changes/archive/2026-10-08-harden-change-authority/`。
-- [ ] 6.2 回写 plan C2 条目（✅ 已落地 + 落点裁决摘要）。
+- [x] 6.1 archive → `openspec/changes/archive/2026-10-08-harden-change-authority/`。
+- [x] 6.2 回写 plan C2 条目（✅ 已落地 + 落点裁决摘要）。
 
 ## Deviation Register
 

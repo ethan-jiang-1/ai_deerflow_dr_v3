@@ -70,7 +70,7 @@
 ### C1 `land-development-loop-map` —— 地图先行，最快治"驾驭无力"（✅ 已落地 2026-10-08，archive：`openspec/changes/archive/2026-10-08-land-development-loop-map`；闭环页落点裁决为 `openspec/README.md` 扩展，根 AGENTS 余量 22 字符不足加行）
 一页式开发闭环旅程：意图（Change Focus）→ 权威归属（Policy Route / owner）→ slice 交付 → 证据分层（车道）→ 验证形态 → 交付记录；每步页面归属可点。"四件不同的事"按我们形态命名：**离线契约 mirror / 装配 smoke / 真实梯观察 / 冷启动发布**。门禁等级四分词汇随页定义。落点候选（proposal 定）：`openspec/README.md` 或根 AGENTS 路由扩展 + app docs 入口；受 doc budgets 与 doc-hygiene checker 约束。纯文档为主，快。
 
-### C2 `harden-change-authority` —— 权威三件套，治"驱动一下能干点但质量成问题"
+### C2 `harden-change-authority` —— 权威三件套，治"驱动一下能干点但质量成问题"（✅ 已落地 2026-10-08，archive：`openspec/changes/archive/2026-10-08-harden-change-authority`；config.yaml 0 余量故规则文本住 change-practice.md，语法住 checker @impl CHA-001；本 change 自身 dogfood 两段常设段）
 语料卷二 02 的逻辑：agent 天然倾向在实现文件里"顺手重新设计"；解药是 spec 独占设计决策 + 实现工件自降权威 + 偏离登记。落地：tasks 模板加 deviation register 常设段（无偏离时显式声明"none"）；change-practice 补"实现工件只排序与验证、不重新设计"scope rule；slice 收尾重读检查单从 control-placement 泛化；交付记录四段成段必填（外部行为/影响面/实际跑了什么/**未执行的检查**）+ red-green 自问句式 + AI 参与披露段（solo+agent 形态裁剪版）；四类陈述进 change-guidance。checker：`change_guidance_kernel.py` / `check_change_guidance.py` 扩展，新规则必须能红（负例控制）。规范语义改动——proposal 停在规划边界等驾驭者拍板。
 
 ### C3 `pin-upstream-claims` —— 钉定纪律，小而关键
