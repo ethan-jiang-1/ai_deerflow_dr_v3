@@ -86,7 +86,7 @@
 |---|---|---|---|
 | **A 来源可追溯性** | 报告中每个 http(s) URL 在同 bundle `diagnostics/searches/` 的工具输出记录（含 web_fetch 抓取内容）中出现过 | 纯函数 over (final 报告, searches/)；需 run-admission 新维度；**定名必须叫"来源可追溯性"而非"真实性"**（模型凭记忆写对的 URL 会红）。实证：现存录制真实样本报告 6 个去重 URL **6/6 精确命中**——断言在现存资产上已成立，零新采集 | 第一批 |
 | **B 报告结构契约** | ≥1 标题、存在 Sources 节、长度上下界、UTF-8 可读 | validator 扩展（封闭码集动 spec）；扩展"模型提议、代码裁决"既有模式，不改权力结构；"有 Sources 节"≠引用真实 | 第一批 |
-| **C 回放物化断言** | 录制真实流（实测 1386 事件：22 values/1363 chunk/1 end；web_search×6、web_fetch×5）回放后 searches/ 物化 11 条、journal 聚合、终态 completed——链路在跑但没被钉住（现测试只断言 journal 形状） | 纯测试扩充，零契约变更 | 第一批 |
+| **C 回放物化断言** ✅ 已落地 2026-10-08 | 同左 | archive：`openspec/changes/archive/2026-10-08-assert-replay-materialization` | 第一批 |
 | **D 真实梯行为侧写** | searches 文件数 / distinct query 数 / web_fetch 深读 / 角度覆盖代理 ≥ 声明区间；end.usage token 区间 | 纯函数可离线对历史 bundle 跑；级 4 lane 栏翻"规划"，永不进默认 CI；**前置接线：pump 现在丢弃 end 事件的 usage**；单次通过不构成统计结论 | 第二批 |
 | **E real-model-io 接入完整图回放** | 真实历史输出零凭证驱动完整图+准入 | **诚实结论：现存资产不够**——单条孤立记录缺多轮 key 链与录制元信息（input/model/pin/命令），完整图几乎必然 ReplayMiss；需新录制承诺（费用+脱敏） | 立项才动 |
 | **F 陈述级接地抽样** | 关键句（数字/日期/条文名）在同 run 工具输出有支持片段（重叠启发式） | 语义是裁决点（纳入句型/阈值），不定就是自动评分幻觉；LLM 评审属 `agents/` 空层 bounded role——先立合同再放代码 | 立项才动（首轮不进） |
