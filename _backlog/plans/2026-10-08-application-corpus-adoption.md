@@ -85,7 +85,7 @@
 | 面 | 断言什么 | seam / 契约 | 批次 |
 |---|---|---|---|
 | **A 来源可追溯性** ✅ 已落地 2026-10-08（形态修正：真实 bundle 探针证明"全 URL 可溯"不成立——厂商端点/模型知识 URL 合法 miss，故改为注册机器+纯函数+测试钉样，**不做 admission 阻断**；fixture 6/6 钉样；admission 化留待独立裁决） | archive：`openspec/changes/archive/2026-10-08-register-source-traceability-machine` | 第一批 |
-| **B 报告结构契约** | ≥1 标题、存在 Sources 节、长度上下界、UTF-8 可读 | validator 扩展（封闭码集动 spec）；扩展"模型提议、代码裁决"既有模式，不改权力结构；"有 Sources 节"≠引用真实 | 第一批 |
+| **B 报告结构契约** ✅ 已落地 2026-10-08 | 同左（另裁决：死码 `hash_mismatch` 删除——plan 骨架缺口③ 二选一；六 journey/单测 fixture 升级为拟真报告，`fixture_report` 构造器住 `tests/fixture_reports.py`——离线车道不可经 scripted 引框架） | archive：`openspec/changes/archive/2026-10-08-assert-report-structure-contract` | 第一批 |
 | **C 回放物化断言** ✅ 已落地 2026-10-08 | 同左 | archive：`openspec/changes/archive/2026-10-08-assert-replay-materialization` | 第一批 |
 | **D 真实梯行为侧写** | searches 文件数 / distinct query 数 / web_fetch 深读 / 角度覆盖代理 ≥ 声明区间；end.usage token 区间 | 纯函数可离线对历史 bundle 跑；级 4 lane 栏翻"规划"，永不进默认 CI；**前置接线：pump 现在丢弃 end 事件的 usage**；单次通过不构成统计结论 | 第二批 |
 | **E real-model-io 接入完整图回放** | 真实历史输出零凭证驱动完整图+准入 | **诚实结论：现存资产不够**——单条孤立记录缺多轮 key 链与录制元信息（input/model/pin/命令），完整图几乎必然 ReplayMiss；需新录制承诺（费用+脱敏） | 立项才动 |
