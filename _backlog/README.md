@@ -89,6 +89,8 @@ _backlog/
   复测/切片发现的新缺口 → 回写 buffer（新 plan / 新 bug），不在 change 里夹带
 ```
 
+> 全景一页走通见 [openspec/README.md](../openspec/README.md) 开发闭环（意图 → 权威归属 → slice 交付 → 证据分层 → 验证形态 → 交付记录与归位）。
+
 几条硬规矩：
 
 - **没有 change，没有行为**：buffer 里的东西无论多成熟，都不会自己变成系统行为；入线必须走

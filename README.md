@@ -81,7 +81,7 @@ make record-stream PROBLEM="…" CONFIG=base  # 显式录制真实 API 事件流
 
 ## 给 Coding Agent
 
-> **当前状态：已实现核心。** specs 主干 12 个能力落地、51 个 changes 归档
+> **当前状态：已实现核心。** specs 主干 12 个能力落地、52 个 changes 归档
 > （实际清单见 `openspec/specs/` 与 `openspec/changes/archive/`）。
 
 见 [AGENTS.md](AGENTS.md)——重点是：应用是主角，框架只 leverage 不改；当前该做什么看

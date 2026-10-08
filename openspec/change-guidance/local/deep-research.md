@@ -60,6 +60,7 @@ reader roles and line budgets here, while current facts and behavior remain in o
 | `control-map.md` | Human/operator | Control spine, two loops, owner routing |
 | `local-operations.md` | Operator | Commands and retained sessions |
 | `testing-and-evaluation.md` | Contributor/operator | Test and evaluation evidence |
+| `openspec/README.md` | Maintainer / Coding agent | Walk the development loop end to end; cite the evidence-layering and gate-level vocabulary |
 | `openspec/config.yaml` | OpenSpec author | Change authoring route |
 | `openspec/product/README.md` | Human/Coding agent | Deep Research-specific orientation |
 
