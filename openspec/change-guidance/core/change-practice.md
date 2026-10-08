@@ -30,6 +30,22 @@ Use a planted invalid input for a deterministic validator and the narrowest real
 handoff for a cross-boundary fact. A failed migration stays active for repair,
 rollback, or explicit re-scope; it never silently narrows the approved outcome.
 
+**Implementation artifacts sequence and verify; they never redesign.** Design and
+tasks order files, symbols, and verification only. Design decisions belong to the
+owning spec/delta and the change's design document; when implementation discovers a
+decision the artifacts did not make, record it in the change's Deviation Register
+with its ruling basis and landing place instead of quietly deciding in an
+implementation file. An empty register states `none: <rationale>` explicitly.
+
+## Four Kinds Of Claims
+
+Label every upstream or imported-corpus conclusion with its claim kind: runtime
+fact (verifiable against a pinned version), upstream requirement (governs
+contributions to that upstream repo only), application-repo recommendation (this
+project's synthesis), or repo-local decision (owned here). Upstream governance
+items are always cited as "上游参考" — they never impersonate this repository's
+requirements, and the citation carries the pinned version it was verified against.
+
 ## Decision Records And Supersession
 
 A change's design document carries an `## Alternatives` section whenever real
@@ -61,7 +77,10 @@ Match the evidence to the surface. A deterministic owner takes a focused test; a
 operator-facing surface takes at least one end-to-end journey (enter, act, observe,
 recover or exit) beside its unit tests. A new guard is unproven until a recorded
 mutation shows it failing when the guarded behavior is removed. State plainly what
-could not be verified locally instead of passing over it quietly.
+could not be verified locally instead of passing over it quietly. At every slice's
+close, run lint and tests and re-read the spec's review checklist before moving on —
+the closeout reread is routine slice discipline, not a control-placement-only
+obligation.
 
 ## Authority And Projections
 
