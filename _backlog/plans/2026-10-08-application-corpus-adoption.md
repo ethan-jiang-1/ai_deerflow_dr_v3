@@ -1,7 +1,7 @@
 # Plan: 应用开发语料消化与吸收（application-corpus adoption）
 
-> 类型: 设计 | 更新: 2026-10-08
-> 来源: 语料 `/Users/bowhead/deer-flow/_deerflow_application_agent_ready_development/`（三卷 18 页正文 + `_coverage` 维护层 + `verify.mjs`/`verify.test.mjs`，钉定上游 release tag `v2.1.0` = `345f08be`）逐篇消化。
+> 类型: 设计 | 更新: 2026-10-08（语料第 10 轮增量对照后）
+> 来源: 语料 `/Users/bowhead/deer-flow/_deerflow_application_agent_ready_development/`（三卷 19 页正文——卷一 3 + 卷二 10 + 卷三 6，各卷另有 00-index 与 README + `_coverage` 维护层 + `verify.mjs`/`verify.test.mjs`，钉定上游 release tag `v2.1.0` = `345f08be`）逐篇消化；语料第 10 轮（评审落地 + 全量补充）增量已对照，见"第 10 轮增量对照"节。
 > 驾驭者三裁决（2026-10-08）：① 诊断成立——"借了器官、缺循环系统"；② 范围=**整个**（流程 / 测试资产 / 质量保证，含代码级守卫）；③ 质量第一指涉=**产出质量**：测试资产是约束机制，"我们生产的内容是对的"是终点。
 
 ## 一、总判断
@@ -49,9 +49,25 @@
 | 语料处置（复制进仓 vs 原地引用） | 待裁决 | **C3**（裁决+落地） |
 | 产出质量可断言面（卷一 03"更深的组合证据应用仓自建" + 裁决③） | ✗ 触发已击发：无自动化研究质量验收、级 4 未规划、real-model-io 无消费者；探索确认现有裁决面 **0 个**断言内容质量 | **C6**（本 plan 主事件；探索完成，A–G 面与批次见 C6 节） |
 
+### 第 10 轮增量对照（2026-10-08，语料"评审落地 + 全量补充"后复核）
+
+第 10 轮**不改 C1–C6 路线**；增量条目处置如下（语义并入上方矩阵，不单开 change）：
+
+| 第 10 轮新增（卷·页） | 对 v3 的意义 | 处置 |
+|---|---|---|
+| 第五接入形态 custom agent/ACP 定义、guardrails 三 provider、IM/GitHub 渠道绑定（卷一 01 新节） | 我们是内嵌 harness 形态，不用 Gateway 部署面、`plugins:` 装载与 task 委派目录配置 | ⏸ 登记；将来启用 config 定制子代理或 guardrails 时回看 |
+| 非交互运行语义：`context.non_interactive` 排除 `ask_clarification`、客户端自带副本被服务端双入口丢弃（卷一 01） | 上游对"非交互不能依赖问用户兜底"的原生立场；我们已有反问门控（TTY/env）+ 拒答回落自动应答（`test_clarification_journey`），实践同源 | 上游事实参考：clarification-channel-discipline plan 可引用；C4 上游边界小节一并登记 |
+| issue 表单三路分流（bug/想法/漏洞各归各口）（卷二 01） | 无外部贡献面 | ⏸ 不搬 |
+| RFC 原生层 + "旧 RFC 示例与已合并代码及测试不一致时，以已合并契约为准"（卷二 02） | deviation register 裁决权的原生先例：偏离裁决在**已合并契约与测试**，不在先写的文档 | 并入 C2 依据引文 |
+| 门禁配套文档层：BLOCKING_IO_DETECTION / REPLAY_E2E 的 "fake green" 动机（卷二 05） | 与我们 replay 车道学说同源——"手写 mock 的 e2e 会 fake green"正是我们录制回放 fixtures 的动机 | C5 写明 CI 语义时引用 |
+| copilot-instructions 修正：两套指南面并存、互不引用、优先级主张不同（卷三 01） | 我们单一指南面（AGENTS.md + CLAUDE `@` 导入），无此病 | C4 预防性一行：若出现第二工具专属指南面，显式写明冲突时信谁 |
+| 两级文档阶梯 / backend/docs 工程文档五类（设计/行为/门禁/契约/运维）（卷三 03） | 我们 docs/ 已有近似分层（地图/研究/测试/运行/运维/质量登记 + playbook + skills） | C4 可选参考，不新增结构 |
+| 手册快照警示：integration-guide 三处与 v2.1.0 源码不符（`stream()`/`chat()`、`get_app_config()`、`app.gateway`）、`POST /api/skills/install` 代码比文档严（admin-only）（卷一 01） | "上游文档是快照、引用上游行为必须对源码核验"的实证案例 | 并入 C3 钉定纪律 |
+| 语料更名"DeerFlow 应用开发语料"（去 "agent-ready" 流行语） | 目录名保留作外部制品标识 | 无动作 |
+
 ## 三、落地路线（每件一 change，一次放行一把）
 
-### C1 `land-development-loop-map` —— 地图先行，最快治"驾驭无力"
+### C1 `land-development-loop-map` —— 地图先行，最快治"驾驭无力"（✅ 已落地 2026-10-08，archive：`openspec/changes/archive/2026-10-08-land-development-loop-map`；闭环页落点裁决为 `openspec/README.md` 扩展，根 AGENTS 余量 22 字符不足加行）
 一页式开发闭环旅程：意图（Change Focus）→ 权威归属（Policy Route / owner）→ slice 交付 → 证据分层（车道）→ 验证形态 → 交付记录；每步页面归属可点。"四件不同的事"按我们形态命名：**离线契约 mirror / 装配 smoke / 真实梯观察 / 冷启动发布**。门禁等级四分词汇随页定义。落点候选（proposal 定）：`openspec/README.md` 或根 AGENTS 路由扩展 + app docs 入口；受 doc budgets 与 doc-hygiene checker 约束。纯文档为主，快。
 
 ### C2 `harden-change-authority` —— 权威三件套，治"驱动一下能干点但质量成问题"
@@ -88,7 +104,7 @@
 ### C5 `document-ci-gate-matrix` —— 可选（机制已够，仅写明）
 把"契约双端触发"语义（框架绑定面或应用面任一变更 → smoke）写进 CI 治理文档；不新增机制。
 
-**顺序与并行**：C1 立即（快、纯文档）；C2 随后——它是 C6 落地**可评审**的前提（没有权威三件套，产出质量的 change 工件自己也会漂）；C3 独立小件随时插；C4/C5 顺带。C6 探索**已完成**（2026-10-08，结论已进 C6 节），其 change 家族按批次进管道；驾驭者若要把 C6 第一批提到 C2 前，代价与收益见落地关联。
+**顺序与并行**：C1 立即（快、纯文档）；C2 随后——它是 C6 落地**可评审**的前提（没有权威三件套，产出质量的 change 工件自己也会漂）；C3 独立小件随时插；C4/C5 顺带。C6 探索**已完成**（2026-10-08，结论已进 C6 节），其 change 家族按批次进管道；驾驭者若要把 C6 第一批提到 C2 前，代价与收益见落地关联。语料第 10 轮对照（2026-10-08）不改变此顺序。
 
 ## 四、演变指导
 
