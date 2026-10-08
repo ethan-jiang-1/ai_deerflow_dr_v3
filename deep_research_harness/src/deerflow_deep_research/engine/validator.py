@@ -9,11 +9,18 @@ silently. The runtime layer materializes verdicts; it never renders them.
 from __future__ import annotations
 
 import hashlib
+import re
 from dataclasses import dataclass
 from pathlib import PurePosixPath
 
 from ..domain.admission import ARTIFACT_KINDS
 from .verdicts import ValidatorVerdict
+
+# Final-report structure envelope (D3): a structural floor, not a quality score.
+REPORT_MIN_CHARS = 200
+REPORT_MAX_CHARS = 200_000
+_HEADING_RE = re.compile(r"^#{1,6}\s+\S", re.MULTILINE)
+_SOURCES_HEADING_RE = re.compile(r"^#{1,6}\s+.*(?:sources|来源|引用)", re.IGNORECASE | re.MULTILINE)
 
 
 @dataclass(frozen=True)
@@ -35,6 +42,25 @@ class AdmissionContext:
 
 def _content_hash(content: bytes) -> str:
     return hashlib.sha256(content).hexdigest()
+
+
+def _report_structure_problem(content: bytes) -> str | None:
+    """The first violated final-report structure aspect, or None (D1 order:
+    encoding -> heading -> Sources -> length)."""
+    try:
+        text = content.decode("utf-8")
+    except UnicodeDecodeError:
+        return "final report content is not valid UTF-8 text"
+    if not _HEADING_RE.search(text):
+        return "final report has no Markdown heading"
+    if not _SOURCES_HEADING_RE.search(text):
+        return "final report has no Sources-class section heading (sources/来源/引用)"
+    size = len(text)
+    if size < REPORT_MIN_CHARS:
+        return f"final report is {size} characters, below the {REPORT_MIN_CHARS}-character structure floor"
+    if size > REPORT_MAX_CHARS:
+        return f"final report is {size} characters, above the {REPORT_MAX_CHARS}-character ceiling"
+    return None
 
 
 def _filename_is_safe(filename: str) -> bool:
@@ -79,4 +105,8 @@ def validate(submission: ArtifactSubmission, context: AdmissionContext) -> Valid
             f"content hash {digest} is already admitted — duplicates are never silent "
             "overwrites",
         )
+    if submission.kind == "final_report":
+        structure_problem = _report_structure_problem(submission.content)
+        if structure_problem:
+            return verdict("report_structure_violation", structure_problem)
     return ValidatorVerdict(result_code="ok", reasons=(), content_hash=digest).validate()

@@ -9,6 +9,7 @@ stdin, so the prompt is exercised end-to-end without a TTY.
 from __future__ import annotations
 
 import json
+from tests.fixture_reports import fixture_report
 import os
 import re
 import subprocess
@@ -37,7 +38,7 @@ class InteractiveClarificationJourneyTest(unittest.TestCase):
                     "id": "call-q1", "name": "ask_clarification",
                     "args": {"question": "范围选哪国市场？"},
                 }]},
-                {"content": "已对齐范围：A 国消费级无人机。Fixture answer with cited sources."},
+                {"content": fixture_report("已对齐范围：A 国消费级无人机。Fixture answer with cited sources.")},
             ]),
             "DEEP_RESEARCH_INTERACTIVE": "1",
         })
@@ -70,7 +71,7 @@ class InteractiveClarificationJourneyTest(unittest.TestCase):
                     "id": "call-q1", "name": "ask_clarification",
                     "args": {"question": "范围选哪国市场？"},
                 }]},
-                {"content": "按假设继续：A 国。Fixture answer."},
+                {"content": fixture_report("按假设继续：A 国。Fixture answer.")},
             ]),
             "DEEP_RESEARCH_INTERACTIVE": "1",
         })

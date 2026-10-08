@@ -8,6 +8,7 @@ the pinned experiment that closes the wiring plan's remaining uncertainty.
 from __future__ import annotations
 
 import json
+from tests.fixture_reports import fixture_report
 import os
 import sqlite3
 import tempfile
@@ -38,7 +39,7 @@ _CONFIG_ROOT = Path(__file__).resolve().parents[2] / "config"
 _SCRIPT_CONTINUATION = json.dumps(
     [
         {"content": "", "tool_calls": [{"id": "c1", "name": "ask_clarification", "args": {"question": "范围选哪国市场？"}}]},
-        {"content": "已按假设完成：聚焦 A 国市场，认证壁垒分析见报告。"},
+        {"content": fixture_report("已按假设完成：聚焦 A 国市场，认证壁垒分析见报告。")},
     ]
 )
 

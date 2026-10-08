@@ -15,8 +15,8 @@ RESULT_CODES: tuple[str, ...] = (
     "schema_malformed",
     "missing_provenance",
     "empty_content",
-    "hash_mismatch",
     "duplicate_content",
+    "report_structure_violation",
 )
 
 DISPOSITIONS: tuple[str, ...] = ("admit", "reject", "replay")

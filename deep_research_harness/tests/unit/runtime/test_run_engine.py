@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import json
+from tests.fixture_reports import fixture_report
 import tempfile
 import unittest
 from datetime import datetime, timezone
@@ -488,7 +489,7 @@ class RunEngineTest(unittest.TestCase):
         def stream_fn(message: str):
             yield _event("values", messages=[
                 {"type": "human", "content": "q"},
-                {"type": "ai", "content": "最终简报全文内容"},
+                {"type": "ai", "content": fixture_report("最终简报全文内容")},
             ])
             yield _event("end")
 
@@ -541,7 +542,7 @@ class RunEngineTest(unittest.TestCase):
         return pump.run_research(self.handle, stream_fn=stream_fn)
 
     def test_clean_completion_records_admitted_delivery(self) -> None:
-        self._drive_to_completion("第一代报告内容")
+        self._drive_to_completion(fixture_report("第一代报告内容"))
         final = bundle_state.read_state(self.handle)
         self.assertEqual(final.status, "completed")
         self.assertEqual(final.delivery, "admitted")
@@ -557,10 +558,10 @@ class RunEngineTest(unittest.TestCase):
     def test_duplicate_refine_answer_records_rejected_delivery_and_stays_refinable(self) -> None:
         from dataclasses import replace as _replace
 
-        first = self._drive_to_completion("完全相同的报告内容")
+        first = self._drive_to_completion(fixture_report("完全相同的报告内容"))
         self.assertEqual(first.delivery, "admitted")
         refined, _record = bundle_actions.refine(self.handle, "深挖成本侧")
-        second = self._drive_to_completion("完全相同的报告内容")  # duplicate hash vs gen 1
+        second = self._drive_to_completion(fixture_report("完全相同的报告内容"))  # duplicate hash vs gen 1
         final = bundle_state.read_state(self.handle)
         self.assertEqual(final.status, "completed")
         self.assertEqual(final.delivery, "rejected")

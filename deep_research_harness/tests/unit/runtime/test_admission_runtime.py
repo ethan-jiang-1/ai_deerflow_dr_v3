@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import json
+from tests.fixture_reports import fixture_report
 import tempfile
 import unittest
 from datetime import datetime, timezone
@@ -195,7 +196,7 @@ class AdmissionRuntimeTest(unittest.TestCase):
         admission_mod.submit_artifact(self.handle, _submission())
         admission_mod.submit_artifact(
             self.handle,
-            _submission(filename="report.md", kind="final_report", content="报告".encode()),
+            _submission(filename="report.md", kind="final_report", content=fixture_report("报告正文").encode()),
         )
         counts = admission_mod.read_admitted_counts(self.handle)
         self.assertEqual(counts, {"evidence": 1, "final_report": 1})
@@ -204,7 +205,7 @@ class AdmissionRuntimeTest(unittest.TestCase):
     def test_final_report_places_to_final(self) -> None:
         entry = admission_mod.submit_artifact(
             self.handle,
-            _submission(kind="final_report", filename="report-gen1.md", content="# 简报\n内容".encode()),
+            _submission(kind="final_report", filename="report-gen1.md", content=fixture_report("# 简报\n内容").encode()),
         )
         self.assertEqual(entry.disposition, "admit")
         placed = self.handle.root / "final" / "report-gen1.md"

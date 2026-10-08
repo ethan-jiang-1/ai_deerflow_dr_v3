@@ -9,6 +9,7 @@ plan prompt is exercised end-to-end without a TTY.
 from __future__ import annotations
 
 import json
+from tests.fixture_reports import fixture_report
 import os
 import re
 import subprocess
@@ -28,8 +29,8 @@ RUNS_ROOT = HARNESS_ROOT.parent / "runs"
 
 _PLAN = "研究计划：1) 广度探索无人机认证壁垒全景 2) 深挖 A 国消费级法规"
 _MARKED_PLAN = "<research-plan>\n" + _PLAN + "\n</research-plan>"
-_FINAL = "Fixture report produced under the confirmed plan."
-_FINAL_UNMARKED = "One-turn research report without any plan markers (the 58b5440e regression shape)."
+_FINAL = fixture_report("Fixture report produced under the confirmed plan.")
+_FINAL_UNMARKED = fixture_report("One-turn research report without any plan markers (the 58b5440e regression shape).")
 
 
 @unittest.skipUnless(_FRAMEWORK_AVAILABLE, "deerflow environment required: run `uv sync` in deep_research_harness/")
@@ -66,7 +67,7 @@ class PlanGateJourneyTest(unittest.TestCase):
         state = json.loads((bundle_dir / "state.json").read_text(encoding="utf-8"))
         self.assertEqual(state["status"], "completed")
         # The plan turn was gated, not admitted; the final report is the second turn.
-        self.assertEqual((bundle_dir / "final" / "report-gen1.md").read_text(encoding="utf-8").strip(), _FINAL)
+        self.assertEqual((bundle_dir / "final" / "report-gen1.md").read_text(encoding="utf-8").strip(), _FINAL.strip())
         # The confirmed plan is materialized as a request artifact.
         plan_file = bundle_dir / "request" / "plan-gen1.md"
         self.assertTrue(plan_file.is_file())
@@ -115,7 +116,7 @@ class PlanGateJourneyTest(unittest.TestCase):
         self.assertEqual(state["status"], "completed")
         self.assertEqual(
             (bundle_dir / "final" / "report-gen1.md").read_text(encoding="utf-8").strip(),
-            _FINAL_UNMARKED,
+            _FINAL_UNMARKED.strip(),
         )
         self.assertFalse((bundle_dir / "request" / "plan-gen1.md").exists())
         journal = (bundle_dir / "diagnostics" / "journal.jsonl").read_text(encoding="utf-8")

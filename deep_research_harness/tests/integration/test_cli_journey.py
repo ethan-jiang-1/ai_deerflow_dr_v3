@@ -8,6 +8,7 @@ cli.py as a subprocess so the human path is what is tested.
 from __future__ import annotations
 
 import json
+from tests.fixture_reports import fixture_report
 import re
 import subprocess
 import sys
@@ -48,7 +49,7 @@ class CliJourneyTest(unittest.TestCase):
                     "id": "call-s1", "name": "web_search",
                     "args": {"query": "无人机 认证壁垒"},
                 }]},
-                {"content": "Fixture answer with cited sources."},
+                {"content": fixture_report("Fixture answer with cited sources.")},
             ])},
         )
         self.assertEqual(created.returncode, 0, created.stderr)
@@ -98,7 +99,7 @@ class CliJourneyTest(unittest.TestCase):
         refined = _cli(
             "refine", bundle_id, "深挖成本侧证据",
             env={"DEERFLOW_FAKE_SCRIPT": json.dumps(
-                [{"content": "Refined fixture answer: cost-side evidence summary."}]
+                [{"content": fixture_report("Refined fixture answer: cost-side evidence summary.")}]
             )},
         )
         self.assertEqual(refined.returncode, 0, refined.stderr)

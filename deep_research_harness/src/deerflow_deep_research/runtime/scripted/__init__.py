@@ -29,6 +29,7 @@ DEFAULT_SCRIPT: list[dict] = [
 ]
 
 
+
 def _load_script() -> list[dict]:
     raw = os.environ.get("DEERFLOW_FAKE_SCRIPT")
     return json.loads(raw) if raw else DEFAULT_SCRIPT
