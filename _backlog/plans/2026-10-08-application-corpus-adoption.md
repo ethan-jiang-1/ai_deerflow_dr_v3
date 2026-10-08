@@ -84,7 +84,7 @@
 
 | 面 | 断言什么 | seam / 契约 | 批次 |
 |---|---|---|---|
-| **A 来源可追溯性** | 报告中每个 http(s) URL 在同 bundle `diagnostics/searches/` 的工具输出记录（含 web_fetch 抓取内容）中出现过 | 纯函数 over (final 报告, searches/)；需 run-admission 新维度；**定名必须叫"来源可追溯性"而非"真实性"**（模型凭记忆写对的 URL 会红）。实证：现存录制真实样本报告 6 个去重 URL **6/6 精确命中**——断言在现存资产上已成立，零新采集 | 第一批 |
+| **A 来源可追溯性** ✅ 已落地 2026-10-08（形态修正：真实 bundle 探针证明"全 URL 可溯"不成立——厂商端点/模型知识 URL 合法 miss，故改为注册机器+纯函数+测试钉样，**不做 admission 阻断**；fixture 6/6 钉样；admission 化留待独立裁决） | archive：`openspec/changes/archive/2026-10-08-register-source-traceability-machine` | 第一批 |
 | **B 报告结构契约** | ≥1 标题、存在 Sources 节、长度上下界、UTF-8 可读 | validator 扩展（封闭码集动 spec）；扩展"模型提议、代码裁决"既有模式，不改权力结构；"有 Sources 节"≠引用真实 | 第一批 |
 | **C 回放物化断言** ✅ 已落地 2026-10-08 | 同左 | archive：`openspec/changes/archive/2026-10-08-assert-replay-materialization` | 第一批 |
 | **D 真实梯行为侧写** | searches 文件数 / distinct query 数 / web_fetch 深读 / 角度覆盖代理 ≥ 声明区间；end.usage token 区间 | 纯函数可离线对历史 bundle 跑；级 4 lane 栏翻"规划"，永不进默认 CI；**前置接线：pump 现在丢弃 end 事件的 usage**；单次通过不构成统计结论 | 第二批 |
