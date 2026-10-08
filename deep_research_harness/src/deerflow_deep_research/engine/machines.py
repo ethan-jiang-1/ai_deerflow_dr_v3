@@ -23,6 +23,9 @@ DECLARED_MACHINES: tuple[tuple[str, str], ...] = (
     ("command-surface-guard", "COMMANDS.md, the Makefile targets, and the cli.py "
      "subcommands stay mutually consistent (docs-as-contract: the documented commands "
      "are the deliverable)."),
+    ("source-traceability", "Every http(s) URL in a final report is computably "
+     "checkable against the run's own search corpus; the pure verdict proves record "
+     "support, never that a record is true, and cannot pass on an empty corpus."),
     ("application-unit-gate", "make verify runs the stdlib unittest suite and exits "
      "non-zero on any failure; it never links OpenSpec content."),
     ("repository-governance-gates", "The aggregate closeout gate and its component "
