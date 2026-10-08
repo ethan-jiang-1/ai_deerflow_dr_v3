@@ -8,6 +8,7 @@ scar: fake-shaped events once passed green while the real stream differed.
 
 from __future__ import annotations
 
+import collections
 import json
 import tempfile
 import unittest
@@ -64,6 +65,50 @@ class EventStreamReplayTest(unittest.TestCase):
         entries = self._journal()
         calls = [call for e in entries if e.category == "model_tool" for call in e.detail.get("calls", [])]
         self.assertIn("tampered_tool", calls, "tampered tool_calls must surface in the journal")
+
+    def test_replayed_stream_materializes_every_search_result(self) -> None:
+        # The recorded run made 6 web_search + 5 web_fetch calls (probe
+        # 2026-10-08); every paired result must land as one readable file —
+        # the physical basis the source-traceability metric stands on.
+        pump.run_research(self.handle, stream_fn=self._stream_fn())
+        searches_dir = self.handle.root / "diagnostics" / "searches"
+        files = sorted(searches_dir.glob("*.json"))
+        self.assertEqual(len(files), 11, "every paired search result must be materialized")
+        tools = collections.Counter(json.loads(f.read_text(encoding="utf-8"))["tool"] for f in files)
+        self.assertEqual(tools["web_search"], 6)
+        self.assertEqual(tools["web_fetch"], 5)
+        for path in files:
+            record = json.loads(path.read_text(encoding="utf-8"))
+            for key in ("generation", "seq", "tool", "arguments", "content", "call_id"):
+                self.assertIn(key, record)
+            self.assertTrue(record["content"], f"materialized record {path.name} has empty content")
+
+    def test_unpaired_search_result_is_not_materialized(self) -> None:
+        # Unpairing a result (its call_id no longer matches any observed call)
+        # must drop exactly that one record — dropping is the pairing rule,
+        # never a silent partial write. The rewrite walks nested values-snapshot
+        # messages too: the pump feeds both chunk and values sources, and any
+        # surviving occurrence would re-pair the result.
+        target = next(
+            e["data"]["tool_call_id"]
+            for e in self.events
+            if e["type"] == "messages-tuple" and isinstance(e["data"], dict) and "tool_call_id" in e["data"]
+        )
+
+        def unpair(node):
+            if isinstance(node, dict):
+                return {
+                    k: ("unpaired-probe" if k == "tool_call_id" and v == target else unpair(v))
+                    for k, v in node.items()
+                }
+            if isinstance(node, list):
+                return [unpair(item) for item in node]
+            return node
+
+        self.events = [{"type": e["type"], "data": unpair(e["data"])} for e in self.events]
+        pump.run_research(self.handle, stream_fn=self._stream_fn())
+        files = list((self.handle.root / "diagnostics" / "searches").glob("*.json"))
+        self.assertEqual(len(files), 10, "exactly the unpaired result must be dropped")
 
     def _journal(self):
         from deerflow_deep_research.runtime.bundle import journal as journal_mod
