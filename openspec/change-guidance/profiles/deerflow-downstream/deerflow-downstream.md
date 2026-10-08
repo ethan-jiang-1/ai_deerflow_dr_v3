@@ -20,3 +20,18 @@ divergences). When the gitlink advances (re-pin), re-review every standing upstr
 claim against the new revision — the retained corpus under
 `_backlog/_reference/deerflow-application-corpus/` keeps the re-review triggers
 for its own conclusions.
+
+## Upstream Boundaries
+
+Negative facts about the upstream (DeerFlow 应用开发语料·卷三 06，钉定 v2.1.0)
+and this repository's countermeasures for the embedded-harness form:
+
+- **Host internals carry no compatibility promise** — only import the public API
+  surface; re-run the package-level tests before advancing the gitlink.
+- **Upstream docs are release-time snapshots** — verify against source at the
+  pinned revision (see Pinning Discipline; the corpus records concrete divergences).
+- **No upstream security SLA** — watch upstream releases; set the gitlink update
+  cadence deliberately.
+- **Startup-only extension loading and the extension-code-outside-sandbox facts**
+  do not bind this repository: the embedded form installs no extensions and runs
+  no extension code; these entries apply only if a future change adopts that form.

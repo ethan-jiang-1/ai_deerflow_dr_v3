@@ -21,6 +21,16 @@ responsibility, host integration, and change governance do not blur together.
   `openspec/change-guidance/profiles/` 是**政策 profile**（change-guidance 的规则集）。
   同名异物，按目录归属读。
 
+## Common Misreadings
+
+- **profile** 同名异物（见上）——按目录归属读，别把运行配置当政策或反之。
+- **"测试绿" ≠ "质量"**：每层证据只证明它断言的属性（车道表见
+  [testing-and-evaluation](./deep_research_harness/docs/testing-and-evaluation.md)），
+  单元绿不证明装配，装配绿不证明研究质量。
+- **`engine/` 与 `run_engine`**：`engine/` 是裁决层（validator/gate 纯函数），
+  `runtime/pump.py` 是运行泵——模块改名（2026-10-07）后旧文档若仍提
+  `run_engine.py` 即已过期。
+
 ## Reading order for a fresh agent
 
 The single entry chain is [AGENTS.md](AGENTS.md) — its routing table owns "where do I

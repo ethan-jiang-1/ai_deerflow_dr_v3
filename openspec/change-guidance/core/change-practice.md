@@ -96,4 +96,5 @@ Start with the owning specification, closest implementation, and lowest responsi
 evidence seam. Before opening an adjacent module or upstream source, name the
 interface, authority, compatibility, or observed-failure question it must answer.
 If local evidence still cannot identify an owner, clarify admission instead of
-scanning unrelated code.
+scanning unrelated code. When guidance text and code disagree, the code and its
+tests win — guidance stays honest by routing to owners, not by outranking them.
