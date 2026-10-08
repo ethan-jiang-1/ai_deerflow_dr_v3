@@ -90,7 +90,7 @@ make record-stream PROBLEM="…" CONFIG=base  # 显式录制真实 API 事件流
 ## 备注
 
 - `deerflow/` submodule 需 `git clone --recurse-submodules` 或 `git submodule update --init` 才完整。
-- 框架运行时基座：submodule 锁在 commit `ceebf97f`（ethan 分支，= 上游 v2.1.0，2026-09-24 发布）。
+- 框架运行时基座：submodule 锁在 commit `ceebf97f`（ethan digest 分支，v2.1.0 的后代而非 tag 本身；上游 v2.1.0 于 2026-09-24 发布）。
   声明锁已在[结构 registry](openspec/governance/project-structure.toml)。
 - 其他根目录居民：`config.yaml`、`.env`（按需准备的宿主配置与凭证，gitignored）、
   `profiles/`（本地运行 profile）、`CONTEXT.md` / `CONTEXT-MAP.md`（词汇边界）。

@@ -73,7 +73,7 @@
 ### C2 `harden-change-authority` —— 权威三件套，治"驱动一下能干点但质量成问题"（✅ 已落地 2026-10-08，archive：`openspec/changes/archive/2026-10-08-harden-change-authority`；config.yaml 0 余量故规则文本住 change-practice.md，语法住 checker @impl CHA-001；本 change 自身 dogfood 两段常设段）
 语料卷二 02 的逻辑：agent 天然倾向在实现文件里"顺手重新设计"；解药是 spec 独占设计决策 + 实现工件自降权威 + 偏离登记。落地：tasks 模板加 deviation register 常设段（无偏离时显式声明"none"）；change-practice 补"实现工件只排序与验证、不重新设计"scope rule；slice 收尾重读检查单从 control-placement 泛化；交付记录四段成段必填（外部行为/影响面/实际跑了什么/**未执行的检查**）+ red-green 自问句式 + AI 参与披露段（solo+agent 形态裁剪版）；四类陈述进 change-guidance。checker：`change_guidance_kernel.py` / `check_change_guidance.py` 扩展，新规则必须能红（负例控制）。规范语义改动——proposal 停在规划边界等驾驭者拍板。
 
-### C3 `pin-upstream-claims` —— 钉定纪律，小而关键
+### C3 `pin-upstream-claims` —— 钉定纪律，小而关键（✅ 已落地 2026-10-08，archive：`openspec/changes/archive/2026-10-08-pin-upstream-claims`；语料处置=**A 原样复制**（38 文件零差异进 `_backlog/_reference/deerflow-application-corpus/`）；另发现并修正 `README.md:93` 同病等式一处）
 修正根 AGENTS.md 的 pin 等式（`ceebf97f` = v2.1.0 后代、digest 分支、v2.1.0 为祖先——写清差异性质）；deerflow-downstream profile 补"对上游的论断必须钉定可核对（tag/commit + 核验方法），pin 前进时重审"纪律；裁决并落地语料处置——**建议原样复制进 `_backlog/_reference/`**（语料 README 自述"复制全部内容并保留相对目录结构即可独立阅读和验证"；`verify.mjs` 可独立跑；引用一律"卷·页"不带行号；重审触发=上游 re-pin 时）。注意：语料自带 `_coverage/` 下划线目录，与 `check_doc_hygiene.py` 的 `_backlog` `_` 目录声明约定的相容性要在 change 里验证处理。复制不动内容。
 
 ### C6 `establish-output-quality-acceptance` —— 主事件（裁决③）
