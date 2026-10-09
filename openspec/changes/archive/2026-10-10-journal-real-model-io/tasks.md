@@ -18,7 +18,7 @@
 ## 4. Receipts, archive, and ledger bookkeeping
 
 - [x] 4.1 Full receipts (exit codes read directly): `make verify` (unit lane) 0; `tests.integration.test_recording` + `test_replay_model` (integration lane, venv) 0 (7 + 6 tests — the latter proving live backward compatibility against the retained legacy sample); `check_doc_hygiene.py` + `--self-test` 0; `check_project_gate.py --phase plan/closeout` 0; `openspec validate` valid; prove-it-red: journaling tamper (`if calls:` → `if False and calls:`) → exit 1 → restore → 0 (pycache cleared between same-length edits — stale-pyc discipline). The import-boundary guard caught a real level-2 relative-import bug (`..assembly` → nonexistent `deerflow_deep_research.assembly`) before any run tripped on it — fixed to `.assembly`.
-- [ ] 4.2 Archive `journal-real-model-io` (deerflow-wiring delta syncs into the main spec), E card stays active with E-1 marked done in 落地关联 (E-2 real run is the next slice, triggered separately after archive). Verify: strict-validate 0; ledger hygiene green; commits with quoted-heredoc messages.
+- [x] 4.2 Archive `journal-real-model-io` (deerflow-wiring delta syncs into the main spec), E card stays active with E-1 marked done in 落地关联 (E-2 real run is the next slice, triggered separately after archive). Verify: strict-validate 0; ledger hygiene green; commits with quoted-heredoc messages.
 
 ## Deviation Register
 

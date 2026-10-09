@@ -54,8 +54,12 @@ F（陈述级接地）与 G（方差）维持 CLS-017 裁决；录制工具的�
 
 ## 落地关联
 
-change 家族：E-1 `journal-real-model-io`（本卡首个 change）→ E-3 回放测试 change。本卡在
-E-3 归档后关闭（CLS-021+），去向登记。
+change 家族：**E-1 done**（`journal-real-model-io`，archive `2026-10-10-journal-real-model-io`：
+record 配置 + JournalingMixin/组合 provider + journal 协议扩展（tool_calls，向后兼容）+ sidecar；
+两条偏离在案——unit→integration 车道修正、import 守卫逮住的二级相对导入 bug）→ **E-2 真跑录制**
+（下一片：`DEERFLOW_RECORD_SINK=<path> make create PROBLEM=<公开话题> CONFIG=record`，费用承诺已给）
+→ 脱敏初筛 + 驾驭者终审 → **E-3 零凭证完整图回放测试**（其_own change）。本卡在 E-3 归档后关闭
+（CLS-021+），去向登记。
 
 ## 关闭条件
 
