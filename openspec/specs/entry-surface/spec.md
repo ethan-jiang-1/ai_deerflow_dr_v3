@@ -55,8 +55,13 @@ and a proposed research plan delivered in an interactive context SHALL render th
 the same module as stable human phrases. The interactive context SHALL be gated: a
 foreground command MAY prompt on stdin only when stdin is a terminal or an explicit
 environment override (`DEEP_RESEARCH_INTERACTIVE`) is set; a non-interactive context
-SHALL never block on stdin and SHALL drive the run without a clarification hook or a
-plan hook (no plan phase, no extra model round). The plan prompt SHALL offer the
+SHALL never block on stdin, SHALL drive the run without a clarification hook (the
+bounded automatic continuation stands), and SHALL drive it WITH an auto-confirming
+plan hook for a first-generation `create`: the plan phase runs, the proposed plan is
+confirmed verbatim and injected as the continuation, and the run proceeds to
+research — the plan-phase model round is the deliberate price of the plan-first
+research methodology (BUG-001: with no plan phase, the plan-first output falls
+through to completion as a plan-shaped "report"). The plan prompt SHALL offer the
 three ways with stable phrases: confirm as-is, append a revision note, or skip the
 plan injection; an explicit abort input exits without further turns. `create` is the
 only command that MAY carry a plan hook, and only for a first-generation run —
@@ -86,9 +91,11 @@ only command that MAY carry a plan hook, and only for a first-generation run —
 
 - **WHEN** a foreground command runs with stdin not a terminal and no environment
   override
-- **THEN** the run is driven without a clarification hook and without a plan hook,
-  completes through the bounded automatic continuation without ever reading stdin,
-  and performs no plan-phase model round
+- **THEN** the run is driven without a clarification hook (the bounded automatic
+  continuation applies) and without ever reading stdin, and a first-generation
+  `create` carries an auto-confirming plan hook: the plan phase runs, the proposed
+  plan is confirmed verbatim and injected, the gate lifecycle is journaled
+  (`plan_proposed` then `plan_confirmed`), and the run proceeds to research
 
 ### Requirement: The watch projection is bounded and terminal-exiting
 
@@ -128,7 +135,6 @@ through the renderer with shape-stable assertions).
 - **WHEN** the recorded clarification-exhaustion scenario replays through the renderer
 - **THEN** the rendered timeline matches the recorded shape (stable phrases and
   ordering, volatile values excluded)
-
 
 ### Requirement: Create and refine route through the declared chain, locked offline
 

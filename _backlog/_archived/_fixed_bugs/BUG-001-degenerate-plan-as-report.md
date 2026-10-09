@@ -1,6 +1,6 @@
 # BUG-001: headless 跑计划门缺席——计划输出直落 completed 冒充报告（根因已确诊，初判修正）
 
-> 严重级别: P1 | 发现: 2026-10-10 | 状态: 活跃
+> 严重级别: P1 | 发现: 2026-10-10 | 状态: 已修（fix-headless-plan-gate，archive 2026-10-10-fix-headless-plan-gate：headless 计划门自动确认 + admission plan-marker 拒绝面；真梯验收跑回执见修复关联）
 
 ## 症状（2026-10-10 根因确诊后修正）
 
