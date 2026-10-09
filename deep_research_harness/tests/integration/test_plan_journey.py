@@ -92,6 +92,44 @@ class PlanGateJourneyTest(unittest.TestCase):
         self.assertEqual(state["status"], "completed")
 
 
+    def test_headless_context_auto_confirms_the_plan(self) -> None:
+        """BUG-001's fix, scripted: a headless create (no TTY, no interactive env)
+        still runs the plan phase — the plan is auto-confirmed verbatim, injected,
+        journaled (plan_proposed + plan_confirmed), and the run proceeds to the
+        report turn. The old behavior (no handler → the plan-shaped first turn
+        completed as the "report") is the bug this test pins shut."""
+        env = dict(os.environ)
+        env.update({
+            "DEERFLOW_FAKE_SCRIPT": json.dumps([
+                {"content": _MARKED_PLAN},
+                {"content": _FINAL},
+            ]),
+        })
+        env.pop("DEEP_RESEARCH_INTERACTIVE", None)
+        env["DEEP_RESEARCH_RUNS_ROOT"] = str(HARNESS_ROOT.parent / "runs")
+        result = subprocess.run(
+            [sys.executable, "cli.py", "create", "研究无人机供应链的认证壁垒", "--config", "fixture"],
+            cwd=HARNESS_ROOT, capture_output=True, text=True, timeout=120,
+            env=env,  # no stdin pipe: headless must never read it
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("run completed", result.stdout)
+
+        bundle_dir = self._bundle_dir(result.stdout)
+        state = json.loads((bundle_dir / "state.json").read_text(encoding="utf-8"))
+        self.assertEqual(state["status"], "completed")
+        # The plan was gated and confirmed — not admitted as the report.
+        journal = (bundle_dir / "diagnostics" / "journal.jsonl").read_text(encoding="utf-8")
+        self.assertIn("plan_proposed", journal)
+        self.assertIn("plan_confirmed", journal)
+        self.assertEqual(
+            (bundle_dir / "final" / "report-gen1.md").read_text(encoding="utf-8").strip(),
+            _FINAL.strip(),
+        )
+        plan_file = bundle_dir / "request" / "plan-gen1.md"
+        self.assertTrue(plan_file.is_file())
+        self.assertIn("广度探索", plan_file.read_text(encoding="utf-8"))
+
     def test_markerless_report_completes_without_gating(self) -> None:
         """The real-ladder regression, scripted: a research turn ending in a plain
         report must complete ungated — no plan prompt on the report, no second pass."""

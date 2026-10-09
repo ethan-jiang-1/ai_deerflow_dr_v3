@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from pathlib import PurePosixPath
 
 from ..domain.admission import ARTIFACT_KINDS
+from ..domain.plan import PLAN_MARKER_OPEN
 from .verdicts import ValidatorVerdict
 
 # Final-report structure envelope (D3): a structural floor, not a quality score.
@@ -46,11 +47,22 @@ def _content_hash(content: bytes) -> str:
 
 def _report_structure_problem(content: bytes) -> str | None:
     """The first violated final-report structure aspect, or None (D1 order:
-    encoding -> heading -> Sources -> length)."""
+    plan markers -> encoding -> heading -> Sources -> length).
+
+    The plan-marker aspect is FIRST and categorical (BUG-001): a text wrapped in
+    the plan protocol's markers is a proposed plan, not a report — it can mimic
+    every other aspect (the observed degenerate plan satisfied the heading and
+    Sources regexes through its deliverables section), so nothing downstream of
+    this check can rescue it."""
     try:
         text = content.decode("utf-8")
     except UnicodeDecodeError:
         return "final report content is not valid UTF-8 text"
+    if PLAN_MARKER_OPEN in text:
+        return (
+            "final report carries explicit plan markers "
+            f"({PLAN_MARKER_OPEN}) — a proposed plan is not a report"
+        )
     if not _HEADING_RE.search(text):
         return "final report has no Markdown heading"
     if not _SOURCES_HEADING_RE.search(text):

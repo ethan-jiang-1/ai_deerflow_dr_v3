@@ -1,41 +1,46 @@
-# BUG-001: 真梯连续两跑"计划走私 + 计划冒充报告"退化（CLS-018 病状复发）
+# BUG-001: headless 跑计划门缺席——计划输出直落 completed 冒充报告（根因已确诊，初判修正）
 
 > 严重级别: P1 | 发现: 2026-10-10 | 状态: 活跃
 
-## 症状
+## 症状（2026-10-10 根因确诊后修正）
 
-两次真梯 run（E-2 录制尝试，`runs/d_20261009/f6d960ec-…` 与 `runs/d_20261009/2d8762ce-…`）
-以完全相同的形态退化：
+真梯 headless `create`（研究型问题）连续四跑同形态退化（`f6d960ec`/`2d8762ce`/
+`5b675921`/`ab6a6ec0`，2026-10-10）：
 
-1. 模型把**完整研究计划塞进 `ask_clarification` 的问题文本**（"请确认是否按此计划执行"）
-   ——CLS-018 记录过的走私病状；
-2. headless 自动应答后，模型**将计划文本直接作为最终报告输出**（`final/report-gen1.md`
-   以 `<research-plan>` 标记开头，约 4KB，零检索、零委派、零来源）；
-3. 该"报告"经 hold point **被 admit**（结构契约只验结构：标题/来源节字样计划里都有）；
-4. journal 仅 3 事件（model_tool_call/run_completed/disposition_recorded），
-   `behavior-profile` 机器判定：`degenerate research — 0 search-or-fetch call(s) recorded`
-   （CLS-020 机器当日落地后首次实战即命中此案）。
+1. 模型按 deep-research skill 方法论**输出研究计划为纯文本**（`<research-plan>` 标记 +
+   末尾"请确认"，**零工具调用**——journal 的 model_tool_call detail 无 `calls` 键实证）；
+2. 运行**直接 completed**（无任何 plan-gate/clarification lifecycle 事件），计划文本
+   （4KB）作为 final_report 经 hold point 被 **admit**；
+3. 零检索、零委派、零来源——`behavior-profile` 机器判定
+   `degenerate research — 0 search-or-fetch call(s) recorded`（CLS-020 机器当日实战命中）。
 
-对照：CLS-018 落地（2026-10-09）前的真梯全旅程跑（如 `5bb2c343`，34 事件、9 搜索+3 抓取+1 委派）
-正常完成研究。两次退化均发生在 CLS-018 措辞纪律落地之后。
+**初判修正**：原卡症状一"计划走私 ask_clarification"是**误读**——`answer_excerpt` 是轮文本
+尾 80 字符（`_consume_turn` 在案），不是澄清问题；部分历史跑（如 `1d8f6b86`）确有真
+ask_clarification，但与本案无关。按纪律如实改正，误读过程留本节。
 
-## 根因（假设）
+## 根因（已确诊，证据链）
 
-- H1（主嫌）：CLS-018 的提示词措辞（"提问轮只携带 ask_clarification、计划确认只走标记"）
-  在真梯上产生了反效果——模型遵从了"提问轮带 ask_clarification"的字面，把计划整体装进问题里；
-  且"计划确认只走标记"未阻止模型把带标记的计划当最终消息发出。
-- H2（并行嫌疑）：计划标记检测（CLS-016 plan-marker-detection）未覆盖"最终报告以
-  `<research-plan>` 标记开头"的形态——标记在场却未触发闸门/未拦截 admission。
-- H3（排除项）：录制包装（JournalingDeepSeek）不是原因——两次退化形态一致，且第二次
-  未经任何 journaling 行为差异（journal 零行是旁路 bug，与本退化无关）。
+**headless 上下文的 `_plan_handler()` 返回 None**（cli.py:65 在案："A non-interactive
+context gets no handler and the engine never enters a plan phase"）→ `on_plan=None` →
+`awaiting_plan=False` 且 `PLAN_REQUEST_SUFFIX` 不附 → 模型的计划输出无门可进 →
+`detected=None` + `awaiting_plan=False` → completed → 计划冒充报告被 admit。
+
+对照实证：历史全旅程真跑（如 `5bb2c343`，34 事件 9 搜索）均为 **TTY 交互跑**（计划门在、
+人确认后研究）；四次退化跑均为 headless 后台跑。原三假设裁决：**H1（CLS-018 措辞反效果）
+不成立**（headless 下措辞后缀根本没附）；**H2 部分成立**（admission 对"计划冒充报告"零
+拒绝面——真正的洞）；**H3 维持排除**；新增 **H4（确诊）：headless 计划门缺席是设计缺口**。
 
 ## 复现
 
-`CONFIG=base make create PROBLEM="<调研类问题>"`（headless；两次不同问题均触发）。
+headless（无 TTY 无 `DEEP_RESEARCH_INTERACTIVE`）`CONFIG=base make create PROBLEM="<研究型
+问题>"`——后台 job/管道环境即触发。
 
 ## 修复关联
 
-待立 change：①提示词/契约层复查（H1）——覆盖 headless 自动应答轮的措辞边界；
-②plan-marker 检测对 final_report 形态的覆盖（H2）——或 admission 结构契约对
-"报告主体即计划"的拒绝面；③验收判据：behavior-profile 画像 `min_search_calls` 不再
-命中退化（真梯复跑 ≥1 搜索/抓取调用）。横切排查：CLSS-018 的真梯验收是否需要复测。
+change `fix-headless-plan-gate`（进行中）：
+①headless 计划门 = **自动确认**（auto-confirm handler，与澄清的有界自动应答同哲学；journal
+可见 plan_proposed/plan_confirmed 全生命周期）；
+②admission 拒绝面：final_report 携带 `<research-plan>` 标记 → `report_structure_violation`
+点名拒绝（计划不是报告——结构维度新方面，复用现有封闭码）；
+③验收判据：真梯 headless 复跑，behavior-profile `min_search_calls` 不再命中退化
+（≥1 搜索/抓取调用），且全旅程（计划→检索→报告）journal 完整。

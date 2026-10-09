@@ -18,13 +18,18 @@ INTERACTIVE_ENV = "DEEP_RESEARCH_INTERACTIVE"
 
 
 class PlanGatingTest(unittest.TestCase):
-    def test_noninteractive_context_builds_no_plan_handler(self) -> None:
+    def test_noninteractive_context_builds_an_auto_confirming_plan_handler(self) -> None:
+        """BUG-001's fix: headless gets an auto-confirming handler, not None —
+        the plan phase runs, the plan is confirmed verbatim and injected, and the
+        plan-first output can no longer fall through to completion-as-report."""
         with (
             mock.patch.object(cli.sys.stdin, "isatty", return_value=False),
             mock.patch.dict(os.environ, {}, clear=False),
         ):
             os.environ.pop(INTERACTIVE_ENV, None)
-            self.assertIsNone(cli._plan_handler())
+            handler = cli._plan_handler()
+            self.assertIsNotNone(handler)
+            self.assertEqual(handler("拟定的研究计划"), "拟定的研究计划")
 
     def test_tty_builds_a_plan_handler(self) -> None:
         with (

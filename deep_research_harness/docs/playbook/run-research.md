@@ -64,10 +64,14 @@ make create PROBLEM="发布面冷启动证明"
   `DEEPSEEK_API_KEY` / `TAVILY_API_KEY`，对应 config 里的 `$VAR` 引用）。框架启动
   时由 python-dotenv 向上发现并加载仓库根 `.env`（应用自身不读 `.env`）；显式
   export 同样有效。凭证属用户保留区：缺了就问，绝不代建。
-- 计划确认闸门（交互上下文，create/gen-1）：首轮 agent 先交研究计划——回车=确认、
-  直接输入=附加修订意见、s=跳过注入、q=放弃；确认/修订的计划物化为
+- 计划确认闸门（create/gen-1）：首轮 agent 先交研究计划——交互上下文（TTY 或
+  `DEEP_RESEARCH_INTERACTIVE=1`）回车=确认、直接输入=附加修订意见、s=跳过注入、q=放弃；
+  **headless 上下文自动确认**（BUG-001 修复：计划门缺席时，计划先行的首轮输出会直落
+  completed 冒充报告——多花一个模型轮是计划先行方法论的既定代价）；确认/修订的计划物化为
   `request/plan-gen1.md` 并注入线程续跑；模型无视框架直接开搜时闸门诚实降级
   （journal `plan_gate_degraded`），不硬拦。refine 不设闸门（方向文档即计划）。
+  另一道闸在 admission：final_report 携带 `<research-plan>` 标记直接拒绝
+  （`report_structure_violation`——计划不是报告），计划冒充报告从此不可能假绿。
 - 计划闸门的触发协议是内容标记：模型把计划包在 `<research-plan>` 标记里，
   引擎见标记才触发；无标记的报告/闲答一律诚实降级（真梯回归 58b5440e 的教训：
   tool-call 形状区分不了研究轮和计划轮）。

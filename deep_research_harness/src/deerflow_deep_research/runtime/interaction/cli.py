@@ -51,18 +51,23 @@ def _clarification_handler():
 
 
 def _plan_handler():
-    """Build the interactive plan-gate handler when the context allows prompting.
+    """Build the plan-gate handler for the context.
 
-    Same gate as the clarification handler (TTY or DEEP_RESEARCH_INTERACTIVE). The
-    operator confirms the plan (Enter), appends a revision note (typed text), skips
-    the injection (s), or aborts (q). A non-interactive context gets no handler and
-    the engine never enters a plan phase.
-    """
+    Interactive (TTY or DEEP_RESEARCH_INTERACTIVE): the operator confirms the plan
+    (Enter), appends a revision note (typed text), skips the injection (s), or
+    aborts (q). Non-interactive: an AUTO-CONFIRMING handler — the plan phase runs,
+    the proposed plan is confirmed verbatim and injected, and the run proceeds to
+    research (BUG-001's fix: returning None here meant a headless plan-first output
+    fell through to completion as a plan-shaped "report"; the extra model round is
+    the deliberate price of the plan-first methodology, stated in the spec)."""
 
     override = os.environ.get(INTERACTIVE_ENV, "").strip().lower()
     interactive = sys.stdin.isatty() or override in {"1", "true", "yes", "on"}
     if not interactive:
-        return None
+        def auto_confirm(plan: str) -> str:
+            return plan
+
+        return auto_confirm
 
     def handler(plan: str):
         print(render.proposed_plan(plan))

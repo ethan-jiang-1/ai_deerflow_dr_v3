@@ -77,6 +77,30 @@ class ValidatorRulesTest(unittest.TestCase):
         self.assertEqual(verdict.result_code, "report_structure_violation")
         self.assertTrue(any("UTF-8" in reason for reason in verdict.reasons))
 
+    def test_plan_marked_final_report_is_rejected_even_when_structure_mimics_a_report(self) -> None:
+        """BUG-001's refusal face: a plan wrapped in the protocol's markers is not a
+        report — even when it carries headings and a Sources-class section (the
+        observed degenerate plan satisfied both via its deliverables section)."""
+        body = (
+            "研究计划正文，长度足以越过结构地板：调研角度覆盖法规基线与成员国差异两类，"
+            "查询策略以官方公报、行业解读与交叉验证三个来源类型为主，先广度后深度。"
+            "交付物为运营人合规清单与来源清单，边界聚焦开放类别，Specific 与 Certified"
+            "仅作边界说明；假设以 EU 层面统一规则为主，成员国仅抽样提示差异。"
+            "红线情形触发转 Specific 类别或其他授权的，在清单中单列升级提示。"
+        )
+        plan_as_report = (
+            "<research-plan>\n## 一、调研角度\n\n" + body +
+            "\n\n## Sources\n\n- https://fixture.example/a\n</research-plan>\n"
+        )
+        verdict = self._structure_verdict(plan_as_report.encode())
+        self.assertEqual(verdict.result_code, "report_structure_violation")
+        self.assertTrue(any("plan" in reason for reason in verdict.reasons))
+        stripped = plan_as_report.replace("<research-plan>\n", "").replace("\n</research-plan>\n", "\n")
+        self.assertEqual(
+            self._structure_verdict(stripped.encode()).result_code, "ok",
+            "the same text without the markers must still admit",
+        )
+
     def test_headingless_final_report_is_rejected(self) -> None:
         verdict = self._structure_verdict("no heading here, just a plain short body without any markdown title".encode())
         self.assertEqual(verdict.result_code, "report_structure_violation")

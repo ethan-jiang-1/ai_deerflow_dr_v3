@@ -14,6 +14,8 @@ from datetime import datetime, timezone
 from typing import Callable
 
 from ..domain import bundle, clarification, journal_policy
+from ..domain.plan import PLAN_MARKER_CLOSE, PLAN_MARKER_OPEN
+from ..domain.plan import extract_plan as _extract_plan  # noqa: F401 — domain owns the vocabulary; seam name preserved
 from ..domain.state_machine import BundleState, rule_clarification_step, rule_run_terminal
 from .bundle import bundle_state, search_log
 from .bundle.journal import append_entry
@@ -24,8 +26,8 @@ AUTO_REPLY_PREFIX = "[非交互模式·系统自动应答] "
 # Markers are the ONLY engagement signal: content structure, never behavioral
 # inference — a research turn ending in a plain-text report is indistinguishable
 # from a plan turn by tool calls alone (the 58b5440e real-ladder regression).
-PLAN_MARKER_OPEN = "<research-plan>"
-PLAN_MARKER_CLOSE = "</research-plan>"
+# The marker literals and the extraction live in domain/plan.py (single owner —
+# the validator's plan-as-report refusal face consumes the same vocabulary).
 PLAN_REQUEST_SUFFIX = (
     "\n\n请先给出研究计划（研究角度、查询策略、来源类型），全文用 <research-plan> 和 "
     "</research-plan> 标记包裹，然后停止等待确认；不要在此轮执行搜索。"
@@ -304,18 +306,6 @@ def run_research(
         written = bundle_state.write_state(handle, fresh, failed)
         _journal(handle, "terminal", "framework_error", {"reason": "framework_error", "error": type(exc).__name__})
         return written
-
-
-def _extract_plan(final_text: str) -> str | None:
-    """Deterministic plan detection: the inner text between the plan markers.
-
-    Returns None when the markers are absent or the inner text is empty — the honest
-    degradation signal. The terminal tool-call picture cannot distinguish a research
-    report from a plan (both end in plain text with no final-message tool calls)."""
-    if PLAN_MARKER_OPEN not in final_text or PLAN_MARKER_CLOSE not in final_text:
-        return None
-    inner = final_text.split(PLAN_MARKER_OPEN, 1)[1].split(PLAN_MARKER_CLOSE, 1)[0].strip()
-    return inner or None
 
 
 def _drive(handle, stream_fn, on_event, on_clarification, on_plan, state, message, recorder):
