@@ -14,7 +14,7 @@
 ## 3. Receipts and closeout
 
 - [x] 3.1 Full receipts: `make verify` 0, `make smoke` 0, replay test 0, `check_doc_hygiene.py` + `--self-test` 0, `check_project_gate.py --phase plan --change` and `--phase closeout` 0, `openspec validate` valid. Verify: all exit 0 (recorded in Delivery Record).
-- [ ] 3.2 Archive `land-complete-graph-replay`; E card `2026-10-10-real-model-io-complete-replay.md` closes as CLS-021 (three-README linkage, counters 20→21, Next CLS-022, root README count pinned). Verify: strict-validate 0; hygiene green; commits with quoted-heredoc messages.
+- [x] 3.2 Archive `land-complete-graph-replay`; E card `2026-10-10-real-model-io-complete-replay.md` closes as CLS-021 (three-README linkage, counters 20→21, Next CLS-022, root README count pinned). Verify: strict-validate 0; hygiene green; commits with quoted-heredoc messages.
 
 ## Deviation Register
 

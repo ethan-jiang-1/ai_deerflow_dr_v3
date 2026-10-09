@@ -1,6 +1,6 @@
 # Issue: E —— real-model-io 完整图回放（零凭证驱动完整研究旅程）
 
-> 立卡: 2026-10-10 ｜ 状态: 推敲中 ｜ 类型: Task ｜ 毕业门: 未过 ｜ 可关闭: 否
+> 立卡: 2026-10-10 ｜ 关闭: 2026-10-10 ｜ 状态: 已结 ｜ 类型: Task ｜ 毕业门: 已过 → journal-real-model-io + fix-headless-plan-gate + land-complete-graph-replay ｜ 可关闭: 是
 
 **问题与期望结果：** CLS-017 遗留 E 项（"立项才动"）获驾驭者立项承诺（2026-10-10：费用与脱敏
 均放行，脱敏终审章仍归驾驭者）。目标：录制一次真实深研究旅程的完整模型 I/O（含多轮 key 链
@@ -25,14 +25,11 @@
 合规清单调研；内容天然干净便于脱敏终审）。其余按证据自决：journal 扩展 tool_calls 字段
 （向后兼容，旧行仍按 content 回放）；usage/token 仍不录（与级 4 token 边界一致）。
 
-**下一步：** **E-2 已落地（2026-10-10，BUG-001 修复后首跑即完整旅程）**：headless 真跑
-（bundle `55c35d44`）全链 journal 在案——`plan_proposed → plan_confirmed`（自动确认真梯实证）
-→ 27 web_search + 1 web_fetch → 15,272 字符真实研究报告（无计划标记、有 Sources）→ admit；
-`behavior-profile` 验收 `min_search_calls=1` 不再命中。**录制 journal 10 行完整 key 链**
-（计划轮 → 7 工具轮 → 报告轮，`runs/recordings/e2-model-io.jsonl`）；脱敏初筛 0 命中（key
-模式 0/27 条公开框架对比查询/报告公开来源）。**剩 E-3**：设计题——完整图回放需工具层同录
-（模型 key 链 + 搜索语料的 query→结果映射，bundle `diagnostics/searches/` 在案）；fixture 入库
-（含驾驭者终审章，初筛已过）+ 零凭证完整图回放测试 → 本卡关闭。
+**下一步：** **已收口（2026-10-10）**：E-1 `journal-real-model-io`（录制旋钮 + journal
+协议，四 follow-through）→ E-2 录制（BUG-001 修复 `fix-headless-plan-gate` 后验收跑
+`55c35d44` 完整旅程，journal 10 行 key 链 + 语料 28 条，脱敏 0 命中 + 预清）→ E-3
+`land-complete-graph-replay`（零凭证完整图回放测试 0：计划→确认→检索→报告逐字→admit）。
+全部归档；本卡按 ritual 关闭 CLS-021。
 
 ## 方案与取舍
 
