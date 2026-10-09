@@ -114,6 +114,37 @@ class JournalingMixinTest(unittest.TestCase):
 
 
 class AsyncPathTest(unittest.TestCase):
+    def test_sync_stream_path_journals_the_assembled_turn(self) -> None:
+        """The path the framework actually uses: v2 protocol streaming drives
+        the sync ``_stream`` bridge (never _generate/_agenerate/_astream — the
+        entry-point spy probe pinned it). A base with native _stream must be
+        journaled by the streaming override, chunks untouched."""
+        from langchain_core.messages import AIMessageChunk
+        from langchain_core.outputs import ChatGenerationChunk
+
+        class _SyncStreamScripted(ScriptedChatModel):
+            def _stream(self, messages, stop=None, run_manager=None, **kwargs):  # noqa: ANN001, ANN202
+                item = self.script[min(self.cursor, len(self.script) - 1)]
+                self.cursor += 1
+                text = str(item.get("content", ""))
+                for piece in (text[:2], text[2:]):
+                    yield ChatGenerationChunk(message=AIMessageChunk(content=piece))
+
+        class _JournaledSyncStream(JournalingMixin, _SyncStreamScripted):
+            def __init__(self) -> None:
+                ScriptedChatModel.__init__(self)
+                self._init_journal(pin="sync-stream-pin")
+
+        with tempfile.TemporaryDirectory() as td:
+            sink = Path(td) / "model-io.jsonl"
+            with _EnvScript([{"content": "同步流回答"}], sink):
+                model = _JournaledSyncStream()
+                pieces = [c.message.content for c in model._stream([HumanMessage(content="同步问")])]
+                self.assertEqual("".join(pieces), "同步流回答")
+                lines = [json.loads(l) for l in sink.read_text(encoding="utf-8").splitlines()]
+                self.assertEqual(len(lines), 1, f"expected one line, got {lines}")
+                self.assertEqual(lines[0]["output"], "同步流回答")
+
     def test_streaming_path_journals_the_assembled_turn(self) -> None:
         """The real bypass: OpenAI-family models stream natively via _astream,
         which never touches _generate/_agenerate. A base with its own _astream

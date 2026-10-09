@@ -29,6 +29,7 @@ from pathlib import Path
 
 from langchain_core.outputs import ChatGeneration, ChatResult
 
+from .scripted import ScriptedChatModel
 from .scripted.replay_model import _journal_tool_calls, replay_key
 
 SINK_ENV = "DEERFLOW_RECORD_SINK"
@@ -107,20 +108,48 @@ class JournalingMixin:
         return result
 
     async def _astream(self, messages, stop=None, run_manager=None, **kwargs):  # noqa: ANN001, ANN202
-        """Journal the streaming path — the framework drives the graph via
-        token streaming (``astream``), which reaches ``_astream`` natively on
-        OpenAI-family models and bypasses BOTH ``_generate`` and ``_agenerate``
-        (the first two E-2 attempts recorded zero lines exactly this way).
-        Chunks are re-emitted untouched and the assembled turn is journaled
-        after the stream ends; the duplicate guard folds the case where the
-        default ``_astream`` delegates through ``_agenerate``."""
+        """Journal the async streaming path."""
         chunks: list = []
         async for chunk in super()._astream(messages, stop=stop, run_manager=run_manager, **kwargs):
             chunks.append(chunk)
             yield chunk
+        self._journal_turn(chunks, messages)
+
+    def _stream(self, messages, stop=None, run_manager=None, **kwargs):  # noqa: ANN001, ANN202
+        """Journal the SYNC streaming path — the one the framework actually uses.
+
+        langchain-core's v2 protocol streaming (``_generate_with_cache`` →
+        ``_iter_v2_events`` when a ``_V2StreamingCallbackHandler`` opts in)
+        drives the native-or-compat ``_stream`` bridge and never reaches
+        ``_generate``/``_agenerate``/``_astream`` — the first three real E-2
+        attempts recorded zero lines exactly this way; the entry-point spy
+        probe pinned it (``invoke`` fired, nothing else did)."""
+        chunks: list = []
+        for chunk in super()._stream(messages, stop=stop, run_manager=run_manager, **kwargs):
+            chunks.append(chunk)
+            yield chunk
+        self._journal_turn(chunks, messages)
+
+    def _journal_turn(self, chunks: list, messages) -> None:  # noqa: ANN001
+        """Assemble one turn from stream chunks and journal it (shared)."""
         if not chunks:
             return
         message = chunks[0].message
         for chunk in chunks[1:]:
             message = message + chunk.message
         self._journal_result(messages, ChatResult(generations=[ChatGeneration(message=message)]))
+
+
+class JournalingScripted(JournalingMixin, ScriptedChatModel):
+    """The fixture-lane composition: the harness's scripted model, journaled.
+
+    Reachable through a configuration's ``use:`` seam for full-graph,
+    zero-API wiring probes of the journaling path. (Composed directly —
+    ScriptedChatModel is a harness class, so no lazy-import dance is needed
+    here; the real-model provider in ``recording_deepseek.py`` keeps its lazy
+    framework import because the framework must not load in the unit lane.)
+    """
+
+    def __init__(self, **kwargs) -> None:  # noqa: ANN401 — the config loader passes model kwargs
+        ScriptedChatModel.__init__(self, **kwargs)
+        self._init_journal(pin=None)
