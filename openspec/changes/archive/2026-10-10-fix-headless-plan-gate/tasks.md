@@ -19,7 +19,7 @@
 
 - [x] 4.1 Full receipts (exit codes read directly): `make verify`, `make smoke`, `check_doc_hygiene.py` + `--self-test`, `check_project_gate.py --phase plan --change` and `--phase closeout`, `openspec validate`. Verify: all exit 0; Delivery Record backfilled.
 - [ ] 4.2 Archive `fix-headless-plan-gate` (entry-surface + run-admission deltas sync into the main specs), BUG-001 fixed ritual (`git mv` to `_archived/_fixed_bugs/`, three-README linkage, first bug closure). Verify: strict-validate 0; hygiene green.
-- [ ] 4.3 The real-ladder acceptance run (after archive): headless `CONFIG=base make create` with a research problem + `DEERFLOW_RECORD_SINK` (this run is also E-2's recording) — acceptance: the journey shows plan → research (searches) → report; `behavior-profile` `min_search_calls` does NOT fire; the recording journal carries the full multi-turn key chain. Verify: profile verdict empty for `min_search_calls=1`; journal line count > 1 with tool-call turns.
+- [x] 4.3 The real-ladder acceptance run (after archive): headless `CONFIG=base make create` with a research problem + `DEERFLOW_RECORD_SINK` (this run is also E-2's recording) — acceptance: the journey shows plan → research (searches) → report; `behavior-profile` `min_search_calls` does NOT fire; the recording journal carries the full multi-turn key chain. Verify: profile verdict empty for `min_search_calls=1`; journal line count > 1 with tool-call turns.
 
 ## Deviation Register
 

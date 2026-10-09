@@ -25,11 +25,14 @@
 合规清单调研；内容天然干净便于脱敏终审）。其余按证据自决：journal 扩展 tool_calls 字段
 （向后兼容，旧行仍按 content 回放）；usage/token 仍不录（与级 4 token 边界一致）。
 
-**下一步：** **E-2/E-3 被 BUG-001 阻塞（如实记录）**：journaling 接线四轮 follow-through 修复后
-全通（v2 协议流 `_stream` 旁路是最终根因；微真梯探针 journal 1 行实证，key 403b9b3e）；但研究型
-问题连续四跑同形态退化（BUG-001），第四跑录制产物仅 1 行退化旅程（key 2fd65eea，2067 字符计划
-文本，零工具轮）且第二轮 key 不在 journal——E-3 完整图回放必然 ReplayMiss。脱敏初筛 0 命中
-（公开话题，内容干净）。**先修 BUG-001 恢复真研究旅程，再重录完整旅程 → E-3 → 本卡关闭**。
+**下一步：** **E-2 已落地（2026-10-10，BUG-001 修复后首跑即完整旅程）**：headless 真跑
+（bundle `55c35d44`）全链 journal 在案——`plan_proposed → plan_confirmed`（自动确认真梯实证）
+→ 27 web_search + 1 web_fetch → 15,272 字符真实研究报告（无计划标记、有 Sources）→ admit；
+`behavior-profile` 验收 `min_search_calls=1` 不再命中。**录制 journal 10 行完整 key 链**
+（计划轮 → 7 工具轮 → 报告轮，`runs/recordings/e2-model-io.jsonl`）；脱敏初筛 0 命中（key
+模式 0/27 条公开框架对比查询/报告公开来源）。**剩 E-3**：设计题——完整图回放需工具层同录
+（模型 key 链 + 搜索语料的 query→结果映射，bundle `diagnostics/searches/` 在案）；fixture 入库
+（含驾驭者终审章，初筛已过）+ 零凭证完整图回放测试 → 本卡关闭。
 
 ## 方案与取舍
 
