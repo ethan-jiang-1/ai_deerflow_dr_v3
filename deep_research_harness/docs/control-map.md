@@ -175,7 +175,7 @@ OpenSpec 开发工作区（规范、准入与治理 checker）、`_backlog/`（�
 - **权威事实源**：Run Bundle 合同 = `run-bundle` spec；验收收口 = `run-admission`
   spec；入口面 = `entry-surface` spec；框架接线 = `deerflow-wiring` spec；
   结构清单 = project-structure manifest。边界决策的历史推敲见
-  [`_backlog/_done/_settled_issues/`](../../_backlog/_done/_settled_issues/README.md)。
+  [`_backlog/_archived/_settled_issues/`](../../_backlog/_archived/_settled_issues/README.md)。
 
 ## 9. 发布形态与未实现清单
 
@@ -201,7 +201,7 @@ make create PROBLEM="研究问题" CONFIG=base   # 真实模型，需凭证
 - evidence 自动物化（搜索结果已物化到 `diagnostics/searches/` 可直读复核，但仍不自动进入 evidence/ 准入）。
 
 对外发布前需要补齐的服务化决策清单见
-[架构计划](../../_backlog/_done/_settled_issues/2026-10-05-runtime-test-interaction-architecture.md)（已验收关闭，Phase 5 裁决记录在案）。
+[架构计划](../../_backlog/_archived/_settled_issues/2026-10-05-runtime-test-interaction-architecture.md)（已验收关闭，Phase 5 裁决记录在案）。
 
 ## 10. 质量车道怎么选
 

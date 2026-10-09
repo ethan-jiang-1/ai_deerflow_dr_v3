@@ -17,11 +17,11 @@
 
 | 对象 | 裁决 | 触发条件（一次观察，出现在哪） | 家 |
 |---|---|---|---|
-| A5' 技能 review 面（adopt-skill-review-surface） | 降级为触发式，不预造 | 技能定制 change 入线时（该 change 的 proposal 阶段就会撞上） | [CLS-010](_done/_settled_issues/2026-10-04-test-doctrine-borrows.md) |
-| 时长基线分片 | 规模门槛，触发前不预支复杂度 | `make verify` 常规跑中单元测试 >500 或 gate 时长 >3 分钟 | [CLS-010](_done/_settled_issues/2026-10-04-test-doctrine-borrows.md) |
-| 迁移契约（逐 revision 回滚） | 规模门槛 | state schema 升 v2 的 change 入线时 | [CLS-010](_done/_settled_issues/2026-10-04-test-doctrine-borrows.md) |
-| 行为断言 eval 栈 | 规模门槛 | 需要断言"研究质量"本身时；CLS-020 已判条件满足、工作仍未立项——首轮收割即抓到的沉底实证 | [CLS-010](_done/_settled_issues/2026-10-04-test-doctrine-borrows.md) |
-| 跨栈契约 JSON / Playwright | 规模门槛 | 仓库出现前端目录/页面时 | [CLS-010](_done/_settled_issues/2026-10-04-test-doctrine-borrows.md) |
-| 集成真服务（Postgres/Redis 语义） | 规模门槛 | 第二个持久化后端入线时 | [CLS-010](_done/_settled_issues/2026-10-04-test-doctrine-borrows.md) |
-| playbook 预算化 | 刻意不做 | 文档审计发现 playbook 同类失控（一场景一文件/三类内容上限被冲破）再犯 | [CLS-011](_done/_settled_issues/2026-10-04-agent-playbook-and-minimal-release.md) |
-| 回执机器守卫 | 刻意不做 | 发现回执被绕过或造假的实例 | [CLS-011](_done/_settled_issues/2026-10-04-agent-playbook-and-minimal-release.md) |
+| A5' 技能 review 面（adopt-skill-review-surface） | 降级为触发式，不预造 | 技能定制 change 入线时（该 change 的 proposal 阶段就会撞上） | [CLS-010](_archived/_settled_issues/2026-10-04-test-doctrine-borrows.md) |
+| 时长基线分片 | 规模门槛，触发前不预支复杂度 | `make verify` 常规跑中单元测试 >500 或 gate 时长 >3 分钟 | [CLS-010](_archived/_settled_issues/2026-10-04-test-doctrine-borrows.md) |
+| 迁移契约（逐 revision 回滚） | 规模门槛 | state schema 升 v2 的 change 入线时 | [CLS-010](_archived/_settled_issues/2026-10-04-test-doctrine-borrows.md) |
+| 行为断言 eval 栈 | 规模门槛 | 需要断言"研究质量"本身时；CLS-020 已判条件满足、工作仍未立项——首轮收割即抓到的沉底实证 | [CLS-010](_archived/_settled_issues/2026-10-04-test-doctrine-borrows.md) |
+| 跨栈契约 JSON / Playwright | 规模门槛 | 仓库出现前端目录/页面时 | [CLS-010](_archived/_settled_issues/2026-10-04-test-doctrine-borrows.md) |
+| 集成真服务（Postgres/Redis 语义） | 规模门槛 | 第二个持久化后端入线时 | [CLS-010](_archived/_settled_issues/2026-10-04-test-doctrine-borrows.md) |
+| playbook 预算化 | 刻意不做 | 文档审计发现 playbook 同类失控（一场景一文件/三类内容上限被冲破）再犯 | [CLS-011](_archived/_settled_issues/2026-10-04-agent-playbook-and-minimal-release.md) |
+| 回执机器守卫 | 刻意不做 | 发现回执被绕过或造假的实例 | [CLS-011](_archived/_settled_issues/2026-10-04-agent-playbook-and-minimal-release.md) |

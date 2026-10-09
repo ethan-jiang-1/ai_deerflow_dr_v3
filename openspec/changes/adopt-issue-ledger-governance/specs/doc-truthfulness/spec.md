@@ -13,13 +13,13 @@ active zone — all enforced by the document-hygiene checker's red-first rules.
 ### Requirement: Ledger bookkeeping surfaces are machine-consistent
 
 The document-hygiene checker SHALL validate the `_backlog` ledger's bookkeeping
-surfaces — each active directory's README (`issues/`, `bugs/`), the `_done/README.md`
+surfaces — each active directory's README (`issues/`, `bugs/`), the `_archived/README.md`
 counters, and each archive subdirectory's index README (`_fixed_bugs/`,
 `_suspended_bugs/`, `_settled_issues/`, `_suspended_issues/`) — as one consistency
 surface: a work-item file present in an active or archive directory SHALL appear in that
 directory's README list, a README list row SHALL reference a file that exists on disk
 under the declared naming convention, and the counters and next-ID declarations in
-`_done/README.md` SHALL match the authoritative index tables and the disk inventory.
+`_archived/README.md` SHALL match the authoritative index tables and the disk inventory.
 The checker SHALL additionally validate card hukou and residency: every work-item card
 in an active directory SHALL carry a `状态：` field within its first 12 lines whose word
 is a member of that surface's declared status vocabulary, and an active card whose

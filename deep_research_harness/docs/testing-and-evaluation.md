@@ -60,4 +60,4 @@ DeerFlow 接线 / 事件 / checkpoint → make smoke
 
 ## 借鉴队列（已收口）
 
-队列已全部处置；全对照修订与逐项结论见 issue 卡 CLS-010（`_backlog/_done/_settled_issues/2026-10-04-test-doctrine-borrows.md`）。
+队列已全部处置；全对照修订与逐项结论见 issue 卡 CLS-010（`_backlog/_archived/_settled_issues/2026-10-04-test-doctrine-borrows.md`）。

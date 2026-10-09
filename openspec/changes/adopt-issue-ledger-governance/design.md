@@ -29,11 +29,12 @@ record.
 **Non-Goals:**
 
 - No mechanization of trigger-row semantics (borrowed ruling: semantic judgment is not
-  gate material; recurrence is the escalation path, not pre-arming).
+  gate material; recurrence is the escalation path, not pre-arming). Methods content is
+  likewise ungated (human-discipline surface; the link rule covers its files only if they
+  join the entry chain, which they deliberately do not).
 - No rewrite of frozen history: `openspec/changes/archive/` references and the 19
-  archived card bodies stay verbatim.
-- No `methods/` directory, no `_reference/` lifecycle, no YAML frontmatter, no CLS
-  renumbering.
+  archived card bodies stay verbatim (including their historical `_done` mentions).
+- No `_reference/` lifecycle, no YAML frontmatter, no CLS renumbering.
 
 ## Decisions
 
@@ -72,6 +73,25 @@ record.
    time and cited by live docs (`testing-and-evaluation.md` CLS-010, `docs/README.md`
    CLS-014); re-prefixing is pure churn with real link cost. The category name changes;
    the identity scheme does not.
+7. **Methods are digested, not copied (mid-apply user ruling 2026-10-09).** The original
+   plan refused a `methods/` directory; the user overturned it ("methods 很重要"). The
+   seven method bodies are rewritten against this repo's facts — downstream entry is
+   `openspec-propose` stopping at the admission boundary (`issue-to-change`, not
+   `issue-to-note`), evidence owners are the lane table and test-evidence policy, seam
+   classes use this repo's vocabulary, the research lifecycle is replaced by
+   evidence-on-card + `_reference/`, and the card naming/hukou rules follow this charter.
+   Methods are standing infrastructure (no roster, no hukou, no work-item lifecycle), and
+   the charter's routing table routes through them. Alternative rejected: verbatim copy —
+   their methods reference a `notes/` downstream, a `research/` directory, and their
+   skill-checkout paths, none of which exist here.
+8. **`_done/` → `_archived/` (mid-apply user ruling 2026-10-09).** The original plan kept
+   the name to avoid churn; the user overturned it. The honest-name argument wins: the
+   directory holds suspended (not-done) work, so `_done` lied about its contents the same
+   way `plans` lied about the category. Mechanically it is the same rename discipline as
+   decision 1 — one `git mv`, the checker's declaring tables (`BACKLOG_UNDERSCORE_DIRS`,
+   `BACKLOG_COUNTERS_FILE`, surface paths, fixtures), `required-paths.toml`, `.gitignore`,
+   and every live link move in the same revision; frozen bodies keep their historical
+   mentions.
 
 ## Risks / Trade-offs
 

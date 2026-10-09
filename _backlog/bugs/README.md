@@ -1,16 +1,16 @@
 # Active Bugs — 活跃 bug 列表
 
 >
-> **bug 编号权威在 `_done/_fixed_bugs/`；新 bug = 已分配的最大编号 + 1（已修复目录 ∪ 活跃目录），避免与活跃 bug 撞号。** 本文件只列活跃 bug。
+> **bug 编号权威在 `_archived/_fixed_bugs/`；新 bug = 已分配的最大编号 + 1（已修复目录 ∪ 活跃目录），避免与活跃 bug 撞号。** 本文件只列活跃 bug。
 
 ## 修完一个 bug 的步骤
 
-1. `git mv bugs/BUG-<NNN>-<slug>.md _done/_fixed_bugs/BUG-<NNN>-<slug>.md`
-2. 更新 `_done/_fixed_bugs/README.md`（加表格行 + 更新 Next available bug ID）
+1. `git mv bugs/BUG-<NNN>-<slug>.md _archived/_fixed_bugs/BUG-<NNN>-<slug>.md`
+2. 更新 `_archived/_fixed_bugs/README.md`（加表格行 + 更新 Next available bug ID）
 3. 更新本文件（删掉该 bug）
-4. 更新 `../_done/README.md`（计数 +1）
+4. 更新 `../_archived/README.md`（计数 +1）
 
-查明了、还没修的，用 `git mv` 进 [`../_done/_suspended_bugs/`](../_done/_suspended_bugs/README.md)——挂起不是修好，**挂起跟显式指示走**，agent 不得自行挂起。
+查明了、还没修的，用 `git mv` 进 [`../_archived/_suspended_bugs/`](../_archived/_suspended_bugs/README.md)——挂起不是修好，**挂起跟显式指示走**，agent 不得自行挂起。
 
 ## 状态词表（机器校验，`check_doc_hygiene.py` 强制）
 
@@ -29,7 +29,7 @@
 
 ---
 
-新建 bug 文件 `BUG-<NNN>-<slug>.md`，`<NNN>` 取 `_done/_fixed_bugs/README.md` 的 Next available ID：
+新建 bug 文件 `BUG-<NNN>-<slug>.md`，`<NNN>` 取 `_archived/_fixed_bugs/README.md` 的 Next available ID：
 
 ```markdown
 # BUG-<NNN>: <一句话标题>

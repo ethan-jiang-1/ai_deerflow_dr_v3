@@ -1,6 +1,6 @@
 # Settled Issues Index — 已结 issue 归档
 
-> 最后更新: 2026-10-09（adopt-issue-ledger-governance：plans 类别退役，本目录更名 `_settled_issues/`，CLS 编号连续） | `_backlog/_done/_settled_issues/` — 已结 issue 的归档目录。
+> 最后更新: 2026-10-09（adopt-issue-ledger-governance：plans 类别退役，本目录更名 `_settled_issues/`，CLS 编号连续） | `_backlog/_archived/_settled_issues/` — 已结 issue 的归档目录。
 > 接收来自 [`../../issues/`](../../issues/) 的卡。`_` 前缀 = coding agent 默认忽略。
 >
 > **卡结后文件名不变，位置即状态。** 移入时分配 `CLS-NNN` 序号，按完成时间递增。

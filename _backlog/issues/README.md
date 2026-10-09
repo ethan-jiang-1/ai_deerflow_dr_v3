@@ -1,18 +1,18 @@
 # Issues — 活跃 issue 列表（推敲 → 结论 → 交接）
 
 >
-> **CLS 编号权威在 `_done/_settled_issues/`；新号 = 已分配的最大编号 + 1，移入时分配（Next available plan ID: CLS-019）。本文件只列活跃 issue，活跃卡本身不带编号，文件名即标识。**
+> **CLS 编号权威在 `_archived/_settled_issues/`；新号 = 已分配的最大编号 + 1，移入时分配（Next available plan ID: CLS-019）。本文件只列活跃 issue，活跃卡本身不带编号，文件名即标识。**
 >
 > ⚠️ **文件名必须以日期编码开头：`YYYY-MM-DD-<name>.md`。这是强制约定，不是惯例**——无日期前缀的卡无法按时间排序与追溯（历史经验教训，v2 踩过）。
 
 ## 完成一个 issue 的步骤
 
-1. `git mv issues/<name>.md _done/_settled_issues/<name>.md`
-2. 更新 `_done/_settled_issues/README.md`（加一行 + 更新 Next available plan ID）
+1. `git mv issues/<name>.md _archived/_settled_issues/<name>.md`
+2. 更新 `_archived/_settled_issues/README.md`（加一行 + 更新 Next available plan ID）
 3. 更新本文件（删掉该卡）
-4. 更新 `../_done/README.md`（计数 +1 closed）
+4. 更新 `../_archived/README.md`（计数 +1 closed）
 
-**issue 是"分析/设计/复盘/推敲"卡，不是活跃 change 本身。** 真正的实施走 `openspec/changes/`；一旦其结论已被 change 吸收或落地，按上方 ritual 关闭。明确暂停的进 [`../_done/_suspended_issues/`](../_done/_suspended_issues/)——挂起不是完成。
+**issue 是"分析/设计/复盘/推敲"卡，不是活跃 change 本身。** 真正的实施走 `openspec/changes/`；一旦其结论已被 change 吸收或落地，按上方 ritual 关闭。明确暂停的进 [`../_archived/_suspended_issues/`](../_archived/_suspended_issues/)——挂起不是完成。
 
 ---
 

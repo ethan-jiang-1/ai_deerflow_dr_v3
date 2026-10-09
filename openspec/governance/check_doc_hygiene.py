@@ -63,7 +63,7 @@ BACKLOG_ROOT = Path("_backlog")
 # The checker requires this list, the filesystem, and the backlog README to
 # agree, so a living area cannot hide behind the `_` prefix.
 BACKLOG_UNDERSCORE_DIRS: tuple[str, ...] = (
-    "_done",
+    "_archived",
     "_reference",
 )
 ENTRY_DOCS: tuple[str, ...] = (
@@ -258,7 +258,7 @@ def _rule_backlog_underscore(root: Path) -> list[str]:
 
 # Ledger bookkeeping surfaces (rule 7). The "编号、索引、计数三处一致" ritual,
 # mechanized: active/archive work-item files must be indexed by their surface
-# README, index rows must resolve to disk, and _done/README.md counters must
+# README, index rows must resolve to disk, and _archived/README.md counters must
 # match disk. Adding a surface is a visible change to these tables.
 BACKLOG_ACTIVE_SURFACES: tuple[str, ...] = ("issues", "bugs")
 BACKLOG_ARCHIVE_SURFACES: tuple[str, ...] = (
@@ -267,7 +267,7 @@ BACKLOG_ARCHIVE_SURFACES: tuple[str, ...] = (
     "_settled_issues",
     "_suspended_issues",
 )
-BACKLOG_COUNTERS_FILE = "_done/README.md"
+BACKLOG_COUNTERS_FILE = "_archived/README.md"
 BACKLOG_NEXT_ID_RE = re.compile(r"\b([A-Z]{3})-(\d{3})\b")
 
 # Card hukou and residency (rule 7 continuation). Every active card carries a
@@ -324,7 +324,7 @@ STALE_MARKER_FILES: tuple[str, ...] = (
 MARKER_ALLOWLIST: dict[tuple[str, str], str] = {
     ("deep_research_harness/src/deerflow_deep_research/agents/__init__.py", "(skeleton)"):
         "the agents layer is genuinely empty; its fate is a deferred owning decision "
-        "(audit plan _backlog/_done/_settled_issues/2026-10-04-fresh-agent-doc-cleanup.md, not-in-scope item)",
+        "(audit plan _backlog/_archived/_settled_issues/2026-10-04-fresh-agent-doc-cleanup.md, not-in-scope item)",
 }
 
 def _rule_doc_budgets(root: Path) -> list[str]:
@@ -404,7 +404,7 @@ def _rule_ledger_consistency(root: Path) -> list[str]:
     The `_backlog` ritual states "编号、索引、计数三处一致"; this rule makes
     the stated ritual a checked invariant: every active/archive work-item file
     is indexed by its surface README, every index row resolves to disk, the
-    `_done/README.md` counters and Next-ID declarations match disk, and every
+    `_archived/README.md` counters and Next-ID declarations match disk, and every
     active card carries a vocabulary-checked hukou without a residency
     violation (graduated/closable cards must have left the active zone).
     """
@@ -414,7 +414,7 @@ def _rule_ledger_consistency(root: Path) -> list[str]:
         return problems
 
     def _surface_dir(surface: str) -> Path:
-        return backlog / surface if surface in BACKLOG_ACTIVE_SURFACES else backlog / "_done" / surface
+        return backlog / surface if surface in BACKLOG_ACTIVE_SURFACES else backlog / "_archived" / surface
 
     def _work_files(surface: str) -> list[Path]:
         surface_dir = _surface_dir(surface)
@@ -763,19 +763,19 @@ def _self_test() -> list[str]:
 
         # Rule 7 negatives: ledger index/counter drift must fail loudly.
         ledger = base / "ledger-repo"
-        for surface in ("issues", "_done/_settled_issues"):
+        for surface in ("issues", "_archived/_settled_issues"):
             surface_dir = ledger / "_backlog" / surface
             surface_dir.mkdir(parents=True, exist_ok=True)
         (ledger / "_backlog" / "issues" / "2026-10-01-demo.md").write_text("# issue\n", encoding="utf-8")
         (ledger / "_backlog" / "issues" / "README.md").write_text("# Issues\n\n（空）\n", encoding="utf-8")
-        (ledger / "_backlog" / "_done" / "_settled_issues" / "README.md").write_text(
+        (ledger / "_backlog" / "_archived" / "_settled_issues" / "README.md").write_text(
             "# Settled\n\n| ID | Date | File | Summary |\n|---|---|---|---|\n"
             "| CLS-001 | 2026-10-01 | [2026-10-01-gone.md](2026-10-01-gone.md) | x |\n\n"
             "**Next available plan ID: CLS-002**\n",
             encoding="utf-8",
         )
-        (ledger / "_backlog" / "_done" ).mkdir(parents=True, exist_ok=True)
-        (ledger / "_backlog" / "_done" / "README.md").write_text(
+        (ledger / "_backlog" / "_archived" ).mkdir(parents=True, exist_ok=True)
+        (ledger / "_backlog" / "_archived" / "README.md").write_text(
             "| 归档目录 | 数量 | Next ID |\n|---|---|---|\n"
             "| `_fixed_bugs/` | 0 | BUG-001 |\n| `_settled_issues/` | 1 | CLS-002 |\n",
             encoding="utf-8",
@@ -794,7 +794,7 @@ def _self_test() -> list[str]:
         # fresh ledger tree; the row references a file that exists on disk so
         # only the placement defect is exercised.
         placed = base / "placement-repo"
-        closed = placed / "_backlog" / "_done" / "_settled_issues"
+        closed = placed / "_backlog" / "_archived" / "_settled_issues"
         closed.mkdir(parents=True, exist_ok=True)
         (closed / "2026-10-01-here.md").write_text("# plan\n", encoding="utf-8")
         (closed / "README.md").write_text(
@@ -810,7 +810,7 @@ def _self_test() -> list[str]:
         placed_problems = _rule_ledger_consistency(placed)
         if not any("placement" in v for v in placed_problems):
             errors.append("self-test: ledger row placement defect not detected")
-        contiguous = placed / "_backlog" / "_done" / "_contiguous_plans"
+        contiguous = placed / "_backlog" / "_archived" / "_contiguous_issues"
         contiguous.mkdir(parents=True, exist_ok=True)
         (contiguous / "2026-10-01-here.md").write_text("# plan\n", encoding="utf-8")
         (contiguous / "README.md").write_text(

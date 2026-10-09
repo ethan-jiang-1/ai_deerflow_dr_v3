@@ -18,27 +18,37 @@ make `issues` the first-class category.
 ## What Changes
 
 - **BREAKING** ledger category rename (paths move, contents do not): `_backlog/plans/`
-  → `_backlog/issues/`; `_backlog/_done/_closed_plans/` → `_backlog/_done/_settled_issues/`;
-  `_backlog/_done/_suspended_plans/` → `_backlog/_done/_suspended_issues/`. The 19
-  archived cards move by `git mv` with bodies untouched (same-depth move, relative links
-  unaffected); the CLS-NNN identifier scheme is unchanged (Next = CLS-019). The two
-  category count stays two: issues / bugs.
+  → `_backlog/issues/`; `_backlog/_done/` → `_backlog/_archived/` (with
+  `_closed_plans/` → `_settled_issues/` and `_suspended_plans/` → `_suspended_issues/`
+  inside it). The 19 archived cards move by `git mv` with bodies untouched (same-depth
+  move, relative links unaffected); the CLS-NNN identifier scheme is unchanged (Next =
+  CLS-019). The two category count stays two: issues / bugs. The `_archived` rename is a
+  mid-apply user ruling (2026-10-09): the old name claimed "done" over a directory that
+  also holds suspended (not-done) work.
 - **Issue card template + status vocabulary** in `issues/README.md`: status line carries
   `状态` (`推敲中` / `等人拍板`), `毕业门` (`未过` / `已过 → change`), `可关闭` (`是` / `否`),
   `类型` (`Feature` / `Task` / `未定`); archive-side words `已结` / `叫停`; bug vocabulary
   gains `待修`. Old cards are not backfilled.
 - **Four-way closure-conditions table** in `_backlog/README.md`: 做 (→ Change Focus +
   change destination) / 以后做 (→ suspended pool or trigger row) / 不做 (→ reason + scope)
-  / 结论已在别处 (→ pointer), plus a step→owner routing table (no `methods/` directory —
-  the method owners already exist in `openspec/change-guidance/`, `governance/`, session
-  skills) and a dated 刻意不借 register (negative knowledge: no `research/` card-migration
-  lifecycle — `_reference/` stays a long-lived corpus; no YAML frontmatter; no `YYMMDD`
-  card names; no 🔒 reserved-card discipline).
+  / 结论已在别处 (→ pointer), plus a dated 刻意不借 register (negative knowledge: no
+  `research/` card-migration lifecycle — `_reference/` stays a long-lived corpus; no YAML
+  frontmatter; no `YYMMDD` card names; no 🔒 reserved-card discipline) with a reversal
+  record (翻案) section, so overturned rulings stay auditable.
+- **Methods library** `_backlog/methods/` (mid-apply user ruling 2026-10-09 — originally
+  registered as not-borrowed, overturned): the borrowing source's per-step methods,
+  digested and rewritten for this repo's context — downstream is the OpenSpec process
+  (`issue-to-change`, not `issue-to-note`), evidence owners are this repo's lane table and
+  test-evidence policy, vocabulary uses this repo's seam classification. 7 method files +
+  a navigation README; methods are standing infrastructure, not work items (no roster,
+  no hukou); the charter's routing table routes through them.
 - **Live trigger index** `_backlog/triggers.md`: one row per deferred verdict that fails
   without it — object / ruling / one self-encountering observation / home; deferred
   verdicts do not auto-add rows; scan moments are change-archive closeout, the
   supersede-check before opening a new card, and stage closeouts. Seed harvest runs over
-  the 19 archived cards under the admit bar (expected: 2–4 rows; "user names it" style
+  the 19 archived cards under the admit bar (landed: 8 rows kept, 4 candidates rejected
+  with recorded reasons — including the "行为断言 eval 栈" row whose condition CLS-020
+  had already observed met, the sinking case the index exists for; "user names it" style
   triggers are rejected). The index is a pointer ledger, not a second truth home; the
   suspended-pool boundary is unchanged. It is NOT machine-gated for content semantics
   (borrowed ruling: semantic judgment is not mechanized); it IS covered by the existing
@@ -52,11 +62,14 @@ make `issues` the first-class category.
   link/newline coverage; self-test fixtures grow red-green pairs for both rules. The
   reverse roster direction (disk file must be indexed) is already enforced by the
   existing ledger rule and is deliberately not duplicated.
-- **Live touchpoints synced in the same revision**: `required-paths.toml` (7 backlog
-  path entries move; `_backlog/triggers.md` added), root `AGENTS.md` ledger cell
-  (`plans / bugs` → `issues / bugs`, character-neutral against its 2425 ceiling),
-  `openspec/README.md` step-1 label, `deep_research_harness/docs/control-map.md` (2
-  links) and `testing-and-evaluation.md` (1 link) re-pointed to `_settled_issues/`.
+- **Live touchpoints synced in the same revision**: `required-paths.toml` (backlog path
+  entries move, `_backlog/triggers.md` and `_backlog/methods/README.md` added), root
+  `AGENTS.md` ledger cell (`plans / bugs` → `issues / bugs`, within its 2425 ceiling —
+  measured 2419→2420), `openspec/README.md` step-1 label,
+  `deep_research_harness/docs/control-map.md` (2 links) and `testing-and-evaluation.md`
+  (1 link) re-pointed to `_archived/_settled_issues/`, `_backlog/.gitignore`
+  (`_archived/_evidence/`), and `openspec/governance/README.md`'s checker-inventory row
+  extended to describe the ledger/hukou/residency rules it now carries.
 - **Frozen history is not rewritten**: the ~30 `_backlog/plans/…` references inside
   `openspec/changes/archive/` stay as historical record; the 19 archived card bodies
   stay verbatim.
@@ -80,21 +93,25 @@ make `issues` the first-class category.
 ## Impact
 
 - Moved (git mv, bodies unchanged): `_backlog/plans/` → `_backlog/issues/` (README only,
-  plus the reborrow card migrates in at apply time); `_done/_closed_plans/` (19 cards) →
-  `_done/_settled_issues/`; `_done/_suspended_plans/` → `_done/_suspended_issues/`.
-- New: `_backlog/triggers.md`.
+  plus the reborrow card migrates in at apply time); `_backlog/_done/` →
+  `_backlog/_archived/` (19 settled cards + the four archive subdirectories inside).
+- New: `_backlog/triggers.md`; `_backlog/methods/` (README + 7 method files).
 - Modified: `openspec/governance/check_doc_hygiene.py` (surface tables, two new rules,
   `ENTRY_DOCS`, self-test fixtures — no new script, no new dependency);
-  `openspec/governance/required-paths.toml`; root `AGENTS.md` (one table cell);
+  `openspec/governance/required-paths.toml`; `openspec/governance/README.md` (one
+  checker-inventory row); root `AGENTS.md` (one table cell);
   `openspec/README.md` (one label); `deep_research_harness/docs/control-map.md`,
   `deep_research_harness/docs/testing-and-evaluation.md` (link re-points);
-  `_backlog/README.md`, `_backlog/issues/README.md`, `_backlog/bugs/README.md`,
-  `_backlog/_done/README.md`, `_backlog/_done/_settled_issues/README.md`,
-  `_backlog/_done/_suspended_issues/README.md`.
+  `_backlog/.gitignore`; `_backlog/README.md`, `_backlog/issues/README.md`,
+  `_backlog/bugs/README.md`, `_backlog/_archived/README.md`,
+  `_backlog/_archived/_settled_issues/README.md`,
+  `_backlog/_archived/_suspended_issues/README.md`.
 - Not touched: `deerflow/` gitlink (read-only, never modified or source-browsed by this
   change); `deep_research_harness/src/` behavior and tests; CI workflow; the archived
-  change records under `openspec/changes/archive/`; the suspended-pool semantics
-  (`_suspended_issues/` keeps its "explicit pause, needs a new ruling to revive" rules).
+  change records under `openspec/changes/archive/`; the frozen bodies of the 19 archived
+  cards (their historical `_done`/`_closed_plans` mentions stay verbatim); the
+  suspended-pool semantics (`_suspended_issues/` keeps its "explicit pause, needs a new
+  ruling to revive" rules).
 
 ## Change Focus
 
@@ -127,8 +144,9 @@ make `issues` the first-class category.
   surface tables and `required-paths.toml` updated together); live-run receipts:
   `check_doc_hygiene.py` (incl. `--self-test`), `check_project_gate.py --phase
   plan/closeout`, `make verify` — all exit 0.
-- **Not in scope:** a `methods/` directory (router table only); a card-migration
-  lifecycle for `_reference/`; YAML frontmatter or `YYMMDD` card names; any 🔒
-  reserved-card discipline; re-litigating the subjects of trigger rows (rows are
-  pointers; owners unchanged); opening the work any trigger row points at.
+- **Not in scope:** a card-migration lifecycle for `_reference/`; YAML frontmatter or
+  `YYMMDD` card names; any 🔒 reserved-card discipline; re-litigating the subjects of
+  trigger rows (rows are pointers; owners unchanged); opening the work any trigger row
+  points at; mechanizing trigger-row semantics or methods content (both stay
+  human-discipline surfaces).
 - **Triggered review policies:** change-admission, local-context
