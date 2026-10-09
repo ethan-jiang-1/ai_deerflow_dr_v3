@@ -1,6 +1,6 @@
 # Closed Plans Index — 已完成 plan 归档
 
-> 最后更新: 2026-10-08（application-corpus-adoption 关闭：CLS-017，八 change 归档） | `_backlog/_done/_closed_plans/` — 已完成 plan 的归档目录。
+> 最后更新: 2026-10-09（clarification-channel-discipline 关闭：CLS-018，同日立卡→change→真梯验收→归档闭环） | `_backlog/_done/_closed_plans/` — 已完成 plan 的归档目录。
 > 接收来自 [`../../plans/`](../../plans/) 的 plan。`_` 前缀 = coding agent 默认忽略。
 >
 > **plan 完成后文件名不变，位置即状态。** 移入时分配 `CLS-NNN` 序号（Closed），按完成时间递增。
@@ -35,6 +35,7 @@ plan 完成后从 `_backlog/plans/` 通过 `git mv` 移入本目录：
 | CLS-014 | 2026-10-06 | [2026-10-05-runtime-test-interaction-architecture.md](2026-10-05-runtime-test-interaction-architecture.md) | Runtime/Test/Interaction/AgentLoop 结构与控制面重整主计划：Phase 0–4 五 change 归档 + Phase 5 八项裁决收官（三项落地、五项维持现状已记录）；2026-10-06 §8 验收清单正式执行全勾（verify/smoke/7 checker/git 检查全 0，11c29fe）；assembly/execution 采有原则退让（entry.py/run_engine.py 平铺，单文件不满足建目录原则）；后续结构维护由应用 docs/README.md 的地图维护触发条件承接（CLS-015） |
 | CLS-015 | 2026-10-06 | [2026-10-05-agent-friendly-repository-map.md](2026-10-05-agent-friendly-repository-map.md) | Agent-friendly Repo 持续整理维护卡：两轮结构整理落地（clarify-application-surfaces + relocate-runs-and-clarify-structure）；触发表由 docs/README.md "地图维护触发条件"节吸收，活跃队列不再留常驻卡（回执 json 随卡归档） |
 | CLS-016 | 2026-10-07 | [2026-10-07-plan-review-gate.md](2026-10-07-plan-review-gate.md) | 计划确认闸门：agent 交计划、操作者审改确认后开跑；plan-review-gate 落地后真梯演示暴露检测缺陷（报告被误当计划），plan-marker-detection 以内容标记修复并固化回归；交互反问先行落地为 interactive-clarification |
+| CLS-018 | 2026-10-09 | [2026-10-07-clarification-channel-discipline.md](2026-10-07-clarification-channel-discipline.md) | 反问/计划通道纪律：吸收反问记 journal clarification_absorbed（5128f695 静默吸收黑洞消除，纯谓词与未答谓词对称）+ 计划框架消息通道纪律措辞（提问轮只带 ask_clarification、计划确认只走标记）；真梯自驱动验收全绿（标记遵从/走私消失/预算 0/2/journal 完整），自驱动替代真人 TTY 已登记 Deviation Register |
 | CLS-017 | 2026-10-08 | [2026-10-08-application-corpus-adoption.md](2026-10-08-application-corpus-adoption.md) | 应用开发语料吸收主卡：C1 闭环地图 + C2 权威三件套（Deviation Register/Delivery Record 常设段+CHA-001 守卫）+ C3 钉定纪律与语料入库（38 文件）+ C6 第一批（C 回放物化/A 来源可溯机器/B 结构契约准入+hash_mismatch 退役+spec sync）+ C4/C5 小件，八 change 全归档；E/F 立项才动、G 显式不做 |
 
-**Next available plan ID: CLS-018**
+**Next available plan ID: CLS-019**

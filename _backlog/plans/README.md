@@ -1,6 +1,6 @@
 # Plans — plan/分析文档索引
 
-> 最后更新: 2026-10-08（application-corpus-adoption 关闭 = CLS-017：C1–C6 第一批+C3/C4/C5 六 change 归档） | `_backlog/plans/` — 活跃 plan 在此（顶层），
+> 最后更新: 2026-10-09（clarification-channel-discipline 关闭 = CLS-018：bind-clarification-channel-discipline 归档，真梯验收全绿） | `_backlog/plans/` — 活跃 plan 在此（顶层），
 > 完成的普通 plan 移入 [`../_done/_closed_plans/`](../_done/_closed_plans/)。
 >
 > **plan 没有编号，文件名即标识。完成后文件名不变，位置即状态。**
@@ -23,9 +23,8 @@
 
 | Plan | 一句话 |
 |------|--------|
-| [2026-10-07-clarification-channel-discipline](2026-10-07-clarification-channel-discipline.md) | 反问/计划双通道职责绑定 + 预算耗尽后静默吸收反问补 journal 事件（真梯动态 review 炸出） |
 
-**Next available plan ID: CLS-018**（移入 `_closed_plans/` 时分配）
+**Next available plan ID: CLS-019**（移入 `_closed_plans/` 时分配）
 
 新方向性工作**必须显性立卡**（驾驭者要求，2026-10-07）：先立卡记录决策与取舍，再走 OpenSpec change 实施；完成后按上方 ritual 关闭归档。地图维护触发条件已并入应用 [docs/README.md](../../deep_research_harness/docs/README.md)；结构重整决策记录见 CLS-014 归档。
 

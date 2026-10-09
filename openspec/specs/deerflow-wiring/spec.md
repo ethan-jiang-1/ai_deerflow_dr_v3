@@ -64,23 +64,32 @@ the returned non-empty answer as the continuation message; an empty or declined 
 SHALL fall back to the bounded automatic continuation — a provenance-marked system
 reply within the state bound — and exhausting the bound transfers to `failed-resume`
 with the question text preserved in `diagnostics/`. Without a hook the engine SHALL
-apply the bounded automatic continuation unchanged.
+apply the bounded automatic continuation unchanged. An `ask_clarification` call that
+the terminal turn itself resolves — its call id appears in the answered set because the
+framework answered it within the same turn, without the run's hook — SHALL be journaled
+as an absorbed clarification round with the question text; the engine SHALL act on no
+absorbed round (no continuation, no bound consumption, no terminal change).
 
 When a plan hook is provided for a first-generation run, the engine SHALL enter a
 plan phase: the first message is the problem text with a plan-request framing that
-asks for the plan wrapped in explicit plan markers, and the first final text carrying
-the markers is the PROPOSED PLAN — the extracted inner text (markers stripped) SHALL
-NOT be admitted as a final answer. The engine SHALL deliver the extracted plan to the
-hook; a returned plan string is injected as the continuation message on the same
-thread (confirmed or user-amended), and a `None` return injects a skip-proceed
-message. A plan-phase turn whose final text carries no markers SHALL degrade the gate
-honestly — whether it is a research report, a non-plan answer, or an empty reply, and
-regardless of the turn's tool calls (the terminal picture cannot distinguish a
-research turn from a plan turn; detection is deterministic content structure, never
-behavioral inference): the engine journals the degradation, clears the plan phase, and
-proceeds under the rules above — the gate never force-blocks the agent. A
-clarification detected during the plan phase SHALL be handled by the clarification
-rules unchanged (the plan arrives on a later marked turn).
+asks for the plan wrapped in explicit plan markers and binds the two channels — a
+clarification turn carries only `ask_clarification` (no sibling tool calls; the
+framework's middleware drops them by design), and plan confirmation travels only
+through the markers, never inside an `ask_clarification` call — and the first final
+text carrying the markers is the PROPOSED PLAN — the extracted inner text (markers
+stripped) SHALL NOT be admitted as a final answer. The engine SHALL deliver the
+extracted plan to the hook; a returned plan string is injected as the continuation
+message on the same thread (confirmed or user-amended), and a `None` return injects a
+skip-proceed message. A plan-phase turn whose final text carries no markers SHALL
+degrade the gate honestly — whether it is a research report, a non-plan answer, or an
+empty reply, and regardless of the turn's tool calls (the terminal picture cannot
+distinguish a research turn from a plan turn; detection is deterministic content
+structure, never behavioral inference): the engine journals the degradation, clears the
+plan phase, and proceeds under the rules above — the gate never force-blocks the agent,
+and the channel binding in the framing is wording-level constraint under the same
+honest-degradation philosophy, never a hard block. A clarification detected during the
+plan phase SHALL be handled by the clarification rules unchanged (the plan arrives on a
+later marked turn).
 
 The engine SHALL treat a framework error-fallback message — the final AI message
 carrying the `deerflow_error_fallback` marker that the framework's error-handling
@@ -148,6 +157,15 @@ terminal state contradicting the state machine.
 
 - **WHEN** a run completes cleanly with a non-empty final answer
 - **THEN** the engine submits the answer as a final_report through the admission hold point, and an admitted report file appears under final/ with a ledger admit entry
+
+#### Scenario: The framing binds the channels and absorbed rounds stay observable
+
+- **WHEN** a plan-phase framing is composed, or a terminal turn's `ask_clarification`
+  calls are all resolved by the turn's own answered set
+- **THEN** the framing instructs that question turns carry only `ask_clarification`
+  and plan confirmation only travels through the plan markers, and each absorbed
+  round is journaled with its question text without triggering a continuation,
+  consuming the bound, or altering the terminal disposition
 
 ### Requirement: Every run records an assembly snapshot
 

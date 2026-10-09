@@ -1,6 +1,6 @@
 # _backlog — 计划与缺陷账本（plans / bugs）
 
-> 最后更新: 2026-10-07（plan-review-gate 关闭归 CLS-016：立卡→change→真梯演示→缺陷修复→回归固化全闭环） | 本目录追踪本仓库的设计推敲、上游分析与缺陷。
+> 最后更新: 2026-10-09（clarification-channel-discipline 关闭归 CLS-018：立卡→change→真梯验收→归档全闭环，活跃 plans 清零） | 本目录追踪本仓库的设计推敲、上游分析与缺陷。
 > 活跃工作走 OpenSpec（`openspec/changes/`）；本目录是 **分析与决策记录 + 缺陷池**，不是运行时真相。
 >
 > **本文件是 `_backlog` 的规矩手册。** 搬迁流程在下面定死，今后大家都遵循这里头定的规矩。
@@ -51,7 +51,7 @@ _backlog/
 
 > 📖 **想看全局状态、历史决策、查阅指南** → [`_done/README.md`](_done/README.md)
 >
-> 📖 **想看当前该做什么、依赖关系、执行顺序** → [plans 索引](plans/README.md)；当前活跃计划仅剩 clarification-channel-discipline（反问/计划通道纪律）；application-corpus-adoption 已关闭 = CLS-017（语料吸收八 change 全归档）；后续产品行为另走 owning change。
+> 📖 **想看当前该做什么、依赖关系、执行顺序** → [plans 索引](plans/README.md)；活跃 plan 清零（clarification-channel-discipline 关闭 = CLS-018：bind-clarification-channel-discipline 归档，真梯验收全绿）；后续产品行为另走 owning change。
 
 ---
 

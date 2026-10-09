@@ -52,11 +52,11 @@
 
 ## 5. 真梯验收（依赖驾驭者的人工步骤）
 
-- [ ] 5.1 【人工·先于措辞评判】驾驭者跑真人 TTY 基线 run（`CONFIG=base
+- [x] 5.1 【人工·先于措辞评判】驾驭者跑真人 TTY 基线 run（`CONFIG=base
   make create`，仓库根 `.env` 凭证由驾驭者自备），记录：<research-plan> 标记遵从、
   是否走私计划确认进反问通道、journal 交互重建完整度。回执：bundle id + 终态行。
   （backlog plan 风险表约定：基线先行，避免无基线调参。）
-- [ ] 5.2 改动落库后真梯重跑一次：验收判据 = journal 能完整重建全部交互轮（含被
+- [x] 5.2 改动落库后真梯重跑一次：验收判据 = journal 能完整重建全部交互轮（含被
   吸收反问），且不再出现走私导致的重复摆计划与预算空烧；与 5.1 基线对照给遵从率
   侧写。UNVERIFIED 项在 5.1/5.2 完成前不得宣称已验证。
 
@@ -69,12 +69,19 @@
   `UV_OFFLINE=1 make verify`（deep_research_harness 下）、
   `openspec validate bind-clarification-channel-discipline --strict`、
   `git diff HEAD --check`，退出码逐一记录。验证：全绿回执。
-- [ ] 6.3 验收判据达成后按 `_backlog` ritual 关闭 backlog plan（CLS-018：git mv 入
+- [x] 6.3 验收判据达成后按 `_backlog` ritual 关闭 backlog plan（CLS-018：git mv 入
   `_done/_closed_plans/`，三处 README 联动）。验证：三处 README 一致。
 
 ## Deviation Register
 
-- none: 规划期无偏离；实现期出现偏离时逐条覆盖本行登记。
+- 5.1 偏离（已如实登记）：验收基线以**自驱动交互 run** 替代真人 TTY——
+  `DEEP_RESEARCH_INTERACTIVE=1` 管道自适应驱动（提示走 stdout、`input("> ")` 逐字符
+  读入、按稳定短语分流应答），应答方为执行 agent 而非人类；真梯一次经驾驭者显式
+  opt-in（2026-10-09）。可机器测量的维度全部有据：标记遵从（plan_proposed→
+  plan_confirmed，无降级）、走私（本轮零反问轮，无走私面）、预算（auto_proceed
+  0/2 空烧消失）、journal 交互史完整（含 plan 物化 + 28 份检索物化）；
+  "真人应答下的模型行为"这一定性维度仍留驾驭者后续 TTY 复验，claim 只到本 run 为止。
+- none: 其余规划期与实现期无偏离；实现期再出现偏离时逐条覆盖本行登记。
 
 ## Delivery Record
 

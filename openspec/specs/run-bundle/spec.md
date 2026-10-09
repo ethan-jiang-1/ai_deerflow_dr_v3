@@ -167,9 +167,14 @@ to the automatic continuation: the bound allows at most N automatic continuation
 with provenance-marked replies, the count is recorded in `state.json`, and exhausting
 the bound SHALL transfer the bundle to `failed-resume` with the unanswered question text
 preserved in `diagnostics/`. Runs without a hook (headless) SHALL behave exactly as the
-bounded automatic continuation. Every clarification round — asked, answered, or
-declined — SHALL be journaled. The client re-invocation loop itself is owned by the
-wiring change.
+bounded automatic continuation. Every clarification round — asked, answered, declined,
+or absorbed — SHALL be journaled: an `ask_clarification` call that the terminal turn
+itself resolves (its call id appears in the answered set because the framework answered
+it within the same turn, without the run's hook) SHALL be journaled as its own
+clarification round with the question text, so the interaction history is
+reconstructable with no silent absorption. An absorbed round is a recorded observation
+only: it SHALL change no state-machine fact, consume no bound, and trigger no
+continuation. The client re-invocation loop itself is owned by the wiring change.
 
 #### Scenario: Exhausting the continuation bound transfers to failed-resume
 
@@ -191,6 +196,15 @@ wiring change.
 - **WHEN** the hook returns an empty answer (the operator declines)
 - **THEN** the run continues with the provenance-marked automatic reply and the round
   consumes the auto bound exactly as a headless continuation would
+
+#### Scenario: An absorbed clarification round is journaled, never acted on
+
+- **WHEN** a terminal turn carries an `ask_clarification` whose call id the turn's own
+  answered set resolves (the framework answered it in-turn, so no unanswered question
+  is detected) — headless or interactive, with or without a hook
+- **THEN** the round is journaled with the question text, the run's terminal rules and
+  `auto_proceed_count` are exactly as if the call had not existed, and no continuation
+  is triggered by the absorbed round
 
 ### Requirement: The journal is bounded, append-only, and never evicts admission anchors
 
