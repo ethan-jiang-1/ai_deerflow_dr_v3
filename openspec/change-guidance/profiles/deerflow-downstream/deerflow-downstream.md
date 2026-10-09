@@ -18,7 +18,7 @@ its release by default: when a claim rests on docs, verify against source at the
 pinned revision before relying on it (the application corpus records concrete
 divergences). When the gitlink advances (re-pin), re-review every standing upstream
 claim against the new revision — the retained corpus under
-`_backlog/_reference/deerflow-application-corpus/` keeps the re-review triggers
+`_backlog/_research/deerflow-application-corpus/` keeps the re-review triggers
 for its own conclusions.
 
 ## Upstream Boundaries
