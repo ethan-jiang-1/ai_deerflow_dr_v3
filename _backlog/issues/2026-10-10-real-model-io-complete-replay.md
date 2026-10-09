@@ -56,9 +56,11 @@ F（陈述级接地）与 G（方差）维持 CLS-017 裁决；录制工具的�
 
 change 家族：**E-1 done**（`journal-real-model-io`，archive `2026-10-10-journal-real-model-io`：
 record 配置 + JournalingMixin/组合 provider + journal 协议扩展（tool_calls，向后兼容）+ sidecar；
-两条偏离在案——unit→integration 车道修正、import 守卫逮住的二级相对导入 bug）→ **E-2 真跑录制**
-（下一片：`DEERFLOW_RECORD_SINK=<path> make create PROBLEM=<公开话题> CONFIG=record`，费用承诺已给）
-→ 脱敏初筛 + 驾驭者终审 → **E-3 零凭证完整图回放测试**（其_own change）。本卡在 E-3 归档后关闭
+三条偏离在案——unit→integration 车道修正、import 守卫逮住的二级相对导入 bug、**CLI argparse
+choices 漏放 record**（E-1 声称"直传已处理"只对一半：composition 映射在、choices 没放开——
+E-2 首触发即被 argparse 逮红，一行修复 + verify 0 直落，spec 不钉 choices 属实现细节））→
+**E-2 真跑录制**（进行中：`DEERFLOW_RECORD_SINK=… CONFIG=record make create`）→ 脱敏初筛 +
+驾驭者终审 → **E-3 零凭证完整图回放测试**（其_own change）。本卡在 E-3 归档后关闭
 （CLS-021+），去向登记。
 
 ## 关闭条件

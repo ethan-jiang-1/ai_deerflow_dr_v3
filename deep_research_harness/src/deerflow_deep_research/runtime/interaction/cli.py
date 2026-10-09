@@ -270,7 +270,7 @@ def main(argv=None) -> int:
 
     create = sub.add_parser("create", help="start a bundle and run in the foreground")
     create.add_argument("problem")
-    create.add_argument("--config", choices=["fixture", "base"], default="fixture")
+    create.add_argument("--config", choices=["fixture", "base", "record"], default="fixture")
     create.set_defaults(func=cmd_create)
 
     for name, func, help_text in (
