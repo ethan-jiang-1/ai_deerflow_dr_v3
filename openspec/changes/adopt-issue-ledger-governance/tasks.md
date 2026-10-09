@@ -29,8 +29,8 @@
 
 ## 5. Full gate receipt and closeout
 
-- [ ] 5.1 Run the canonical receipt sequence and record command + exit code + revision: `python3 openspec/governance/check_doc_hygiene.py` (incl. `--self-test`), `python3 openspec/governance/check_project_gate.py --phase plan` and `--phase closeout`, `make verify`. Verify: all exit 0; receipts written under the change directory per closeout policy.
-- [ ] 5.2 Prove-it-red spot check on the live tree: temporarily declare the reborrow card `毕业门：已过` → expect the residency rule to name it; revert; expect green. Verify: both exit codes recorded (never committed in the red state).
+- [x] 5.1 Run the canonical receipt sequence and record command + exit code + revision: `python3 openspec/governance/check_doc_hygiene.py` (incl. `--self-test`), `python3 openspec/governance/check_project_gate.py --phase plan` and `--phase closeout`, `make verify`. Verify: all exit 0; receipts written under the change directory per closeout policy.
+- [x] 5.2 Prove-it-red spot check on the live tree: temporarily declare the reborrow card `毕业门：已过` → expect the residency rule to name it; revert; expect green. Verify: both exit codes recorded (never committed in the red state).
 - [ ] 5.3 Closeout: sync delta spec per policy, `openspec archive adopt-issue-ledger-governance`, ledger ritual (CLS-019 assigned at settle; three-README linkage), and the change's closeout evidence recorded. Verify: archive strict-validate exit 0; `_settled_issues/` index row present; counters updated.
 
 ## 6. Methods library (mid-apply user ruling 2026-10-09)
@@ -66,7 +66,16 @@
   `openspec/governance/README.md` checker 行补账本面描述；`_backlog` 8 份 README + 章程 +
   `.gitignore` + triggers.md + methods/ 8 文件；根 `AGENTS.md` 1 cell（2420/2425）；
   `openspec/README.md` 1 label；应用 docs 2 文件 3 链接；19 张归档卡 `git mv` 正文零改动。
-- **实际跑了什么**: 待收口段（5.1/5.2 回执后回填）。
+- **实际跑了什么**（退出码一律直读，无管道；跑于 apply 工作树，HEAD `cbf6984` + 本 change 未提交改动，apply commit 紧随）:
+  `check_doc_hygiene.py --self-test` → 0（含户口/滞留/触发器断链红绿夹具与"等人拍板不误杀"负例）；
+  `check_doc_hygiene.py` live → 0（更名后全账本面绿）；`check_project_gate.py --phase plan --change` → 0
+  （guidance/delta/strict 三组件）；`check_project_gate.py --phase closeout` → 0（六组件各 0）；
+  `make verify`（deep_research_harness）→ 0；`openspec validate` → valid；prove-it-red：翻
+  `毕业门: 已过` → exit 1 且点名 `issues/2026-10-09-backlog-governance-reborrow.md`，还原 → exit 0
+  （红态未提交）。门禁过程真红三例均已修复：`triggers.md` 缺失（ENTRY_DOCS 新条目按设计报红→落盘）、
+  `openspec/README.md` 断链（label 改写时误删 `../` 前缀→补回）、tasks.md 缺常设段（gate 报
+  Deviation Register/Delivery Register→补齐）；最终残留 grep 由 `.venv` 噪声滤出真残留一处
+  （`_reference/README.md` 旧 `plans/` 指向→修正），活文件清零。
 - **未执行的检查**: `make smoke`（应用集成梯）——本 change 零应用代码/测试改动，按窄证据政策不整跑；
   CI 远端序列 UNVERIFIED-until-push（仓库惯例）。
 - **AI 参与披露**: 本 change 由 coding agent（GLM，经 DeepSeek Harness）起草并实现，驾驭者拍板
