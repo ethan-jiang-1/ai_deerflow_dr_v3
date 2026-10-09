@@ -20,9 +20,8 @@
 
 | Issue | 一句话 |
 |------|--------|
-| [2026-10-10-real-model-io-complete-replay.md](2026-10-10-real-model-io-complete-replay.md) | E·完整图回放：录制旋钮+journal 协议扩展（E-1 journal-real-model-io）→ 真跑录制 → 脱敏终审 → 零凭证完整图回放 |
 
-**Next available issue ID: CLS-021**（移入 `_settled_issues/` 时分配；CLS-019/020 已分配）
+**Next available issue ID: CLS-022**（移入 `_settled_issues/` 时分配；CLS-019/020/021 已分配）
 
 新方向性工作**必须显性立卡**（驾驭者要求，2026-10-07）：先立卡记录决策与取舍，再走 OpenSpec change 实施；完成后按上方 ritual 关闭归档。
 
