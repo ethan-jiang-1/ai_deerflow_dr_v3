@@ -13,7 +13,7 @@ from pathlib import Path
 from ...domain import bundle
 from .contracts import client_surface
 
-CONFIG_NAMES: tuple[str, ...] = ("base", "fixture")
+CONFIG_NAMES: tuple[str, ...] = ("base", "fixture", "record")
 
 # The embedded stream's recursion limit is a PER-CALL override (upstream
 # deerflow/backend/packages/harness/deerflow/client.py:293) — the

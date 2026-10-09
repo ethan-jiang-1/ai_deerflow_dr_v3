@@ -61,7 +61,7 @@ class MirrorTest(unittest.TestCase):
 
 class ConfigResolutionTest(unittest.TestCase):
     def test_explicit_existing_paths_resolve(self) -> None:
-        for name in ("base", "fixture"):
+        for name in ("base", "fixture", "record"):
             path = client_binding.resolve_config_path(_CONFIG_ROOT, name)
             self.assertTrue(path.is_file(), path)
             self.assertEqual(path.parent, _CONFIG_ROOT)
