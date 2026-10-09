@@ -30,6 +30,9 @@ PLAN_REQUEST_SUFFIX = (
     "\n\n请先给出研究计划（研究角度、查询策略、来源类型），全文用 <research-plan> 和 "
     "</research-plan> 标记包裹，然后停止等待确认；不要在此轮执行搜索。"
     "如需先澄清问题，请直接提问，获得回答后请再次输出带标记的研究计划。"
+    "通道纪律：提问的一轮只携带 ask_clarification 这一个工具调用，不要同轮调用任何其他"
+    "工具（同轮的兄弟调用会被直接丢弃，已做的检索全部白费）；计划确认只通过 "
+    "<research-plan> 标记表达，绝不要把确认请求或计划全文塞进 ask_clarification。"
 )
 PLAN_CONFIRM_PREFIX = "研究计划已确认（或经用户修订）。严格按以下计划执行研究并产出最终报告：\n\n"
 PLAN_SKIP_MESSAGE = "跳过计划注入，按你自己的判断研究并产出最终报告。"
@@ -327,6 +330,19 @@ def _drive(handle, stream_fn, on_event, on_clarification, on_plan, state, messag
                 answered_call_ids=frozenset(answered),
             )
         )
+        # A clarification the framework answered in-turn (call id in the answered set)
+        # is still a round the model asked — journal it at classification time, before
+        # any terminal decision or plan-gate branch, so the interaction history has no
+        # silent absorption. Recorded only: no continuation, no bound consumption.
+        for absorbed_call in clarification.absorbed_ask_clarifications(
+            clarification.TerminalObservation(
+                tool_calls=tuple(tool_calls),
+                answered_call_ids=frozenset(answered),
+            )
+        ):
+            _journal(handle, "lifecycle", "clarification_absorbed", {
+                "question": clarification.question_text(absorbed_call.arguments),
+            })
 
         if not detected:
             if awaiting_plan:

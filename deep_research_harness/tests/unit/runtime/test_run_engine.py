@@ -136,6 +136,69 @@ class RunEngineTest(unittest.TestCase):
         events = [e.event for e in journal_mod_entries(self.handle) if e.category == "lifecycle"]
         self.assertIn("clarification_declined", events)
 
+    def _absorbed_turn_messages(self) -> list[dict]:
+        """The 5128f695 incident shape: the terminal AI message asks alongside a
+        search, and the framework answers the ask in-turn — the ask call lands in the
+        answered set, so no unanswered question is detected."""
+        return [
+            _ai(tool_calls=[
+                _ask_call("c1"),
+                {"id": "t1", "name": "web_search", "args": {"query": "认证壁垒"}},
+            ]),
+            _tool_result("t1"),
+            {"type": "tool", "tool_call_id": "c1", "content": "ok"},  # the framework's in-turn answer
+        ]
+
+    def _lifecycle(self) -> list:
+        return [e for e in journal_mod_entries(self.handle) if e.category == "lifecycle"]
+
+    def test_absorbed_ask_is_journaled_headless_without_consuming_bound(self) -> None:
+        def stream_fn(message: str):
+            yield _event("values", messages=self._absorbed_turn_messages())
+            yield _event("end")
+
+        result = pump.run_research(self.handle, stream_fn=stream_fn)
+        # The run takes today's completion path — the absorbed round changes nothing.
+        self.assertEqual(result.status, "completed")
+        self.assertEqual(result.auto_proceed_count, 0)
+        absorbed = [e for e in self._lifecycle() if e.event == "clarification_absorbed"]
+        self.assertEqual(len(absorbed), 1)
+        self.assertEqual(absorbed[0].detail.get("question"), "范围选哪国市场？")
+        events = [e.event for e in self._lifecycle()]
+        self.assertNotIn("auto_continuation", events)
+        self.assertNotIn("clarification_asked", events)
+
+    def test_absorbed_ask_never_fires_the_clarification_hook(self) -> None:
+        def stream_fn(message: str):
+            yield _event("values", messages=self._absorbed_turn_messages())
+            yield _event("end")
+
+        result = pump.run_research(
+            self.handle, stream_fn=stream_fn,
+            on_clarification=lambda q: self.fail("an absorbed round must not reach the hook"),
+        )
+        self.assertEqual(result.status, "completed")
+        self.assertEqual(result.auto_proceed_count, 0)
+        absorbed = [e for e in self._lifecycle() if e.event == "clarification_absorbed"]
+        self.assertEqual(len(absorbed), 1)
+
+    def test_absorbed_ask_in_plan_phase_journals_before_the_gate_degrades(self) -> None:
+        def stream_fn(message: str):
+            yield _event("values", messages=self._absorbed_turn_messages())
+            yield _event("end")
+
+        result = pump.run_research(
+            self.handle, stream_fn=stream_fn,
+            on_plan=lambda p: self.fail("a markerless absorbed turn must not reach the gate"),
+        )
+        self.assertEqual(result.status, "completed")
+        self.assertFalse((self.handle.root / "request" / "plan-gen1.md").exists())
+        events = [e.event for e in self._lifecycle()]
+        self.assertIn("clarification_absorbed", events)
+        self.assertIn("plan_gate_degraded", events)
+        # The absorbed round is recorded at classification time — before the gate branch.
+        self.assertLess(events.index("clarification_absorbed"), events.index("plan_gate_degraded"))
+
     _PLAN_TEXT = "研究计划：\n1. 广度探索认证壁垒的全景\n2. 深挖 A 国消费级法规"
     _MARKED_PLAN = "<research-plan>\n" + _PLAN_TEXT + "\n</research-plan>"
 
@@ -163,6 +226,10 @@ class RunEngineTest(unittest.TestCase):
         # The first message carries the problem plus a plan-request framing.
         self.assertIn("研究 A 国无人机供应链的认证壁垒", turns[0])
         self.assertNotIn(self._PLAN_TEXT, turns[0])
+        # The framing binds the two channels (deerflow-wiring spec delta): question
+        # turns carry only ask_clarification; plan confirmation only via the markers.
+        self.assertIn("通道纪律", turns[0])
+        self.assertIn("ask_clarification", turns[0])
         # The continuation injects the confirmed plan.
         self.assertIn(self._PLAN_TEXT, turns[1])
         # The confirmed plan is materialized as a request artifact.

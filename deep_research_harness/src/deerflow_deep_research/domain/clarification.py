@@ -39,6 +39,22 @@ def unanswered_ask_clarification(observation: TerminalObservation) -> bool:
     )
 
 
+def absorbed_ask_clarifications(
+    observation: TerminalObservation,
+) -> tuple[TerminalToolCall, ...]:
+    """The ask_clarification calls the terminal turn itself resolved — the framework
+    answered them within the same turn, so their call ids appear in the answered set
+    and the unanswered predicate reports False (the 5128f695 silent-absorption shape).
+    Symmetric to ``unanswered_ask_clarification``: together the two partition every
+    ask_clarification the turn carries. Recorded, never acted on."""
+
+    return tuple(
+        call
+        for call in observation.tool_calls
+        if call.name == ASK_CLARIFICATION_TOOL and call.call_id in observation.answered_call_ids
+    )
+
+
 def question_text(arguments: str) -> str:
     """The unanswered question's text: the JSON `question` field when the arguments
     parse, otherwise the raw argument text (provenance honesty over prettiness)."""

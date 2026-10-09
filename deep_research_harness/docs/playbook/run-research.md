@@ -75,6 +75,12 @@ make create PROBLEM="发布面冷启动证明"
   `DEEP_RESEARCH_INTERACTIVE=1`）会现场问你：回答即继续（不耗自动应答预算），
   回车留空 = 不答（回落自动应答并计预算）。headless（无 TTY 无覆盖）永不读
   stdin，行为与从前一致（自动应答，上限 2 次，耗尽诚实失败）。
+- 通道纪律（真梯 bundle 5128f695 的教训）：计划相位框架消息要求提问轮只携带
+  `ask_clarification`（同轮兄弟调用会被框架中间件丢弃，检索白做）、计划确认只走
+  `<research-plan>` 标记。措辞是约束不是强制——模型无视时按现行规则跑，不硬拦。
+- 被框架同轮自答的反问（call id 落进 answered 集，检测谓词报 False）会记
+  journal `lifecycle`/`clarification_absorbed`（带问题原文）：只记账，不耗预算、
+  不改终态、不触发续跑；交互史据此可完整重建，无静默吸收。
 - real 梯 run 中单个工具调用失败（如某个 URL 抓取 BadRequest）会打出完整
   traceback 噪音；lead agent 会自行换路恢复。判据看终态与 delivery 行，不看
   中途噪音。

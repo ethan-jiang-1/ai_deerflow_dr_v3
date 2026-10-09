@@ -140,6 +140,39 @@ class ClarificationRulesTest(unittest.TestCase):
         )
         self.assertFalse(clarification.unanswered_ask_clarification(answered))
 
+    def test_predicate_detects_absorbed_ask_clarifications(self) -> None:
+        """The 5128f695 incident shape: the framework answers an ask_clarification
+        in-turn (its call id lands in the answered set), so the unanswered predicate
+        reports False — but the model DID ask, and the round must be observable."""
+        observation = clarification.TerminalObservation(
+            tool_calls=(
+                clarification.TerminalToolCall(call_id="c1", name="ask_clarification", arguments='{"question": "范围选哪国市场？"}'),
+                clarification.TerminalToolCall(call_id="c2", name="ask_clarification", arguments='{"question": "时间窗定在几月？"}'),
+                clarification.TerminalToolCall(call_id="c3", name="web_search", arguments="{}"),
+            ),
+            answered_call_ids=frozenset({"c1", "c3"}),
+        )
+        absorbed = clarification.absorbed_ask_clarifications(observation)
+        self.assertEqual([call.call_id for call in absorbed], ["c1"])
+        self.assertEqual(clarification.question_text(absorbed[0].arguments), "范围选哪国市场？")
+
+    def test_absorbed_and_unanswered_predicates_partition_the_ask_calls(self) -> None:
+        observation = clarification.TerminalObservation(
+            tool_calls=(
+                clarification.TerminalToolCall(call_id="c1", name="ask_clarification", arguments='{"question": "q1"}'),
+                clarification.TerminalToolCall(call_id="c2", name="ask_clarification", arguments='{"question": "q2"}'),
+                clarification.TerminalToolCall(call_id="c3", name="web_search", arguments="{}"),
+            ),
+            answered_call_ids=frozenset({"c1", "c3"}),
+        )
+        absorbed_ids = {call.call_id for call in clarification.absorbed_ask_clarifications(observation)}
+        self.assertEqual(absorbed_ids, {"c1"})
+        self.assertTrue(clarification.unanswered_ask_clarification(observation))
+        # No ask calls at all -> nothing absorbed, nothing unanswered.
+        empty = clarification.TerminalObservation(tool_calls=(), answered_call_ids=frozenset({"c1"}))
+        self.assertEqual(clarification.absorbed_ask_clarifications(empty), ())
+        self.assertFalse(clarification.unanswered_ask_clarification(empty))
+
     def test_question_text_extraction(self) -> None:
         self.assertEqual(clarification.question_text('{"question": "范围选哪国市场？"}'), "范围选哪国市场？")
         self.assertEqual(clarification.question_text("not json"), "not json")
