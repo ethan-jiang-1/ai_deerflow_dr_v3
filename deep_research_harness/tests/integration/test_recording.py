@@ -113,6 +113,55 @@ class JournalingMixinTest(unittest.TestCase):
                 self.assertIn("usage/token", meta["deliberate_limits"][0])
 
 
+class AsyncPathTest(unittest.TestCase):
+    def test_async_path_journals_exactly_once(self) -> None:
+        """The framework drives the graph via astream → _agenerate; with a base
+        that has no _agenerate of its own, the default delegates to the sync
+        override — the duplicate guard must leave exactly one line."""
+        import asyncio
+
+        with tempfile.TemporaryDirectory() as td:
+            sink = Path(td) / "model-io.jsonl"
+            with _EnvScript([{"content": "异步回答"}], sink):
+                model = _JournaledScripted()
+                result = asyncio.run(model._agenerate([HumanMessage(content="异步问")]))
+                self.assertEqual(result.generations[0].message.content, "异步回答")
+                lines = [json.loads(l) for l in sink.read_text(encoding="utf-8").splitlines()]
+                self.assertEqual(len(lines), 1, f"expected one line, got {lines}")
+                self.assertEqual(lines[0]["output"], "异步回答")
+
+    def test_async_only_base_journals_from_the_async_override(self) -> None:
+        """A base with its own _agenerate (the real-model shape) bypasses the
+        sync override entirely; the async override alone must journal."""
+        import asyncio
+
+        from langchain_core.messages import AIMessage
+        from langchain_core.outputs import ChatGeneration, ChatResult
+
+        class _AsyncScripted(ScriptedChatModel):
+            async def _agenerate(self, messages, stop=None, run_manager=None, **kwargs):  # noqa: ANN001, ANN202
+                item = self.script[min(self.cursor, len(self.script) - 1)]
+                self.cursor += 1
+                return ChatResult(
+                    generations=[ChatGeneration(message=AIMessage(content=str(item.get("content", ""))))]
+                )
+
+        class _JournaledAsync(JournalingMixin, _AsyncScripted):
+            def __init__(self) -> None:
+                ScriptedChatModel.__init__(self)
+                self._init_journal(pin="async-pin")
+
+        with tempfile.TemporaryDirectory() as td:
+            sink = Path(td) / "model-io.jsonl"
+            with _EnvScript([{"content": "纯异步回答"}], sink):
+                model = _JournaledAsync()
+                result = asyncio.run(model._agenerate([HumanMessage(content="纯异步问")]))
+                self.assertEqual(result.generations[0].message.content, "纯异步回答")
+                lines = [json.loads(l) for l in sink.read_text(encoding="utf-8").splitlines()]
+                self.assertEqual(len(lines), 1, f"expected one line, got {lines}")
+                self.assertEqual(lines[0]["output"], "纯异步回答")
+
+
 class ReplayRoundTripTest(unittest.TestCase):
     def test_content_journal_replays_through_the_mechanism(self) -> None:
         with tempfile.TemporaryDirectory() as td:

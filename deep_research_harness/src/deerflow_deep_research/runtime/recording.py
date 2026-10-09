@@ -50,6 +50,7 @@ class JournalingMixin:
             )
         self._journal_sink = Path(raw)
         self._journal_sink.parent.mkdir(parents=True, exist_ok=True)
+        self._last_journal_line: dict | None = None
         self._write_sidecar(pin=pin)
 
     def _write_sidecar(self, *, pin: str | None) -> None:
@@ -69,8 +70,15 @@ class JournalingMixin:
             json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
 
-    def _generate(self, messages, stop=None, run_manager=None, **kwargs):  # noqa: ANN001, ANN202
-        result = super()._generate(messages, stop=stop, run_manager=run_manager, **kwargs)
+    def _journal_result(self, messages, result) -> None:  # noqa: ANN001
+        """Append the I/O pair for one model turn (shared by sync and async paths).
+
+        The consecutive-duplicate guard exists because the async default path
+        delegates to the sync override: when the wrapped model has no
+        ``_agenerate`` of its own, one astream call flows through BOTH
+        overrides and would journal the identical pair twice. Identical
+        consecutive pairs are one turn; different turns always append.
+        """
         message = result.generations[0].message
         line: dict = {
             "key": replay_key(messages),
@@ -79,6 +87,22 @@ class JournalingMixin:
         calls = _journal_tool_calls(list(getattr(message, "tool_calls", None) or []))
         if calls:
             line["tool_calls"] = calls
+        if line == self._last_journal_line:
+            return
+        self._last_journal_line = line
         with self._journal_sink.open("a", encoding="utf-8") as fh:
             fh.write(json.dumps(line, ensure_ascii=False) + "\n")
+
+    def _generate(self, messages, stop=None, run_manager=None, **kwargs):  # noqa: ANN001, ANN202
+        result = super()._generate(messages, stop=stop, run_manager=run_manager, **kwargs)
+        self._journal_result(messages, result)
+        return result
+
+    async def _agenerate(self, messages, stop=None, run_manager=None, **kwargs):  # noqa: ANN001, ANN202
+        """Journal the async path too — the framework drives the graph via
+        astream, which reaches ``_agenerate`` and bypasses a sync-only override
+        (the first E-2 attempt recorded zero lines exactly this way: sidecar
+        written, journal empty)."""
+        result = await super()._agenerate(messages, stop=stop, run_manager=run_manager, **kwargs)
+        self._journal_result(messages, result)
         return result
