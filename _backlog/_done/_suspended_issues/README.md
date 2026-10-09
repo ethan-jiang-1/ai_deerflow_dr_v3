@@ -1,6 +1,6 @@
-# Suspended Plans — 暂停的计划与延期跟进
+# Suspended Issues — 暂停的 issue 与延期跟进
 
-> 更新: 2026-10-02（仓库起骨架日，空表） | 这里记录已明确不排期、但不应伪装成"完成"的计划或延期跟进。
+> 更新: 2026-10-09（adopt-issue-ledger-governance 更名；`_suspended_plans/` → `_suspended_issues/`） | 这里记录已明确不排期、但不应伪装成"完成"的 issue 或延期跟进。
 
 Suspended 不等于 done，也不是删除：保留原始上下文、风险和重启条件，但它们不再属于活跃
 todo/plan，不进入推荐执行顺序。只有新的明确优先级决定或经审查的 OpenSpec change 才能把它们

@@ -17,7 +17,7 @@
 
 一笔变更从意图到归位按序六步；本页只路由，正文留在各 owner：
 
-1. **意图** — 分析与设计推敲进 [_backlog/plans/](../_backlog/README.md)；「决策/方案」
+1. **意图** — 分析与设计推敲进 [_backlog/issues/](../_backlog/README.md)；「决策/方案」
    与「落地关联」填实即毕业（能写出一张 [Change Focus](change-guidance/core/change-practice.md)）。
 2. **权威归属** — 按 [Policy Route](change-guidance/README.md) 选齐触发的 canonical
    policy；应用面 owner 看 [app 指南 Information Map](../deep_research_harness/AGENTS.md)；

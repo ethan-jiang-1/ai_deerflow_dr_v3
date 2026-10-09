@@ -1,11 +1,11 @@
 # Issue: backlog 治理反向借鉴 —— plans 更名 issues、活触发器索引、门禁补盲
 
-> 立卡: 2026-10-09 ｜ 状态: 等人拍板 ｜ 类型: Task ｜ 毕业门: 未过 ｜ 可关闭: 否
+> 立卡: 2026-10-09 ｜ 状态: 推敲中 ｜ 类型: Task ｜ 毕业门: 未过 ｜ 可关闭: 否
 
 **问题与期望结果：** 驾驭者点名 `/Users/bowhead/ai_dsh_assitant/_backlog/`（同源账本制度敲打后
 最成熟的一环）消化借鉴，调整本仓 `_backlog/`。拍板定调（2026-10-09）：**长远做对**——plans 类别
-退役、issues 立为正式类别。本卡按目标形态（issue 卡模板）立卡，暂居 `plans/`，随
-adopt-issue-ledger-governance 的目录更名迁入 `issues/`。
+退役、issues 立为正式类别。本卡按目标形态（issue 卡模板）立卡，已随 adopt-issue-ledger-governance
+的目录更名迁入 `issues/`（2026-10-09）。
 
 **当前情况：** 谱系已核清：ai_dsh_assitant 的借鉴记录自证其 `_backlog` 制度上溯
 ai_deerflow_deep_research_v2，且同族 loop_advisor 2026-10-03 曾从本仓补借主干/挂起池/reference；
@@ -14,10 +14,10 @@ ai_deerflow_deep_research_v2，且同族 loop_advisor 2026-10-03 曾从本仓补
 靠主动翻旧卡才发现触发已满足）；③卡片无机器可锚的 `状态`/`毕业门` 户口；④门禁看不见
 "毕业了没走"（名册只查行→磁盘，不查反向与滞留）。
 
-**未决问题：** OpenSpec proposal（adopt-issue-ledger-governance）停在拍板边界，等驾驭者。
+**未决问题：** 无——proposal 已获驾驭者拍板（2026-10-09「apply」），实施中。
 
-**下一步：** 驾驭者拍板 proposal → apply（红绿先行：checker 夹具先红后绿）→ archive →
-本卡按新 ritual 关闭（CLS-019）。
+**下一步：** apply 进行中（红绿先行）；archive 后本卡按新 ritual 关闭（CLS-019，
+去向 = adopt-issue-ledger-governance）。
 
 ## 方案与取舍
 

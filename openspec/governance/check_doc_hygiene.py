@@ -4,7 +4,9 @@
 
 @impl DOB-001
 
-Five mechanical doc-layer rules plus one backlog navigation rule:
+Five mechanical doc-layer rules plus one backlog navigation rule, plus the
+post-skeleton mechanizations (ledger bookkeeping surfaces with card hukou and
+residency, declared stale-narrative markers, root README count pinning):
 
 1. ADR index <-> directory consistency: every ``NNNN-*.md`` in
    ``deep_research_harness/docs/adr/`` (excluding ``README.md``) is listed in the
@@ -71,6 +73,7 @@ ENTRY_DOCS: tuple[str, ...] = (
     "deep_research_harness/README.md",
     "deep_research_harness/docs/README.md",
     "_backlog/README.md",
+    "_backlog/triggers.md",
     "openspec/README.md",
 )
 # Resident-document character ceilings (rule 6). These are the files an agent
@@ -257,15 +260,31 @@ def _rule_backlog_underscore(root: Path) -> list[str]:
 # mechanized: active/archive work-item files must be indexed by their surface
 # README, index rows must resolve to disk, and _done/README.md counters must
 # match disk. Adding a surface is a visible change to these tables.
-BACKLOG_ACTIVE_SURFACES: tuple[str, ...] = ("plans", "bugs")
+BACKLOG_ACTIVE_SURFACES: tuple[str, ...] = ("issues", "bugs")
 BACKLOG_ARCHIVE_SURFACES: tuple[str, ...] = (
     "_fixed_bugs",
     "_suspended_bugs",
-    "_closed_plans",
-    "_suspended_plans",
+    "_settled_issues",
+    "_suspended_issues",
 )
 BACKLOG_COUNTERS_FILE = "_done/README.md"
 BACKLOG_NEXT_ID_RE = re.compile(r"\b([A-Z]{3})-(\d{3})\b")
+
+# Card hukou and residency (rule 7 continuation). Every active card carries a
+# 状态 field within its first 12 lines whose word belongs to the surface's
+# declared vocabulary; a card whose graduation field reads 已过 or which
+# declares 可关闭：是 fails while it sits in the active zone. The residency
+# match anchors on those termination-state fields only — delivery adjectives
+# in the card body never red-line an honest awaiting-human card (the
+# mis-kill class the borrowing source documented and fixed in 2026-10-08).
+BACKLOG_CARD_HUKOU_LINE_LIMIT = 12
+BACKLOG_STATUS_FIELD_RE = re.compile(r"状态[:：]\s*([^\s｜|，,]+)")
+BACKLOG_STATUS_VOCABULARY: dict[str, tuple[str, ...]] = {
+    "issues": ("推敲中", "等人拍板"),
+    "bugs": ("活跃", "待修"),
+}
+BACKLOG_GRADUATION_PASSED_RE = re.compile(r"毕业门[:：]\s*已过")
+BACKLOG_CLOSABLE_RE = re.compile(r"可关闭[:：]\s*是")
 
 # Stale-narrative markers (rule 8). A declared closed list of resident and
 # doc-layer files must not contain a declared skeleton-era marker outside the
@@ -305,7 +324,7 @@ STALE_MARKER_FILES: tuple[str, ...] = (
 MARKER_ALLOWLIST: dict[tuple[str, str], str] = {
     ("deep_research_harness/src/deerflow_deep_research/agents/__init__.py", "(skeleton)"):
         "the agents layer is genuinely empty; its fate is a deferred owning decision "
-        "(audit plan _backlog/_done/_closed_plans/2026-10-04-fresh-agent-doc-cleanup.md, not-in-scope item)",
+        "(audit plan _backlog/_done/_settled_issues/2026-10-04-fresh-agent-doc-cleanup.md, not-in-scope item)",
 }
 
 def _rule_doc_budgets(root: Path) -> list[str]:
@@ -340,13 +359,54 @@ def _rule_doc_budgets(root: Path) -> list[str]:
 
 
 
+def _card_hukou_problems(surface: str, card: Path) -> list[str]:
+    """Active-card hukou and residency (rule 7 continuation).
+
+    Every active card carries a ``状态`` field in its first 12 lines whose
+    word belongs to the surface's declared vocabulary; a card whose status
+    line declares ``毕业门：已过`` or ``可关闭：是`` fails while it still sits
+    in the active zone. Anchored on the declared fields only — an awaiting
+    ``等人拍板`` card with delivery language in its body stays green.
+    """
+    text, decode_problem = _read_utf8(card)
+    if text is None:
+        return [f"non-UTF-8 active card, hukou not checked: {surface}/{card.name}"]
+    head = "\n".join(text.splitlines()[:BACKLOG_CARD_HUKOU_LINE_LIMIT])
+    problems: list[str] = []
+    status = BACKLOG_STATUS_FIELD_RE.search(head)
+    vocabulary = BACKLOG_STATUS_VOCABULARY.get(surface, ())
+    if status is None:
+        problems.append(
+            f"active card missing 状态 hukou in first "
+            f"{BACKLOG_CARD_HUKOU_LINE_LIMIT} lines: {surface}/{card.name}"
+        )
+    elif status.group(1).strip() not in vocabulary:
+        problems.append(
+            f"active card status word {status.group(1)!r} outside declared "
+            f"vocabulary {vocabulary}: {surface}/{card.name}"
+        )
+    if BACKLOG_GRADUATION_PASSED_RE.search(head):
+        problems.append(
+            f"graduated card still in active zone (毕业门：已过): {surface}/{card.name}"
+        )
+    if BACKLOG_CLOSABLE_RE.search(head):
+        problems.append(
+            f"card declared closable but still in active zone (可关闭：是): "
+            f"{surface}/{card.name}"
+        )
+    return problems
+
+
+
 def _rule_ledger_consistency(root: Path) -> list[str]:
     """Ledger bookkeeping surfaces must be mechanically consistent (rule 7).
 
     The `_backlog` ritual states "编号、索引、计数三处一致"; this rule makes
     the stated ritual a checked invariant: every active/archive work-item file
-    is indexed by its surface README, every index row resolves to disk, and
-    the `_done/README.md` counters and Next-ID declarations match disk.
+    is indexed by its surface README, every index row resolves to disk, the
+    `_done/README.md` counters and Next-ID declarations match disk, and every
+    active card carries a vocabulary-checked hukou without a residency
+    violation (graduated/closable cards must have left the active zone).
     """
     problems: list[str] = []
     backlog = root / "_backlog"
@@ -382,6 +442,9 @@ def _rule_ledger_consistency(root: Path) -> list[str]:
                 problems.append(
                     f"active ledger surface has an unindexed work item: {surface}/{work.name}"
                 )
+        if surface in BACKLOG_ACTIVE_SURFACES:
+            for work in work_files:
+                problems.extend(_card_hukou_problems(surface, work))
         for link in MARKDOWN_LINK_RE.findall(index_text):
             target = link.split("#", 1)[0].strip()
             if not target.endswith(".md"):
@@ -627,6 +690,16 @@ def _self_test() -> list[str]:
         if not any("gone.md" in v for v in _rule_links(base)):
             errors.append("self-test: broken link not detected")
 
+        # Rule 2 negative (entry-chain): trigger index with a dangling home
+        # link — every trigger row must resolve to its owner record.
+        write_doc("_backlog/triggers.md", "# triggers\n\n[owner](no-such-owner.md)\n")
+        if not any(
+            "_backlog/triggers.md" in v and "no-such-owner.md" in v
+            for v in _rule_links(base)
+        ):
+            errors.append("self-test: dangling trigger-index home link not detected")
+        write_doc("_backlog/triggers.md", "# T\n\n[self](triggers.md)\n")
+
         # Rule 3 negative (entry-chain): missing trailing newline.
         write_doc("openspec/README.md", "# no newline")
         if not any("trailing newline" in v for v in _rule_encoding_newline(base)):
@@ -690,13 +763,13 @@ def _self_test() -> list[str]:
 
         # Rule 7 negatives: ledger index/counter drift must fail loudly.
         ledger = base / "ledger-repo"
-        for surface in ("plans", "_done/_closed_plans"):
+        for surface in ("issues", "_done/_settled_issues"):
             surface_dir = ledger / "_backlog" / surface
             surface_dir.mkdir(parents=True, exist_ok=True)
-        (ledger / "_backlog" / "plans" / "2026-10-01-demo.md").write_text("# plan\n", encoding="utf-8")
-        (ledger / "_backlog" / "plans" / "README.md").write_text("# Plans\n\n（空）\n", encoding="utf-8")
-        (ledger / "_backlog" / "_done" / "_closed_plans" / "README.md").write_text(
-            "# Closed\n\n| ID | Date | File | Summary |\n|---|---|---|---|\n"
+        (ledger / "_backlog" / "issues" / "2026-10-01-demo.md").write_text("# issue\n", encoding="utf-8")
+        (ledger / "_backlog" / "issues" / "README.md").write_text("# Issues\n\n（空）\n", encoding="utf-8")
+        (ledger / "_backlog" / "_done" / "_settled_issues" / "README.md").write_text(
+            "# Settled\n\n| ID | Date | File | Summary |\n|---|---|---|---|\n"
             "| CLS-001 | 2026-10-01 | [2026-10-01-gone.md](2026-10-01-gone.md) | x |\n\n"
             "**Next available plan ID: CLS-002**\n",
             encoding="utf-8",
@@ -704,7 +777,7 @@ def _self_test() -> list[str]:
         (ledger / "_backlog" / "_done" ).mkdir(parents=True, exist_ok=True)
         (ledger / "_backlog" / "_done" / "README.md").write_text(
             "| 归档目录 | 数量 | Next ID |\n|---|---|---|\n"
-            "| `_fixed_bugs/` | 0 | BUG-001 |\n| `_closed_plans/` | 1 | CLS-002 |\n",
+            "| `_fixed_bugs/` | 0 | BUG-001 |\n| `_settled_issues/` | 1 | CLS-002 |\n",
             encoding="utf-8",
         )
         ledger_problems = _rule_ledger_consistency(ledger)
@@ -721,7 +794,7 @@ def _self_test() -> list[str]:
         # fresh ledger tree; the row references a file that exists on disk so
         # only the placement defect is exercised.
         placed = base / "placement-repo"
-        closed = placed / "_backlog" / "_done" / "_closed_plans"
+        closed = placed / "_backlog" / "_done" / "_settled_issues"
         closed.mkdir(parents=True, exist_ok=True)
         (closed / "2026-10-01-here.md").write_text("# plan\n", encoding="utf-8")
         (closed / "README.md").write_text(
@@ -749,6 +822,52 @@ def _self_test() -> list[str]:
         )
         if any("placement" in v for v in _rule_ledger_consistency(contiguous)):
             errors.append("self-test: contiguous table flagged as misplaced")
+
+        # Rule 7 continuation (hukou/residency): an active card without a
+        # 状态 field, with an out-of-vocabulary word, declaring 毕业门：已过 or
+        # 可关闭：是 must each fail loudly; an awaiting-human card carrying
+        # delivery language in its body must stay green (the mis-kill
+        # negative — anchoring is on the declared fields, never on prose).
+        hukou = base / "hukou-repo"
+        issues = hukou / "_backlog" / "issues"
+        issues.mkdir(parents=True, exist_ok=True)
+        (issues / "README.md").write_text("# Issues\n\n（空）\n", encoding="utf-8")
+
+        def hukou_card(name: str, head: str, body: str = "") -> None:
+            (issues / name).write_text(f"{head}\n{body}", encoding="utf-8")
+
+        hukou_card("2026-10-01-no-hukou.md", "# Issue: no hukou")
+        hukou_card(
+            "2026-10-02-bad-word.md",
+            "> 立卡: 2026-10-02 ｜ 状态: 已结 ｜ 毕业门: 未过 ｜ 可关闭: 否",
+        )
+        hukou_card(
+            "2026-10-03-graduated.md",
+            "> 立卡: 2026-10-03 ｜ 状态: 推敲中 ｜ 毕业门: 已过 ｜ 可关闭: 否",
+        )
+        hukou_card(
+            "2026-10-04-closable.md",
+            "> 立卡: 2026-10-04 ｜ 状态: 等人拍板 ｜ 毕业门: 未过 ｜ 可关闭: 是",
+        )
+        hukou_card(
+            "2026-10-05-awaiting-human.md",
+            "> 立卡: 2026-10-05 ｜ 状态: 等人拍板 ｜ 毕业门: 未过 ｜ 可关闭: 否",
+            body="\n## 落地关联\n\nS1+S2 已交付，全链路绿。\n",
+        )
+        hukou_problems = _rule_ledger_consistency(hukou)
+        for needle in (
+            "missing 状态 hukou",
+            "outside declared vocabulary",
+            "毕业门：已过",
+            "可关闭：是",
+        ):
+            if not any(needle in v for v in hukou_problems):
+                errors.append(f"self-test: card hukou rule did not detect: {needle}")
+        # The fixture roster is empty on purpose, so unindexed-card problems
+        # are expected; the mis-kill check reads hukou-specific problems only.
+        hukou_only = [v for v in hukou_problems if "unindexed" not in v]
+        if any("2026-10-05-awaiting-human.md" in v for v in hukou_only):
+            errors.append("self-test: hukou rule mis-killed awaiting card")
 
         # Root-count pinning negative: a README status line whose declared
         # counts differ from the computed inventory must fail loudly.
