@@ -20,9 +20,8 @@
 
 | Issue | 一句话 |
 |------|--------|
-| [2026-10-09-backlog-governance-reborrow.md](2026-10-09-backlog-governance-reborrow.md) | _backlog 治理反向借鉴：plans→issues 更名 + 活触发器索引 + 门禁补盲（apply 中，adopt-issue-ledger-governance） |
 
-**Next available plan ID: CLS-019**（移入 `_settled_issues/` 时分配）
+**Next available plan ID: CLS-020**（移入 `_settled_issues/` 时分配；CLS-019 已分配给 backlog-governance-reborrow）
 
 新方向性工作**必须显性立卡**（驾驭者要求，2026-10-07）：先立卡记录决策与取舍，再走 OpenSpec change 实施；完成后按上方 ritual 关闭归档。
 

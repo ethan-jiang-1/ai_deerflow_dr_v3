@@ -37,5 +37,6 @@ issue 关闭后从 `_backlog/issues/` 通过 `git mv` 移入本目录：
 | CLS-016 | 2026-10-07 | [2026-10-07-plan-review-gate.md](2026-10-07-plan-review-gate.md) | 计划确认闸门：agent 交计划、操作者审改确认后开跑；plan-review-gate 落地后真梯演示暴露检测缺陷（报告被误当计划），plan-marker-detection 以内容标记修复并固化回归；交互反问先行落地为 interactive-clarification |
 | CLS-018 | 2026-10-09 | [2026-10-07-clarification-channel-discipline.md](2026-10-07-clarification-channel-discipline.md) | 反问/计划通道纪律：吸收反问记 journal clarification_absorbed（5128f695 静默吸收黑洞消除，纯谓词与未答谓词对称）+ 计划框架消息通道纪律措辞（提问轮只带 ask_clarification、计划确认只走标记）；真梯自驱动验收全绿（标记遵从/走私消失/预算 0/2/journal 完整），自驱动替代真人 TTY 已登记 Deviation Register |
 | CLS-017 | 2026-10-08 | [2026-10-08-application-corpus-adoption.md](2026-10-08-application-corpus-adoption.md) | 应用开发语料吸收主卡：C1 闭环地图 + C2 权威三件套（Deviation Register/Delivery Record 常设段+CHA-001 守卫）+ C3 钉定纪律与语料入库（38 文件）+ C6 第一批（C 回放物化/A 来源可溯机器/B 结构契约准入+hash_mismatch 退役+spec sync）+ C4/C5 小件，八 change 全归档；E/F 立项才动、G 显式不做 |
+| CLS-019 | 2026-10-09 | [2026-10-09-backlog-governance-reborrow.md](2026-10-09-backlog-governance-reborrow.md) | _backlog 治理反向借鉴（同源制度下游增量回流）：plans→issues、_done→_archived、_closed_plans→_settled_issues 三层更名 + 关闭条件四态表 + 户口/状态词表 + triggers.md 活触发器索引（8 行种子）+ methods/ 方法库（7 篇，apply 中翻案采纳）+ checker 户口/滞留门禁（prove-it-red 1→0）；两条 apply 中翻案（methods、_archived）均登记；新门禁下第一张完整生命周期卡 |
 
-**Next available plan ID: CLS-019**
+**Next available plan ID: CLS-020**

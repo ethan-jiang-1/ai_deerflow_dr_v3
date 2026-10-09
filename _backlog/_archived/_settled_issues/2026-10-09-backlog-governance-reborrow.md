@@ -1,6 +1,6 @@
 # Issue: backlog 治理反向借鉴 —— plans 更名 issues、活触发器索引、门禁补盲
 
-> 立卡: 2026-10-09 ｜ 状态: 推敲中 ｜ 类型: Task ｜ 毕业门: 未过 ｜ 可关闭: 否
+> 立卡: 2026-10-09 ｜ 关闭: 2026-10-09 ｜ 状态: 已结 ｜ 类型: Task ｜ 毕业门: 已过 → adopt-issue-ledger-governance ｜ 可关闭: 是
 
 **问题与期望结果：** 驾驭者点名 `/Users/bowhead/ai_dsh_assitant/_backlog/`（同源账本制度敲打后
 最成熟的一环）消化借鉴，调整本仓 `_backlog/`。拍板定调（2026-10-09）：**长远做对**——plans 类别
@@ -14,10 +14,12 @@ ai_deerflow_deep_research_v2，且同族 loop_advisor 2026-10-03 曾从本仓补
 靠主动翻旧卡才发现触发已满足）；③卡片无机器可锚的 `状态`/`毕业门` 户口；④门禁看不见
 "毕业了没走"（名册只查行→磁盘，不查反向与滞留）。
 
-**未决问题：** 无——proposal 已获驾驭者拍板（2026-10-09「apply」），实施中。
+**未决问题：** 无——proposal 已获驾驭者拍板（2026-10-09「apply」），实施完成。
 
-**下一步：** apply 进行中（红绿先行）；archive 后本卡按新 ritual 关闭（CLS-019，
-去向 = adopt-issue-ledger-governance）。
+**下一步：** 已收口：apply 全绿（红绿先行、prove-it-red 1→0）、change 归档为
+`openspec/changes/archive/2026-10-09-adopt-issue-ledger-governance/`（doc-truthfulness
+delta 并入主干）。本卡按新 ritual 关闭为 CLS-019，去向 = adopt-issue-ledger-governance；
+它是新门禁上线后第一张走完整生命周期的卡（立卡 → 拍板 → apply → 已结）。
 
 ## 方案与取舍
 
