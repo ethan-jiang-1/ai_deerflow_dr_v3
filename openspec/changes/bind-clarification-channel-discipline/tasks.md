@@ -62,9 +62,9 @@
 
 ## 6. Closeout 义务
 
-- [ ] 6.1 交回回执：runner 写下命令/退出码/revision，回执新于最后一次改动；
+- [x] 6.1 交回回执：runner 写下命令/退出码/revision，回执新于最后一次改动；
   `git status --porcelain` 干净度随回执记录。验证：回执在案。
-- [ ] 6.2 archive 前跑仓库根
+- [x] 6.2 archive 前跑仓库根
   `python3 openspec/governance/check_project_gate.py --phase closeout` 与
   `UV_OFFLINE=1 make verify`（deep_research_harness 下）、
   `openspec validate bind-clarification-channel-discipline --strict`、
@@ -78,7 +78,19 @@
 
 ## Delivery Record
 
-- **外部行为**: （apply 完成时回填）
-- **影响面**: （apply 完成时回填）
-- **实际跑了什么**: （apply 完成时回填）
-- **未执行的检查**: （apply 完成时回填）
+- **外部行为**: 反问与计划确认的通道绑定——计划相位框架消息明确"提问轮只携带
+  ask_clarification、计划确认只走 <research-plan> 标记"；被框架同轮自答的反问
+  （5128f695 静默吸收形状）记 journal lifecycle/clarification_absorbed（带问题
+  原文），交互史可完整重建；吸收轮不耗预算、不改终态、不触发续跑、不触 hook。
+- **影响面**: `domain/clarification.py`（+吸收谓词，与未答谓词对称）、
+  `runtime/pump.py`（分类点记账 + 措辞扩展；AUTO_REPLY_PREFIX 字节不变）、两个
+  既有测试文件（+6 测试：谓词 2 + 引擎 3 + 措辞钉 1）、playbook 坑节 2 条；
+  无新测试文件，无 CLI/状态机/journal category 变更。
+- **实际跑了什么**: 红证（谓词 AttributeError×2；引擎 0!=1×3；措辞钉 FAILED×1）
+  → 实现 → `UV_OFFLINE=1 make verify` exit 0（242 tests）→ `make smoke` exit 0
+  （15 tests）→ 治理 checker 五件 + `check_project_gate --phase plan` +
+  `openspec validate --strict` 全 exit 0 → fixture bundle 上 `cli.py watch`/
+  `inspect` exit 0 且 `clarification_absorbed` 可见 → apply 提交 `933842b`。
+- **未执行的检查**: tasks 5.1/5.2（真人 TTY 基线 + 真梯重跑验收）未执行——UNVERIFIED，
+  归驾驭者；archive 等待其完成；本机无法验证模型对新措辞的遵从率（措辞是约束
+  不是强制）。
