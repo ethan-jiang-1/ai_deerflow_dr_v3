@@ -1,6 +1,6 @@
 # Issue: 行为断言 eval 栈 —— 研究质量的机器可断言面（替身阶梯级 4）
 
-> 立卡: 2026-10-09 ｜ 状态: 推敲中 ｜ 类型: Task ｜ 毕业门: 未过 ｜ 可关闭: 否
+> 立卡: 2026-10-09 ｜ 关闭: 2026-10-10 ｜ 状态: 已结 ｜ 类型: Task ｜ 毕业门: 已过 → establish-behavior-assertion-lane ｜ 可关闭: 是
 
 **问题与期望结果：** [triggers.md](../triggers.md)「行为断言 eval 栈」行**已触发**（CLS-020/CLS-017
 裁决③判定"需要断言研究质量本身时"条件满足；本卡按删行规则消费该行，句子留在 owner 卡
@@ -30,8 +30,10 @@ CLS-010/CLS-017）。驾驭者裁决③在案：质量第一指摄 = **产出质
 token 待干净生产者，如实登记限制）；owning spec 先立（CLS-017:114 诫命适用）；E/F/G 维持
 既有裁决；常设授权已覆盖拍板边界。
 
-**下一步：** openspec propose `establish-behavior-assertion-lane` →（常设授权）直接 apply
-红绿 → archive → 本卡按 ritual 关闭（CLS-020）。
+**下一步：** 已收口：change 归档为 `openspec/changes/archive/2026-10-10-establish-behavior-assertion-lane/`
+（`test-evidence` 进主干，13 能力 +4 requirements；behavior-profile 机器 + 真实 journal 钉样
++ 留存样本首个消费者全落地，make verify 0/249、负例控制红绿在案）。本卡按 ritual 关闭为
+CLS-020，去向 = establish-behavior-assertion-lane。
 
 ## 方案与取舍
 
