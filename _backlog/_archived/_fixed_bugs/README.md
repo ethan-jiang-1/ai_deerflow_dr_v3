@@ -17,6 +17,6 @@ bug 修完后从 `_backlog/bugs/` 通过 `git mv` 移入本目录：
 
 | ID | Date | Title |
 |----|------|-------|
-| BUG-001 | 2026-10-10 | headless 跑计划门缺席——计划输出直落 completed 冒充报告（fix-headless-plan-gate；根因确诊与初判修正在卡） |
+| BUG-001 | 2026-10-10 | [BUG-001-degenerate-plan-as-report.md](BUG-001-degenerate-plan-as-report.md) — headless 跑计划门缺席——计划输出直落 completed 冒充报告（fix-headless-plan-gate；根因确诊与初判修正在卡） |
 
 **Next available bug ID: BUG-002**
