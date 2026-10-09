@@ -19,7 +19,7 @@
 ## 4. Receipts, archive, and ledger closeout
 
 - [x] 4.1 Full receipts (exit codes read directly): `make verify` (deep_research_harness), `check_doc_hygiene.py` + `--self-test`, `check_project_gate.py --phase plan --change` and `--phase closeout`, `openspec validate`. Verify: all exit 0; record in Delivery Record.
-- [ ] 4.2 Archive `establish-behavior-assertion-lane` (spec sync: `test-evidence` becomes a main spec), ledger ritual: the issue card `2026-10-09-behavior-assertion-eval-stack.md` closes as CLS-020 (three-README linkage, counters 19→20, Next CLS-021), root README archived-change count pinned. Verify: archive strict-validate 0; doc-hygiene green at the final revision; commits with quoted-heredoc messages.
+- [x] 4.2 Archive `establish-behavior-assertion-lane` (spec sync: `test-evidence` becomes a main spec), ledger ritual: the issue card `2026-10-09-behavior-assertion-eval-stack.md` closes as CLS-020 (three-README linkage, counters 19→20, Next CLS-021), root README archived-change count pinned. Verify: archive strict-validate 0; doc-hygiene green at the final revision; commits with quoted-heredoc messages.
 
 ## Deviation Register
 
