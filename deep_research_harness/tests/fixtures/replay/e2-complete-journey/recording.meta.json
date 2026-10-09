@@ -1,0 +1,24 @@
+{
+  "model": "JournalingDeepSeek",
+  "base_model": [
+    "JournalingMixin",
+    "PatchedChatDeepSeek"
+  ],
+  "deerflow_pin": "ceebf97fc31afbbfe2aadf7c8d82b03c3742d5d7",
+  "argv": [
+    "cli.py",
+    "create",
+    "对比 2025-2026 年主流开源 deep research 框架的能力边界与成熟度",
+    "--config",
+    "record"
+  ],
+  "recorded_at": "2026-10-10T07:11:19+0800",
+  "journal_schema": [
+    "key",
+    "output",
+    "tool_calls?"
+  ],
+  "deliberate_limits": [
+    "usage/token metadata not journaled"
+  ]
+}

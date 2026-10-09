@@ -81,6 +81,13 @@ class _Base(BaseChatModel):
     def _llm_type(self) -> str:
         return "replay-fixture"
 
+    def bind_tools(self, tools, **kwargs):  # noqa: ANN001, ANN202 — framework signature
+        # Tool execution happens in the agent's tool node; the replay model only
+        # emits the recorded tool_calls. Return self so the agent chain binds
+        # unchanged (the default BaseChatModel.bind_tools raises NotImplementedError —
+        # surfaced when the complete-graph replay first drove the real agent chain).
+        return self
+
     def _load(self) -> dict[str, dict]:
         """Return the full journal lines keyed by replay key.
 

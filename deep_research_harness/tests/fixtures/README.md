@@ -8,6 +8,7 @@
 | [real-small-stream.json](replay/real-small-stream.json) | [事件回放](../unit/test_event_stream_replay.py) | 留存事件形状，含外部工具内容；历史录制元信息不全，不证明事实正确 |
 | [real-model-io.jsonl](replay/real-model-io.jsonl) | [留存样本消费者](../integration/test_replay_model.py)（形状契约 + 回放机制参与） | 缺原始输入/model/pin/录制命令；不能独立复核来源，不冒充完整图回放——消费点已声明，只断言可断言面 |
 | [real-research-journal.jsonl](replay/real-research-journal.jsonl) | [行为画像断言](../unit/engine/test_behavior_profile.py) | 逐字提取自真实 run `5bb2c343`（2026-10-05，34 事件）的 journal；钉样画像，不断言研究质量为真 |
+| [e2-complete-journey/](replay/e2-complete-journey/) | [完整图回放](../integration/test_complete_graph_replay.py) | 录制旅程三件套（模型 journal 10 行 + 搜索语料 28 条 + provenance sidecar），逐字提取自验收跑 `55c35d44`（2026-10-10）；零凭证驱动全图；脱敏机器扫描 0 命中 + 驾驭者预清在案 |
 
 新增样本按消费者放 recorded（golden）或 replay（事件/模型记录）。同轮登记消费者、录制命令、配置、模型/框架 pin、revision 和用途；历史缺失就声明缺失。只留最小复现输入，提交前审查用户内容、凭证、工具结果和消息。移除 volatile 字段不等于脱敏。
 
