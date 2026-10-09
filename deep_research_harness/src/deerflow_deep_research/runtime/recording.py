@@ -27,6 +27,8 @@ import sys
 import time
 from pathlib import Path
 
+from langchain_core.outputs import ChatGeneration, ChatResult
+
 from .scripted.replay_model import _journal_tool_calls, replay_key
 
 SINK_ENV = "DEERFLOW_RECORD_SINK"
@@ -99,10 +101,26 @@ class JournalingMixin:
         return result
 
     async def _agenerate(self, messages, stop=None, run_manager=None, **kwargs):  # noqa: ANN001, ANN202
-        """Journal the async path too — the framework drives the graph via
-        astream, which reaches ``_agenerate`` and bypasses a sync-only override
-        (the first E-2 attempt recorded zero lines exactly this way: sidecar
-        written, journal empty)."""
+        """Journal the async path — a stream-less await routes here."""
         result = await super()._agenerate(messages, stop=stop, run_manager=run_manager, **kwargs)
         self._journal_result(messages, result)
         return result
+
+    async def _astream(self, messages, stop=None, run_manager=None, **kwargs):  # noqa: ANN001, ANN202
+        """Journal the streaming path — the framework drives the graph via
+        token streaming (``astream``), which reaches ``_astream`` natively on
+        OpenAI-family models and bypasses BOTH ``_generate`` and ``_agenerate``
+        (the first two E-2 attempts recorded zero lines exactly this way).
+        Chunks are re-emitted untouched and the assembled turn is journaled
+        after the stream ends; the duplicate guard folds the case where the
+        default ``_astream`` delegates through ``_agenerate``."""
+        chunks: list = []
+        async for chunk in super()._astream(messages, stop=stop, run_manager=run_manager, **kwargs):
+            chunks.append(chunk)
+            yield chunk
+        if not chunks:
+            return
+        message = chunks[0].message
+        for chunk in chunks[1:]:
+            message = message + chunk.message
+        self._journal_result(messages, ChatResult(generations=[ChatGeneration(message=message)]))

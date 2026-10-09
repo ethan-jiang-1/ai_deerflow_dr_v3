@@ -114,6 +114,46 @@ class JournalingMixinTest(unittest.TestCase):
 
 
 class AsyncPathTest(unittest.TestCase):
+    def test_streaming_path_journals_the_assembled_turn(self) -> None:
+        """The real bypass: OpenAI-family models stream natively via _astream,
+        which never touches _generate/_agenerate. A base with its own _astream
+        (the real-model shape) must be journaled by the streaming override —
+        chunks re-emitted untouched, the merged turn appended once."""
+        import asyncio
+
+        from langchain_core.messages import AIMessageChunk
+        from langchain_core.outputs import ChatGenerationChunk
+
+        class _StreamingScripted(ScriptedChatModel):
+            async def _astream(self, messages, stop=None, run_manager=None, **kwargs):  # noqa: ANN001, ANN202
+                item = self.script[min(self.cursor, len(self.script) - 1)]
+                self.cursor += 1
+                text = str(item.get("content", ""))
+                for piece in (text[:2], text[2:]):
+                    yield ChatGenerationChunk(message=AIMessageChunk(content=piece))
+
+        class _JournaledStream(JournalingMixin, _StreamingScripted):
+            def __init__(self) -> None:
+                ScriptedChatModel.__init__(self)
+                self._init_journal(pin="stream-pin")
+
+        async def _drive() -> list:
+            out = []
+            with _EnvScript([{"content": "流式回答整段"}], Path(_drive_sink[0])):
+                model = _JournaledStream()
+                async for chunk in model._astream([HumanMessage(content="流问")]):
+                    out.append(chunk.message.content)
+            return out
+
+        with tempfile.TemporaryDirectory() as td:
+            sink = Path(td) / "model-io.jsonl"
+            _drive_sink = [str(sink)]
+            pieces = asyncio.run(_drive())
+            self.assertEqual("".join(pieces), "流式回答整段")
+            lines = [json.loads(l) for l in sink.read_text(encoding="utf-8").splitlines()]
+            self.assertEqual(len(lines), 1, f"expected one line, got {lines}")
+            self.assertEqual(lines[0]["output"], "流式回答整段")
+
     def test_async_path_journals_exactly_once(self) -> None:
         """The framework drives the graph via astream → _agenerate; with a base
         that has no _agenerate of its own, the default delegates to the sync
