@@ -1,6 +1,6 @@
 # Fixed Bugs Index — 已修复 bug 归档
 
-> 最后更新: 2026-10-02（仓库起骨架日，空表） | `_backlog/_archived/_fixed_bugs/` — 已修复 bug 的归档目录。
+> 最后更新: 2026-10-10（BUG-001 修复关闭：fix-headless-plan-gate） | `_backlog/_archived/_fixed_bugs/` — 已修复 bug 的归档目录。
 > 接收来自 [`../../bugs/`](../../bugs/) 的 bug。`_` 前缀 = coding agent 默认忽略。
 >
 > **本目录是 bug 编号的唯一权威来源——新 bug 的编号 = 已分配的最大编号 + 1（已修复目录 ∪ 活跃目录）。**
@@ -17,5 +17,6 @@ bug 修完后从 `_backlog/bugs/` 通过 `git mv` 移入本目录：
 
 | ID | Date | Title |
 |----|------|-------|
+| BUG-001 | 2026-10-10 | headless 跑计划门缺席——计划输出直落 completed 冒充报告（fix-headless-plan-gate；根因确诊与初判修正在卡） |
 
-**Next available bug ID: BUG-001**
+**Next available bug ID: BUG-002**
