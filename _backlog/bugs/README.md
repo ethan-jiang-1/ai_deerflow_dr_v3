@@ -24,8 +24,9 @@
 
 | Bug | 标题 | 发现 | 状态 |
 |-----|------|------|------|
+| [BUG-001-degenerate-plan-as-report.md](BUG-001-degenerate-plan-as-report.md) | 真梯连续两跑"计划走私 + 计划冒充报告"退化（CLS-018 病状复发） | 2026-10-10 | 活跃 |
 
-**Next available bug ID: BUG-001**
+**Next available bug ID: BUG-002**
 
 ---
 
