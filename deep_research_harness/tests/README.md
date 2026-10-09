@@ -81,7 +81,8 @@ CLI 旅程的 refine 断言第二代跑完且报告 admit；cancel 在旅程中�
 | --- | --- | --- |
 | [clarification-exhaustion.json](fixtures/recorded/clarification-exhaustion.json) | entry_surface 渲染 golden；样本自述来自脚本 run | 不执行澄清耗尽场景，也不代表真实模型行为 |
 | [real-small-stream.json](fixtures/replay/real-small-stream.json) | event_stream_replay 消费；锁定记录事件形状 | 有外部内容/工具回复；不是事实正确性的标准答案，录制元信息不完整 |
-| [real-model-io.jsonl](fixtures/replay/real-model-io.jsonl) | 留存模型输出样本；当前没有测试消费者 | 单条 key/output，缺原始输入/model/pin/录制命令；不能独立复核真实来源 |
+| [real-model-io.jsonl](fixtures/replay/real-model-io.jsonl) | 留存模型输出样本；首个测试消费者在 [test_replay_model.py](integration/test_replay_model.py)（形状契约 + 回放机制参与） | 单条 key/output，缺原始输入/model/pin/录制命令；不能独立复核真实来源——消费点声明，只断言可断言面 |
+| [real-research-journal.jsonl](fixtures/replay/real-research-journal.jsonl) | [test_behavior_profile.py](unit/engine/test_behavior_profile.py) 消费；行为画像钉样（工具选择/事件构成/时长） | 逐字提取自真实 run `5bb2c343`（2026-10-05）journal；画像钉样不证明研究质量为真 |
 | [runtime/scripted](../src/deerflow_deep_research/runtime/scripted/__init__.py) | fixture 配置动态加载的 ScriptedChatModel / FakeWebSearchTool | 代码 provider，不是样本文件；最后脚本项会重复，循环上限由调用方负责 |
 | [replay_model.py](../src/deerflow_deep_research/runtime/scripted/replay_model.py) | RecordingChatModel / ReplayChatModel 的内容寻址机制 | key 忽略 system 消息，输出只保存 content，不保留完整 tool_calls/usage 协议 |
 | [record_stream.py](../tools/record_stream.py) | 显式记录 client.stream；不在自动收集中 | 外部调用/数据写入工具，不是安全脱敏器 |

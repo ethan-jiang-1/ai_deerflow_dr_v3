@@ -12,6 +12,7 @@
 | subagent-posture-guard | 两份 checked-in 配置声明无自定义 subagent；未来任何声明必须把 `task` 排除在 `disallowed_tools` 外（深度自校验 fail-closed，报错点名配置文件/违规者/remedy） | `tests/unit/runtime/test_subagent_posture.py`（含违反声明→红的负例控制） |
 | command-surface-guard | `COMMANDS.md` 登记的 make targets / cli 子命令与 Makefile、`runtime/interaction/cli.py` 三处互相一致；漂移即红 | `tests/unit/interaction/test_command_surface.py`（双向一致性 + 负例控制） |
 | source-traceability | 报告中每个 http(s) URL 对同 run 搜索语料的"有记录支撑"是纯函数可计算的（证支撑、不证为真）；空语料不可能假绿 | `tests/unit/engine/test_traceability.py`（fixture 钉样 + 合成/空语料/篡改三类负例） |
+| behavior-profile | 真实 run 的 journal 纯派生观察画像（工具选择/事件构成/时长跨度）对照声明期望、违规点名；**观察非准入**——不产准入码、不进 gate；token 维度不断言（journal 无结构化字段，test-evidence spec 在案） | `tests/unit/engine/test_behavior_profile.py`（真实 journal fixture 钉样 + 篡改/退化研究/未知工具三类负例） |
 | application-unit-gate | `make verify`（语义 owner: [../COMMANDS.md](../COMMANDS.md)） | `Makefile` + gate 自身的红证明回执（红 → 绿） |
 | repository-governance-gates | 聚合 closeout 门禁及其组件 checker（结构/需求/specs/指导/依赖方向）在归档前全部 exit 0 | 仓库根治理目录（其 README 登记确切命令；governance-owned，非 harness lane） |
 

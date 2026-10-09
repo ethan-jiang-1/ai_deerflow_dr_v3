@@ -26,6 +26,11 @@ DECLARED_MACHINES: tuple[tuple[str, str], ...] = (
     ("source-traceability", "Every http(s) URL in a final report is computably "
      "checkable against the run's own search corpus; the pure verdict proves record "
      "support, never that a record is true, and cannot pass on an empty corpus."),
+    ("behavior-profile", "A real run's journal derives a pure observational profile "
+     "(tool selection, event composition, wall-clock span) checked against declared "
+     "expectations with named violations; it observes and never admits — no "
+     "admission codes, no gate consumer — and asserts no token dimension (the "
+     "journal carries none)."),
     ("application-unit-gate", "make verify runs the stdlib unittest suite and exits "
      "non-zero on any failure; it never links OpenSpec content."),
     ("repository-governance-gates", "The aggregate closeout gate and its component "

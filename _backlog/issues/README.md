@@ -20,6 +20,7 @@
 
 | Issue | 一句话 |
 |------|--------|
+| [2026-10-09-behavior-assertion-eval-stack.md](2026-10-09-behavior-assertion-eval-stack.md) | 行为断言 eval 栈（已触发行消费）：test-evidence owning spec + 级 4 画像机器 + 钉样断言 + 留存样本首个消费者 |
 
 **Next available issue ID: CLS-020**（移入 `_settled_issues/` 时分配；CLS-019 已分配给 backlog-governance-reborrow）
 
