@@ -23,6 +23,7 @@
 
 | Plan | 一句话 |
 |------|--------|
+| [2026-10-09-backlog-governance-reborrow.md](2026-10-09-backlog-governance-reborrow.md) | _backlog 治理反向借鉴：plans→issues 更名 + 活触发器索引 + 门禁补盲（proposal 待拍板） |
 
 **Next available plan ID: CLS-019**（移入 `_closed_plans/` 时分配）
 
