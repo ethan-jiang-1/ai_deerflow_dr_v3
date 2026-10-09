@@ -2,7 +2,7 @@
 
 > 最后更新: 2026-10-09（adopt-issue-ledger-governance：plans 类别退役、issues 立为正式类别、
 > `_done/` 更名 `_archived/`；新增关闭条件四态表、卡片户口与状态词表、活触发器索引与扫描义务、
-> methods/ 方法库、刻意不借登记与翻案记录） |
+> methods/ 方法库、刻意不借登记与翻案记录；同日驾驭者更名 `_reference/` → `_research/`，角色不变） |
 > 本目录追踪本仓库的设计推敲、上游分析与缺陷。
 > 活跃工作走 OpenSpec（`openspec/changes/`）；本目录是 **分析与决策记录 + 缺陷池**，不是运行时真相。
 >
@@ -13,7 +13,7 @@
 > 1. **归档工作件**（会关闭；coding agent 默认忽略，除非点名）：`_archived/`
 >    （含 `_fixed_bugs/`、`_settled_issues/`、`_suspended_bugs/`、`_suspended_issues/`）。
 > 2. **留存参考 / 证据**（不参与工作件搬迁；agent 按任务按需读，**不**默认忽略）：
->    `_reference/`（外部系统分析）。
+>    `_research/`（外部系统分析）。
 >
 > 活跃工作件在无前缀目录（`bugs/`、`issues/`）；`methods/` 是无前缀的**常设方法库**（不是工作件区、不占名册）。**`_` 只表示"不在活跃队列"，不表示"禁止读"**——读不读由任务决定。`check_doc_hygiene.py` 校验：磁盘上任何 `_` 目录必须在此声明，且每个声明名必须出现在本文件中。
 
@@ -39,7 +39,7 @@ _backlog/
 ├── bugs/                              # 🐛 活跃 bug → 修完移入 _archived/_fixed_bugs/
 ├── issues/                            # 📐 活跃 issue（推敲 → 结论 → 交接）→ 完成移入 _archived/_settled_issues/
 │
-└── _reference/                        # 📚 留存：外部系统分析资料（消化后产出 issue）
+└── _research/                        # 📚 留存：外部系统分析资料（消化后产出 issue）
 ```
 
 ---
@@ -127,7 +127,7 @@ agent 不得自行挂起；回活需要一次显式的新优先级决定。
 | 卡走到哪一步 | 方法（[methods/](methods/README.md)） | 关键 owner |
 |---|---|---|
 | 需求不清、问题太大要拆 | [澄清需求](methods/requirements-elicitation.md) | `CONTEXT-MAP.md`（词汇）；取代检查扫 [triggers.md](triggers.md) |
-| 缺事实、要调研或试原型 | [补充证据](methods/requirements-probes.md) | 卡内留证；长寿命外部分析进 `_reference/` |
+| 缺事实、要调研或试原型 | [补充证据](methods/requirements-probes.md) | 卡内留证；长寿命外部分析进 `_research/` |
 | 不知道怎样算完成 | [设计验收标准](methods/validation-design.md) | [车道表](../deep_research_harness/docs/testing-and-evaluation.md) + [test-evidence-policy](../openspec/governance/test-evidence-policy.md) |
 | 信息齐、要比方案定结论 | [整理方案与结论](methods/requirements-synthesis.md) | 本文件关闭条件四态表 |
 | 结论定了、要交接下游 | [申请下游处理](methods/issue-to-change.md) | `openspec/change-guidance/README.md`（Change Focus） |
@@ -177,7 +177,7 @@ agent 不得自行挂起；回活需要一次显式的新优先级决定。
 
 | 不借什么 | 理由 |
 |---|---|
-| `research/` 卡片随迁生命周期 | 本仓 `_reference/` 是长寿命框架参照（DeerFlow 盘点语料），不是按卡消费的证据堆；活跃卡证据就写在卡内 |
+| `research/` 卡片随迁生命周期 | 名字已对齐借鉴源（2026-10-09 驾驭者更名 `_reference/` → `_research/`，角色不变），但**随卡迁 archive 的生命周期仍不借**：本仓 `_research/` 是长寿命框架参照（DeerFlow 盘点语料），不是按卡消费的证据堆；活跃卡证据就写在卡内 |
 | YAML frontmatter 卡片头 | 本仓状态行传统已被 bug 卡与门禁锚定，两套头部约定是纯成本 |
 | `YYMMDD` 短日期卡名 | `YYYY-MM-DD` 是本仓拍板过的强制约定，改名收益不值全量翻修 |
 | 🔒 保留卡纪律 | 根 AGENTS.md 的 REVIEW 节制（用户保留区清单）已覆盖同类边界 |
@@ -241,5 +241,5 @@ git mv issues/<name>.md _archived/_settled_issues/<name>.md
 | `openspec/specs/` | 已接受 spec（运行时真相层，与 `_backlog` 各自簿记） |
 | `openspec/changes/` | 活跃 change（完成归档于 `openspec/changes/archive/`） |
 | `deerflow/AGENTS.md`、`deerflow/backend/AGENTS.md` | 框架 submodule 自带的只读指引 |
-| `_backlog/_reference/` | 外部系统分析资料（如 DeerFlow v2.1.0 原生 Deep Research 能力盘点），消化后产出 `_backlog/issues/` |
+| `_backlog/_research/` | 外部系统分析资料（如 DeerFlow v2.1.0 原生 Deep Research 能力盘点），消化后产出 `_backlog/issues/` |
 | `deerflow/backend/` `deerflow/frontend/` | 上游镜像（**禁改**，submodule 锁定在 `deerflow/` 内） |

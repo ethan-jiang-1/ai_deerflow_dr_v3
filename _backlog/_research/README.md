@@ -1,6 +1,6 @@
-# Reference — 外部系统分析资料
+# Research — 外部系统调研与分析语料
 
-> 最后更新: 2026-10-09（路径同步 adopt-issue-ledger-governance：plans→issues） | 本目录存放对外部系统的分析、研究笔记、架构参考。
+> 最后更新: 2026-10-09（adopt-issue-ledger-governance 路径同步 + 驾驭者更名 `_reference/`→`_research/`，角色不变：长寿命留存语料，非随卡迁移证据区） | 本目录存放对外部系统的分析、研究笔记、架构参考。
 > 这些是**消化材料**——读完、理解完之后，产出 `_backlog/issues/` 里的实际方案。
 
 ## 目录
@@ -25,7 +25,7 @@
 ## 与 issues 的关系
 
 ```
-reference/  →  学习外部系统的设计、机制、取舍
+_research/  →  学习外部系统的设计、机制、取舍
     ↓ 消化
 issues/     →  基于学习产出本项目的具体方案
     ↓ 落地

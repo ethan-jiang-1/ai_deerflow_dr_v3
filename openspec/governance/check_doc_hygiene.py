@@ -64,7 +64,7 @@ BACKLOG_ROOT = Path("_backlog")
 # agree, so a living area cannot hide behind the `_` prefix.
 BACKLOG_UNDERSCORE_DIRS: tuple[str, ...] = (
     "_archived",
-    "_reference",
+    "_research",
 )
 ENTRY_DOCS: tuple[str, ...] = (
     "AGENTS.md",

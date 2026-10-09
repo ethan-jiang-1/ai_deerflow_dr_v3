@@ -57,7 +57,7 @@ fact-finding.
 Keep short findings in the card's known/unresolved sections. This repo has no card-migration
 research directory by ruling (see the charter's 刻意不借 register): evidence lives on the card;
 material with long-lived external-analysis value goes to
-[`_reference/`](../_reference/README.md) per its own contract. Link the evidence once; record
+[`_research/`](../_research/README.md) per its own contract. Link the evidence once; record
 which question it settles, source/version or artifact commit, limitations, attribution and what
 becomes answerable next.
 
