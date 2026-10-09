@@ -45,7 +45,7 @@ DeerFlow 接线 / 事件 / checkpoint → make smoke
 | --- | --- | --- | --- |
 | 1 剧本模型 | ✅ [ScriptedChatModel](../src/deerflow_deep_research/runtime/scripted/__init__.py) + `DEERFLOW_FAKE_SCRIPT` | 预编程消息（含 tool_calls 与 raise），框架 smoke 保留真图/中间件/checkpointer | 零凭证验证绑定/入口合同，不证明研究质量 |
 | 2 记录事件流回放 | ✅ [事件记录](../tests/fixtures/replay/real-small-stream.json) + [回放测试](../tests/unit/runtime/test_event_stream_replay.py) | 记录形状经真实 Harness pump 回放，不重跑模型/工具 | 锁定 flat chunk 适配与 journal 回归 |
-| 3 内容寻址模型回放 | ✅ [机制实现](../src/deerflow_deep_research/runtime/scripted/replay_model.py) + [机制测试](../tests/integration/test_replay_model.py) | 临时脚本录制/回放与 miss 诊断；[留存模型样本](../tests/fixtures/replay/real-model-io.jsonl) 已有首个测试消费者（形状契约 + 回放机制参与，来源限制在消费点声明） | 不保留完整模型协议；尚无真实模型记录接入图的旅程证明 |
+| 3 内容寻址模型回放 | ✅ [机制实现](../src/deerflow_deep_research/runtime/scripted/replay_model.py) + [机制测试](../tests/integration/test_replay_model.py) | 临时脚本录制/回放与 miss 诊断；journal 行含 content + 可选 tool_calls（向后兼容旧行）；[record 配置](../config/record.yaml) 可对真跑录制模型 I/O journal + 元信息 sidecar（[provider](../src/deerflow_deep_research/runtime/recording.py)，E-1 落地）；[留存模型样本](../tests/fixtures/replay/real-model-io.jsonl) 已有首个测试消费者 | usage/token 协议不保留（边界在案）；尚无真实模型记录接入图的旅程证明（E-2/E-3 待落地） |
 | 4 行为断言（live 面） | ✅ [behavior_profile](../src/deerflow_deep_research/engine/behavior_profile.py) + [断言测试](../tests/unit/engine/test_behavior_profile.py)（[真实 journal fixture](../tests/fixtures/replay/real-research-journal.jsonl)） | 纯派生自真实 run 的 journal：工具选择计数、事件构成、时长跨度，对照声明期望、违规点名；注册机器 `behavior-profile` | 显式 opt-in 的质量观察：**观察非准入**（不产准入码、不进 gate）；**token 不断言**——journal 无结构化字段，解析内容字符串即伪造维度（test-evidence spec 在案） |
 
 替身选型纪律（借鉴）：**替身只替换"贵的与不确定的"（模型、时间、外部凭证），不替换"被测语义本身"**——无 fake-redis 类的先例，我们同样无假 checkpointer。

@@ -102,6 +102,7 @@ files = [
 files = [
   "deep_research_harness/config/base.yaml",
   "deep_research_harness/config/fixture.yaml",
+  "deep_research_harness/config/record.yaml",
   "deep_research_harness/src/deerflow_deep_research/runtime/adapters/client.py",
   "deep_research_harness/src/deerflow_deep_research/runtime/pump.py",
   "deep_research_harness/src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py",

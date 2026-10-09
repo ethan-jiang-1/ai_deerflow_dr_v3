@@ -27,6 +27,7 @@ make test      # unit + contract 套件（stdlib，离线可跑）
 make verify    # 应用单元门禁 = make test 的 gate 形态；任一测试失败即非零退出
 make smoke     # 集成 lane（需先 uv sync：框架依赖环境）
 make record-stream PROBLEM="…" CONFIG=base   # 真实 API 事件录制；省略 CONFIG 则录制 fixture
+DEERFLOW_RECORD_SINK=<路径> make create PROBLEM="…" CONFIG=record   # 真跑 + 模型 I/O journal（E 完整图回放素材；composition 仍 all_real）
 ```
 
 `make verify` 只承载 harness 自身测试，不读、不引、不执行任何 OpenSpec 内容。

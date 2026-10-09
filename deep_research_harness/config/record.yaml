@@ -1,0 +1,48 @@
+# record.yaml — real-run configuration with model-I/O journaling (E-1, journal-real-model-io).
+# Identical to base.yaml except the model `use:` seam: the real model is wrapped by the
+# harness-owned journaling provider, which appends every model turn (content + tool_calls)
+# to $DEERFLOW_RECORD_SINK and writes a one-time metadata sidecar. Construction fails
+# loudly when DEERFLOW_RECORD_SINK is unset. The bundle's declared composition stays
+# `all_real` (a journaled real run is still a real run); usage/token metadata is
+# deliberately not journaled (matches the ladder's declared token boundary).
+config_version: 45
+recursion_limit: 300
+log_level: info
+
+database:
+  checkpoint_channel_mode: delta
+  checkpoint_delta:
+    snapshot_frequency: 10
+
+sandbox:
+  use: deerflow.sandbox.local:LocalSandboxProvider
+  allow_host_bash: false
+
+models:
+  - name: deepseek-flash
+    display_name: DeepSeek Flash V4.1 (journaled)
+    use: deerflow_deep_research.runtime.recording_deepseek:JournalingDeepSeek
+    model: deepseek-flash
+    api_key: $DEEPSEEK_API_KEY
+    supports_thinking: true
+
+tool_groups:
+  - name: web
+
+tools:
+  - name: web_search
+    group: web
+    use: deerflow.community.tavily.tools:web_search_tool
+    api_key: $TAVILY_API_KEY
+    max_results: 5
+  - name: web_fetch
+    group: web
+    use: deerflow.community.tavily.tools:web_fetch_tool
+    api_key: $TAVILY_API_KEY
+    timeout: 10
+
+summarization:
+  enabled: true
+
+available_skills:
+  - deep-research

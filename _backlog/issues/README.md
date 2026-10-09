@@ -20,6 +20,7 @@
 
 | Issue | 一句话 |
 |------|--------|
+| [2026-10-10-real-model-io-complete-replay.md](2026-10-10-real-model-io-complete-replay.md) | E·完整图回放：录制旋钮+journal 协议扩展（E-1 journal-real-model-io）→ 真跑录制 → 脱敏终审 → 零凭证完整图回放 |
 
 **Next available issue ID: CLS-021**（移入 `_settled_issues/` 时分配；CLS-019/020 已分配）
 

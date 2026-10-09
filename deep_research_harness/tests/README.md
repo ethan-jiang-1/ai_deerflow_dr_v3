@@ -84,7 +84,8 @@ CLI 旅程的 refine 断言第二代跑完且报告 admit；cancel 在旅程中�
 | [real-model-io.jsonl](fixtures/replay/real-model-io.jsonl) | 留存模型输出样本；首个测试消费者在 [test_replay_model.py](integration/test_replay_model.py)（形状契约 + 回放机制参与） | 单条 key/output，缺原始输入/model/pin/录制命令；不能独立复核真实来源——消费点声明，只断言可断言面 |
 | [real-research-journal.jsonl](fixtures/replay/real-research-journal.jsonl) | [test_behavior_profile.py](unit/engine/test_behavior_profile.py) 消费；行为画像钉样（工具选择/事件构成/时长） | 逐字提取自真实 run `5bb2c343`（2026-10-05）journal；画像钉样不证明研究质量为真 |
 | [runtime/scripted](../src/deerflow_deep_research/runtime/scripted/__init__.py) | fixture 配置动态加载的 ScriptedChatModel / FakeWebSearchTool | 代码 provider，不是样本文件；最后脚本项会重复，循环上限由调用方负责 |
-| [replay_model.py](../src/deerflow_deep_research/runtime/scripted/replay_model.py) | RecordingChatModel / ReplayChatModel 的内容寻址机制 | key 忽略 system 消息，输出只保存 content，不保留完整 tool_calls/usage 协议 |
+| [replay_model.py](../src/deerflow_deep_research/runtime/scripted/replay_model.py) | RecordingChatModel / ReplayChatModel 的内容寻址机制 | key 忽略 system 消息；journal 行含 content + 可选 tool_calls（向后兼容旧行）；usage/token 协议仍不保留（边界在案） |
+| [recording.py / recording_deepseek.py](../src/deerflow_deep_research/runtime/recording.py) | record 配置的 journaling provider（真模型 + mixin，journal + 元信息 sidecar） | 仅经 config/record.yaml 的 use: 缝构造；DEERFLOW_RECORD_SINK 必设；usage/token 不录 | [test_recording.py](integration/test_recording.py)（mixin journal/往返/负例；真实组合类由 E-2 真跑检验） |
 | [record_stream.py](../tools/record_stream.py) | 显式记录 client.stream；不在自动收集中 | 外部调用/数据写入工具，不是安全脱敏器 |
 
 录制真实事件时必须明确选择 `CONFIG=base`；[Makefile](../Makefile) 的 CONFIG 默认 fixture，不能仅凭 target 名认定调用了真实 API。
