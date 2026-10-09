@@ -771,7 +771,7 @@ def _self_test() -> list[str]:
         (ledger / "_backlog" / "_archived" / "_settled_issues" / "README.md").write_text(
             "# Settled\n\n| ID | Date | File | Summary |\n|---|---|---|---|\n"
             "| CLS-001 | 2026-10-01 | [2026-10-01-gone.md](2026-10-01-gone.md) | x |\n\n"
-            "**Next available plan ID: CLS-002**\n",
+            "**Next available issue ID: CLS-002**\n",
             encoding="utf-8",
         )
         (ledger / "_backlog" / "_archived" ).mkdir(parents=True, exist_ok=True)
@@ -804,7 +804,7 @@ def _self_test() -> list[str]:
             "|------|--------|\n"
             "```\n"
             "| CLS-001 | 2026-10-01 | [2026-10-01-here.md](2026-10-01-here.md) | ok |\n\n"
-            "**Next available plan ID: CLS-002**\n",
+            "**Next available issue ID: CLS-002**\n",
             encoding="utf-8",
         )
         placed_problems = _rule_ledger_consistency(placed)

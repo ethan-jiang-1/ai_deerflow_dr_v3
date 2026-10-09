@@ -9,7 +9,7 @@
 
 issue 关闭后从 `_backlog/issues/` 通过 `git mv` 移入本目录：
 1. 在本文件表格加一行（CLS-NNN + 日期 + 文件名 + 简述），编号 = 当前最大 + 1
-2. 更新最后的 "Next available plan ID" 行
+2. 更新最后的 "Next available issue ID" 行
 3. 更新 `../../issues/README.md`（移除该卡的行）
 4. 更新 `../README.md`（计数 +1）
 
@@ -39,4 +39,4 @@ issue 关闭后从 `_backlog/issues/` 通过 `git mv` 移入本目录：
 | CLS-017 | 2026-10-08 | [2026-10-08-application-corpus-adoption.md](2026-10-08-application-corpus-adoption.md) | 应用开发语料吸收主卡：C1 闭环地图 + C2 权威三件套（Deviation Register/Delivery Record 常设段+CHA-001 守卫）+ C3 钉定纪律与语料入库（38 文件）+ C6 第一批（C 回放物化/A 来源可溯机器/B 结构契约准入+hash_mismatch 退役+spec sync）+ C4/C5 小件，八 change 全归档；E/F 立项才动、G 显式不做 |
 | CLS-019 | 2026-10-09 | [2026-10-09-backlog-governance-reborrow.md](2026-10-09-backlog-governance-reborrow.md) | _backlog 治理反向借鉴（同源制度下游增量回流）：plans→issues、_done→_archived、_closed_plans→_settled_issues 三层更名 + 关闭条件四态表 + 户口/状态词表 + triggers.md 活触发器索引（8 行种子）+ methods/ 方法库（7 篇，apply 中翻案采纳）+ checker 户口/滞留门禁（prove-it-red 1→0）；两条 apply 中翻案（methods、_archived）均登记；新门禁下第一张完整生命周期卡 |
 
-**Next available plan ID: CLS-020**
+**Next available issue ID: CLS-020**

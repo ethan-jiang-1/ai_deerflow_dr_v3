@@ -41,9 +41,9 @@ refers to the criteria without repeating them. Each criterion names:
 | Human judgment | Only where taste, business value, risk, compliance or authority cannot be mechanically decided |
 
 Use the repo's evidence lanes to choose the owner and command:
-[testing-and-evaluation](../../../deep_research_harness/docs/testing-and-evaluation.md) (车道表
+[testing-and-evaluation](../../deep_research_harness/docs/testing-and-evaluation.md) (车道表
 与各 lane 的"不证明什么"列) and
-[test-evidence-policy](../../../openspec/governance/test-evidence-policy.md). Preserve source
+[test-evidence-policy](../../openspec/governance/test-evidence-policy.md). Preserve source
 links, versions, artifact commits and attribution for load-bearing evidence. A command
 finishing, a keyword being present, one happy-path example, or a passing demo is not by itself
 a pass condition.

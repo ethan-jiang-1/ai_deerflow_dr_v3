@@ -5,8 +5,8 @@
 本体；技能未注册或本地缺失时，如实报告缺了哪个本体、阻断哪一步，继续不依赖它的工作。
 
 backlog 负责把问题想清楚，向 OpenSpec 申请后续处理，是前后两段。这里准备结论、依据和必要的
-验收标准；下游是否立 change、怎么实施，由 [OpenSpec 流程](../../../openspec/README.md) 与
-[change-guidance](../../../openspec/change-guidance/README.md) 决定。申请提交不等于 change 已立，
+验收标准；下游是否立 change、怎么实施，由 [OpenSpec 流程](../../openspec/README.md) 与
+[change-guidance](../../openspec/change-guidance/README.md) 决定。申请提交不等于 change 已立，
 也不等于下游完成。
 
 ## 现在需要哪篇
@@ -25,7 +25,7 @@ backlog 负责把问题想清楚，向 OpenSpec 申请后续处理，是前后�
 
 | 当前情况 | 方法 | 用途 |
 |---|---|---|
-| 已有验收标准，需要知道用什么证据检查 | [选择证据](validation-evidence.md) | 按 [车道表](../../../deep_research_harness/docs/testing-and-evaluation.md) 选最小车道，说明它能证明什么 |
+| 已有验收标准，需要知道用什么证据检查 | [选择证据](validation-evidence.md) | 按 [车道表](../../deep_research_harness/docs/testing-and-evaluation.md) 选最小车道，说明它能证明什么 |
 | 声称做完，需要检查是否符合要求 | [判断验收结果](validation-judgment.md) | 逐项记录通过、不通过、证据不足或等待用户判断；结果回到承载该工作的现有记录 |
 
 发现需求不清时，回到具体问题补充确认；发现实现不符合标准时，记录实际差异。不能改标准来迁就实现。
@@ -52,6 +52,6 @@ Matt Pocock 的技能，见其 methods/README 登记的版本），按本仓语�
 | [补充证据](requirements-probes.md) | `research`、`prototype` |
 | [整理方案与结论](requirements-synthesis.md) | 需要分析模块接口时读 `codebase-design` |
 | [设计验收标准](validation-design.md) | `tdd`、`codebase-design` |
-| [选择证据](validation-evidence.md) | 无外部技能依赖；按本仓 [车道表](../../../deep_research_harness/docs/testing-and-evaluation.md) |
+| [选择证据](validation-evidence.md) | 无外部技能依赖；按本仓 [车道表](../../deep_research_harness/docs/testing-and-evaluation.md) |
 | [判断验收结果](validation-judgment.md) | 需要相应步骤时读 `code-review`、`diagnosing-bugs` |
 | [申请下游处理](issue-to-change.md) | `openspec-propose`（下游入口）；打磨用 `polish-openspec-change` |

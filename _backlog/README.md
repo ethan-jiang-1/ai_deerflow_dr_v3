@@ -225,7 +225,7 @@ git mv issues/<name>.md _archived/_settled_issues/<name>.md
 | 操作 | 怎么改 |
 |------|--------|
 | `issues/README.md` | 从活跃列表移除该 issue 的行 |
-| `_archived/_settled_issues/README.md` | 表格加一行 + 更新 Next available plan ID |
+| `_archived/_settled_issues/README.md` | 表格加一行 + 更新 Next available issue ID |
 | `_archived/README.md` | 已关闭 issue 计数 +1 |
 
 ---

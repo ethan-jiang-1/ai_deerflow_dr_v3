@@ -1,14 +1,14 @@
 # Issues — 活跃 issue 列表（推敲 → 结论 → 交接）
 
 >
-> **CLS 编号权威在 `_archived/_settled_issues/`；新号 = 已分配的最大编号 + 1，移入时分配（Next available plan ID: CLS-019）。本文件只列活跃 issue，活跃卡本身不带编号，文件名即标识。**
+> **CLS 编号权威在 `_archived/_settled_issues/`；新号 = 已分配的最大编号 + 1，移入时分配（Next available issue ID: CLS-020）。本文件只列活跃 issue，活跃卡本身不带编号，文件名即标识。**
 >
 > ⚠️ **文件名必须以日期编码开头：`YYYY-MM-DD-<name>.md`。这是强制约定，不是惯例**——无日期前缀的卡无法按时间排序与追溯（历史经验教训，v2 踩过）。
 
 ## 完成一个 issue 的步骤
 
 1. `git mv issues/<name>.md _archived/_settled_issues/<name>.md`
-2. 更新 `_archived/_settled_issues/README.md`（加一行 + 更新 Next available plan ID）
+2. 更新 `_archived/_settled_issues/README.md`（加一行 + 更新 Next available issue ID）
 3. 更新本文件（删掉该卡）
 4. 更新 `../_archived/README.md`（计数 +1 closed）
 
@@ -21,7 +21,7 @@
 | Issue | 一句话 |
 |------|--------|
 
-**Next available plan ID: CLS-020**（移入 `_settled_issues/` 时分配；CLS-019 已分配给 backlog-governance-reborrow）
+**Next available issue ID: CLS-020**（移入 `_settled_issues/` 时分配；CLS-019 已分配给 backlog-governance-reborrow）
 
 新方向性工作**必须显性立卡**（驾驭者要求，2026-10-07）：先立卡记录决策与取舍，再走 OpenSpec change 实施；完成后按上方 ritual 关闭归档。
 

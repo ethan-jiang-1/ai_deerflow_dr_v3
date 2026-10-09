@@ -47,7 +47,7 @@ block only dependent questions. Capture answers, attribution, alternatives and c
 card as they settle, not at the end. Record only alternatives actually considered; a fixed
 constraint need not generate fake candidates.
 
-Vocabulary owners in this repo are [`CONTEXT-MAP.md`](../../../CONTEXT-MAP.md) and the
+Vocabulary owners in this repo are [`CONTEXT-MAP.md`](../../CONTEXT-MAP.md) and the
 per-layer `CONTEXT.md` files — tentative terms and choices stay on the card; update current
 owners only for authorized, effective facts. Do not create parallel glossary directories.
 
