@@ -25,9 +25,11 @@
 合规清单调研；内容天然干净便于脱敏终审）。其余按证据自决：journal 扩展 tool_calls 字段
 （向后兼容，旧行仍按 content 回放）；usage/token 仍不录（与级 4 token 边界一致）。
 
-**下一步：** E-1 change `journal-real-model-io`（录制旋钮 + journal 协议扩展 + 红绿，零 API
-花费）→ E-2 真跑录制（费用发生点）→ 机器脱敏初筛 + 驾驭者终审 → E-3 零凭证完整图回放测试
-+ fixture 入库 → 本卡关闭。
+**下一步：** **E-2/E-3 被 BUG-001 阻塞（如实记录）**：journaling 接线四轮 follow-through 修复后
+全通（v2 协议流 `_stream` 旁路是最终根因；微真梯探针 journal 1 行实证，key 403b9b3e）；但研究型
+问题连续四跑同形态退化（BUG-001），第四跑录制产物仅 1 行退化旅程（key 2fd65eea，2067 字符计划
+文本，零工具轮）且第二轮 key 不在 journal——E-3 完整图回放必然 ReplayMiss。脱敏初筛 0 命中
+（公开话题，内容干净）。**先修 BUG-001 恢复真研究旅程，再重录完整旅程 → E-3 → 本卡关闭**。
 
 ## 方案与取舍
 
@@ -54,14 +56,13 @@ F（陈述级接地）与 G（方差）维持 CLS-017 裁决；录制工具的�
 
 ## 落地关联
 
-change 家族：**E-1 done**（`journal-real-model-io`，archive `2026-10-10-journal-real-model-io`：
-record 配置 + JournalingMixin/组合 provider + journal 协议扩展（tool_calls，向后兼容）+ sidecar；
-三条偏离在案——unit→integration 车道修正、import 守卫逮住的二级相对导入 bug、**CLI argparse
-choices 漏放 record**（E-1 声称"直传已处理"只对一半：composition 映射在、choices 没放开——
-E-2 首触发即被 argparse 逮红，一行修复 + verify 0 直落，spec 不钉 choices 属实现细节））→
-**E-2 真跑录制**（进行中：`DEERFLOW_RECORD_SINK=… CONFIG=record make create`）→ 脱敏初筛 +
-驾驭者终审 → **E-3 零凭证完整图回放测试**（其_own change）。本卡在 E-3 归档后关闭
-（CLS-021+），去向登记。
+change 家族：**E-1 done**（`journal-real-model-io`，archive `2026-10-10-journal-real-model-io` +
+四个 follow-through 直落修复：argparse choices、CONFIG_NAMES、异步 `_agenerate`、**v2 协议流
+`_stream`**（最终根因——入口哨兵探针实证框架经 `_V2StreamingCallbackHandler` 走 `_stream` 兼容桥，
+三个标准原语整体短路）；最终态 journaling 全路径覆盖，11 集成测试绿，微真梯 journal 实证）→
+**E-2/E-3 blocked on BUG-001**（退化旅程录制链不完整；BUG-001 修复后重录完整旅程 → 零凭证完整图
+回放测试 → 本卡关闭 CLS-021+）。录制产物暂存 `runs/recordings/`（本地证据不入库；脱敏初筛
+0 命中，key 模式/内容主旨均已检）。
 
 ## 关闭条件
 
