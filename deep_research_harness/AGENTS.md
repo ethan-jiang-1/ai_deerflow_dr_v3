@@ -8,9 +8,8 @@ or source-browse it for ordinary application work — inspecting a framework-int
 builder named by LLM-Node gate step 3 is the declared exception.
 
 v3 borrows DeerFlow's native deep research capability; the harness keeps the
-deterministic, inspectable parts (full telling: root `README.md`). The `agents/` layer
-is the one still-empty owner (see Non-Model Work); the other ownership boundaries are
-binding today.
+deterministic, inspectable parts (full telling: root `README.md`). The `agents/`
+layer is the one empty owner; the other ownership boundaries bind today.
 
 ## Application Focus
 
@@ -30,9 +29,9 @@ observed-failure question. A possible future use is not enough to expand scope.
 
 For a Coding Agent creating, changing, or reviewing an LLM-bearing node or direct
 model branch, use this route before implementation navigation. Never infer the seam
-from the first file found or from presence or absence of a model call.
-
-Application authority for the cognition-versus-code contract — the portable node-agent profile may diverge; this file wins here. Route: the numbered steps plus Non-Model Work.
+from the first file found or from presence or absence of a model call. Application
+authority for the cognition-versus-code contract — the portable node-agent profile may
+diverge; this file wins here.
 
 1. **Classify the surface** as `cognitive-program`, `deterministic-guardrail`,
    `human-decision`, or `wiring`. A model-bearing behavior symptom reaches cognition
@@ -80,7 +79,7 @@ cognition is not causal. Do not invent a capability, prompt, or repair loop.
 | Run commands | [Menu](COMMANDS.md), [Makefile](Makefile) |
 | Local ops | [Operations](docs/local-operations.md) |
 | Evidence policy | [Testing](docs/testing-and-evaluation.md) |
-| Other docs | [Index](docs/README.md) |
+| Limits & other docs | [Known limitations](docs/known-limitations.md)（接手必读）, [Index](docs/README.md) |
 
 ## Boundaries
 

@@ -28,14 +28,14 @@ ai_deerflow_dr_v3/
 |   |   `-- scripted/           脚本梯 providers（fixture 梯用的假模型/假搜索）
 |   |-- tests/                  unit / contract / integration + fixtures（样本）
 |   |-- docs/                   全部地图（control-map 是总图；playbook 是操作旅程）
-|   |-- config/                 base（真模型）/ fixture（零凭证）两梯配置
+|   |-- config/                 base（真模型）/ fixture（零凭证）两梯 + record（真跑录制变体）
 |   `-- tools/                  显式录制等开发操作（不是测试）
 |-- runs/                    本地 Run Bundle 数据（每次研究的状态/证据/报告；gitignored，
 |                            应用子树之外；DEEP_RESEARCH_RUNS_ROOT 可覆盖）
 |-- deerflow/                被 leverage 的框架（submodule 锁 ceebf97f = ethan-v2.1.0 的前一提交；只读不改）
 |-- openspec/                设计规格、准入与治理 checker（开发治理，不参与运行）
 |-- _backlog/                任务账本（issues / bugs + 归档）
-`-- .agents/skills/          openspec 技能（用户保留区）
+`-- .agents/skills/          openspec / keel 技能（用户保留区）
 ```
 
 ### 一次研究怎么串起来（入口 → 报告）
@@ -78,6 +78,7 @@ make record-stream PROBLEM="…" CONFIG=base  # 显式录制真实 API 事件流
 - [Run Bundle 地图](deep_research_harness/docs/run-bundle.md)：持久化合同、artifact 权属
 - [测试资产地图](deep_research_harness/tests/README.md)：每份测试证明什么、最小红绿路径
 - [操作旅程](deep_research_harness/docs/playbook/run-research.md)：跑研究的步骤、完成判据与坑
+- [已知限制](deep_research_harness/docs/known-limitations.md)：接手者必读的存续限制清单
 
 ## 给 Coding Agent
 
@@ -90,7 +91,12 @@ make record-stream PROBLEM="…" CONFIG=base  # 显式录制真实 API 事件流
 ## 备注
 
 - `deerflow/` submodule 需 `git clone --recurse-submodules` 或 `git submodule update --init` 才完整。
+- 提交钩子：`.githooks/pre-commit`（whitespace + doc hygiene）需一次
+  `git config core.hooksPath .githooks` 激活，见[治理 README](openspec/governance/README.md)。
 - 框架运行时基座：submodule 锁在 commit `ceebf97f`（ethan digest 分支，ethan-v2.1.0 tag 的前一提交而非 tag 本身；上游 v2.1.0 于 2026-09-24 发布）。
   声明锁已在[结构 registry](openspec/governance/project-structure.toml)。
-- 其他根目录居民：`config.yaml`、`.env`（按需准备的宿主配置与凭证，gitignored）、
-  `profiles/`（本地运行 profile）、`CONTEXT.md` / `CONTEXT-MAP.md`（词汇边界）。
+- 其他根目录居民：`.env`（real 梯凭证，gitignored；框架启动时向上发现并加载，应用自身不读）、
+  `profiles/`（本地运行 profile，暂无已注册条目）、`CONTEXT.md` / `CONTEXT-MAP.md`（词汇边界）。
+  框架原生习惯的根 `config.yaml` 本应用**不消费**（binding 钉死 checked-in 应用配置），无需创建。
+- 文档语言中英混排（agent 指南偏英文，应用/账本文档偏中文）；术语以
+  [CONTEXT-MAP.md](CONTEXT-MAP.md) 与 owning spec 为准，语言不承载语义。

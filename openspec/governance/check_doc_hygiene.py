@@ -88,9 +88,9 @@ DOC_BUDGETS: dict[str, int] = {
     "AGENTS.md": 2425,
     # Root Claude entry stub; must stay a thin AGENTS.md import, never a copy.
     "CLAUDE.md": 400,
-    # Module change map incl. generated structure block (6854 chars measured
-    # post establish-operator-control-map; ratcheted down from 6863).
-    "deep_research_harness/AGENTS.md": 6854,
+    # Module change map incl. generated structure block (6835 chars measured
+    # post the 2026-10-10 fresh-agent doc sweep; ratcheted down from 6854).
+    "deep_research_harness/AGENTS.md": 6835,
     # Module Claude entry stub (253 chars at adoption).
     "deep_research_harness/CLAUDE.md": 400,
     # The largest resident-injection layer (11436 chars post

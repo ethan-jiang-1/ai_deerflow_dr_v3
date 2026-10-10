@@ -79,7 +79,7 @@ state.json（thread_id、composition、pin、终态）
 1. **终态**：`state.json` 的 status 到达 completed / cancelled / failed-resume；
 2. **交付行**：`delivery` 字段——admitted（含报告路径）/ rejected / no-answer；None = 未记录（变更前旧状态或写入前崩溃），此时用 belt：journal 的 validation disposition + `final/` 文件有无。
 
-当前 run engine **先写 terminal 再提交最终报告**，因此看到 completed 的瞬间报告
+当前 pump **先写 terminal 再提交最终报告**，因此看到 completed 的瞬间报告
 可能还在准入流程中。质量达标（引用真实、覆盖充分）是第四件事，没有任何 lane
 自动证明它——见 [研究过程地图](research-process.md) 的证据判断方法。
 

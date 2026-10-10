@@ -10,6 +10,7 @@
 tests/
 |-- README.md           本地图：选哪里测、样本是什么、怎样执行
 |-- __init__.py         unittest 递归发现的包标记
+|-- fixture_reports.py  共享 fixture 报告模板（旅程/单元构造真实形报告；报告结构合同在 engine validator，不在模板）
 |-- unit/
 |   |-- __init__.py     离线默认门禁的包标记
 |   |-- test_collection_guard.py   收集守卫：owner 标记齐全、integration 默认隔离
@@ -30,7 +31,7 @@ tests/
 发现范围），新增/删除包标记都会变红。
 
 **目录与测试职责不是同一个维度。** unit 内含真实文件系统和有限并发测试；integration 内的模型回放测试并非完整端到端。
-Bundle 规则合同在 [test_bundle_domain](domain/test_bundle_domain.py)，离线接口镜像在 [test_wiring_mirror](contract/test_wiring_mirror.py)，真实 client 构造参数名对比在 [test_wiring_smoke](integration/test_wiring_smoke.py)。
+Bundle 规则合同在 [test_bundle_domain](unit/domain/test_bundle_domain.py)，离线接口镜像在 [test_wiring_mirror](contract/test_wiring_mirror.py)，真实 client 构造参数名对比在 [test_wiring_smoke](integration/test_wiring_smoke.py)。
 目录按依赖和责任选择；需要真实框架的合同仍在 integration。录制操作已移到 [tools](../tools/README.md)，输入数据见 [fixtures](fixtures/README.md)。
 
 [Makefile](../Makefile) 决定实际收集方式：
@@ -43,34 +44,43 @@ Bundle 规则合同在 [test_bundle_domain](domain/test_bundle_domain.py)，离�
 
 ## 改了什么，就先测什么
 
-下面列出所有现存 test 文件。先运行一个文件定位红绿，再按风险扩大到 lane。
+下面列出全部现存测试文件（收集守卫 test_collection_guard.py 见上方树图；fixture_reports.py 是 helper，不是测试）。先运行一个文件定位红绿，再按风险扩大到 lane。
 
 | 要证明的行为 / 接口 | 测试资产 | 使用的真实部分与替身 |
 | --- | --- | --- |
-| Bundle 路径、状态转移、澄清、journal 纯规则 | [test_bundle_domain.py](domain/test_bundle_domain.py) | 真实 domain；手工状态/调用观察，无 I/O |
-| 创建、碰撞、cancel/refine、CAS、lease、journal 落盘 | [test_bundle_runtime.py](runtime/test_bundle_runtime.py) | 临时目录/真实存储；固定时刻/pin、注入 liveness；含短命进程 |
-| 状态文件缺失/目录缺失分类、有限并发 rewrite | [test_state_read_diagnosis.py](runtime/test_state_read_diagnosis.py) | 临时目录/线程；patch 制造读取竞态，不证明所有跨进程/文件系统情况 |
-| validator 结果、gate 数量推导、quality register 登记 | [test_admission_engine.py](engine/test_admission_engine.py) | 真实纯裁决；人工 submission/context 与文档 |
-| reject 不落内容、admit/replay、账本篡改、报告路径 | [test_admission_runtime.py](runtime/test_admission_runtime.py) | 真实 validator/临时落盘/hash 链；人工产物 |
-| run_research 的续答、终态、fallback、取消与最终报告 | [test_run_engine.py](runtime/test_run_engine.py) | 真实 Bundle/journal/admission；手写 stream_fn 事件，非真实 agent loop |
-| 前台装配、create 顺序/缺依赖 remedy、Bundle 查找、pin 失败、无框架 help/观察错误 | [test_entry_composition.py](interaction/test_entry_composition.py) | 真入口/临时落盘/依赖阻断子进程与负例；client/saver/run_engine 协议替身，不执行模型 |
-| 文案、直播事件 callback、journal tail、golden 渲染 | [test_entry_surface.py](interaction/test_entry_surface.py) | 真实 render/pump/临时文件；人工事件与 golden 样本，不执行 CLI |
-| 真实 flat 事件形状进入 pump、工具名进入 journal | [test_event_stream_replay.py](runtime/test_event_stream_replay.py) | 固定记录流 + 真实 pump/落盘；不重跑模型、搜索和框架图 |
+| Bundle 路径、状态转移、澄清、journal 纯规则 | [test_bundle_domain.py](unit/domain/test_bundle_domain.py) | 真实 domain；手工状态/调用观察，无 I/O |
+| 创建、碰撞、cancel/refine、CAS、lease、journal 落盘 | [test_bundle_runtime.py](unit/runtime/test_bundle_runtime.py) | 临时目录/真实存储；固定时刻/pin、注入 liveness；含短命进程 |
+| 状态文件缺失/目录缺失分类、有限并发 rewrite | [test_state_read_diagnosis.py](unit/runtime/test_state_read_diagnosis.py) | 临时目录/线程；patch 制造读取竞态，不证明所有跨进程/文件系统情况 |
+| validator 结果、gate 数量推导、quality register 登记 | [test_admission_engine.py](unit/engine/test_admission_engine.py) | 真实纯裁决；人工 submission/context 与文档 |
+| 报告 URL 对本 run 搜索语料的可计算支撑（证支撑、不证为真） | [test_traceability.py](unit/engine/test_traceability.py) | 真实纯函数；fixture 钉样 + 空/篡改语料负例，无 I/O |
+| 真实 journal 的行为画像（工具选择/事件构成/时长；观察非准入、token 不断言） | [test_behavior_profile.py](unit/engine/test_behavior_profile.py) | 真实 journal fixture 钉样；篡改/退化研究/未知工具负例，不执行模型 |
+| reject 不落内容、admit/replay、账本篡改、报告路径 | [test_admission_runtime.py](unit/runtime/test_admission_runtime.py) | 真实 validator/临时落盘/hash 链；人工产物 |
+| run_research 的续答、终态、fallback、取消与最终报告 | [test_run_engine.py](unit/runtime/test_run_engine.py) | 真实 Bundle/journal/admission；手写 stream_fn 事件，非真实 agent loop |
+| 文档旋钮表与代码常量对账（research-process binding 表漂移即红） | [test_binding_doc_guard.py](unit/runtime/test_binding_doc_guard.py) | 读文档与代码常量对账；无 I/O |
+| 每次搜索/抓取物化为 diagnostics/searches/ 可直读文件（call_id 去重） | [test_search_log.py](unit/runtime/test_search_log.py) | 真实临时落盘；双源/孤儿/内容断言，无模型 |
+| 前台装配、create 顺序/缺依赖 remedy、Bundle 查找、pin 失败、无框架 help/观察错误 | [test_entry_composition.py](unit/interaction/test_entry_composition.py) | 真入口/临时落盘/依赖阻断子进程与负例；client/saver/pump 协议替身，不执行模型 |
+| 文案、直播事件 callback、journal tail、golden 渲染 | [test_entry_surface.py](unit/interaction/test_entry_surface.py) | 真实 render/pump/临时文件；人工事件与 golden 样本，不执行 CLI |
+| 真实 flat 事件形状进入 pump、工具名进入 journal | [test_event_stream_replay.py](unit/runtime/test_event_stream_replay.py) | 固定记录流 + 真实 pump/落盘；不重跑模型、搜索和框架图 |
 | 配置解析、本地 client mirror、thread/递归上限转发 | [test_wiring_mirror.py](contract/test_wiring_mirror.py) | 本地代码/配置；FakeClient 记录调用，不 import 真 client |
 | 入口链六环的组合关系被替换、绕过或改名漏切 | [test_entry_chain.py](contract/test_entry_chain.py) | stdlib AST 源码断言，零产品 import、不锁行号；阶段内重构不误伤，不证明运行时行为 |
 | 终态分类七类互斥、ambiguous 兜底、碰撞负例 | [test_diagnosis.py](unit/domain/test_diagnosis.py) | 真实纯分类器；手工 state/journal/presence 输入，无 I/O |
 | diagnose 渲染短语 + 只读边界（哈希对照）+ active 不分类 | [test_entry_surface.py](unit/interaction/test_entry_surface.py)（DiagnoseSurfaceTest） | 真 Bundle/临时目录；不执行模型 |
 | 框架 home pin：env 指向仓库根、子树外、pin 先于 build_client | [test_framework_home.py](contract/test_framework_home.py) | 真 pin 函数 + AST 调用顺序；不 import 框架 |
-| subagent 配置 posture 与违规声明 | [test_subagent_posture.py](runtime/test_subagent_posture.py) | stdlib checker + 真实/临时配置，不执行委派 |
-| COMMANDS、Makefile、CLI 动词清单一致 | [test_command_surface.py](interaction/test_command_surface.py) | 文本/正则检查，不执行命令 |
-| 命令菜单路由与 playbook 完成判据登记 | [test_agent_playbook.py](interaction/test_agent_playbook.py) | 文档检查，不证明旅程真的成功 |
-| 反问交互门控（TTY/env）、提示渲染、create/refine 接线 | [test_clarification_prompt.py](interaction/test_clarification_prompt.py) | patch stdin/env 的接线检查；handler 行为用假 input，不执行模型 |
-| 计划闸门门控、三路 handler（确认/修订/跳过/放弃）、create-only 接线 | [test_plan_prompt.py](interaction/test_plan_prompt.py) | patch stdin/env 与假 input；不执行模型 |
+| 两梯 available_skills 声明恰为 `[deep-research]`（config-as-contract） | [test_skill_declaration.py](contract/test_skill_declaration.py) | 读 checked-in 配置断言声明；缺省/多余即红 |
+| subagent 配置 posture 与违规声明 | [test_subagent_posture.py](unit/runtime/test_subagent_posture.py) | stdlib checker + 真实/临时配置，不执行委派 |
+| COMMANDS、Makefile、CLI 动词清单一致 | [test_command_surface.py](unit/interaction/test_command_surface.py) | 文本/正则检查，不执行命令 |
+| 命令菜单路由与 playbook 完成判据登记 | [test_agent_playbook.py](unit/interaction/test_agent_playbook.py) | 文档检查，不证明旅程真的成功 |
+| status 的 delivery 行（admitted/rejected/no-answer/未记录投影） | [test_status_delivery.py](unit/interaction/test_status_delivery.py) | 真实 render/state 投影；人工 state 输入 |
+| refine 创建下一代并前台跑完该代的正向接线（cancel 正向 wiring） | [test_refine_foreground.py](unit/interaction/test_refine_foreground.py) | 假 run_foreground 接线断言；旅程负例另测 |
+| 反问交互门控（TTY/env）、提示渲染、create/refine 接线 | [test_clarification_prompt.py](unit/interaction/test_clarification_prompt.py) | patch stdin/env 的接线检查；handler 行为用假 input，不执行模型 |
+| 计划闸门门控、三路 handler（确认/修订/跳过/放弃）、create-only 接线 | [test_plan_prompt.py](unit/interaction/test_plan_prompt.py) | patch stdin/env 与假 input；不执行模型 |
 | **smoke**：多轮澄清、真实 fallback、SQLite、snapshot、构造接口合同 | [test_wiring_smoke.py](integration/test_wiring_smoke.py) | 真 DeerFlowClient/图/middleware/saver；脚本模型与 fake search |
 | **smoke**：create（含搜索物化）/watch/status（含 delivery 行）/refine（跑完并 admit gen2 报告）/inspect/cancel（终态负例）/diagnose（raise 模型 → model_call_failed 分类）、非法输入 | [test_cli_journey.py](integration/test_cli_journey.py) | 真 CLI 子进程/框架/落盘；检查非空报告及 ledger admit；fixture 模型，写仓库根 runs |
 | **smoke**：replay_key、录制后回放、miss 诊断 | [test_replay_model.py](integration/test_replay_model.py) | langchain 消息/JSONL/替身实现；临时脚本录制，不消费真实模型样本、不跑图 |
 | **smoke**：交互反问旅程（作答继续不耗预算 / 拒答回落自动应答） | [test_clarification_journey.py](integration/test_clarification_journey.py) | 真 CLI 子进程 + DEEP_RESEARCH_INTERACTIVE=1 + 管道 stdin；脚本模型伪造反问，零凭证 |
 | **smoke**：计划闸门旅程（标记计划确认注入+物化 / 修订附加 / 无标记报告降级回归） | [test_plan_journey.py](integration/test_plan_journey.py) | 真 CLI 子进程 + 管道 stdin；脚本模型覆盖标记计划与 58b5440e 回归形状，零凭证 |
+| **smoke**：零凭证完整图回放（录制旅程 fixture 驱动真框架图全程，报告逐字复现 admit） | [test_complete_graph_replay.py](integration/test_complete_graph_replay.py) | 真 DeerFlow 图 + ReplayChatModel 顺序供行；不调用真实 API |
+| **smoke**：record 配置 journaling provider（mixin journal/往返/负例） | [test_recording.py](integration/test_recording.py) | langchain 环境；真实组合类由 E-2 真跑检验，不调用真实 API |
 
 CLI 旅程的 refine 断言第二代跑完且报告 admit；cancel 在旅程中是终态负例（正向接线在 unit 的 refine_foreground 文件）；仍不证明运行中中断。
 真实构造合同目前对比参数**名称**；离线 contract mirror 断言不能替代真实接口对比，也不证明所有 defaults/类型/事件 schema。
@@ -86,7 +96,7 @@ CLI 旅程的 refine 断言第二代跑完且报告 admit；cancel 在旅程中�
 | [e2-complete-journey/](fixtures/replay/e2-complete-journey/) | [test_complete_graph_replay.py](integration/test_complete_graph_replay.py) 消费；零凭证完整图回放（计划→确认→检索→报告→准入全旅程） | 模型 journal 10 行 + 搜索语料 28 条 + provenance sidecar，逐字提取自验收跑 `55c35d44`；脱敏扫描 0 命中 + 预清在案；顺序供行设计（key 匹配跨环境实测不适合） |
 | [runtime/scripted](../src/deerflow_deep_research/runtime/scripted/__init__.py) | fixture 配置动态加载的 ScriptedChatModel / FakeWebSearchTool | 代码 provider，不是样本文件；最后脚本项会重复，循环上限由调用方负责 |
 | [replay_model.py](../src/deerflow_deep_research/runtime/scripted/replay_model.py) | RecordingChatModel / ReplayChatModel 的内容寻址机制 | key 忽略 system 消息；journal 行含 content + 可选 tool_calls（向后兼容旧行）；usage/token 协议仍不保留（边界在案） |
-| [recording.py / recording_deepseek.py](../src/deerflow_deep_research/runtime/recording.py) | record 配置的 journaling provider（真模型 + mixin，journal + 元信息 sidecar） | 仅经 config/record.yaml 的 use: 缝构造；DEERFLOW_RECORD_SINK 必设；usage/token 不录 | [test_recording.py](integration/test_recording.py)（mixin journal/往返/负例；真实组合类由 E-2 真跑检验） |
+| [recording.py / recording_deepseek.py](../src/deerflow_deep_research/runtime/recording.py) | record 配置的 journaling provider（真模型 + mixin，journal + 元信息 sidecar）；消费者 [test_recording.py](integration/test_recording.py)（mixin journal/往返/负例；真实组合类由 E-2 真跑检验） | 仅经 config/record.yaml 的 use: 缝构造；DEERFLOW_RECORD_SINK 必设；usage/token 不录 |
 | [record_stream.py](../tools/record_stream.py) | 显式记录 client.stream；不在自动收集中 | 外部调用/数据写入工具，不是安全脱敏器 |
 
 录制真实事件时必须明确选择 `CONFIG=base`；[Makefile](../Makefile) 的 CONFIG 默认 fixture，不能仅凭 target 名认定调用了真实 API。

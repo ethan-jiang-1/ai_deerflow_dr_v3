@@ -49,7 +49,7 @@ Harness 不决定每一步搜什么，而是把一次研究运行装进可追踪
 | 代码入口 | [client 绑定](../src/deerflow_deep_research/runtime/adapters/client.py)（`make_stream_fn` 是唯一 stream 缝，per-call recursion limit） | [pump](../src/deerflow_deep_research/runtime/pump.py) 消费 `_consume_turn` |
 | 运行证据 | checkpoint.sqlite、assembly-snapshot、journal 里的 model/tool/subagent 事件 | state.json、journal.jsonl、admission ledger |
 
-由此必须持续区分四件**不是同一件事**的事（当前 run engine 先写 terminal 再提交报告）：
+由此必须持续区分四件**不是同一件事**的事（当前 pump 先写 terminal 再提交报告）：
 
 ```text
 agent stream 结束  ≠  Harness state = completed  ≠  final report 被 admission  ≠  研究事实质量达标
@@ -72,7 +72,7 @@ agent stream 结束  ≠  Harness state = completed  ≠  final report 被 admis
 ```text
 deep_research_harness/
 |-- cli.py                      稳定启动入口，转交交互实现
-|-- config/                     模型、工具和框架配置（base / fixture 两梯）
+|-- config/                     模型、工具和框架配置（base / fixture 两梯 + record 录制变体）
 |-- src/deerflow_deep_research/ 四个所有权层（见上表）
 |   `-- runtime/scripted/       脚本梯 providers（ScriptedChatModel、假搜索）
 |-- tests/                      unit / contract / integration / fixtures
@@ -85,7 +85,10 @@ deep_research_harness/
 runs/                           （仓库根）本地 Run Bundle 数据，gitignored，
                                 应用子树之外；env DEEP_RESEARCH_RUNS_ROOT 可覆盖
 .deer-flow/                     （仓库根）框架运行态 home（memory 库、skill 投影、
-                                用户数据），gitignored；binding 经 DEER_FLOW_HOME 钉入
+                                用户数据），gitignored；binding 经 DEER_FLOW_HOME 钉入。
+                                注：pin 只在前台装配路径（create/refine）生效；smoke 与
+                                record 工具的直连 client 未 pin，按 cwd 落
+                                deep_research_harness/.deer-flow/ 第二个 home（gitignored）
 ```
 
 仓库根还有：`deerflow/`（锁定上游，**只读**，普通工作不修改不深读其内部）、
@@ -136,7 +139,9 @@ OpenSpec 开发工作区（规范、准入与治理 checker）、`_backlog/`（�
 | `base` | 需 `$DEEPSEEK_API_KEY` 等 | 当前模型、skill、工具下一次真实研究的行为与质量 | 统计意义上的稳定质量 |
 
 配置文件是 [base.yaml](../config/base.yaml) / [fixture.yaml](../config/fixture.yaml)；
-`mixed` 是尚未接线的枚举成员。模型/工具细节见研究过程地图。
+`mixed` 是尚未接线的枚举成员。[record.yaml](../config/record.yaml) 是 base 的真跑录制变体
+（`DEERFLOW_RECORD_SINK` 必设，composition 仍 `all_real`，配方见 [COMMANDS](../COMMANDS.md)）。
+模型/工具细节见研究过程地图。
 
 ## 7. 改什么，就找哪个 owner，先测哪里
 

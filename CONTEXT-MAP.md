@@ -29,7 +29,8 @@ responsibility, host integration, and change governance do not blur together.
   单元绿不证明装配，装配绿不证明研究质量。
 - **`engine/` 与 `run_engine`**：`engine/` 是裁决层（validator/gate 纯函数），
   `runtime/pump.py` 是运行泵——模块改名（2026-10-07）后旧文档若仍提
-  `run_engine.py` 即已过期。
+  `run_engine.py` 即已过期。spec 文本仍以 "run engine" 指此运行泵对象（= pump.py），
+  `test_run_engine.py` 文件名沿用旧词——四个名字一个东西，读到时按此对齐。
 
 ## Reading order for a fresh agent
 

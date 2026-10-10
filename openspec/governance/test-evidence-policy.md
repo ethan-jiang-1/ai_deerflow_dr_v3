@@ -9,7 +9,7 @@ dependency by design.
 
 | Surface | Authority |
 |---|---|
-| The test-evidence owning capability's main spec (to be established by a v3 governance change; until then this policy defines process only, never normative semantics) | Approved normative test-evidence semantics |
+| The test-evidence owning capability's main spec (established 2026-10-10 by `establish-behavior-assertion-lane`: [`openspec/specs/test-evidence/spec.md`](../specs/test-evidence/spec.md)) | Approved normative test-evidence semantics |
 | One active owning delta of that capability | Pending normative modifications during review and apply |
 | Test-owned evidence, scenario, incident, node, fault, and discovery registries | Exact enumerable evidence metadata |
 | `openspec/config.yaml` and human-authored `deep_research_harness/AGENTS.md` text | Authoring bootstrap, navigation, commands, and concise operational guidance |

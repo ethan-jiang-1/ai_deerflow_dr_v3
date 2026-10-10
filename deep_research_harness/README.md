@@ -32,7 +32,7 @@ AST 级、零产品 import）：任何一环被替换、绕过或改名漏切，
 | 开发操作：显式录制与诊断 | [tools](tools/README.md) |
 | 运行数据：每次研究的状态、证据和报告 | [Run Bundle 地图](docs/run-bundle.md)、[Bundle 路径合同](src/deerflow_deep_research/domain/bundle.py)；仓库根 `runs/`（gitignored，`DEEP_RESEARCH_RUNS_ROOT` 可覆盖） |
 | 开发治理：设计准入、结构登记、任务账本 | 仓库根 OpenSpec / backlog；不参与产品运行 |
-| 权威边界与策略参考 | [控制地图](docs/control-map.md)、[local operations](docs/local-operations.md)、[testing](docs/testing-and-evaluation.md)、[词汇](CONTEXT.md) |
+| 权威边界与策略参考 | [控制地图](docs/control-map.md)、[local operations](docs/local-operations.md)、[testing](docs/testing-and-evaluation.md)、[已知限制（接手必读）](docs/known-limitations.md)、[词汇](CONTEXT.md) |
 
 源码仍有 `domain / engine / agents / runtime` 四个所有权层；`agents` 当前仅包入口。上游 `deerflow/`（包括它的 scripts）是锁定的只读框架。我们自己的可执行开发工具放 tools，不把它们混进产品入口或测试 runner。
 
@@ -52,7 +52,7 @@ python3 cli.py inspect <bundle_id>        # 时间线、已采证据、装配快
 
 `cancel` 只记录取消请求，由运行泵协作终止。`refine` 创建下一代并**前台跑完该代**（方向文本即该代方向文档）。完整命令见 [COMMANDS](COMMANDS.md)，操作旅程见 [playbook](docs/playbook/run-research.md)。
 
-框架运行态（memory 库、skill 投影、用户数据）由 binding 钉在仓库根 `.deer-flow/`（gitignored，应用子树外）。fixture 配置加载 [runtime scripted providers](src/deerflow_deep_research/runtime/scripted/__init__.py)，base 记录 `all_real`，fixture 记录 `fixture`；`mixed` 是尚未接线的枚举。provider 代码随当前 Python package 打包，wheel 仍不包含完整 CLI/config/兄弟布局，发布面是源码 checkout + 锁定 submodule。
+框架运行态（memory 库、skill 投影、用户数据）由 binding 钉在仓库根 `.deer-flow/`（gitignored，应用子树外）。注意 pin 只在 create/refine 的前台装配路径生效：`make smoke` 与 `make record-stream` 的直连 client 未 pin，按 cwd 在 `deep_research_harness/.deer-flow/` 落第二个运行态 home（gitignored，可再生）。fixture 配置加载 [runtime scripted providers](src/deerflow_deep_research/runtime/scripted/__init__.py)，base 记录 `all_real`，fixture 记录 `fixture`；`mixed` 是尚未接线的枚举。provider 代码随当前 Python package 打包，wheel 仍不包含完整 CLI/config/兄弟布局，发布面是源码 checkout + 锁定 submodule。
 
 ## 改一处，先证明哪一层
 

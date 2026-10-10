@@ -86,6 +86,7 @@ files = [
   "openspec/governance/selected-change-closeout.py",
   "openspec/governance/test-evidence-policy.md",
   "openspec/product/README.md",
+  "openspec/tests/governance/test_change_authority.py",
   "openspec/tests/governance/test_ci_governance_steps.py",
   "openspec/tests/governance/test_harness_dependency_direction.py",
   "openspec/tests/governance/test_project_gate.py",

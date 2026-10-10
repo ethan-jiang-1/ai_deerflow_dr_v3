@@ -12,7 +12,7 @@
 | 哪些认知能力打开了？ | [binding defaults](../src/deerflow_deep_research/runtime/adapters/contracts/client_surface.py#L32) | thinking/subagent 开启、plan mode 关闭；`available_skills` 由两梯声明为窄面 `deep-research`（模型可见目录只有它；是否加载使用仍是 agent 决定） |
 | 使用什么模型和 Web 工具？ | [base.yaml](../config/base.yaml)、[fixture.yaml](../config/fixture.yaml) | 真实梯与脚本梯的具体 provider/tool 声明 |
 | 如何委派子代理？ | [框架说明](../../deerflow/backend/AGENTS.md#architecture)、[本应用 posture](../src/deerflow_deep_research/runtime/adapters/subagent_posture.py) | 框架提供 task 委派，本应用当前没有声明 custom subagent 类型 |
-| 研究结果如何回到应用？ | [run_research](../src/deerflow_deep_research/runtime/pump.py#L203) | 消费 stream，处理续答/失败/取消，投影最后回答到报告准入 |
+| 研究结果如何回到应用？ | [run_research](../src/deerflow_deep_research/runtime/pump.py#L277) | 消费 stream，处理续答/失败/取消，投影最后回答到报告准入 |
 | 这次模型看到了什么？ | [snapshot middleware](../src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py#L16) | 第一次模型调用的 system prompt、可见工具、模型名、pin |
 
 上游说明的 [lead_agent 目录定位](../../deerflow/backend/AGENTS.md#project-structure) 指向

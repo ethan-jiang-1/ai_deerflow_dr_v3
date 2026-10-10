@@ -12,7 +12,7 @@
 | Project-structure manifest（`project-structure.toml` 契约 + `required-paths.toml` 清单） | 精确目录 / import 清单？ | [project-structure.toml](project-structure.toml) · [required-paths.toml](required-paths.toml) |
 | `check_project_specs.py` | main spec 结构是否有效？ | 脚本 docstring |
 | `check_project_architecture.py` | 结构治理是否通过？ | 脚本 docstring |
-| `check_change_guidance.py` | Change Guidance / policy 路由 / Focus Card 是否通过？ | 脚本 docstring |
+| `check_change_guidance.py` | Change Guidance / policy 路由 / Focus Card（即 proposal 的 `## Change Focus` 记录）是否通过？ | 脚本 docstring |
 | `check_harness_dependency_direction.py` | Harness 是否反向依赖 OpenSpec？验证回执（`verification-receipt.json`，结构识别：非空 `checks` 命令记录）是豁免证据，不是依赖 | 脚本 docstring（`@impl DEP-001`） |
 | `check_ci_governance.py` | CI 工作流与本地 hook 的声明是否漂移（触发器、路径过滤、pinned 工具链、canonical 命令、hook 命令集）？ | 脚本 docstring（`@impl CIG-001`） |
 | `check_doc_hygiene.py` | 文档层（ADR 索引↔目录 / 入口链与 docs 层的相对链接 / 编码换行 / docs 层范围完整性 / `_backlog` 的 `_` 目录命名约定 / **账本面一致性**——活跃名册双向互查、计数与 Next-ID、卡片户口（首 12 行 `状态：` 且词在词表内）与滞留检测（`毕业门：已过`/`可关闭：是` 不得滞留活跃区，锚字段不误杀等人卡） / **入口层字符预算闸**——受管常驻文件的声明上限，超限与缺失响亮报错，只降不升棘轮 / 陈旧叙事标记封闭清单 / 根 README 计数钉死）是否漂移？ | 脚本 docstring（standalone，非 gate 组件、非 `make verify` 目标；已进 CI canonical 序列；`@impl DOB-001`） |
@@ -55,7 +55,8 @@ git config core.hooksPath .githooks
 
 CI 门禁：`.github/workflows/governance.yml` 在 push / pull request（路径过滤
 `openspec/**`、`deep_research_harness/**`、工作流与 hooks 自身）上单 job 运行
-canonical 序列——治理 unittest 套件、聚合 closeout gate、doc hygiene、setup-uv +
+canonical 序列——治理 unittest 套件（`openspec/tests/governance/`，`python3 -m unittest
+discover -s openspec/tests/governance -q`）、聚合 closeout gate、doc hygiene、setup-uv +
 harness `make smoke`（fixture 梯集成 lane）、harness `make verify`、harness `make lint`
 （ruff，2026-10-10 起 promote-lint-to-ci 升入序列）；任何非零退出即失败。声明由
 `check_ci_governance.py` 机器校验。**契约双端触发**是本形态的

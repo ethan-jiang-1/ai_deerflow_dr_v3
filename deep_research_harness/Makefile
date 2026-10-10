@@ -15,8 +15,9 @@ test:
 verify: test
 	@echo "[verify] harness unittest gate passed."
 
-# Lint convenience lane (ruff; CI does not enforce it — see pyproject dev group).
-# Requires the synced environment (`uv sync`), same as the smoke lane.
+# Lint lane (ruff; enforced in CI as the sixth governance-gate step — see
+# pyproject dev group). Requires the synced environment (`uv sync`), same as
+# the smoke lane.
 lint:
 	UV_CACHE_DIR=$$(pwd)/../.uv-cache uv run --no-sync ruff check src tests tools cli.py
 

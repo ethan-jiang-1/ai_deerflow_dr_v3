@@ -40,7 +40,10 @@
 4. **交回回执**：命令 + 退出码 + 终态行。只报本会话实际执行过的 run——没跑过的命令
    不得当作结果报告。
 
-## 冷启动 lane（发布证明，慢速；RLF-001——ID 已退役，沿革归档 change `2026-10-04-remove-requirement-id-tracking`，在仓库根治理目录——的 on-demand 全量证据）
+## 冷启动 lane（发布证明，慢速；on-demand 全量证据）
+
+> 历史沿革：本 lane 原 ID RLF-001，已随 requirement-ID 追踪退役；沿革见归档 change
+> `2026-10-04-remove-requirement-id-tracking`（仓库根治理目录）。
 
 全新两件套 checkout（harness + deerflow submodule）从零跑通全链路，证明发布面自足：
 

@@ -1,4 +1,7 @@
-# Quality Register（检查注册处，RT10——ID 已退役，沿革归档 change `2026-10-04-remove-requirement-id-tracking`，在仓库根治理目录）
+# Quality Register（检查注册处）
+
+> 历史沿革：本表原登记 ID RT10，已随 requirement-ID 追踪退役；沿革见归档 change
+> `2026-10-04-remove-requirement-id-tracking`（仓库根治理目录）。
 
 > 质量由哪些机器保证——单一清单面。清单的代码事实源 = `src/deerflow_deep_research/engine/machines.py`
 > 的 `DECLARED_MACHINES`；单元测试在两者漂移时失败。接手者从这里一眼看到每台机器
