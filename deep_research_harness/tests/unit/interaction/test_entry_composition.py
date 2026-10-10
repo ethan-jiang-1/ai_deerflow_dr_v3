@@ -167,9 +167,13 @@ class LauncherTest(unittest.TestCase):
                 self.assertNotEqual(result.returncode, 0)
                 self.assertIn("permanently unavailable", result.stderr)
 
-    def test_refine_help_discloses_next_generation_without_automatic_run(self):
+    def test_refine_help_discloses_foreground_next_generation(self):
+        # owning spec (entry-surface): refine SHALL create the next generation and
+        # drive the run engine in the foreground over that generation's direction
+        # document — the help text must disclose the same semantic.
         result = without_framework(HARNESS / "cli.py", "--help")
-        self.assertIn("without running", result.stdout)
+        self.assertIn("create the next generation", result.stdout)
+        self.assertIn("foreground", result.stdout)
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@
 
 > 人与 agent 的入口菜单：这里只回答「能处理多少事情」，不写过程——每个需要过程的
 > 条目给出指向 playbook 的路由，细节一律在路由目标里。动词语义与封闭命令集的 owner
-> 是 entry-surface 能力（ENS-001；该 ID 已退役，沿革归档 change `2026-10-04-remove-requirement-id-tracking`，在仓库根治理目录）；治理门禁属于仓库根的治理目录。
+> 是 entry-surface 能力；治理门禁属于仓库根治理目录。
 
 ## 研究 run（`cd deep_research_harness`）
 
@@ -31,7 +31,7 @@ DEERFLOW_RECORD_SINK=<路径> make create PROBLEM="…" CONFIG=record   # 真跑
 ```
 
 `make verify` 只承载 harness 自身测试，不读、不引、不执行任何 OpenSpec 内容。
-录制工具与副作用见 [tools/README.md](tools/README.md)；入口与目录职责见 [控制地图](README.md)。
+录制工具与副作用见 [tools/README.md](tools/README.md)；入口与目录职责见[控制地图](docs/control-map.md)。
 
 ## 能干什么（一段话答「HELP」）
 

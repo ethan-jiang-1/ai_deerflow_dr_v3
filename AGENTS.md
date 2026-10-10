@@ -1,11 +1,11 @@
 # AGENTS.md
 
-本仓库 = **跑在 DeerFlow 之上的 deep research 应用**。两层，顺序很重要：
+本仓库 = **跑在 DeerFlow 之上的 deep research 应用**。分层，顺序很重要：
 
 | 层 | 是什么 | 怎么对待 |
 |----|--------|---------|
 | `deep_research_harness/` | ★ **你的应用**（`src/deerflow_deep_research`、`tests`、`docs`） | 改代码、写测试、跑它——几乎所有工作在这里 |
-| `deerflow/` | 被 leverage 的框架（submodule 锁 `ceebf97f`（v2.1.0 的后代、digest 分支，非 tag）） | **只 import，绝不修改、不为排查翻它内部**；理解框架读它的只读指引 `deerflow/AGENTS.md` 与 `deerflow/backend/AGENTS.md` |
+| `deerflow/` | 被 leverage 的框架（submodule 锁 `ceebf97f`（v2.1.0 的前一提交、digest 分支，非 tag）） | **只 import，绝不修改、不为排查翻它内部**；理解框架读它的只读指引 `deerflow/AGENTS.md` 与 `deerflow/backend/AGENTS.md` |
 | `openspec/` | 设计与准入（specs / changes / governance / change-guidance） | 契约与规范写这里 |
 | `_backlog/` | 任务账本（issues / bugs 两类） | 追踪；搬迁按 ritual |
 

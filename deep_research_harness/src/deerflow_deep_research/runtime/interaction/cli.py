@@ -269,7 +269,7 @@ def cmd_inspect(args) -> None:
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(
         prog="cli.py",
-        description="Deep Research harness entry surface (create/status/watch/cancel/refine/inspect)",
+        description="Deep Research harness entry surface (create/status/watch/cancel/refine/inspect/diagnose)",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -288,7 +288,7 @@ def main(argv=None) -> int:
         command.add_argument("bundle_id")
         command.set_defaults(func=func)
 
-    refine = sub.add_parser("refine", help="enter the next generation without running it")
+    refine = sub.add_parser("refine", help="create the next generation and run it in the foreground")
     refine.add_argument("bundle_id")
     refine.add_argument("direction")
     refine.set_defaults(func=cmd_refine)

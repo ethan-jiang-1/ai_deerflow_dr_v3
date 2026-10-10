@@ -269,6 +269,21 @@ BACKLOG_ARCHIVE_SURFACES: tuple[str, ...] = (
 )
 BACKLOG_COUNTERS_FILE = "_archived/README.md"
 BACKLOG_NEXT_ID_RE = re.compile(r"\b([A-Z]{3})-(\d{3})\b")
+# Numbered ledger allocation spans BOTH zones — the ledger rule states
+# "新号 = 已分配的最大编号 + 1（已修复目录 ∪ 活跃目录）": a filed active card
+# reserves its number. Next-ID derivation must therefore scan the active
+# counterpart too; archive-only scanning let a declared next ID collide with
+# an already-filed active card (2026-10-10 audit, BUG-002).
+BACKLOG_ARCHIVE_TO_ACTIVE: dict[str, str] = {"_fixed_bugs": "bugs", "_settled_issues": "issues"}
+# Numbered ledger READMEs whose "Next available … ID" declaration lines are
+# checker-managed: at most one declaration per file and prefix, and the value
+# must equal the allocation-derived next ID (BUG-002).
+BACKLOG_NUMBERED_SURFACES: tuple[str, ...] = ("issues", "bugs", "_fixed_bugs", "_settled_issues")
+BACKLOG_NUMBERED_PREFIXES: dict[str, tuple[str, str]] = {
+    "BUG": ("_fixed_bugs", "bugs"),
+    "CLS": ("_settled_issues", "issues"),
+}
+BACKLOG_NEXT_ID_DECL_RE = re.compile(r"Next available \w+ ID:\s*([A-Z]{3})-(\d{3})")
 
 # Card hukou and residency (rule 7 continuation). Every active card carries a
 # 状态 field within its first 12 lines whose word belongs to the surface's
@@ -422,6 +437,29 @@ def _rule_ledger_consistency(root: Path) -> list[str]:
             return []
         return sorted(p for p in surface_dir.glob("*.md") if p.name != "README.md")
 
+    def _allocated_numbers(archive_surface: str, active_surface: str | None, prefix: str) -> list[int]:
+        """Allocated numbers for one prefix across the archive zone and the
+        active zone (the ledger rule: 已修复目录 ∪ 活跃目录). Single source for
+        the counters check and the README declaration check."""
+        allocated: list[int] = []
+        index_file = backlog / "_archived" / archive_surface / "README.md"
+        if index_file.is_file():
+            body, _ = _read_utf8(index_file)
+            for line in (body or "").splitlines():
+                if not line.lstrip().startswith("|"):
+                    continue  # skip the Next-ID declaration line itself
+                for id_match in BACKLOG_NEXT_ID_RE.finditer(line):
+                    if id_match.group(1) == prefix:
+                        allocated.append(int(id_match.group(2)))
+        work_files = list(_work_files(archive_surface))
+        if active_surface:
+            work_files.extend(_work_files(active_surface))
+        for work in work_files:
+            for id_match in BACKLOG_NEXT_ID_RE.finditer(work.name):
+                if id_match.group(1) == prefix:
+                    allocated.append(int(id_match.group(2)))
+        return allocated
+
     for surface in (*BACKLOG_ACTIVE_SURFACES, *BACKLOG_ARCHIVE_SURFACES):
         surface_dir = _surface_dir(surface)
         index = surface_dir / "README.md"
@@ -508,25 +546,50 @@ def _rule_ledger_consistency(root: Path) -> list[str]:
                 if not next_match:
                     continue
                 prefix, number = next_match.group(1), int(next_match.group(2))
-                index = _surface_dir(surface) / "README.md"
-                allocated: list[int] = []
-                if index.is_file():
-                    index_body, _ = _read_utf8(index)
-                    for line in (index_body or "").splitlines():
-                        if not line.lstrip().startswith("|"):
-                            continue  # skip the Next-ID declaration line itself
-                        for id_match in BACKLOG_NEXT_ID_RE.finditer(line):
-                            if id_match.group(1) == prefix:
-                                allocated.append(int(id_match.group(2)))
-                for work in _work_files(surface):
-                    for id_match in BACKLOG_NEXT_ID_RE.finditer(work.name):
-                        if id_match.group(1) == prefix:
-                            allocated.append(int(id_match.group(2)))
+                allocated = _allocated_numbers(surface, BACKLOG_ARCHIVE_TO_ACTIVE.get(surface), prefix)
                 expected_next = (max(allocated) + 1) if allocated else 1
                 if number != expected_next:
                     problems.append(
                         f"next-ID mismatch in {BACKLOG_COUNTERS_FILE}: {surface} declares "
                         f"{prefix}-{number:03d} but allocation implies {prefix}-{expected_next:03d}"
+                    )
+
+    # Next-ID declarations in the numbered ledger READMEs: at most one per file
+    # and prefix, and the value must equal the ∪-derived next ID (BUG-002: a
+    # duplicated stale declaration passed while the counters table alone stayed
+    # consistent).
+    for surface in BACKLOG_NUMBERED_SURFACES:
+        surface_dir = _surface_dir(surface)
+        index = surface_dir / "README.md"
+        if not index.is_file():
+            continue
+        index_text, _ = _read_utf8(index)
+        if index_text is None:
+            continue
+        declarations: dict[str, list[tuple[int, str]]] = {}
+        for line_no, line in enumerate(index_text.splitlines(), 1):
+            decl_match = BACKLOG_NEXT_ID_DECL_RE.search(line)
+            if decl_match:
+                declarations.setdefault(decl_match.group(1), []).append(
+                    (int(decl_match.group(2)), f"line {line_no}")
+                )
+        for prefix in sorted(declarations):
+            entries = declarations[prefix]
+            if len(entries) > 1:
+                problems.append(
+                    f"duplicate next-ID declaration in {surface}/README.md: prefix {prefix} declared "
+                    f"{len(entries)} times ({', '.join(f'{value:03d} at {where}' for value, where in entries)})"
+                )
+            prefix_pair = BACKLOG_NUMBERED_PREFIXES.get(prefix)
+            if not prefix_pair:
+                continue
+            declared_allocated = _allocated_numbers(prefix_pair[0], prefix_pair[1], prefix)
+            derived_next = (max(declared_allocated) + 1) if declared_allocated else 1
+            for value, where in entries:
+                if value != derived_next:
+                    problems.append(
+                        f"next-ID declaration disagrees in {surface}/README.md: {prefix}-{value:03d} at {where} "
+                        f"but allocation implies {prefix}-{derived_next:03d}"
                     )
     return problems
 
@@ -788,6 +851,96 @@ def _self_test() -> list[str]:
         ):
             if not any(needle in v for v in ledger_problems):
                 errors.append(f"self-test: ledger rule did not detect: {needle}")
+
+        # Rule 7 negative: Next-ID allocation ignoring the active zone. A filed
+        # active card reserves its number (ledger rule: 已修复目录 ∪ 活跃目录),
+        # so a counters row declaring the archive-only next ID must fail loudly,
+        # and the ∪-consistent declaration must stay green (BUG-002, 2026-10-10).
+        allocation_repo = base / "allocation-repo"
+        active_bugs = allocation_repo / "_backlog" / "bugs"
+        fixed_dir = allocation_repo / "_backlog" / "_archived" / "_fixed_bugs"
+        active_bugs.mkdir(parents=True, exist_ok=True)
+        fixed_dir.mkdir(parents=True, exist_ok=True)
+        (active_bugs / "BUG-002-active-hold.md").write_text(
+            "# BUG-002: x\n\n> 严重级别: P2 | 发现: 2026-10-10 | 状态: 活跃\n\n## 症状\ns\n",
+            encoding="utf-8",
+        )
+        (active_bugs / "README.md").write_text(
+            "# Active bugs\n\n| Bug | 标题 | 发现 | 状态 |\n|---|---|---|---|\n"
+            "| [BUG-002-active-hold.md](BUG-002-active-hold.md) | x | 2026-10-10 | 活跃 |\n",
+            encoding="utf-8",
+        )
+        (fixed_dir / "BUG-001-fixed.md").write_text("# BUG-001: x\n", encoding="utf-8")
+        (fixed_dir / "README.md").write_text(
+            "# Fixed\n\n| ID | Date | Title |\n|---|---|---|\n"
+            "| BUG-001 | 2026-10-09 | [BUG-001-fixed.md](BUG-001-fixed.md) | x |\n\n"
+            "**Next available bug ID: BUG-002**\n",
+            encoding="utf-8",
+        )
+        counters_path = allocation_repo / "_backlog" / "_archived" / "README.md"
+        counters_path.write_text(
+            "| 归档目录 | 数量 | Next ID |\n|---|---|---|\n"
+            "| `_fixed_bugs/` | 1 | BUG-002 |\n",
+            encoding="utf-8",
+        )
+        allocation_problems = _rule_ledger_consistency(allocation_repo)
+        if not any("next-ID mismatch" in v and "_fixed_bugs" in v for v in allocation_problems):
+            errors.append("self-test: archive-only Next-ID allocation not detected")
+        counters_path.write_text(
+            "| 归档目录 | 数量 | Next ID |\n|---|---|---|\n"
+            "| `_fixed_bugs/` | 1 | BUG-003 |\n",
+            encoding="utf-8",
+        )
+        if any(
+            "next-ID mismatch" in v and "_fixed_bugs" in v
+            for v in _rule_ledger_consistency(allocation_repo)
+        ):
+            errors.append("self-test: union-consistent Next-ID declaration flagged")
+
+        # Rule 7 negative: next-ID declarations in the ledger READMEs. A README
+        # carrying TWO declarations for one prefix (one stale) must fail loudly,
+        # and a single declaration whose value disagrees with the ∪-derived next
+        # ID must fail even when the counters table alone stays consistent
+        # (BUG-002: the stale header line passed while green).
+        decl_repo = base / "decl-repo"
+        decl_bugs = decl_repo / "_backlog" / "bugs"
+        decl_fixed = decl_repo / "_backlog" / "_archived" / "_fixed_bugs"
+        decl_arch = decl_repo / "_backlog" / "_archived"
+        decl_bugs.mkdir(parents=True, exist_ok=True)
+        decl_fixed.mkdir(parents=True, exist_ok=True)
+        (decl_bugs / "BUG-002-active-hold.md").write_text(
+            "# BUG-002: x\n\n> 严重级别: P2 | 发现: 2026-10-10 | 状态: 活跃\n\n## 症状\ns\n",
+            encoding="utf-8",
+        )
+        (decl_bugs / "README.md").write_text(
+            "# Active bugs\n\n| Bug | 标题 | 发现 | 状态 |\n|---|---|---|---|\n"
+            "| [BUG-002-active-hold.md](BUG-002-active-hold.md) | x | 2026-10-10 | 活跃 |\n"
+            "\n**Next available bug ID: BUG-003**\n",
+            encoding="utf-8",
+        )
+        (decl_fixed / "BUG-001-fixed.md").write_text("# BUG-001: x\n", encoding="utf-8")
+        (decl_fixed / "README.md").write_text(
+            "# Fixed\n\n| ID | Date | Title |\n|---|---|---|\n"
+            "| BUG-001 | 2026-10-09 | [BUG-001-fixed.md](BUG-001-fixed.md) | x |\n"
+            "\n**Next available bug ID: BUG-002**\n**Next available bug ID: BUG-003**\n",
+            encoding="utf-8",
+        )
+        (decl_arch / "README.md").write_text(
+            "| 归档目录 | 数量 | Next ID |\n|---|---|---|\n"
+            "| `_fixed_bugs/` | 1 | BUG-003 |\n",
+            encoding="utf-8",
+        )
+        decl_problems = _rule_ledger_consistency(decl_repo)
+        if not any(
+            "duplicate next-ID declaration in _fixed_bugs/README.md" in v for v in decl_problems
+        ):
+            errors.append("self-test: duplicate next-ID declaration not detected")
+        if not any(
+            "next-ID declaration disagrees in _fixed_bugs/README.md" in v for v in decl_problems
+        ):
+            errors.append("self-test: disagreeing next-ID declaration not detected")
+        if any("duplicate next-ID declaration in bugs/README.md" in v for v in decl_problems):
+            errors.append("self-test: consistent single declaration flagged as duplicate")
 
         # Rule 7 negative (placement): a work-item row separated from its table
         # header block by a blank line and a fence must fail loudly. Uses a

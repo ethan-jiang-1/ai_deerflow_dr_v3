@@ -1,6 +1,6 @@
 # _archived — 已完成/暂停的归档记录
 
-> 最后更新: 2026-10-09（adopt-issue-ledger-governance 更名：_closed_plans → _settled_issues、_suspended_plans → _suspended_issues；CLS-019 关闭，closed issues 19） | `_backlog/_archived/` — 已完成内容与明确暂停项的归档根目录。
+> 最后更新: 2026-10-10（CLS-021 关闭；计数与 Next ID 唯一承载于下方状态总览表，头注不再复述——曾因复述滞留 "closed issues 19" 而与表格漂移） | `_backlog/_archived/` — 已完成内容与明确暂停项的归档根目录。
 > **`_archived/` = 归档工作件，coding agent 默认忽略，除非显式点名要读**（`_` 前缀的两类语义见 [`../README.md`](../README.md)）。
 >
 > 状态总览和查阅指南在本文件。当前该做什么、执行顺序 → 活跃列表见 [`../issues/README.md`](../issues/README.md)（新方向按其卡片模板立 issue）。
@@ -24,7 +24,7 @@ _archived/
 
 | 归档目录 | 数量 | Next ID |
 |---------|------|---------|
-| `_fixed_bugs/` | 1 | BUG-002 |
+| `_fixed_bugs/` | 2 | BUG-003 |
 | `_settled_issues/` | 21 | CLS-022 |
 
 ### ⏸ SUSPENDED（明确暂停）

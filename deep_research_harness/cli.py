@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Stable source-checkout launcher for the six-verb CLI.
+"""Stable source-checkout launcher for the seven-verb CLI.
 
-Interaction is in runtime/interaction; foreground assembly is in runtime/entry.
+Interaction is in runtime/interaction; foreground assembly is in runtime/assembly.
 """
 
 from __future__ import annotations

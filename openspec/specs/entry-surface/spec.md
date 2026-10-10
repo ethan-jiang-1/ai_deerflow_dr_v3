@@ -3,18 +3,18 @@
 
 ## Purpose
 
-Owns the required behavior of the human command surface: six thin verbs over the
-existing substrate — create, status, watch, cancel, refine, inspect — a shared
+Owns the required behavior of the human command surface: seven thin verbs over the
+existing substrate — create, status, watch, cancel, refine, inspect, diagnose — a shared
 human rendering vocabulary for the live view and the journal projection, the
 two-ladder configuration selection, and the EV2 evidence (journey smoke, golden
 replay).
 
 ## Requirements
 
-### Requirement: Six verbs mirror the state machine and observation layers
+### Requirement: The verb set mirrors the state machine and observation layers
 
-The CLI SHALL expose exactly `create`, `status`, `watch`, `cancel`, `refine`, and
-`inspect`; each SHALL delegate to the owning runtime action and SHALL add no second
+The CLI SHALL expose exactly `create`, `status`, `watch`, `cancel`, `refine`,
+`inspect`, and `diagnose`; each SHALL delegate to the owning runtime action and SHALL add no second
 state authority. `create` SHALL start a bundle (configuration selected explicitly,
 `fixture` by default) and drive the run engine in the foreground with the live human
 view; `status` SHALL report state, journal summary, and owner-PID liveness; `watch`
@@ -26,12 +26,24 @@ declared composition ladder (no fresh ladder choice; an unwired composition SHAL
 fail loudly naming it) — ending at a typed terminal state with the same terminal
 output and environment-remedy behavior as `create`; `inspect` SHALL render the journal
 timeline, the admitted evidence, the assembly snapshot, and the checkpoint thread
-summary when the framework is available. Any other command SHALL be rejected loudly
+summary when the framework is available; `diagnose` SHALL read the bundle's persisted
+facts — the typed state, the journal's terminal and lifecycle entries, and the
+existence of diagnostics artifacts — and SHALL render a classified failure diagnosis:
+the terminal outcome classified into the declared classes (model-call failure carrying
+the framework-reported error type; framework crash carrying the exception name;
+framework stop reason; clarification bound exhausted pointing at the
+unanswered-clarifications artifact; operator cancellation; owner-death transfer
+detected from a live state whose owner PID is gone; completed-but-undelivered when the
+terminal state carries no recorded delivery), the chain stage that owns the failing
+condition, and the concrete evidence files for the class. An active run SHALL be
+reported as still running and SHALL NOT be classified. `diagnose` SHALL be a
+projection only: it SHALL NOT modify state, journal, or any bundle artifact, and its
+classification SHALL NOT become lifecycle authority. Any other command SHALL be rejected loudly
 naming the legal set.
 
 #### Scenario: Every verb delegates and unknown verbs fail
 
-- **WHEN** each of the six verbs runs against a fixture bundle, and an unknown verb is
+- **WHEN** each of the seven verbs runs against a fixture bundle, and an unknown verb is
   requested
 - **THEN** each verb produces the substrate's declared behavior, and the unknown verb
   fails naming the legal command set

@@ -31,7 +31,7 @@ _Avoid_: using the bare word for both in one sentence
 
 **Entry Surface**:
 A user-facing or host-facing surface through which a run starts or is observed —
-the closed six-verb CLI plus the make lanes (owner: `entry-surface` capability).
+the closed CLI verb set plus the make lanes (owner: `entry-surface` capability).
 _Avoid_: an internal module boundary
 
 > 词汇的权威随 owning spec 落地；本文件只登记承重词，避免第二权威。

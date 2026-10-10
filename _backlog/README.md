@@ -51,7 +51,7 @@ _backlog/
 | 类型 | 活跃（当前工作） | 归档（已完成） | 编号方式 |
 |------|-----------------|---------------|---------|
 | 🐛 **Bug** | [`bugs/`](bugs/) — 活跃 bug 列表 | [`_archived/_fixed_bugs/`](_archived/_fixed_bugs/) — 已修复 | BUG-NNN 递增，编号权威在 `_fixed_bugs/`；新号 = 已分配的最大编号 + 1（已修复 ∪ 活跃） |
-| 📐 **Issue** | [`issues/`](issues/) — 活跃 issue 列表 | [`_archived/_settled_issues/`](_archived/_settled_issues/) — 已结 | CLS-NNN 递增，移入时分配（历史 CLS-001–018 有效） |
+| 📐 **Issue** | [`issues/`](issues/) — 活跃 issue 列表 | [`_archived/_settled_issues/`](_archived/_settled_issues/) — 已结 | CLS-NNN 递增，移入时分配（编号权威在 `_archived/_settled_issues/`，不在此复述范围） |
 | ⏸ **Suspended follow-up** | 无；不进入推荐执行顺序 | [`_archived/_suspended_issues/`](_archived/_suspended_issues/) — 明确暂停 | 文件名不变；重新开启时移回活跃目录 |
 
 > 📖 **想看全局状态、历史决策、查阅指南** → [`_archived/README.md`](_archived/README.md)

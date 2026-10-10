@@ -50,7 +50,7 @@ python3 cli.py watch <bundle_id>          # 观察 journal，终态退出
 python3 cli.py inspect <bundle_id>        # 时间线、已采证据、装配快照
 ```
 
-`cancel` 记录请求，由运行泵协作终止。`refine` 进入下一代 active，目前不自动执行研究。完整命令见 [COMMANDS](COMMANDS.md)，操作旅程见 [playbook](docs/playbook/run-research.md)。
+`cancel` 只记录取消请求，由运行泵协作终止。`refine` 创建下一代并**前台跑完该代**（方向文本即该代方向文档）。完整命令见 [COMMANDS](COMMANDS.md)，操作旅程见 [playbook](docs/playbook/run-research.md)。
 
 框架运行态（memory 库、skill 投影、用户数据）由 binding 钉在仓库根 `.deer-flow/`（gitignored，应用子树外）。fixture 配置加载 [runtime scripted providers](src/deerflow_deep_research/runtime/scripted/__init__.py)，base 记录 `all_real`，fixture 记录 `fixture`；`mixed` 是尚未接线的枚举。provider 代码随当前 Python package 打包，wheel 仍不包含完整 CLI/config/兄弟布局，发布面是源码 checkout + 锁定 submodule。
 

@@ -18,5 +18,6 @@ bug 修完后从 `_backlog/bugs/` 通过 `git mv` 移入本目录：
 | ID | Date | Title |
 |----|------|-------|
 | BUG-001 | 2026-10-10 | [BUG-001-degenerate-plan-as-report.md](BUG-001-degenerate-plan-as-report.md) — headless 跑计划门缺席——计划输出直落 completed 冒充报告（fix-headless-plan-gate；根因确诊与初判修正在卡） |
+| BUG-002 | 2026-10-10 | [BUG-002-doc-hygiene-next-id-blindspot.md](BUG-002-doc-hygiene-next-id-blindspot.md) — check_doc_hygiene 的账本 Next-ID 校验读不到活跃 README 声明——同文件双声明漂移全绿通过（harden-backlog-next-id-guard；∪ 推导单源化 + 声明唯一性/一致性双门禁） |
 
-**Next available bug ID: BUG-002**
+**Next available bug ID: BUG-003**

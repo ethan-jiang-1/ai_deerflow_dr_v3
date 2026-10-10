@@ -1,14 +1,6 @@
-# doc-truthfulness Specification
+# doc-truthfulness Delta
 
-## Purpose
-
-Owns the required behavior of the declaration-layer truthfulness gate: the ledger
-bookkeeping surfaces stay mechanically consistent with disk, and a declared closed list
-of resident and doc-layer files stays free of declared stale-narrative markers, both
-enforced by the document-hygiene checker's red-first rules so narrative cannot lag
-implementation silently.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Ledger bookkeeping surfaces are machine-consistent
 
@@ -84,34 +76,3 @@ manifest in the same revision that moves the directories.
 - **WHEN** an active card's status line reads `状态：等人拍板` with `毕业门` `未过` and
   `可关闭：否`, including a card that also records delivered-partial language in its body
 - **THEN** the checker exits 0
-
-### Requirement: Declared stale-narrative markers fail loudly
-
-The checker SHALL validate a declared closed list of resident and doc-layer files
-against a declared closed list of stale-narrative markers — pre-implementation-era
-placeholder phrases and stale module docstring claims on implemented layers, each
-declared verbatim in the checker's declaring table. A file
-measuring as containing a marker SHALL fail loudly naming the file, the marker, and the
-line, unless an explicit allowlist entry covering that file-and-marker pair carries a
-recorded justification (for a marker that is currently true, such as the genuinely
-empty `agents/` layer). Adding a file, a marker, or an allowlist entry is a visible
-change to the declaring tables; an allowlist entry without a justification fails the
-check.
-
-#### Scenario: Truthful declaration layer passes
-
-- **WHEN** the checker runs and no declared file contains a declared marker outside the
-  justified allowlist
-- **THEN** the checker exits 0
-
-#### Scenario: Re-introduced marker fails loudly
-
-- **WHEN** a declared file gains a declared marker with no covering allowlist entry
-- **THEN** the checker exits non-zero and names the file, the marker, and the line
-
-#### Scenario: Allowlisted exception stays honest
-
-- **WHEN** a file contains a marker but a justification-recorded allowlist entry covers
-  the pair, or an allowlist entry has no justification or no longer matches any file
-- **THEN** the covered pair passes, and an unjustified or dangling allowlist entry
-  fails loudly naming the entry

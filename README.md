@@ -5,7 +5,7 @@
 把每一次研究变成一个独立、可检查、可单独删除的 **Run Bundle**，并在有界 LLM 认知之外做确定性准入
 （validator / evidence ledger / gate）。
 
-与 v2（[`ai_deerflow_deep_research_v2`](../ai_deerflow_deep_research_v2/)）的分野：
+与 v2（前代仓 `ai_deerflow_deep_research_v2`）的分野：
 
 - **思想与结构继承**：Run Bundle 是持久真相、显式组成（`all_real` / `fixture` / `mixed`）、
   "模型提议、代码裁决"、OpenSpec spec-driven 开发、`_backlog` 任务账本、DeerFlow 只读边界——全部延续。
@@ -32,9 +32,9 @@ ai_deerflow_dr_v3/
 |   `-- tools/                  显式录制等开发操作（不是测试）
 |-- runs/                    本地 Run Bundle 数据（每次研究的状态/证据/报告；gitignored，
 |                            应用子树之外；DEEP_RESEARCH_RUNS_ROOT 可覆盖）
-|-- deerflow/                被 leverage 的框架（submodule 锁 ceebf97f = v2.1.0；只读不改）
+|-- deerflow/                被 leverage 的框架（submodule 锁 ceebf97f = ethan-v2.1.0 的前一提交；只读不改）
 |-- openspec/                设计规格、准入与治理 checker（开发治理，不参与运行）
-|-- _backlog/                任务账本（plans / bugs + 归档）
+|-- _backlog/                任务账本（issues / bugs + 归档）
 `-- .agents/skills/          openspec 技能（用户保留区）
 ```
 
@@ -44,15 +44,15 @@ ai_deerflow_dr_v3/
 python3 cli.py create "问题" --config fixture        ← deep_research_harness/ 下执行
   -> runtime/interaction/cli.py      参数、交互、直播输出
   -> runtime/bundle/bundle_actions   创建 Run Bundle（runs/d_日期/<bundle-id>/）
-  -> runtime/entry.run_foreground    配置、client、SQLite checkpointer 装配
+  -> runtime/assembly.run_foreground 配置、client、SQLite checkpointer 装配
   -> DeerFlow lead agent             框架的 agent loop（按需加载 skill、搜索、委派 subagent）
-  -> runtime/run_engine              消费事件流、有限续答、取消、终态
+  -> runtime/pump                    消费事件流、有限续答、取消、终态
   -> engine/validator + admission    最终回答确定性准入
   -> runs/…/final/report-genN.md     通过准入的报告落在 Bundle 内
 ```
 
 > 两种 loop 并存且职责不重叠：**DeerFlow agent loop** 决定搜什么、何时收束（研究认知）；
-> **Harness run loop**（run_engine）决定状态、终态与准入（运行控制）。详见[控制地图](deep_research_harness/docs/control-map.md)。
+> **Harness run loop**（pump）决定状态、终态与准入（运行控制）。详见[控制地图](deep_research_harness/docs/control-map.md)。
 
 ### 三个 lane 的命令（都在 deep_research_harness/ 下执行）
 
@@ -90,7 +90,7 @@ make record-stream PROBLEM="…" CONFIG=base  # 显式录制真实 API 事件流
 ## 备注
 
 - `deerflow/` submodule 需 `git clone --recurse-submodules` 或 `git submodule update --init` 才完整。
-- 框架运行时基座：submodule 锁在 commit `ceebf97f`（ethan digest 分支，v2.1.0 的后代而非 tag 本身；上游 v2.1.0 于 2026-09-24 发布）。
+- 框架运行时基座：submodule 锁在 commit `ceebf97f`（ethan digest 分支，ethan-v2.1.0 tag 的前一提交而非 tag 本身；上游 v2.1.0 于 2026-09-24 发布）。
   声明锁已在[结构 registry](openspec/governance/project-structure.toml)。
 - 其他根目录居民：`config.yaml`、`.env`（按需准备的宿主配置与凭证，gitignored）、
   `profiles/`（本地运行 profile）、`CONTEXT.md` / `CONTEXT-MAP.md`（词汇边界）。

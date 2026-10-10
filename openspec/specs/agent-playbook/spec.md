@@ -12,8 +12,8 @@ executable commands, under content and receipt discipline.
 
 ### Requirement: The entry face is a menu with routing, never a recipe
 
-`deep_research_harness/COMMANDS.md` SHALL list every legal command surface (the six
-CLI verbs and the make targets) with one entry per surface, and SHALL NOT carry
+`deep_research_harness/COMMANDS.md` SHALL list every legal command surface (the closed
+CLI verb set and the make targets) with one entry per surface, and SHALL NOT carry
 procedural sequences: steps, ordered instructions, and scenario walkthroughs live only
 in playbook files. Every entry whose execution needs procedure SHALL carry exactly one
 routing line naming its playbook file, and every routing target SHALL exist under
@@ -24,7 +24,7 @@ entry-surface vocabulary and SHALL NOT introduce a second command vocabulary.
 
 - **WHEN** the entry face is read to answer "what can be handled", and each routing
   line's target path is resolved under `docs/playbook/`
-- **THEN** the command entries match the closed six-verb vocabulary plus the declared
+- **THEN** the command entries match the closed entry-surface vocabulary plus the declared
   make targets, no entry contains an ordered procedural sequence, and every routing
   target exists
 ### Requirement: Playbook files are MD mixed with real commands under content discipline

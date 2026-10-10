@@ -1,7 +1,7 @@
 # Issues — 活跃 issue 列表（推敲 → 结论 → 交接）
 
 >
-> **CLS 编号权威在 `_archived/_settled_issues/`；新号 = 已分配的最大编号 + 1，移入时分配（Next available issue ID: CLS-021）。本文件只列活跃 issue，活跃卡本身不带编号，文件名即标识。**
+> **CLS 编号权威在 `_archived/_settled_issues/`；新号 = 已分配的最大编号 + 1，移入时分配（本文件不再重复声明 Next-ID，唯一活跃声明见下方活跃列表末行）。本文件只列活跃 issue，活跃卡本身不带编号，文件名即标识。**
 >
 > ⚠️ **文件名必须以日期编码开头：`YYYY-MM-DD-<name>.md`。这是强制约定，不是惯例**——无日期前缀的卡无法按时间排序与追溯（历史经验教训，v2 踩过）。
 
@@ -20,6 +20,7 @@
 
 | Issue | 一句话 |
 |------|--------|
+| [2026-10-10-lint-lane-establishment.md](2026-10-10-lint-lane-establishment.md) | lint lane 缺位：ruff 配置在、基线 108 违规、无命令位；change-practice 措辞已对齐，卡跟踪建 lane 后恢复 |
 
 **Next available issue ID: CLS-022**（移入 `_settled_issues/` 时分配；CLS-019/020/021 已分配）
 

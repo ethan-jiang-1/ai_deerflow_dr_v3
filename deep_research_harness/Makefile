@@ -23,7 +23,7 @@ smoke:
 record-stream:
 	UV_CACHE_DIR=$$(pwd)/../.uv-cache uv run --no-sync python tools/record_stream.py "$(PROBLEM)" $(CONFIG)
 
-# Human entry surface (six verbs over the substrate). See COMMANDS.md.
+# Human entry surface (seven verbs over the substrate). See COMMANDS.md.
 CONFIG ?= fixture
 
 create:
