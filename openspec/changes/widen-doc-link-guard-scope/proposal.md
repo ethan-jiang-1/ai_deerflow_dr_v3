@@ -48,7 +48,7 @@ owner 分组重排（2026-10-05 group-unit-tests-by-owner）与 runtime 改名
 
 - **Primary module / causal owner:** `openspec/governance/check_doc_hygiene.py` 的
   `_rule_links` 范围清单——链接规则的行为承载
-- **Seam classification:** deterministic-guardrail
+- **Seam classification:** deterministic-guardrail — 纯文件存在性的机器校验；无模型、无运行时行为
 - **Question:** 链接规则的受管面能否扩到测试/工具资产文档，使「分组重排/改名漏改
   相对路径」这一漂移类在 CI 当场红？
 - **Necessary adjacent/external contracts:** doc-truthfulness 主 spec（本 change 给

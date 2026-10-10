@@ -25,3 +25,11 @@
 ## Deviation Register
 
 - none: 尚未开始 apply；批次与判定以 design 为准，apply 中若出现偏离就地登记。
+
+## Delivery Record
+
+- **外部行为**: （apply 后填写）本 change 落地后的可观察行为变化一句话。
+- **影响面**: （apply 后填写）触碰的文件与面清单。
+- **实际跑了什么**: （apply 后填写）红绿命令与退出码直读回执。
+- **未执行的检查**: （apply 后填写）UNVERIFIED 项如实列出；无则写 none。
+- **AI 参与披露**: 本 change 由 coding agent 起草并实现（常设授权，DeepSeek Harness）。

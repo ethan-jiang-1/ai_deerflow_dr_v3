@@ -47,7 +47,7 @@ thread、0 个能对上仓库 bundle（smoke bundle 在 tempdir），当日上�
 - **Primary module / causal owner:** 三个直连 client 调用方（smoke ×2 文件 +
   `tools/record_stream.py`）——pin 的接线点；语义 owner 是已批的 deerflow-wiring
   framework-home requirement
-- **Seam classification:** wiring
+- **Seam classification:** wiring — 纯接线事实：既有 pin 函数接到三个漏网调用方，pin 语义零改动
 - **Question:** 未走 `run_foreground` 的直连 `build_client` 调用方，能否在不改 pin
   语义的前提下同样钉住框架 home，使应用子树不再出现第二个运行态家？
 - **Necessary adjacent/external contracts:** deerflow-wiring「framework home pinned」
