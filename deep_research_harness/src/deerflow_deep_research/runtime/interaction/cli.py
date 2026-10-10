@@ -14,9 +14,9 @@ import os
 import sys
 import time
 
-from ...domain import bundle, diagnosis as diagnosis_mod
-from .. import pump
-from .. import assembly
+from ...domain import bundle
+from ...domain import diagnosis as diagnosis_mod
+from .. import assembly, pump
 from ..bundle import bundle_actions, bundle_state
 from . import render
 

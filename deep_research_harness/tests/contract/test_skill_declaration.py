@@ -20,7 +20,7 @@ from pathlib import Path
 HARNESS_ROOT = Path(__file__).resolve().parents[2]
 SRC = HARNESS_ROOT / "src" / "deerflow_deep_research"
 
-from deerflow_deep_research.runtime.assembly import resolve_skills
+from deerflow_deep_research.runtime.assembly import resolve_skills  # noqa: E402, I001 — sys.path bootstrapping precedes the product import; the block must not be re-sorted above the bootstrap
 
 
 def _parse(rel_path: str) -> ast.Module:

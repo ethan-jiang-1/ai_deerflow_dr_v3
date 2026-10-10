@@ -12,14 +12,14 @@ import tempfile
 import threading
 import unittest
 import unittest.mock as um
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from deerflow_deep_research.domain import bundle
 from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
 
 _PIN = "c" * 40
-_FIXED_NOW = datetime(2026, 10, 4, 12, 0, tzinfo=timezone.utc)
+_FIXED_NOW = datetime(2026, 10, 4, 12, 0, tzinfo=UTC)
 _FIXED_BUCKET = "d_20261004"
 
 

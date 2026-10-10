@@ -48,7 +48,7 @@ class BundleState:
     delivery: str | None = None
     delivery_artifact: str | None = None
 
-    def validate(self) -> "BundleState":
+    def validate(self) -> BundleState:
         if self.schema_version != _SCHEMA_VERSION:
             raise RuleViolation(
                 f"state schema_version must be {_SCHEMA_VERSION}, got {self.schema_version}"
@@ -94,7 +94,7 @@ class BundleState:
 
 
     @classmethod
-    def from_dict(cls, raw: dict) -> "BundleState":
+    def from_dict(cls, raw: dict) -> BundleState:
         try:
             return cls(
                 schema_version=int(raw["schema_version"]),

@@ -19,7 +19,7 @@ class GateRequirement:
     kind: str
     minimum: int
 
-    def validate(self) -> "GateRequirement":
+    def validate(self) -> GateRequirement:
         if self.kind not in ARTIFACT_KINDS:
             raise ValueError(
                 f"gate requirement kind {self.kind!r} is outside the closed set {ARTIFACT_KINDS}"

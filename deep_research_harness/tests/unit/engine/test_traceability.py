@@ -11,7 +11,7 @@ from __future__ import annotations
 import json
 import tempfile
 import unittest
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from deerflow_deep_research.engine import traceability
@@ -27,7 +27,7 @@ def _replay_report_and_corpus(tmp: str) -> tuple[str, str]:
     runs = Path(tmp) / "runs"
     state = bundle_actions.start(
         runs, problem_text=recorded["problem"], composition="all_real",
-        deerflow_pin="c" * 40, now=datetime(2026, 10, 3, 12, 0, tzinfo=timezone.utc),
+        deerflow_pin="c" * 40, now=datetime(2026, 10, 3, 12, 0, tzinfo=UTC),
     )
     handle = bundle_state.BundleHandle.open(runs / "d_20261003" / state.thread_id)
     events = iter(recorded["events"])
@@ -41,7 +41,10 @@ def _replay_report_and_corpus(tmp: str) -> tuple[str, str]:
     report = (handle.root / "final" / "report-gen1.md").read_text(encoding="utf-8")
     records = [
         (r["content"], r["arguments"])
-        for r in (json.loads(f.read_text(encoding="utf-8")) for f in (handle.root / "diagnostics" / "searches").glob("*.json"))
+        for r in (
+            json.loads(f.read_text(encoding="utf-8"))
+            for f in (handle.root / "diagnostics" / "searches").glob("*.json")
+        )
     ]
     return report, traceability.search_corpus_text(records)
 

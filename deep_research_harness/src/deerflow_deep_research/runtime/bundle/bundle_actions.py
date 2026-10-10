@@ -11,10 +11,10 @@ from __future__ import annotations
 
 import os
 import uuid
+from collections.abc import Callable
 from dataclasses import replace
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Callable
 
 from ...domain import bundle, journal_policy, state_machine
 from ...domain.state_machine import BundleState, RefineRecord
@@ -36,7 +36,7 @@ def _default_liveness(pid: int) -> bool:
 
 
 def _now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _journal(handle: BundleHandle, category: str, event: str, detail: dict) -> None:
@@ -62,7 +62,7 @@ def start(
     removes the staging tree and leaves no partial bundle."""
 
     if now is None:
-        moment = datetime.now(timezone.utc)
+        moment = datetime.now(UTC)
     elif callable(now):
         moment = now()
     else:

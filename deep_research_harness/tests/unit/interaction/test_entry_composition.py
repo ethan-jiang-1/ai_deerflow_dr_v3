@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from datetime import UTC
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -73,13 +74,13 @@ class EntryCompositionTest(unittest.TestCase):
         so a bundle directory moved wholesale (retired scopes/ root -> runs/) keeps
         working under the new root."""
         import shutil
-        from datetime import datetime, timezone
+        from datetime import datetime
 
         with tempfile.TemporaryDirectory() as old_root, tempfile.TemporaryDirectory() as new_root:
             state = bundle_actions.start(
                 Path(old_root), problem_text="question", composition="fixture", deerflow_pin=PIN,
                 bundle_id="0f0e0d0c-0b0a-4938-8276-5f5d4e3d2c1b",
-                now=datetime(2026, 10, 3, tzinfo=timezone.utc),
+                now=datetime(2026, 10, 3, tzinfo=UTC),
             )
             # Move the whole date bucket (the one-time physical relocation shape).
             shutil.move(str(Path(old_root) / "d_20261003"), str(Path(new_root) / "d_20261003"))

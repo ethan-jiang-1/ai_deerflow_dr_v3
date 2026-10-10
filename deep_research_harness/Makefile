@@ -1,7 +1,7 @@
 # Deep Research Harness — Makefile
 # make verify = the application unit gate; semantic owner: COMMANDS.md.
 
-.PHONY: install verify test smoke create watch status record-stream
+.PHONY: install verify test lint smoke create watch status record-stream
 
 install:
 	@echo "[install] no-op: use uv sync for runtime and integration dependencies."
@@ -14,6 +14,11 @@ test:
 
 verify: test
 	@echo "[verify] harness unittest gate passed."
+
+# Lint convenience lane (ruff; CI does not enforce it — see pyproject dev group).
+# Requires the synced environment (`uv sync`), same as the smoke lane.
+lint:
+	UV_CACHE_DIR=$$(pwd)/../.uv-cache uv run --no-sync ruff check src tests tools cli.py
 
 # Integration lane (framework-dependent): requires the synced environment (`uv sync`).
 smoke:

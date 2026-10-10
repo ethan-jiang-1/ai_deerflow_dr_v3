@@ -87,7 +87,8 @@ class CompleteGraphReplayTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             runs_root = Path(td) / "runs"
             state = bundle_actions.start(
-                runs_root, problem_text=PROBLEM, composition="fixture", deerflow_pin="0000000000000000000000000000000000000000"
+                runs_root, problem_text=PROBLEM, composition="fixture",
+                deerflow_pin="0" * 40,
             )
             handle = assembly.resolve_bundle(runs_root, state.thread_id)
             with hclient.bundle_checkpointer(handle) as saver:
@@ -112,9 +113,9 @@ class CompleteGraphReplayTest(unittest.TestCase):
 
             report = (handle.root / "final" / "report-gen1.md").read_text(encoding="utf-8")
             recorded_lines = [
-                json.loads(l)
-                for l in (FIXTURE_DIR / "model-io.jsonl").read_text(encoding="utf-8").splitlines()
-                if l.strip()
+                json.loads(line)
+                for line in (FIXTURE_DIR / "model-io.jsonl").read_text(encoding="utf-8").splitlines()
+                if line.strip()
             ]
             recorded_report = recorded_lines[-1]["output"]
             self.assertEqual(

@@ -10,7 +10,7 @@ event sources; a result without a paired observed call is not materialized.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from . import atomic
@@ -68,7 +68,7 @@ class SearchLog:
             "arguments": arguments,
             "content": content or "",
             "call_id": call_id,
-            "recorded_at": datetime.now(timezone.utc).isoformat(),
+            "recorded_at": datetime.now(UTC).isoformat(),
         }
         self._dir.mkdir(parents=True, exist_ok=True)
         atomic.atomic_write_bytes(

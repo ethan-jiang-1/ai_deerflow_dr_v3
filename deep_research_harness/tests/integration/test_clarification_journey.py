@@ -9,13 +9,14 @@ stdin, so the prompt is exercised end-to-end without a TTY.
 from __future__ import annotations
 
 import json
-from tests.fixture_reports import fixture_report
 import os
 import re
 import subprocess
 import sys
 import unittest
 from pathlib import Path
+
+from tests.fixture_reports import fixture_report
 
 try:
     from deerflow.client import DeerFlowClient  # noqa: F401

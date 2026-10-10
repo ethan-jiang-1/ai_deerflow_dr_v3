@@ -10,8 +10,9 @@ Terminal decisions are the RUB-001 pure rules; this module never re-decides them
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
-from typing import Callable
+from collections.abc import Callable
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 from ..domain import bundle, clarification, journal_policy
 from ..domain.plan import PLAN_MARKER_CLOSE, PLAN_MARKER_OPEN
@@ -19,6 +20,11 @@ from ..domain.plan import extract_plan as _extract_plan  # noqa: F401 — domain
 from ..domain.state_machine import BundleState, rule_clarification_step, rule_run_terminal
 from .bundle import bundle_state, search_log
 from .bundle.journal import append_entry
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from .bundle.bundle_state import BundleHandle
 
 AUTO_REPLY_PREFIX = "[非交互模式·系统自动应答] "
 
@@ -29,19 +35,19 @@ AUTO_REPLY_PREFIX = "[非交互模式·系统自动应答] "
 # The marker literals and the extraction live in domain/plan.py (single owner —
 # the validator's plan-as-report refusal face consumes the same vocabulary).
 PLAN_REQUEST_SUFFIX = (
-    "\n\n请先给出研究计划（研究角度、查询策略、来源类型），全文用 <research-plan> 和 "
-    "</research-plan> 标记包裹，然后停止等待确认；不要在此轮执行搜索。"
+    f"\n\n请先给出研究计划（研究角度、查询策略、来源类型），全文用 {PLAN_MARKER_OPEN} 和 "
+    f"{PLAN_MARKER_CLOSE} 标记包裹，然后停止等待确认；不要在此轮执行搜索。"
     "如需先澄清问题，请直接提问，获得回答后请再次输出带标记的研究计划。"
     "通道纪律：提问的一轮只携带 ask_clarification 这一个工具调用，不要同轮调用任何其他"
     "工具（同轮的兄弟调用会被直接丢弃，已做的检索全部白费）；计划确认只通过 "
-    "<research-plan> 标记表达，绝不要把确认请求或计划全文塞进 ask_clarification。"
+    f"{PLAN_MARKER_OPEN} 标记表达，绝不要把确认请求或计划全文塞进 ask_clarification。"
 )
 PLAN_CONFIRM_PREFIX = "研究计划已确认（或经用户修订）。严格按以下计划执行研究并产出最终报告：\n\n"
 PLAN_SKIP_MESSAGE = "跳过计划注入，按你自己的判断研究并产出最终报告。"
 
 
 def _now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _journal(handle: BundleHandle, category: str, event: str, detail: dict) -> None:
@@ -81,7 +87,7 @@ def _consume_turn(
     message: str,
     thread_id: str,
     on_event: Callable[[object], None] | None = None,
-    recorder: "search_log.SearchLog | None" = None,
+    recorder: search_log.SearchLog | None = None,
 ) -> tuple[list[clarification.TerminalToolCall], set[str], str | None, str | None, str]:
     """One stream turn: journal tool/subagent events, and derive the terminal picture
     from the final ``values`` snapshot (complete message list) with streamed chunks as
@@ -90,7 +96,6 @@ def _consume_turn(
     tool_calls: list[clarification.TerminalToolCall] = []
     answered: set[str] = set()
     stop_reason: str | None = None
-    fallback_error_type: str | None = None
     values_calls: list[clarification.TerminalToolCall] = []
     values_answered: set[str] = set()
     values_fallback_error_type: str | None = None
@@ -179,7 +184,11 @@ def _consume_turn(
     # individually — the ledger stays at event granularity).
     if turn_text or tool_calls:
         excerpt = "".join(turn_text)[-80:]
-        detail = {"calls": [call.name for call in tool_calls], "answer_excerpt": excerpt} if tool_calls else {"answer_excerpt": excerpt}
+        detail = (
+            {"calls": [call.name for call in tool_calls], "answer_excerpt": excerpt}
+            if tool_calls
+            else {"answer_excerpt": excerpt}
+        )
         _journal(handle, "model_tool", "model_tool_call", detail)
     if saw_values or values_calls or values_answered or values_fallback_error_type is not None:
         return values_calls, values_answered, stop_reason, values_fallback_error_type, "".join(values_final_text)
@@ -224,8 +233,8 @@ def _submit_final_report(handle: BundleHandle, generation: int, final_text: str)
     text = (final_text or "").strip()
     if not text:
         return None
-    from .bundle.admission import submit_artifact
     from ..engine.validator import ArtifactSubmission
+    from .bundle.admission import submit_artifact
 
     return submit_artifact(
         handle,

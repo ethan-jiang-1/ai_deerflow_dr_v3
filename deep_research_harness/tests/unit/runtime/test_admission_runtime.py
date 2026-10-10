@@ -5,23 +5,22 @@
 from __future__ import annotations
 
 import json
-from tests.fixture_reports import fixture_report
 import tempfile
 import unittest
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
-from deerflow_deep_research.domain import bundle
-from deerflow_deep_research.engine import verdicts
-from deerflow_deep_research.engine.validator import AdmissionContext, ArtifactSubmission
 from deerflow_deep_research.domain.state_machine import RuleViolation
-from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
+from deerflow_deep_research.engine import verdicts
+from deerflow_deep_research.engine.validator import ArtifactSubmission
 from deerflow_deep_research.runtime.bundle import admission as admission_mod
+from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
 from deerflow_deep_research.runtime.bundle import journal as journal_mod
 from deerflow_deep_research.runtime.bundle.ledger import LedgerEntry, commit_entry, read_ledger
+from tests.fixture_reports import fixture_report
 
 _PIN = "c" * 40
-_FIXED_NOW = datetime(2026, 10, 3, 12, 0, tzinfo=timezone.utc)
+_FIXED_NOW = datetime(2026, 10, 3, 12, 0, tzinfo=UTC)
 _FIXED_BUCKET = "d_20261003"
 
 
@@ -29,7 +28,7 @@ def _submission(**overrides) -> ArtifactSubmission:
     kwargs: dict = {
         "kind": "evidence",
         "filename": "supply-chain-notes.md",
-        "content": "认证壁垒调研笔记".encode("utf-8"),
+        "content": "认证壁垒调研笔记".encode(),
         "provenance": {"producer": "research-skill"},
     }
     kwargs.update(overrides)
@@ -205,7 +204,9 @@ class AdmissionRuntimeTest(unittest.TestCase):
     def test_final_report_places_to_final(self) -> None:
         entry = admission_mod.submit_artifact(
             self.handle,
-            _submission(kind="final_report", filename="report-gen1.md", content=fixture_report("# 简报\n内容").encode()),
+            _submission(
+                kind="final_report", filename="report-gen1.md", content=fixture_report("# 简报\n内容").encode()
+            ),
         )
         self.assertEqual(entry.disposition, "admit")
         placed = self.handle.root / "final" / "report-gen1.md"

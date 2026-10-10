@@ -33,7 +33,7 @@ class ValidatorVerdict:
     reasons: tuple[str, ...] = field(default=())
     content_hash: str = ""
 
-    def validate(self) -> "ValidatorVerdict":
+    def validate(self) -> ValidatorVerdict:
         if self.result_code not in RESULT_CODES:
             raise ValueError(
                 f"result code {self.result_code!r} is outside the closed set {RESULT_CODES}"
@@ -46,7 +46,7 @@ class GateVerdict:
     phase_verdict: str
     unmet: tuple[str, ...] = field(default=())
 
-    def validate(self) -> "GateVerdict":
+    def validate(self) -> GateVerdict:
         if self.phase_verdict not in PHASE_VERDICTS:
             raise ValueError(
                 f"phase verdict {self.phase_verdict!r} is outside the closed set {PHASE_VERDICTS}"

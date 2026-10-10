@@ -25,7 +25,9 @@ class JournalingDeepSeek(JournalingMixin, PatchedChatDeepSeek):
     @staticmethod
     def _read_pin() -> str | None:
         try:
-            from .assembly import read_pin  # same runtime layer (..assembly would be a level-2 hop to a nonexistent module — caught by the import-boundary guard)
+            # Same runtime layer (.assembly): "..assembly" would be a level-2 hop to
+            # a nonexistent module — caught by the import-boundary guard.
+            from .assembly import read_pin
 
             return read_pin()
         except Exception:  # noqa: BLE001 — pin is metadata, never a run blocker

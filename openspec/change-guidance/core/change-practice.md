@@ -78,7 +78,7 @@ operator-facing surface takes at least one end-to-end journey (enter, act, obser
 recover or exit) beside its unit tests. A new guard is unproven until a recorded
 mutation shows it failing when the guarded behavior is removed. State plainly what
 could not be verified locally instead of passing over it quietly. At every slice's
-close, run the tests and re-read the spec's review checklist before moving on —
+close, run lint and tests and re-read the spec's review checklist before moving on —
 the closeout reread is routine slice discipline, not a control-placement-only
 obligation.
 

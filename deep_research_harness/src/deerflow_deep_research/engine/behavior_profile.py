@@ -18,9 +18,10 @@ Known boundaries (deliberate, evidence-recorded):
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 #: Closed known-tool vocabulary, from the recorded run corpus (2026-10-03..07).
 KNOWN_TOOLS: tuple[str, ...] = (

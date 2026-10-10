@@ -1,6 +1,6 @@
 # Issue: lint lane 缺位——ruff 已配置、基线 108 违规、无命令位
 
-> 立卡: 2026-10-10 ｜ 状态: 推敲中 ｜ 类型: Task ｜ 毕业门: 未过 ｜ 可关闭: 否
+> 立卡: 2026-10-10 ｜ 状态: 已结（establish-lint-lane，archive 2026-10-10-establish-lint-lane：全树 ruff 108 → 0、make lint 命令位 + 红演示、COMMANDS 行、change-practice 措辞恢复）｜ 类型: Task ｜ 毕业门: 未过 ｜ 可关闭: 否
 
 **问题与期望结果：** `pyproject.toml` dev 组已配 ruff（select E/F/I/UP/B/ASYNC、
 line-length 120，注释自认 "CI does not enforce it"），但仓库内不存在 lint 命令位
@@ -45,3 +45,12 @@ COMMANDS 行 + change-practice 恢复 "lint and tests" 措辞，本卡按 ritual
 
 四态之一——默认"做"：`make lint` 全绿 + COMMANDS 登记 + change-practice 恢复措辞 +
 新鲜回执（命令/退出码/revision）。
+
+## 附录：红基线取证（2026-10-10）
+
+- 基线 revision：`868d4f0`（审计修复 + change① 归档后的树）
+- 复现命令：`cd deep_research_harness && UV_CACHE_DIR=../.uv-cache uv run --no-sync ruff check src tests tools cli.py --output-format concise`
+- 结果：exit 1，**108 violations**（rule census：E501×22、I001×15、UP017×14、UP037×13、
+  F401×10、F821×7、UP012×5、F841×3、E731×3、E402×2、B007×1、UP035×4）
+- 逐条凭据：由上命令于该 revision 复现（避免 11KB 逐条清单永久入卡——信噪比裁定，
+  见 change 的 Deviation Register）。

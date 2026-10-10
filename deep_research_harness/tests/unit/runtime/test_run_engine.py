@@ -5,19 +5,19 @@
 from __future__ import annotations
 
 import json
-from tests.fixture_reports import fixture_report
 import tempfile
 import unittest
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from types import SimpleNamespace
 
-from deerflow_deep_research.domain import bundle, journal_policy, state_machine
-from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
+from deerflow_deep_research.domain import bundle, state_machine
 from deerflow_deep_research.runtime import pump
+from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
+from tests.fixture_reports import fixture_report
 
 _PIN = "c" * 40
-_FIXED_NOW = datetime(2026, 10, 3, 12, 0, tzinfo=timezone.utc)
+_FIXED_NOW = datetime(2026, 10, 3, 12, 0, tzinfo=UTC)
 _FIXED_BUCKET = "d_20261003"
 
 
@@ -570,7 +570,11 @@ class RunEngineTest(unittest.TestCase):
         self.assertTrue(any(e.disposition == "admit" and e.kind == "final_report" for e in entries))
 
     def test_fallback_completion_never_submits(self) -> None:
-        fallback_ai = {"type": "ai", "content": "LLM request failed", "additional_kwargs": {"deerflow_error_fallback": True, "error_type": "RuntimeError"}}
+        fallback_ai = {
+            "type": "ai",
+            "content": "LLM request failed",
+            "additional_kwargs": {"deerflow_error_fallback": True, "error_type": "RuntimeError"},
+        }
 
         def stream_fn(message: str):
             yield _event("values", messages=[{"type": "human", "content": "q"}, fallback_ai])
@@ -600,7 +604,7 @@ class RunEngineTest(unittest.TestCase):
         self.assertIn("深挖成本侧证据", first_messages[0])
         self.assertNotIn("认证壁垒", first_messages[0], "generation 2 must not resend the original problem")
 
-    def _drive_to_completion(self, answer: str) -> "state_machine.BundleState":
+    def _drive_to_completion(self, answer: str) -> state_machine.BundleState:
         def stream_fn(message: str):
             yield _event("values", title="t", messages=[_ai(answer)])
             yield _chunk_event(_ai(answer))
@@ -623,12 +627,12 @@ class RunEngineTest(unittest.TestCase):
         self.assertIsNone(final.delivery_artifact)
 
     def test_duplicate_refine_answer_records_rejected_delivery_and_stays_refinable(self) -> None:
-        from dataclasses import replace as _replace
 
         first = self._drive_to_completion(fixture_report("完全相同的报告内容"))
         self.assertEqual(first.delivery, "admitted")
         refined, _record = bundle_actions.refine(self.handle, "深挖成本侧")
-        second = self._drive_to_completion(fixture_report("完全相同的报告内容"))  # duplicate hash vs gen 1
+        # duplicate hash vs gen 1 — the call drives the run; its return value is intentionally unused
+        self._drive_to_completion(fixture_report("完全相同的报告内容"))
         final = bundle_state.read_state(self.handle)
         self.assertEqual(final.status, "completed")
         self.assertEqual(final.delivery, "rejected")

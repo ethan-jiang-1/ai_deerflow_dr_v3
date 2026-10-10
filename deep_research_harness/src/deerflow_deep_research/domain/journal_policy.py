@@ -47,7 +47,7 @@ class JournalEntry:
     event: str
     detail: dict
 
-    def validate(self) -> "JournalEntry":
+    def validate(self) -> JournalEntry:
         check_category(self.category)
         if not self.timestamp:
             raise RuleViolation("journal entry requires a timestamp")
@@ -64,7 +64,7 @@ class JournalEntry:
         }
 
     @classmethod
-    def from_dict(cls, raw: dict) -> "JournalEntry":
+    def from_dict(cls, raw: dict) -> JournalEntry:
         return cls(
             timestamp=raw.get("ts", ""),
             category=raw.get("category", ""),

@@ -40,7 +40,7 @@ class BundleHandle:
     identity: tuple[int, int]
 
     @classmethod
-    def open(cls, root: Path) -> "BundleHandle":
+    def open(cls, root: Path) -> BundleHandle:
         if not root.is_dir():
             raise BundleUnavailable(
                 f"bundle {root} is permanently unavailable: the directory does not exist "

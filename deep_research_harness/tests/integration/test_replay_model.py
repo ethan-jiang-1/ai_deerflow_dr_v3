@@ -9,12 +9,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from langchain_core.messages import HumanMessage, SystemMessage
+
 from deerflow_deep_research.runtime.scripted.replay_model import (
-    ReplayChatModel,
     RecordingChatModel,
+    ReplayChatModel,
     replay_key,
 )
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
 
 def _messages(with_volatile: bool = False) -> list:

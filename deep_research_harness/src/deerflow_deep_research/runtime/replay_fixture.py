@@ -75,7 +75,7 @@ class JourneyReplayModel(BaseChatModel):
         journal = _replay_root() / "model-io.jsonl"
         if not journal.is_file():
             raise RuntimeError(f"replay journal missing: {journal}")
-        raw = [json.loads(l) for l in journal.read_text(encoding="utf-8").splitlines() if l.strip()]
+        raw = [json.loads(line) for line in journal.read_text(encoding="utf-8").splitlines() if line.strip()]
         # The recorded journal interleaves the agent's calls with middleware model
         # calls (the summarization middleware has its own instance). A mid-journey
         # content-only line cannot be an agent turn — an agent turn ending in plain
@@ -84,7 +84,7 @@ class JourneyReplayModel(BaseChatModel):
         # summarization, so the agent's calls consume exactly the agent subsequence:
         # the first line (plan), every tool-call line, and the last line (report).
         if len(raw) > 2:
-            turns = [raw[0]] + [l for l in raw[1:-1] if l.get("tool_calls")] + [raw[-1]]
+            turns = [raw[0]] + [line for line in raw[1:-1] if line.get("tool_calls")] + [raw[-1]]
         else:
             turns = raw
         _reset_shared_position(_replay_root())
@@ -98,7 +98,7 @@ class JourneyReplayModel(BaseChatModel):
         return self
 
     def _serve(self, messages) -> ChatResult:  # noqa: ANN001
-        position = self.cursor + 0  # instance field unused for serving; kept for introspection
+        position = self.cursor + 0  # noqa: F841 — instance cursor kept for introspection; serving reads the shared position below
         cursor = _SHARED_POSITION["cursor"]
         if cursor >= len(self.turns):
             raise KeyError(
@@ -113,7 +113,11 @@ class JourneyReplayModel(BaseChatModel):
             {"name": c["name"], "args": c["args"], "id": c["id"], "type": "tool_call"}
             for c in (line.get("tool_calls") or [])
         ]
-        message = AIMessage(content=str(line["output"]), tool_calls=tool_calls) if tool_calls else AIMessage(content=str(line["output"]))
+        message = (
+            AIMessage(content=str(line["output"]), tool_calls=tool_calls)
+            if tool_calls
+            else AIMessage(content=str(line["output"]))
+        )
         return ChatResult(generations=[ChatGeneration(message=message)])
 
     def _generate(self, messages, stop=None, run_manager=None, **kwargs):  # noqa: ANN001, ANN202

@@ -8,7 +8,7 @@ import os
 import subprocess
 import tempfile
 import unittest
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from unittest import mock
 
@@ -18,7 +18,7 @@ from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
 from deerflow_deep_research.runtime.bundle import journal as journal_mod
 
 _PIN = "c" * 40
-_FIXED_NOW = datetime(2026, 10, 3, 12, 0, tzinfo=timezone.utc)
+_FIXED_NOW = datetime(2026, 10, 3, 12, 0, tzinfo=UTC)
 _FIXED_BUCKET = "d_20261003"
 
 

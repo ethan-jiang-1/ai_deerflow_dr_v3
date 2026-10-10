@@ -7,18 +7,18 @@ from __future__ import annotations
 import json
 import tempfile
 import unittest
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from deerflow_deep_research.domain import bundle, journal_policy
+from deerflow_deep_research.domain import journal_policy
 from deerflow_deep_research.runtime import pump
 from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
 from deerflow_deep_research.runtime.interaction import render
 
 _PIN = "c" * 40
-_FIXED_NOW = datetime(2026, 10, 3, 12, 0, tzinfo=timezone.utc)
+_FIXED_NOW = datetime(2026, 10, 3, 12, 0, tzinfo=UTC)
 _FIXED_BUCKET = "d_20261003"
 _GOLDEN = Path(__file__).resolve().parents[3] / "tests" / "fixtures" / "recorded" / "clarification-exhaustion.json"
 
@@ -43,8 +43,14 @@ class RendererTest(unittest.TestCase):
     def test_stream_chunk_text_returns_inline_text_only_for_ai_content(self) -> None:
         self.assertEqual(render.stream_chunk_text(_event("messages-tuple", type="ai", content="无人")), "无人")
         self.assertIsNone(render.stream_chunk_text(_event("messages-tuple", type="ai", content="")))
-        self.assertIsNone(render.stream_chunk_text(_event("messages-tuple", type="ai", tool_calls=[{"id": "t1", "name": "web_search", "args": {}}])))
-        self.assertIsNone(render.stream_chunk_text(_event("messages-tuple", type="tool", tool_call_id="t1", content="ok")))
+        self.assertIsNone(
+            render.stream_chunk_text(
+                _event("messages-tuple", type="ai", tool_calls=[{"id": "t1", "name": "web_search", "args": {}}])
+            )
+        )
+        self.assertIsNone(
+            render.stream_chunk_text(_event("messages-tuple", type="tool", tool_call_id="t1", content="ok"))
+        )
         self.assertIsNone(render.stream_chunk_text(_event("end")))
 
     def test_journal_projection_uses_the_same_phrase(self) -> None:

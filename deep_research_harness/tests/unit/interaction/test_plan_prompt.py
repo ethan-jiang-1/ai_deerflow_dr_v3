@@ -105,7 +105,9 @@ class PlanHandlerBehaviorTest(unittest.TestCase):
 
 class PlanWiringTest(unittest.TestCase):
     def test_create_passes_the_plan_handler_refine_passes_none(self) -> None:
-        sentinel = lambda p: p
+        def sentinel(p):
+            return p
+
         create_calls: list[dict] = []
         refine_calls: list[dict] = []
         fake_for_create = SimpleNamespace(

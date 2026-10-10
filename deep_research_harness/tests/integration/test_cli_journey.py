@@ -8,12 +8,13 @@ cli.py as a subprocess so the human path is what is tested.
 from __future__ import annotations
 
 import json
-from tests.fixture_reports import fixture_report
 import re
 import subprocess
 import sys
 import unittest
 from pathlib import Path
+
+from tests.fixture_reports import fixture_report
 
 try:
     from deerflow.client import DeerFlowClient  # noqa: F401
@@ -74,8 +75,18 @@ class CliJourneyTest(unittest.TestCase):
         report = bundle_dirs[0] / "final/report-gen1.md"
         self.assertTrue(report.is_file(), created.stdout)
         self.assertTrue(report.read_text(encoding="utf-8").strip())
-        entries = [json.loads(line) for line in (bundle_dirs[0] / "evidence/submissions.jsonl").read_text(encoding="utf-8").splitlines()]
-        self.assertTrue(any(e["kind"] == "final_report" and e["disposition"] == "admit" and e["artifact_path"] == "final/report-gen1.md" for e in entries))
+        entries = [
+            json.loads(line)
+            for line in (bundle_dirs[0] / "evidence/submissions.jsonl").read_text(encoding="utf-8").splitlines()
+        ]
+        self.assertTrue(
+            any(
+                e["kind"] == "final_report"
+                and e["disposition"] == "admit"
+                and e["artifact_path"] == "final/report-gen1.md"
+                for e in entries
+            )
+        )
 
         # Round-4 ruling: the search result is materialized readable.
         search_log = bundle_dirs[0] / "diagnostics" / "searches" / "gen1-001-web_search.json"
@@ -108,8 +119,18 @@ class CliJourneyTest(unittest.TestCase):
         report2 = bundle_dirs[0] / "final/report-gen2.md"
         self.assertTrue(report2.is_file(), refined.stdout)
         self.assertIn("cost-side", report2.read_text(encoding="utf-8"))
-        entries2 = [json.loads(line) for line in (bundle_dirs[0] / "evidence/submissions.jsonl").read_text(encoding="utf-8").splitlines()]
-        self.assertTrue(any(e["kind"] == "final_report" and e["disposition"] == "admit" and e["artifact_path"] == "final/report-gen2.md" for e in entries2))
+        entries2 = [
+            json.loads(line)
+            for line in (bundle_dirs[0] / "evidence/submissions.jsonl").read_text(encoding="utf-8").splitlines()
+        ]
+        self.assertTrue(
+            any(
+                e["kind"] == "final_report"
+                and e["disposition"] == "admit"
+                and e["artifact_path"] == "final/report-gen2.md"
+                for e in entries2
+            )
+        )
 
         status2 = _cli("status", bundle_id)
         self.assertEqual(status2.returncode, 0, status2.stderr)

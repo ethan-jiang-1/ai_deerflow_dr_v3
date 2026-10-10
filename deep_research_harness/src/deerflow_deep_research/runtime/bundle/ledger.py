@@ -13,6 +13,7 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import dataclass, replace
+from pathlib import Path
 from typing import Any
 
 from ...domain.state_machine import RuleViolation
@@ -85,7 +86,7 @@ class LedgerEntry:
         }
 
     @classmethod
-    def from_dict(cls, raw: dict[str, Any]) -> "LedgerEntry":
+    def from_dict(cls, raw: dict[str, Any]) -> LedgerEntry:
         keys = set(raw.keys())
         if keys != _ENTRY_FIELDS:
             unknown = sorted(keys - _ENTRY_FIELDS)
@@ -120,9 +121,7 @@ def _entry_hash(prev_hash: str, entry_without_hash: dict[str, Any]) -> str:
     return hashlib.sha256((prev_hash + _canonical(entry_without_hash)).encode("utf-8")).hexdigest()
 
 
-def ledger_path(handle: BundleHandle) -> "Path":
-    from pathlib import Path
-
+def ledger_path(handle: BundleHandle) -> Path:
     return handle.root / Path(LEDGER_RELATIVE)
 
 

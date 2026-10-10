@@ -8,10 +8,10 @@ journals every disposition under the `validation` category.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from ...domain.journal_policy import JournalEntry
-from ...engine.validator import ArtifactSubmission, AdmissionContext, validate
+from ...engine.validator import AdmissionContext, ArtifactSubmission, validate
 from . import atomic
 from .bundle_state import BundleHandle
 from .journal import append_entry
@@ -35,7 +35,7 @@ __all__ = [
 
 
 def _now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _build_context(handle: BundleHandle) -> AdmissionContext:
@@ -59,7 +59,11 @@ def submit_artifact(handle: BundleHandle, submission: ArtifactSubmission) -> Led
     context = _build_context(handle)
     verdict = validate(submission, context)
     # RUB-001's directory contract: final reports route to final/; everything else evidence/.
-    placement = f"final/{submission.filename}" if submission.kind == "final_report" else f"evidence/{submission.kind}/{submission.filename}"
+    placement = (
+        f"final/{submission.filename}"
+        if submission.kind == "final_report"
+        else f"evidence/{submission.kind}/{submission.filename}"
+    )
     if verdict.result_code != "ok":
         disposition, artifact_path, replay_of = "reject", "", None
     elif verdict.content_hash in context.rejected_hashes:

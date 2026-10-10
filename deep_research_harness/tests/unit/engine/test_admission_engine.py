@@ -20,7 +20,7 @@ def _submission(**overrides) -> ArtifactSubmission:
     kwargs: dict = {
         "kind": "evidence",
         "filename": "supply-chain-notes.md",
-        "content": "认证壁垒调研笔记".encode("utf-8"),
+        "content": "认证壁垒调研笔记".encode(),
         "provenance": {"producer": "research-skill"},
     }
     kwargs.update(overrides)
@@ -40,7 +40,14 @@ class ClosedVocabulariesTest(unittest.TestCase):
     def test_result_codes_are_the_declared_set(self) -> None:
         self.assertEqual(
             verdicts.RESULT_CODES,
-            ("ok", "schema_malformed", "missing_provenance", "empty_content", "duplicate_content", "report_structure_violation"),
+            (
+                "ok",
+                "schema_malformed",
+                "missing_provenance",
+                "empty_content",
+                "duplicate_content",
+                "report_structure_violation",
+            ),
         )
 
     def test_dispositions_are_the_closed_three(self) -> None:
@@ -66,10 +73,12 @@ class ValidatorRulesTest(unittest.TestCase):
             "这两项共同决定了整个准入时间线的弹性区间。"
         )
         report = "## 结论\n\n" + body + "\n\n## Sources\n\n- https://fixture.example/a\n- https://fixture.example/b\n"
-        verdict = validator.validate(_submission(kind="final_report", filename="r.md", content=report.encode()), _context())
+        verdict = validator.validate(
+            _submission(kind="final_report", filename="r.md", content=report.encode()), _context()
+        )
         self.assertEqual(verdict.result_code, "ok")
 
-    def _structure_verdict(self, content: bytes) -> "object":
+    def _structure_verdict(self, content: bytes) -> object:
         return validator.validate(_submission(kind="final_report", filename="r.md", content=content), _context())
 
     def test_non_utf8_final_report_is_rejected(self) -> None:
@@ -102,7 +111,7 @@ class ValidatorRulesTest(unittest.TestCase):
         )
 
     def test_headingless_final_report_is_rejected(self) -> None:
-        verdict = self._structure_verdict("no heading here, just a plain short body without any markdown title".encode())
+        verdict = self._structure_verdict(b"no heading here, just a plain short body without any markdown title")
         self.assertEqual(verdict.result_code, "report_structure_violation")
         self.assertTrue(any("heading" in reason for reason in verdict.reasons))
 
@@ -144,7 +153,7 @@ class ValidatorRulesTest(unittest.TestCase):
     def test_duplicate_admitted_content_is_caught(self) -> None:
         import hashlib
 
-        content = "重复证据".encode("utf-8")
+        content = "重复证据".encode()
         digest = hashlib.sha256(content).hexdigest()
         verdict = validator.validate(
             _submission(content=content), _context(admitted_hashes=frozenset({digest}))
@@ -154,7 +163,7 @@ class ValidatorRulesTest(unittest.TestCase):
     def test_rejected_history_does_not_duplicate(self) -> None:
         import hashlib
 
-        content = "曾被打回的证据".encode("utf-8")
+        content = "曾被打回的证据".encode()
         digest = hashlib.sha256(content).hexdigest()
         verdict = validator.validate(
             _submission(content=content), _context(rejected_hashes={digest: 4})

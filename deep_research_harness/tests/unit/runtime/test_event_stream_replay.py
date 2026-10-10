@@ -12,10 +12,9 @@ import collections
 import json
 import tempfile
 import unittest
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
-from deerflow_deep_research.domain import bundle
 from deerflow_deep_research.runtime import pump
 from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
 
@@ -33,7 +32,7 @@ class EventStreamReplayTest(unittest.TestCase):
         self.events = recorded["events"]
         state = bundle_actions.start(
             self.runs, problem_text=recorded["problem"], composition="all_real",
-            deerflow_pin=_PIN, now=datetime(2026, 10, 3, 12, 0, tzinfo=timezone.utc),
+            deerflow_pin=_PIN, now=datetime(2026, 10, 3, 12, 0, tzinfo=UTC),
         )
         self.handle = bundle_state.BundleHandle.open(self.runs / "d_20261003" / state.thread_id)
 
@@ -59,7 +58,10 @@ class EventStreamReplayTest(unittest.TestCase):
         tampered = [dict(e) for e in self.events]
         for e in tampered:
             if e["type"] == "messages-tuple" and isinstance(e["data"], dict) and e["data"].get("tool_calls"):
-                e["data"] = {**e["data"], "tool_calls": [{**tc, "name": "tampered_tool"} for tc in e["data"]["tool_calls"]]}
+                e["data"] = {
+                    **e["data"],
+                    "tool_calls": [{**tc, "name": "tampered_tool"} for tc in e["data"]["tool_calls"]],
+                }
         self.events = tampered
         pump.run_research(self.handle, stream_fn=self._stream_fn())
         entries = self._journal()

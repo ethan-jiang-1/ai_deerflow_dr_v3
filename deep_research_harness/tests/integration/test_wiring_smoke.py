@@ -8,13 +8,14 @@ the pinned experiment that closes the wiring plan's remaining uncertainty.
 from __future__ import annotations
 
 import json
-from tests.fixture_reports import fixture_report
 import os
 import sqlite3
 import tempfile
 import unittest
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
+
+from tests.fixture_reports import fixture_report
 
 try:
     from deerflow.client import DeerFlowClient  # noqa: F401
@@ -23,22 +24,25 @@ try:
 except ImportError:  # pragma: no cover — environments without the framework
     _FRAMEWORK_AVAILABLE = False
 
-from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
-from deerflow_deep_research.runtime.adapters import client as client_binding
-from deerflow_deep_research.runtime.bundle import journal as journal_mod
 from deerflow_deep_research.runtime import pump
+from deerflow_deep_research.runtime.adapters import client as client_binding
+from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
+from deerflow_deep_research.runtime.bundle import journal as journal_mod
 
 
 def journal_entries(handle):
     return journal_mod.read_entries(handle)
 
 _PIN = "c" * 40
-_FIXED_NOW = datetime(2026, 10, 3, 12, 0, tzinfo=timezone.utc)
+_FIXED_NOW = datetime(2026, 10, 3, 12, 0, tzinfo=UTC)
 _CONFIG_ROOT = Path(__file__).resolve().parents[2] / "config"
 
 _SCRIPT_CONTINUATION = json.dumps(
     [
-        {"content": "", "tool_calls": [{"id": "c1", "name": "ask_clarification", "args": {"question": "范围选哪国市场？"}}]},
+        {
+            "content": "",
+            "tool_calls": [{"id": "c1", "name": "ask_clarification", "args": {"question": "范围选哪国市场？"}}],
+        },
         {"content": fixture_report("已按假设完成：聚焦 A 国市场，认证壁垒分析见报告。")},
     ]
 )

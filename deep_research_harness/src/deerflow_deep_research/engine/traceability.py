@@ -16,8 +16,8 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 _URL_RE = re.compile(r"https?://[^\s)\]}>\"']+")
 _TRAILING_PUNCT = "),.;'\""

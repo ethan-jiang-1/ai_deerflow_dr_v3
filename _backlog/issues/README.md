@@ -20,9 +20,8 @@
 
 | Issue | 一句话 |
 |------|--------|
-| [2026-10-10-lint-lane-establishment.md](2026-10-10-lint-lane-establishment.md) | lint lane 缺位：ruff 配置在、基线 108 违规、无命令位；change-practice 措辞已对齐，卡跟踪建 lane 后恢复 |
 
-**Next available issue ID: CLS-022**（移入 `_settled_issues/` 时分配；CLS-019/020/021 已分配）
+**Next available issue ID: CLS-023**（移入 `_settled_issues/` 时分配；CLS-019/020/021/022 已分配）
 
 新方向性工作**必须显性立卡**（驾驭者要求，2026-10-07）：先立卡记录决策与取舍，再走 OpenSpec change 实施；完成后按上方 ritual 关闭归档。
 

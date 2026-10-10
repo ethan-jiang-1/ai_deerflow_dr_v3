@@ -88,7 +88,9 @@ class ClarificationHandlerBehaviorTest(unittest.TestCase):
 
 class ClarificationWiringTest(unittest.TestCase):
     def test_create_passes_the_handler_through_run_foreground(self) -> None:
-        sentinel = lambda q: "x"
+        def sentinel(q):
+            return "x"
+
         calls: list[dict] = []
         fake_assembly = SimpleNamespace(
             runs_root=lambda: "/runs",
@@ -112,7 +114,9 @@ class ClarificationWiringTest(unittest.TestCase):
         self.assertEqual(calls[0].get("on_clarification"), sentinel)
 
     def test_refine_passes_the_handler_through_run_foreground(self) -> None:
-        sentinel = lambda q: "x"
+        def sentinel(q):
+            return "x"
+
         calls: list[dict] = []
         refined = SimpleNamespace(status="active", generation=2, composition="fixture", thread_id="t2")
         record = SimpleNamespace(generation=2, direction_text="深挖")

@@ -15,10 +15,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from langchain_core.messages import HumanMessage
+
 from deerflow_deep_research.runtime.recording import JournalingMixin
 from deerflow_deep_research.runtime.scripted import ScriptedChatModel
 from deerflow_deep_research.runtime.scripted.replay_model import ReplayChatModel, replay_key
-from langchain_core.messages import HumanMessage
 
 
 class _JournaledScripted(JournalingMixin, ScriptedChatModel):
@@ -69,7 +70,7 @@ class JournalingMixinTest(unittest.TestCase):
                 model = _JournaledScripted()
                 result = model._generate([HumanMessage(content="问题")])
                 self.assertEqual(result.generations[0].message.content, "记录的回答")
-                lines = [json.loads(l) for l in sink.read_text(encoding="utf-8").splitlines()]
+                lines = [json.loads(line) for line in sink.read_text(encoding="utf-8").splitlines()]
                 self.assertEqual(len(lines), 1)
                 self.assertEqual(lines[0]["key"], replay_key([HumanMessage(content="问题")]))
                 self.assertEqual(lines[0]["output"], "记录的回答")
@@ -91,7 +92,7 @@ class JournalingMixinTest(unittest.TestCase):
                 result = model._generate([HumanMessage(content="开始调研")])
                 message = result.generations[0].message
                 self.assertTrue(message.tool_calls, "scripted turn must emit tool calls")
-                lines = [json.loads(l) for l in sink.read_text(encoding="utf-8").splitlines()]
+                lines = [json.loads(line) for line in sink.read_text(encoding="utf-8").splitlines()]
                 self.assertEqual(len(lines), 1)
                 self.assertEqual(
                     lines[0]["tool_calls"],
@@ -141,7 +142,7 @@ class AsyncPathTest(unittest.TestCase):
                 model = _JournaledSyncStream()
                 pieces = [c.message.content for c in model._stream([HumanMessage(content="同步问")])]
                 self.assertEqual("".join(pieces), "同步流回答")
-                lines = [json.loads(l) for l in sink.read_text(encoding="utf-8").splitlines()]
+                lines = [json.loads(line) for line in sink.read_text(encoding="utf-8").splitlines()]
                 self.assertEqual(len(lines), 1, f"expected one line, got {lines}")
                 self.assertEqual(lines[0]["output"], "同步流回答")
 
@@ -181,7 +182,7 @@ class AsyncPathTest(unittest.TestCase):
             _drive_sink = [str(sink)]
             pieces = asyncio.run(_drive())
             self.assertEqual("".join(pieces), "流式回答整段")
-            lines = [json.loads(l) for l in sink.read_text(encoding="utf-8").splitlines()]
+            lines = [json.loads(line) for line in sink.read_text(encoding="utf-8").splitlines()]
             self.assertEqual(len(lines), 1, f"expected one line, got {lines}")
             self.assertEqual(lines[0]["output"], "流式回答整段")
 
@@ -197,7 +198,7 @@ class AsyncPathTest(unittest.TestCase):
                 model = _JournaledScripted()
                 result = asyncio.run(model._agenerate([HumanMessage(content="异步问")]))
                 self.assertEqual(result.generations[0].message.content, "异步回答")
-                lines = [json.loads(l) for l in sink.read_text(encoding="utf-8").splitlines()]
+                lines = [json.loads(line) for line in sink.read_text(encoding="utf-8").splitlines()]
                 self.assertEqual(len(lines), 1, f"expected one line, got {lines}")
                 self.assertEqual(lines[0]["output"], "异步回答")
 
@@ -228,7 +229,7 @@ class AsyncPathTest(unittest.TestCase):
                 model = _JournaledAsync()
                 result = asyncio.run(model._agenerate([HumanMessage(content="纯异步问")]))
                 self.assertEqual(result.generations[0].message.content, "纯异步回答")
-                lines = [json.loads(l) for l in sink.read_text(encoding="utf-8").splitlines()]
+                lines = [json.loads(line) for line in sink.read_text(encoding="utf-8").splitlines()]
                 self.assertEqual(len(lines), 1, f"expected one line, got {lines}")
                 self.assertEqual(lines[0]["output"], "纯异步回答")
 

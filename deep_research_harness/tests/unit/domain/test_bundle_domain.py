@@ -128,7 +128,9 @@ class ClarificationRulesTest(unittest.TestCase):
     def test_predicate_detects_unanswered_ask_clarification(self) -> None:
         observation = clarification.TerminalObservation(
             tool_calls=(
-                clarification.TerminalToolCall(call_id="c1", name="ask_clarification", arguments='{"question": "范围选哪国市场？"}'),
+                clarification.TerminalToolCall(
+                    call_id="c1", name="ask_clarification", arguments='{"question": "范围选哪国市场？"}'
+                ),
                 clarification.TerminalToolCall(call_id="c2", name="web_search", arguments="{}"),
             ),
             answered_call_ids=frozenset({"c2"}),
@@ -146,8 +148,12 @@ class ClarificationRulesTest(unittest.TestCase):
         reports False — but the model DID ask, and the round must be observable."""
         observation = clarification.TerminalObservation(
             tool_calls=(
-                clarification.TerminalToolCall(call_id="c1", name="ask_clarification", arguments='{"question": "范围选哪国市场？"}'),
-                clarification.TerminalToolCall(call_id="c2", name="ask_clarification", arguments='{"question": "时间窗定在几月？"}'),
+                clarification.TerminalToolCall(
+                    call_id="c1", name="ask_clarification", arguments='{"question": "范围选哪国市场？"}'
+                ),
+                clarification.TerminalToolCall(
+                    call_id="c2", name="ask_clarification", arguments='{"question": "时间窗定在几月？"}'
+                ),
                 clarification.TerminalToolCall(call_id="c3", name="web_search", arguments="{}"),
             ),
             answered_call_ids=frozenset({"c1", "c3"}),
@@ -232,7 +238,7 @@ class JournalPolicyTest(unittest.TestCase):
         entries = self._entries(journal_policy.COMPACTION_THRESHOLD + 5)
         kept = journal_policy.select_compaction_keep(entries)
         kept_index = {id(entry) for entry in kept}
-        for i, entry in enumerate(entries):
+        for entry in entries:
             if entry.category == "admission":
                 self.assertIn(id(entry), kept_index)
         tail = [entry for entry in entries if id(entry) in kept_index and entry.category != "admission"]

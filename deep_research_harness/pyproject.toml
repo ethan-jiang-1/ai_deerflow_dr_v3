@@ -11,7 +11,7 @@ dependencies = ["deerflow-harness"]
 # stdlib-only (the CI job installs nothing). Each entry states its role.
 dev = [
     "pytest>=9.0.3",   # local runner for the same tests the stdlib gate runs
-    "ruff>=0.14.11",   # lint/format convenience (CI does not enforce it)
+    "ruff>=0.14.11",   # lint/format convenience lane (make lint; CI does not enforce it)
 ]
 
 [build-system]
