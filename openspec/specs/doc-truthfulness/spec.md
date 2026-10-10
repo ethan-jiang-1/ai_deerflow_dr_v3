@@ -115,3 +115,26 @@ check.
   the pair, or an allowlist entry has no justification or no longer matches any file
 - **THEN** the covered pair passes, and an unjustified or dangling allowlist entry
   fails loudly naming the entry
+
+### Requirement: Root README inventory counts are machine-pinned
+
+The document-hygiene checker SHALL compute the number of capability specs under
+`openspec/specs/` and the number of archived changes under `openspec/changes/archive/`
+directly from disk, and SHALL require the root `README.md` status line to declare
+exactly those two numbers. A declared count that differs from the computed inventory
+SHALL fail loudly naming both the computed and the declared values. The rule SHALL
+match the status line structurally (the declared count pattern anchored to its
+inventory nouns), not to a byte-exact sentence, so wording may evolve without
+weakening the pin.
+
+#### Scenario: Matching counts pass
+
+- **WHEN** the checker runs and the root README declares exactly the computed
+  capability-spec and archived-change counts
+- **THEN** the checker exits 0
+
+#### Scenario: A drifted count fails loudly
+
+- **WHEN** the computed inventory differs from the counts declared in the root README
+  status line
+- **THEN** the checker exits non-zero naming both the computed and the declared values
