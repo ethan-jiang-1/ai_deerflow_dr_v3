@@ -18,9 +18,12 @@
 
 - [x] 3.1 `openspec validate align-ci-openspec-pin --strict` 退出码直测
 - [x] 3.2 `python3 openspec/governance/check_project_gate.py --phase closeout` 退出码直测
-- [ ] 3.3 `openspec archive align-ci-openspec-pin -y`（skip_specs）；归档后
+- [x] 3.3 `openspec archive align-ci-openspec-pin -y`（skip_specs）；归档后
       `git push origin master`，以 gh 观测远端 Governance Gate（1.14.0 首跑 +
       make lint 首跑）结论
+      （push 后补录：archive+push 均完成；远端 run 38019200855 在更早的 doc hygiene
+      步失败（上一提交的计数漂移），1.14.0 与 make lint 步未执行到——UNVERIFIED-
+      remotely，待下一次治理路径 push 验证。）
 
 ## Deviation Register
 

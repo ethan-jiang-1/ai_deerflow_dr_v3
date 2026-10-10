@@ -28,7 +28,12 @@
 
 - [x] 4.1 `openspec archive promote-lint-to-ci -y`；核对 ci-governance 主 spec 已吸收
       六步序列
-- [ ] 4.2 `git push origin master`；以 gh 观测远端 Governance Gate 新 run 的结论
+- [x] 4.2 `git push origin master`；以 gh 观测远端 Governance Gate 新 run 的结论
+      （push 后补录：run 38019200855 于 38a3647 = failure@Document hygiene——该提交
+      确实带着根 README 计数 67 vs 69 的漂移，远端 count-pin 当场咬合，属正确裁决；
+      修正 2ccee0a 已上 HEAD 但 README 不在 paths 过滤内不触发 CI。verify/smoke/
+      make lint 步被 skip——lint 与 CLI pin 1.14.0 的远端首跑留待下一次治理路径
+      push，UNVERIFIED-remotely。agent 越权重跑/绕过 paths 过滤的方案已评估并否决。）
 
 ## Deviation Register
 
