@@ -14,17 +14,22 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 import sys
 from pathlib import Path
 
 WORKFLOW_RELATIVE = Path(".github") / "workflows" / "governance.yml"
 HOOK_RELATIVE = Path(".githooks") / "pre-commit"
+SKILLS_DIR_RELATIVE = Path(".agents") / "skills"
+OPENSPEC_PIN_RE = re.compile(r"@fission-ai/openspec@([\w.-]+)")
+GENERATED_BY_RE = re.compile(r"^\s*generatedBy:\s*\"?([^\"]+?)\"?\s*$", re.MULTILINE)
 
 # Every marker must appear verbatim in the workflow file. Triggers, path
 # filters, checkout shape, pinned toolchain, and the four canonical commands.
 WORKFLOW_REQUIRED_MARKERS: tuple[str, ...] = (
     "push:",
     "pull_request:",
+    "workflow_dispatch:",
     "openspec/**",
     "deep_research_harness/**",
     ".github/workflows/governance.yml",
@@ -95,6 +100,37 @@ def check(root: Path) -> list[str]:
             errors.append(
                 "workflow must declare exactly one job (one runs-on:), "
                 f"found {job_count} ({WORKFLOW_RELATIVE.as_posix()})"
+            )
+
+        # Generation cross-check: the workflow's pinned OpenSpec CLI must match
+        # the generation recorded in the skills frontmatter. Two declarations
+        # corroborating only each other can drift together silently — the
+        # 1.13.1 double-stale incident (2026-10-10 audit).
+        workflow_pins = OPENSPEC_PIN_RE.findall(workflow_text)
+        recorded: dict[str, str] = {}
+        skills_dir = root / SKILLS_DIR_RELATIVE
+        if skills_dir.is_dir():
+            for skill in sorted(skills_dir.glob("*/SKILL.md")):
+                skill_text = skill.read_text(encoding="utf-8")
+                for generated_by in GENERATED_BY_RE.finditer(skill_text):
+                    recorded[skill.parent.name] = generated_by.group(1).strip()
+        values = set(recorded.values())
+        if not values:
+            errors.append(
+                "generation source missing: no `.agents/skills/*/SKILL.md` carries a "
+                "generatedBy record — the CLI generation truth source is unreadable "
+                "(align-ci-openspec-pin companion rule)"
+            )
+        elif len(values) > 1:
+            errors.append(
+                "ambiguous generation record: skills frontmatter declares multiple CLI "
+                f"generations ({', '.join(sorted(values))}) — regenerate with one CLI"
+            )
+        elif workflow_pins and workflow_pins[0] not in values:
+            errors.append(
+                f"generation mismatch: workflow pins {workflow_pins[0]} but skills "
+                f"frontmatter records {next(iter(values))} — align the pin with the "
+                "recorded generation"
             )
 
     hook = root / HOOK_RELATIVE

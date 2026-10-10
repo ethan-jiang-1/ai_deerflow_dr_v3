@@ -13,7 +13,10 @@ machine-validated so the enforcement surface cannot drift silently.
 
 The repository SHALL run a single-job CI workflow on every push and on every pull request
 that touches the governance surfaces (any path under `openspec/`, the harness tree, the
-workflow file, or the hooks directory). The workflow SHALL check out the repository with
+workflow file, or the hooks directory), and SHALL additionally accept a manual
+`workflow_dispatch` run started by an operator with write access against the current
+HEAD — the manual path re-runs the same canonical sequence and grants no new permission
+or skip. The workflow SHALL check out the repository with
 submodules (the architecture checker validates nested gitlink metadata), SHALL set up a
 pinned Python and the pinned OpenSpec CLI version, and SHALL run the canonical governance
 sequence — the governance unittest suite, the aggregate closeout gate, the standalone
@@ -38,6 +41,13 @@ exhaustive set stays in one deterministic job.
 - **WHEN** a change touches nothing under the declared governance paths
 - **THEN** the workflow does not run, and no unrelated surface can force or skip the gate
   by editing unrelated files
+
+#### Scenario: Manual dispatch re-runs the gate on HEAD
+
+- **WHEN** an operator with write access dispatches the workflow manually against the
+  current HEAD
+- **THEN** the same single job runs the full canonical sequence with no skipped or
+  additional step, and its verdict reflects the HEAD tree exactly
 
 ### Requirement: The local hook stays cheap and high-confidence
 
@@ -66,8 +76,13 @@ The CI workflow file, the hook script, and the ci-governance checker SHALL be de
 the structural inventory, so their deletion fails architecture governance. A dedicated
 ci-governance checker SHALL machine-validate that the workflow declares the required
 triggers and invokes each canonical governance command, and that the hook is wired to the
-declared hooks path. A workflow that stops invoking a canonical command, or a hook that
-gains a forbidden command, SHALL fail the checker.
+declared hooks path. The checker SHALL additionally cross-check the workflow's pinned
+OpenSpec CLI generation against the generation recorded in the skills frontmatter
+(`.agents/skills/*/SKILL.md` `generatedBy`): a workflow pin that disagrees with the
+recorded generation, a missing or ambiguous generation record, SHALL fail loudly naming
+both sides — two declarations may not drift together silently by corroborating only each
+other. A workflow that stops invoking a canonical command, or a hook that gains a
+forbidden command, SHALL fail the checker.
 
 #### Scenario: Deleted workflow fails governance
 
@@ -84,3 +99,10 @@ gains a forbidden command, SHALL fail the checker.
 
 - **WHEN** the hook script gains a test, snapshot, type-analysis, or build invocation
 - **THEN** the ci-governance checker exits non-zero and names the forbidden command
+
+#### Scenario: CLI generation drift fails the checker
+
+- **WHEN** the workflow's pinned OpenSpec CLI version disagrees with the skills
+  frontmatter's `generatedBy`, or the generation record is missing or ambiguous
+- **THEN** the ci-governance checker exits non-zero naming the workflow pin and the
+  recorded generation

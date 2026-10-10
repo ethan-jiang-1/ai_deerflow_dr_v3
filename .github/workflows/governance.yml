@@ -4,6 +4,7 @@ name: Governance Gate
 # deterministic job (no matrix, no split). The ci-governance checker pins
 # every declaration below, so this workflow cannot drift silently.
 on:
+  workflow_dispatch:
   push:
     paths:
       - "openspec/**"

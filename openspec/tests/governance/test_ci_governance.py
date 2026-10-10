@@ -26,6 +26,7 @@ CHECKER = REPO_ROOT / "openspec" / "governance" / "check_ci_governance.py"
 VALID_WORKFLOW = """name: Governance Gate
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - "openspec/**"
@@ -91,6 +92,7 @@ def _build_tree(
     workflow: str | None = VALID_WORKFLOW,
     hook: str | None = VALID_HOOK,
     executable: bool = True,
+    skills_generation: str | None = "1.14.0",
 ) -> None:
     if workflow is not None:
         path = root / ".github" / "workflows" / "governance.yml"
@@ -101,6 +103,13 @@ def _build_tree(
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(hook, encoding="utf-8")
         path.chmod(0o755 if executable else 0o644)
+    if skills_generation is not None:
+        skill = root / ".agents" / "skills" / "demo" / "SKILL.md"
+        skill.parent.mkdir(parents=True, exist_ok=True)
+        skill.write_text(
+            "---\nname: demo\ngeneratedBy: \"%s\"\n---\n# demo\n" % skills_generation,
+            encoding="utf-8",
+        )
 
 
 class CheckCiGovernanceTests(unittest.TestCase):
@@ -134,6 +143,36 @@ class CheckCiGovernanceTests(unittest.TestCase):
         _build_tree(self.root, workflow=gutted)
         errors = self.checker.check(self.root)
         self.assertTrue(any("workflow marker missing: 'make lint'" in error for error in errors))
+
+    def test_workflow_missing_dispatch_trigger_fails(self) -> None:
+        gutted = VALID_WORKFLOW.replace("  workflow_dispatch:\n", "")
+        _build_tree(self.root, workflow=gutted)
+        errors = self.checker.check(self.root)
+        self.assertTrue(
+            any("workflow marker missing: 'workflow_dispatch:'" in error for error in errors)
+        )
+
+    def test_generation_mismatch_fails(self) -> None:
+        _build_tree(self.root, skills_generation="1.15.0")
+        errors = self.checker.check(self.root)
+        self.assertTrue(any("generation mismatch" in error for error in errors))
+
+    def test_missing_generation_source_fails(self) -> None:
+        _build_tree(self.root, skills_generation=None)
+        errors = self.checker.check(self.root)
+        self.assertTrue(any("generation source missing" in error for error in errors))
+
+    def test_ambiguous_generation_record_fails(self) -> None:
+        _build_tree(self.root, skills_generation="1.14.0")
+        extra = self.root / ".agents" / "skills" / "other" / "SKILL.md"
+        extra.parent.mkdir(parents=True, exist_ok=True)
+        extra.write_text("---\nname: other\ngeneratedBy: \"1.13.1\"\n---\n# other\n", encoding="utf-8")
+        errors = self.checker.check(self.root)
+        self.assertTrue(any("ambiguous generation record" in error for error in errors))
+
+    def test_aligned_generation_passes_clean(self) -> None:
+        _build_tree(self.root, skills_generation="1.14.0")
+        self.assertEqual(self.checker.check(self.root), [])
 
     def test_multi_job_workflow_fails(self) -> None:
         two_jobs = VALID_WORKFLOW + "  second:\n    runs-on: ubuntu-latest\n"
