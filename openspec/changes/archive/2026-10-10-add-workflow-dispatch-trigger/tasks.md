@@ -17,11 +17,15 @@
 
 - [x] 3.1 `openspec validate add-workflow-dispatch-trigger --strict` 退出码直测
 - [x] 3.2 `check_project_gate.py --phase closeout` 退出码直测
-- [ ] 3.3 `openspec archive add-workflow-dispatch-trigger -y`；核对主 spec 吸收
+- [x] 3.3 `openspec archive add-workflow-dispatch-trigger -y`；核对主 spec 吸收
       dispatch 场景
-- [ ] 3.4 push 后 `gh workflow run` 或直接以新 push 触发，观测远端 run：canonical
+- [x] 3.4 push 后 `gh workflow run` 或直接以新 push 触发，观测远端 run：canonical
       六步 + 1.14.0 首跑 + lint 首跑的结论（这一步同时关闭 establish-lint-lane 与
       align-ci-openspec-pin 的 UNVERIFIED-remotely）
+      （push 后补录：run 38030674831 = **success**，53s；API 步骤级收据——step 5
+      Pin CLI 1.14.0 success、step 12 Harness lint success、step 6 套件含
+      cross-check 用例 success。本 change 与 establish-lint-lane /
+      align-ci-openspec-pin 三者的 UNVERIFIED-remotely 全部关闭。）
 
 ## Deviation Register
 
