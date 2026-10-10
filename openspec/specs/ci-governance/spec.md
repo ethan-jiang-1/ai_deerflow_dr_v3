@@ -1,6 +1,5 @@
 # ci-governance Specification
 
-
 ## Purpose
 
 Owns the required behavior of the acceptance path: the governance suite is machine-forced
@@ -18,7 +17,8 @@ workflow file, or the hooks directory). The workflow SHALL check out the reposit
 submodules (the architecture checker validates nested gitlink metadata), SHALL set up a
 pinned Python and the pinned OpenSpec CLI version, and SHALL run the canonical governance
 sequence — the governance unittest suite, the aggregate closeout gate, the standalone
-document-hygiene checker, and the harness `make verify` — failing the job on any non-zero
+document-hygiene checker, the harness `make verify`, the harness integration smoke
+(`make smoke`), and the harness lint (`make lint`) — failing the job on any non-zero
 exit. The workflow SHALL NOT split these checks across jobs or add platform matrices; the
 exhaustive set stays in one deterministic job.
 

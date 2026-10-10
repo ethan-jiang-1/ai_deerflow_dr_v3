@@ -55,13 +55,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - run: npm install -g @fission-ai/openspec@1.13.1
+      - run: npm install -g @fission-ai/openspec@1.14.0
       - run: python3 -m unittest discover -s openspec/tests/governance -q
       - run: python3 openspec/governance/check_project_gate.py --phase closeout
       - run: python3 openspec/governance/check_doc_hygiene.py
       - run: UV_OFFLINE=1 make verify
       - uses: astral-sh/setup-uv@v7
       - run: make smoke
+      - run: make lint
   concurrency:
     group: governance-${{ github.ref }}
     cancel-in-progress: true
@@ -127,6 +128,12 @@ class CheckCiGovernanceTests(unittest.TestCase):
         self.assertTrue(
             any("check_project_gate.py --phase closeout" in error for error in errors)
         )
+
+    def test_workflow_missing_lint_step_fails(self) -> None:
+        gutted = VALID_WORKFLOW.replace("      - run: make lint\n", "")
+        _build_tree(self.root, workflow=gutted)
+        errors = self.checker.check(self.root)
+        self.assertTrue(any("workflow marker missing: 'make lint'" in error for error in errors))
 
     def test_multi_job_workflow_fails(self) -> None:
         two_jobs = VALID_WORKFLOW + "  second:\n    runs-on: ubuntu-latest\n"

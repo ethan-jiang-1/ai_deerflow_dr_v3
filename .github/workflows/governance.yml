@@ -44,7 +44,7 @@ jobs:
         with:
           node-version: "22"
       - name: Pin the OpenSpec CLI
-        run: npm install -g @fission-ai/openspec@1.13.1
+        run: npm install -g @fission-ai/openspec@1.14.0
       - name: Governance unittest suite
         run: python3 -m unittest discover -s openspec/tests/governance -q
       - name: Aggregate closeout gate
@@ -57,4 +57,7 @@ jobs:
       - uses: astral-sh/setup-uv@v7
       - name: Harness integration smoke (fixture lane, zero credentials)
         run: make smoke
+        working-directory: deep_research_harness
+      - name: Harness lint (ruff; the local convenience lane promoted to the gate)
+        run: make lint
         working-directory: deep_research_harness

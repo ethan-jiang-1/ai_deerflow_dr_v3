@@ -56,7 +56,9 @@ git config core.hooksPath .githooks
 CI 门禁：`.github/workflows/governance.yml` 在 push / pull request（路径过滤
 `openspec/**`、`deep_research_harness/**`、工作流与 hooks 自身）上单 job 运行
 canonical 序列——治理 unittest 套件、聚合 closeout gate、doc hygiene、setup-uv +
-harness `make smoke`（fixture 梯集成 lane）、harness `make verify`；任何非零退出即失败。声明由 `check_ci_governance.py` 机器校验。**契约双端触发**是本形态的
+harness `make smoke`（fixture 梯集成 lane）、harness `make verify`、harness `make lint`
+（ruff，2026-10-10 起 promote-lint-to-ci 升入序列）；任何非零退出即失败。声明由
+`check_ci_governance.py` 机器校验。**契约双端触发**是本形态的
 结构事实：单 job 全序列使任一受治理面（应用面 / 框架绑定面 / spec / 治理自身）
 变更都跑完整序列，无需路径分流——这是主仓"契约两侧任一变更都触发回放门禁"
 原则（上游参考：DeerFlow 应用开发语料·卷二 05，钉定 v2.1.0）在本仓单 job
