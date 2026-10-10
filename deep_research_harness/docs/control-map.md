@@ -209,18 +209,10 @@ make create PROBLEM="研究问题" CONFIG=base   # 真实模型，需凭证
 
 ## 10. 质量车道怎么选
 
-不要每次从真实端到端开始。按问题选最小车道，再扩大：
-
-```text
-规则 / 状态 / 文件 / 准入问题      → make verify
-DeerFlow 接线 / 事件 / checkpoint → make smoke
-真实模型 / skill / 外部工具质量    → base 真实梯（显式 opt-in）
-发布布局 / 新机器冷启动           → 冷启动 lane
-代码结构 / 依赖方向 / 发布面       → governance checker
-```
-
-每条 lane 证明什么、不证明什么，三种质量对象（研究引擎 / Harness 控制 / 发布）
-的划分 → [车道策略](testing-and-evaluation.md) 与 [测试资产地图](../tests/README.md)。
+不要每次从真实端到端开始；按问题选最小车道，再按风险扩大。完整车道表
+（含每条 lane「证明什么 / 不证明什么」与三种质量对象——研究引擎 / Harness 控制 /
+发布——的划分）唯一持有处在[车道策略](testing-and-evaluation.md)，逐文件测试资产见
+[测试资产地图](../tests/README.md)；本图不复制该表。
 
 ## 同轮维护
 
