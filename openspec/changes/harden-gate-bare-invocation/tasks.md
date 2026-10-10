@@ -21,3 +21,7 @@
       `openspec validate harden-gate-bare-invocation --strict` 0。
 - [ ] 3.2 `openspec archive harden-gate-bare-invocation`（strict validate）；
       归档后复跑 closeout gate 0。
+
+## Deviation Register
+
+- none: 尚未开始 apply；批次与判定以 design 为准，apply 中若出现偏离就地登记。

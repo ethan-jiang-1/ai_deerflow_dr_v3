@@ -37,3 +37,7 @@
 - [ ] 4.2 `make lint` exit 0；`python3 openspec/governance/check_doc_hygiene.py` exit 0。
 - [ ] 4.3 closeout gate（`check_project_gate.py --phase closeout`）exit 0 →
       `openspec archive`（strict validate）→ 知识归位（无 spec delta，主干不动）。
+
+## Deviation Register
+
+- none: 尚未开始 apply；批次与判定以 design 为准，apply 中若出现偏离就地登记。

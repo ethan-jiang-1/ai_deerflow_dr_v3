@@ -34,3 +34,7 @@
       `openspec/specs/doc-truthfulness/spec.md`（本轮 ca82507 修过两处漏 sync，
       归位不欠账）。
 - [ ] 4.2 归档后复跑 `check_doc_hygiene` + `check_project_specs` exit 0。
+
+## Deviation Register
+
+- none: 尚未开始 apply；批次与判定以 design 为准，apply 中若出现偏离就地登记。
