@@ -52,6 +52,127 @@ ACTIVE_TERMINOLOGY_RULES = {
     "compositionAlias": re.compile(r"\bfull[- ]fake\b", re.IGNORECASE),
 }
 
+# Delta-sync completeness（enforce-delta-sync）：归档 delta 的 ADDED requirement 钉进
+# 所属主 spec。豁免面封闭：同 capability 更晚归档 delta 的正式退役（REMOVED/RENAMED，
+# 含 RENAMED 的 `#### FROM:` 行），或带理由的 allowlist（out-of-band 修复，如审计修复
+# 吸收漏 sync 时的改名；无理由条目即红——沿用 doc-hygiene MARKER_ALLOWLIST 形状）。
+# Declared limitations：MODIFIED 标题不钉（out-of-band 改名以 allowlist 承载）；归档序
+# 按目录名字典序（date-prefixed，跨日精确，同日为近似）。
+DELTA_SYNC_ALLOWLIST: dict[tuple[str, str], str] = {
+    ("entry-surface", "Six verbs mirror the state machine and observation layers"): (
+        "renamed out-of-band to 'The verb set mirrors the state machine and observation "
+        "layers' by the 868d4f0 audit repair absorbing operator-failure-diagnosis's "
+        "missed sync; no delta formally records the rename"
+    ),
+}
+RENAMED_FROM_RE = re.compile(r"^####\s+FROM:\s*(.+?)\s*$", re.IGNORECASE)
+
+
+def _delta_section_titles(delta_text: str) -> dict[str, list[str]]:
+    """按 delta 分节（ADDED/MODIFIED/REMOVED/RENAMED）收集 requirement 标题。
+
+    RENAMED 节的 `#### FROM:` 旧行额外收进伪节 ``RENAMED_FROM``（正式退役面）。
+    """
+    titles: dict[str, list[str]] = {}
+    section: str | None = None
+    for line in delta_text.splitlines():
+        header = DELTA_HEADER_RE.match(line)
+        if header:
+            section = header.group(1).upper()
+            titles.setdefault(section, [])
+            continue
+        if section is None:
+            continue
+        requirement = REQUIREMENT_TITLE_RE.match(line)
+        if requirement:
+            titles[section].append(requirement.group(1).strip())
+            continue
+        if section == "RENAMED":
+            from_match = RENAMED_FROM_RE.match(line)
+            if from_match:
+                titles.setdefault("RENAMED_FROM", []).append(from_match.group(1).strip())
+    return titles
+
+
+def _main_requirement_titles(spec_text: str) -> set[str]:
+    """收集主 spec 全部 requirement 标题（结构合法性由既有结构规则负责）。"""
+    stripped = strip_fenced_code_blocks(spec_text)
+    return {
+        match.group(1).strip()
+        for match in (REQUIREMENT_TITLE_RE.match(line) for line in stripped.splitlines())
+        if match
+    }
+
+
+def _delta_sync_violations(root: Path) -> list[dict]:
+    """归档 delta 的 ADDED requirement 必须钉进主 spec（漏 sync 当场红）。"""
+    archive = root / "openspec" / "changes" / "archive"
+    if not archive.is_dir():
+        return []
+    added: list[tuple[str, str, str]] = []  # (capability, title, adding change)
+    retired: list[tuple[str, str, str]] = []  # (capability, title, retiring change)
+    for change_dir in sorted((p for p in archive.iterdir() if p.is_dir()), key=lambda p: p.name):
+        for delta in sorted(change_dir.glob("specs/*/spec.md")):
+            capability = delta.parent.name
+            sections = _delta_section_titles(
+                strip_fenced_code_blocks(delta.read_text(encoding="utf-8"))
+            )
+            for title in sections.get("ADDED", []):
+                added.append((capability, title, change_dir.name))
+            for title in (
+                sections.get("REMOVED", [])
+                + sections.get("RENAMED", [])
+                + sections.get("RENAMED_FROM", [])
+            ):
+                retired.append((capability, title, change_dir.name))
+    violations: list[dict] = []
+    for (capability, title), justification in DELTA_SYNC_ALLOWLIST.items():
+        if not justification.strip():
+            violations.append({
+                "file": "openspec/governance/check_project_specs.py",
+                "check": "deltaSyncAllowlistUnjustified",
+                "detail": f"delta-sync allowlist 条目（{capability}, {title}）缺理由",
+                "line": None,
+            })
+    main_titles_cache: dict[str, set[str]] = {}
+
+    def main_titles(capability: str) -> set[str] | None:
+        if capability not in main_titles_cache:
+            main = root / "openspec" / "specs" / capability / "spec.md"
+            main_titles_cache[capability] = (
+                _main_requirement_titles(main.read_text(encoding="utf-8")) if main.is_file() else None
+            )
+        return main_titles_cache[capability]
+
+    for capability, title, change_name in added:
+        titles = main_titles(capability)
+        if titles is None:
+            violations.append({
+                "file": f"openspec/specs/{capability}/spec.md",
+                "check": "deltaSyncCapabilityMissing",
+                "detail": f"归档 change {change_name} 的 ADDED requirement「{title}」所属 capability 无主 spec",
+                "line": None,
+            })
+            continue
+        if title in titles:
+            continue
+        formally_retired = any(
+            retire_cap == capability and retire_title == title and retire_change > change_name
+            for retire_cap, retire_title, retire_change in retired
+        )
+        if formally_retired or (capability, title) in DELTA_SYNC_ALLOWLIST:
+            continue
+        violations.append({
+            "file": f"openspec/specs/{capability}/spec.md",
+            "check": "deltaSyncMissing",
+            "detail": (
+                f"归档 change {change_name} 的 ADDED requirement「{title}」不在主 spec"
+                "（归档时的 spec 更新被跳过？）"
+            ),
+            "line": None,
+        })
+    return violations
+
 
 def strip_fenced_code_blocks(content: str) -> str:
     """把围栏代码块内容替换成空行，保持行号，避免代码示例里的 ## 头被误判。"""
@@ -224,6 +345,8 @@ def _validate_main_specs(root: Path) -> int:
             }
         )
 
+    violations.extend(_delta_sync_violations(root))
+
     if violations:
         labels = {
             "deltaHeaderInMain": "Delta header in main spec",
@@ -231,6 +354,9 @@ def _validate_main_specs(root: Path) -> int:
             "placeholderPurpose": "Empty or placeholder Purpose section",
             "missingRequirements": "Missing ## Requirements section",
             "historicalTerminology": "Historical terminology in active authority",
+            "deltaSyncMissing": "Archived ADDED requirement missing from main spec",
+            "deltaSyncCapabilityMissing": "Archived capability missing from main specs",
+            "deltaSyncAllowlistUnjustified": "Delta-sync allowlist entry lacks justification",
         }
         by_check: dict[str, list] = {}
         for v in violations:
@@ -239,7 +365,8 @@ def _validate_main_specs(root: Path) -> int:
             print(f"{labels[check]} ({len(items)}):", file=sys.stderr)
             for item in items:
                 loc = f":{item['line']}" if item.get("line") else ""
-                print(f"  {item['file']}{loc}", file=sys.stderr)
+                detail = f" — {item['detail']}" if item.get("detail") else ""
+                print(f"  {item['file']}{loc}{detail}", file=sys.stderr)
         print(f"\n{len(violations)} violation(s) in {len(spec_files)} spec files.", file=sys.stderr)
         return 1
 

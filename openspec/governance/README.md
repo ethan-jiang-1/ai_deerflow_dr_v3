@@ -10,7 +10,7 @@
 |------|----------|--------------|
 | `architecture-policy.md` | 什么算 active spec、结构权威如何分工？ | [architecture-policy.md](architecture-policy.md) |
 | Project-structure manifest（`project-structure.toml` 契约 + `required-paths.toml` 清单） | 精确目录 / import 清单？ | [project-structure.toml](project-structure.toml) · [required-paths.toml](required-paths.toml) |
-| `check_project_specs.py` | main spec 结构是否有效？ | 脚本 docstring |
+| `check_project_specs.py` | main spec 结构是否有效？归档 delta 的 ADDED requirement 是否钉进主 spec（delta-sync 完整性；豁免面 = 后续 REMOVED/RENAMED 正式退役 + 带理由 allowlist）？ | 脚本 docstring |
 | `check_project_architecture.py` | 结构治理是否通过？ | 脚本 docstring |
 | `check_change_guidance.py` | Change Guidance / policy 路由 / Focus Card（即 proposal 的 `## Change Focus` 记录）是否通过？ | 脚本 docstring |
 | `check_harness_dependency_direction.py` | Harness 是否反向依赖 OpenSpec？验证回执（`verification-receipt.json`，结构识别：非空 `checks` 命令记录）是豁免证据，不是依赖 | 脚本 docstring（`@impl DEP-001`） |

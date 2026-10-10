@@ -23,7 +23,7 @@
 
 （当前无活跃卡。）
 
-**Next available issue ID: CLS-023**（移入 `_settled_issues/` 时分配；CLS-019/020/021/022 已分配）
+**Next available issue ID: CLS-024**（移入 `_settled_issues/` 时分配；CLS-019/020/021/022/023 已分配）
 
 新方向性工作**必须显性立卡**（驾驭者要求，2026-10-07）：先立卡记录决策与取舍，再走 OpenSpec change 实施；完成后按上方 ritual 关闭归档。
 
