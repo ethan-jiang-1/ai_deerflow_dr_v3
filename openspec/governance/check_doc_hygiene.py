@@ -12,10 +12,13 @@ residency, declared stale-narrative markers, root README count pinning):
    ``deep_research_harness/docs/adr/`` (excluding ``README.md``) is listed in the
    index table, and every ADR listed in the index exists on disk.
 2. Relative links resolve: every relative Markdown link in the entry-chain
-   documents and in the docs-layer documents points to an existing file.
+   documents, in the docs-layer documents, and in the harness test/tools asset
+   documents (``LINKED_ASSET_DOCS``) points to an existing file.
    ``http(s)``, ``mailto:``, bare ``#anchor``, and angle-bracket targets are
-   ignored.
-3. Entry-chain and docs-layer documents are UTF-8 and end with a trailing newline.
+   ignored. Fragment and query suffixes do not participate in existence
+   checking; anchors are deliberately NOT validated (line anchors track
+   implementations) — an exclusion by declared limitation, not by omission.
+3. Entry-chain, docs-layer, and asset documents are UTF-8 and end with a trailing newline.
 4. Docs-layer scope completeness: every Markdown document actually present under
    ``deep_research_harness/docs/`` is registered in ``DOC_LAYER_DOCS``, so coverage
    cannot silently shrink when new documents are added. Registered but absent
@@ -116,6 +119,19 @@ DOC_LAYER_DOCS: tuple[str, ...] = (
     "deep_research_harness/docs/playbook/run-research.md",
 )
 
+LINKED_ASSET_DOCS: tuple[str, ...] = (
+    # Harness test/tools asset documents swept by the link (and newline) rules.
+    # These sit outside the docs/ tree, so they are deliberately NOT in
+    # DOC_LAYER_DOCS — that list also feeds the docs-scope completeness rule,
+    # which is scoped to docs/ only. The 2026-10-10 fresh-agent audit found 18
+    # live dead links on these surfaces (grouping/rename changes had missed the
+    # relative paths). Expanding this list is a visible change to the declaring
+    # table (owning change: widen-doc-link-guard-scope).
+    "deep_research_harness/tests/README.md",
+    "deep_research_harness/tests/fixtures/README.md",
+    "deep_research_harness/tools/README.md",
+)
+
 ADR_FILE_RE = re.compile(r"^\d{4}-.*\.md$")
 INDEX_ROW_RE = re.compile(r"^\|\s*(\d{4})\s*\|")
 MARKDOWN_LINK_RE = re.compile(r"\]\(([^)\s][^)]*)\)")
@@ -168,7 +184,11 @@ def _read_utf8(doc: Path) -> tuple[str | None, str | None]:
 
 def _rule_links(root: Path) -> list[str]:
     problems: list[str] = []
-    for kind, rels in (("entry-chain", ENTRY_DOCS), ("docs-layer", DOC_LAYER_DOCS)):
+    for kind, rels in (
+        ("entry-chain", ENTRY_DOCS),
+        ("docs-layer", DOC_LAYER_DOCS),
+        ("asset-doc", LINKED_ASSET_DOCS),
+    ):
         for rel in rels:
             doc = root / rel
             if not doc.is_file():
@@ -193,7 +213,11 @@ def _rule_links(root: Path) -> list[str]:
 
 def _rule_encoding_newline(root: Path) -> list[str]:
     problems: list[str] = []
-    for kind, rels in (("entry-chain", ENTRY_DOCS), ("docs-layer", DOC_LAYER_DOCS)):
+    for kind, rels in (
+        ("entry-chain", ENTRY_DOCS),
+        ("docs-layer", DOC_LAYER_DOCS),
+        ("asset-doc", LINKED_ASSET_DOCS),
+    ):
         for rel in rels:
             doc = root / rel
             if not doc.is_file():
@@ -708,6 +732,9 @@ def _self_test() -> list[str]:
             write_doc(rel, f"# T\n\n[self]({name})\n")
             if ADR_FILE_RE.match(name):
                 adr_ids.append(name[:4])
+        for rel in LINKED_ASSET_DOCS:
+            name = rel.rsplit("/", 1)[-1]
+            write_doc(rel, f"# T\n\n[self]({name})\n")
         # The clean fixture builds the ADR layer only when the registered scope
         # declares it; with no ``docs/adr/`` entry the directory stays absent and
         # ``_rule_adr_index`` is dormant by its dir-existence guard.
@@ -775,6 +802,21 @@ def _self_test() -> list[str]:
         )
         if not any("gone.md" in v for v in _rule_links(base)):
             errors.append("self-test: docs-layer broken link not detected")
+
+        # Rule 2 negative (asset docs): broken relative link in a test/tools
+        # asset document — the 2026-10-10 audit found 18 live dead links there
+        # because these surfaces sat outside the link rule's scope.
+        write_doc(
+            "deep_research_harness/tests/README.md",
+            "# tests\n\nsee [gone.md](gone.md)\n",
+        )
+        if not any(
+            "tests/README.md" in v and "gone.md" in v for v in _rule_links(base)
+        ):
+            errors.append("self-test: asset-doc broken link not detected")
+        write_doc("deep_research_harness/tests/README.md", "# T\n\n[self](README.md)\n")
+        if any("tests/README.md" in v for v in _rule_links(base)):
+            errors.append("self-test: asset-doc resolvable link flagged")
 
         # Rule 3 negative (docs-layer): missing trailing newline.
         write_doc("deep_research_harness/docs/testing-and-evaluation.md", "# no newline")
