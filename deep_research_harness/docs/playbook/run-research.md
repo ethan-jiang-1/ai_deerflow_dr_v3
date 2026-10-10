@@ -106,6 +106,11 @@ make create PROBLEM="发布面冷启动证明"
 
 ### 最近回执
 
+- 2026-10-10（fresh-agent 全库清扫轮收口）：`UV_OFFLINE=1 make verify` exit 0（251 tests,
+  1.1s）· `make smoke` exit 0（30 tests, 23.5s；smoke/record 直连 client 已 pin，
+  `deep_research_harness/.deer-flow` 删除后不再再生——pin-framework-home-secondary-callers
+  归档在案）· `make lint` exit 0 · 治理 closeout gate 六组件全 0 · 治理 unittest 套件
+  94 tests 全绿。
 - 2026-10-04（本 change apply 时）：`UV_OFFLINE=1 make verify` exit 0（112 tests）·
   `make create PROBLEM="发布面冷启动随行回执"` exit 0
   （`state: completed (generation 1, revision 2)`）。
