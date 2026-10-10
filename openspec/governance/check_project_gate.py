@@ -191,10 +191,36 @@ def run_plan(root: Path, change_name: str, runner=_run) -> int:
     return 1
 
 
+class _GateParser(argparse.ArgumentParser):
+    """Argparse that points failed invocations at the phase contract.
+
+    A bare run used to die with argparse's bare "the following arguments are
+    required: --phase" and no pointer to the documented contract (2026-10-10
+    fresh-agent audit footgun). The hint names the two phases and the
+    authoritative README; the exit code stays 2 and no phase default is
+    introduced — the explicit ``--phase`` contract is deliberately not relaxed.
+    """
+
+    def error(self, message: str) -> None:
+        self.print_usage(sys.stderr)
+        self.exit(
+            2,
+            f"{self.prog}: error: {message}\n"
+            "Run with --phase plan|closeout; see openspec/governance/README.md "
+            "for the phase contract.\n",
+        )
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(
+    parser = _GateParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "phases: --phase plan sequences the read-only admission owners for "
+            "one active change; --phase closeout runs every registered component "
+            "checker from the repository root. Authoritative command surface: "
+            "openspec/governance/README.md"
+        ),
     )
     parser.add_argument(
         "project_root",

@@ -556,5 +556,28 @@ class NativeStrictValidationPlantedNegativeTest(unittest.TestCase):
             self.assertIn("omits scenario", combined)
 
 
+class GateBareInvocationHintTest(unittest.TestCase):
+    """A bare gate run fails closed AND names the phase contract.
+
+    2026-10-10 fresh-agent audit: bare invocation died with argparse's bare
+    "the following arguments are required: --phase" and no pointer to the
+    documented contract in openspec/governance/README.md.
+    """
+
+    def test_bare_run_exits_two_and_names_the_phase_contract(self) -> None:
+        result = _run(sys.executable, str(GATE))
+        self.assertEqual(result.returncode, 2)
+        combined = (result.stdout or "") + (result.stderr or "")
+        self.assertIn("--phase", combined)
+        self.assertIn("openspec/governance/README.md", combined)
+
+    def test_help_carries_the_same_pointer(self) -> None:
+        result = _run(sys.executable, str(GATE), "--help")
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("openspec/governance/README.md", result.stdout)
+
+
+
+
 if __name__ == "__main__":
     unittest.main()
