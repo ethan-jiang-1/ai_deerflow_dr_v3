@@ -84,6 +84,8 @@ class CompleteGraphReplayTest(unittest.TestCase):
         from deerflow_deep_research.runtime.adapters import client as hclient
         from deerflow_deep_research.runtime.bundle import bundle_actions
 
+        assembly.pin_framework_home()  # direct client: pin before build_client (framework-home contract)
+
         with tempfile.TemporaryDirectory() as td:
             runs_root = Path(td) / "runs"
             state = bundle_actions.start(

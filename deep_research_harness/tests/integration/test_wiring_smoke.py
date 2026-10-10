@@ -24,7 +24,7 @@ try:
 except ImportError:  # pragma: no cover — environments without the framework
     _FRAMEWORK_AVAILABLE = False
 
-from deerflow_deep_research.runtime import pump
+from deerflow_deep_research.runtime import assembly, pump
 from deerflow_deep_research.runtime.adapters import client as client_binding
 from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
 from deerflow_deep_research.runtime.bundle import journal as journal_mod
@@ -63,6 +63,7 @@ class WiringSmokeTest(unittest.TestCase):
         self.handle = bundle_state.BundleHandle.open(self.runs / "d_20261003" / self.state.thread_id)
 
     def test_multi_turn_run_completes_with_readable_checkpoint(self) -> None:
+        assembly.pin_framework_home()  # direct client: pin before build_client (framework-home contract)
         os.environ["DEERFLOW_FAKE_SCRIPT"] = _SCRIPT_CONTINUATION
         self.addCleanup(os.environ.pop, "DEERFLOW_FAKE_SCRIPT", None)
         with client_binding.bundle_checkpointer(self.handle) as saver:
@@ -97,6 +98,7 @@ class WiringSmokeTest(unittest.TestCase):
         self.assertIn("system_prompt", payload)
 
     def test_raising_model_fails_loud_via_the_framework_fallback(self) -> None:
+        assembly.pin_framework_home()  # direct client: pin before build_client (framework-home contract)
         # The full chain: scripted model raises → the framework's error-handling
         # middleware renders the deerflow_error_fallback message → the run engine's
         # guard lands the run in failed-resume instead of a silent completion.

@@ -85,10 +85,9 @@ deep_research_harness/
 runs/                           （仓库根）本地 Run Bundle 数据，gitignored，
                                 应用子树之外；env DEEP_RESEARCH_RUNS_ROOT 可覆盖
 .deer-flow/                     （仓库根）框架运行态 home（memory 库、skill 投影、
-                                用户数据），gitignored；binding 经 DEER_FLOW_HOME 钉入。
-                                注：pin 只在前台装配路径（create/refine）生效；smoke 与
-                                record 工具的直连 client 未 pin，按 cwd 落
-                                deep_research_harness/.deer-flow/ 第二个 home（gitignored）
+                                用户数据），gitignored；binding 经 DEER_FLOW_HOME 钉入，
+                                全入口已 pin（前台路径 + smoke/record 直连 client，
+                                AST contract 锁在 test_framework_home）
 ```
 
 仓库根还有：`deerflow/`（锁定上游，**只读**，普通工作不修改不深读其内部）、

@@ -52,7 +52,7 @@ python3 cli.py inspect <bundle_id>        # 时间线、已采证据、装配快
 
 `cancel` 只记录取消请求，由运行泵协作终止。`refine` 创建下一代并**前台跑完该代**（方向文本即该代方向文档）。完整命令见 [COMMANDS](COMMANDS.md)，操作旅程见 [playbook](docs/playbook/run-research.md)。
 
-框架运行态（memory 库、skill 投影、用户数据）由 binding 钉在仓库根 `.deer-flow/`（gitignored，应用子树外）。注意 pin 只在 create/refine 的前台装配路径生效：`make smoke` 与 `make record-stream` 的直连 client 未 pin，按 cwd 在 `deep_research_harness/.deer-flow/` 落第二个运行态 home（gitignored，可再生）。fixture 配置加载 [runtime scripted providers](src/deerflow_deep_research/runtime/scripted/__init__.py)，base 记录 `all_real`，fixture 记录 `fixture`；`mixed` 是尚未接线的枚举。provider 代码随当前 Python package 打包，wheel 仍不包含完整 CLI/config/兄弟布局，发布面是源码 checkout + 锁定 submodule。
+框架运行态（memory 库、skill 投影、用户数据）由 binding 钉在仓库根 `.deer-flow/`（gitignored，应用子树外）：create/refine 前台路径与 smoke/record 的直连 client 都已 pin（AST contract 锁在 [test_framework_home](tests/contract/test_framework_home.py)，pin 后于 build_client）。fixture 配置加载 [runtime scripted providers](src/deerflow_deep_research/runtime/scripted/__init__.py)，base 记录 `all_real`，fixture 记录 `fixture`；`mixed` 是尚未接线的枚举。provider 代码随当前 Python package 打包，wheel 仍不包含完整 CLI/config/兄弟布局，发布面是源码 checkout + 锁定 submodule。
 
 ## 改一处，先证明哪一层
 

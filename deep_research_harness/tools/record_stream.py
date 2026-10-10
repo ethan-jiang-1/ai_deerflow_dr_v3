@@ -30,6 +30,7 @@ def record(problem: str, config: str, *, runs_root: Path, output: Path) -> int:
         composition="all_real" if config == "base" else "fixture", deerflow_pin=pin,
     )
     handle = assembly.resolve_bundle(runs_root, state.thread_id)
+    assembly.pin_framework_home()  # direct client: pin before build_client (framework-home contract)
     events = []
     with cb.bundle_checkpointer(handle) as saver:
         client = cb.build_client(
