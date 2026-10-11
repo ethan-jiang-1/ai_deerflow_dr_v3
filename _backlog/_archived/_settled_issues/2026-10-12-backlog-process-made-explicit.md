@@ -1,6 +1,6 @@
 # Issue: backlog 制度显性化（借鉴 loop_advisor）——缺陷修复流、状态生命周期、门票条件与 agent 门牌
 
-> 立卡: 2026-10-12 ｜ 状态: 等人拍板 ｜ 类型: Task ｜ 毕业门: 未过 ｜ 可关闭: 否
+> 立卡: 2026-10-12 ｜ 关闭: 2026-10-12 ｜ 状态: 已结 ｜ 类型: Task ｜ 毕业门: 已过 → make-backlog-process-explicit ｜ 可关闭: 是
 
 **问题与期望结果：** 驾驭者点名
 `/Users/bowhead/ai_dsh_loop_advisor/_backlog/issues/2026-10-12-backlog-process-made-explicit.md`
@@ -20,9 +20,10 @@
 的 REVIEW 节制表，还是独立成文）；② bug 词表扩集与 `活跃`→`调查中` 更名；③ agent 门牌要不要
 （要则入 `DOC_BUDGETS` 登记）。
 
-**下一步：** 驾驭者扫卡：五条补充（适配版）、例外边界、两张翻转表。点头后走一个 OpenSpec
-change（暂名 `make-backlog-process-explicit`）：propose → 拍板 → apply（红绿先行）→ archive；
-本卡随 change 关闭。
+**下一步：** 已收口（2026-10-12）：驾驭者放行全程落地，三张未决票按卡内推荐项默认（例外边界接
+REVIEW 节制表 / bug 词表扩集更名 / 门牌采纳，翻案随时可）。make-backlog-process-explicit：
+propose 工件齐（plan gate 0）→ apply 红绿全绿（prove-it-red 在案）→ 归档。本卡按 ritual 关闭为
+CLS-024，去向 = make-backlog-process-explicit——同源谱系第四波（loop_advisor → 本仓）完成回流。
 
 ## 已知与未决
 
@@ -131,8 +132,7 @@ change 内翻转；`可关闭: 是` 是出场守卫旗，随 `git mv` 落（现�
 
 ## 落地关联
 
-OpenSpec change **make-backlog-process-explicit**（已入线 2026-10-12：驾驭者放行全程落地，
-propose 工件齐、plan gate 0，apply 进行中）。范围：
+OpenSpec change **make-backlog-process-explicit**（2026-10-12 apply 全绿、同日归档）。范围：
 ① 章程缺陷节写全流程（triage → 调查 → 修就绪 → 通道 → 已落修 → 确认 → 归档 → 回写）+ 例外
 条款 + 铁律带日期例外 + 两张翻转表，总流程图 bug 泳道补授权 / 确认语义；②
 [bugs/README](../bugs/README.md) 模板补 `## 修好判据`、状态节列词表与翻转规则；③

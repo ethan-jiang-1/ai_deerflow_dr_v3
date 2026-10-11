@@ -20,9 +20,10 @@
 
 | Issue | 一句话 |
 |------|--------|
-| [2026-10-12-backlog-process-made-explicit.md](2026-10-12-backlog-process-made-explicit.md) | 借鉴 loop_advisor 2026-10-12 卡：缺陷修复流、状态生命周期、门票条件与 agent 门牌写显——`_backlog` 调对的载体卡 |
 
-**Next available issue ID: CLS-024**（移入 `_settled_issues/` 时分配；CLS-019/020/021/022/023 已分配）
+（当前无活跃卡。）
+
+**Next available issue ID: CLS-025**（移入 `_settled_issues/` 时分配；CLS-019/020/021/022/023/024 已分配）
 
 新方向性工作**必须显性立卡**（驾驭者要求，2026-10-07）：先立卡记录决策与取舍，再走 OpenSpec change 实施；完成后按上方 ritual 关闭归档。
 

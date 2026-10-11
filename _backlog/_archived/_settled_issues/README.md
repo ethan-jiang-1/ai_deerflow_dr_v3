@@ -1,6 +1,6 @@
 # Settled Issues Index — 已结 issue 归档
 
-> 最后更新: 2026-10-09（adopt-issue-ledger-governance：plans 类别退役，本目录更名 `_settled_issues/`，CLS 编号连续） | `_backlog/_archived/_settled_issues/` — 已结 issue 的归档目录。
+> 最后更新: 2026-10-12（CLS-024 入账：make-backlog-process-explicit） | `_backlog/_archived/_settled_issues/` — 已结 issue 的归档目录。
 > 接收来自 [`../../issues/`](../../issues/) 的卡。`_` 前缀 = coding agent 默认忽略。
 >
 > **卡结后文件名不变，位置即状态。** 移入时分配 `CLS-NNN` 序号，按完成时间递增。
@@ -42,5 +42,6 @@ issue 关闭后从 `_backlog/issues/` 通过 `git mv` 移入本目录：
 | CLS-021 | 2026-10-10 | [2026-10-10-real-model-io-complete-replay.md](2026-10-10-real-model-io-complete-replay.md) | E·完整图回放三 change 闭环：journal-real-model-io（录制旋钮+journal 协议含 tool_calls，四 follow-through：choices/CONFIG_NAMES/_agenerate/v2 协议流 _stream）→ fix-headless-plan-gate（BUG-001 根因=headless 计划门缺席+计划冒充报告 admission 拒绝面；真梯验收 27 检索+15K 报告）→ land-complete-graph-replay（零凭证完整图回放：录制旅程 fixture 驱动真框架图全程、报告逐字复现 admit）；脱敏 0 命中+预清；阶梯级 3 旅程证明落地 |
 | CLS-022 | 2026-10-10 | [2026-10-10-lint-lane-establishment.md](2026-10-10-lint-lane-establishment.md) | lint lane 缺位收口（establish-lint-lane）：全树 ruff 108 → 0 violations（分级四批、每批 verify 红绿、AST 锁链全程绿；PLAN_MARKER 常量真用化取代 noqa）+ `make lint` 命令位 + 红演示（2→0）+ COMMANDS 行 + change-practice "run lint and tests" 措辞恢复；基线取证入卡附录（revision 868d4f0 可复现）；红基线由 count-pin checker 抓 change① 归档漂移当场实证 |
 | CLS-023 | 2026-10-10 | [2026-10-10-delta-sync-guard.md](2026-10-10-delta-sync-guard.md) | delta-sync 完整性守卫（enforce-delta-sync）：check_project_specs 默认模式新增规则——归档 delta 的 ADDED requirement 钉进主 spec，漏 sync 当场红（点名 change/capability/标题）；豁免面封闭（后续 REMOVED/RENAMED 正式退役 + 带理由 allowlist，首条 = 868d4f0 的 Six verbs out-of-band 改名）；治理套件五例矩阵红绿在案；真树 86 条 ADDED 对账 = 84 在场 + 1 退役豁免 + 1 allowlist 豁免；起因 = 本轮审计抓到两处归档漏 sync（ca82507 人工补齐）+ 根因实锤（archive 确认被跳过）；规范归属 doc-truthfulness ADDED requirement 随归档 sync——规则为自身规范归属当第一个服务对象 |
+| CLS-024 | 2026-10-12 | [2026-10-12-backlog-process-made-explicit.md](2026-10-12-backlog-process-made-explicit.md) | backlog 制度显性化（借鉴 loop_advisor 2026-10-12 卡，谱系第四波）：「一张 bug 怎么走」缺陷修复流成节（修就绪门票=根因证据+方案+修好判据；P1/P2 自带撰写 propose 授权，P0/契约/规范语义/越界/已记录决定走 owner）+ 铁律范围化例外 + 状态翻转法则两轨成表 + bug 词表扩集更名（活跃→调查中，+修就绪/已落修/等人拍板）+ bug 模板「修好判据」节 + agent 门牌 _backlog/AGENTS.md（ENTRY_DOCS + DOC_BUDGETS 1195）；make-backlog-process-explicit 全绿归档（skip_specs：机器面全在既有机制内的声明值变更，零新失败类；prove-it-red 在案） |
 
-**Next available issue ID: CLS-024**
+**Next available issue ID: CLS-025**
