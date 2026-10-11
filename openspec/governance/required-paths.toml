@@ -19,6 +19,7 @@ files = [
   "README.md",
   "_backlog/.gitignore",
   "_backlog/README.md",
+  "_backlog/AGENTS.md",
   "_backlog/triggers.md",
   "_backlog/bugs/README.md",
   "_backlog/methods/README.md",

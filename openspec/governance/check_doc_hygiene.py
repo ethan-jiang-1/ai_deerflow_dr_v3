@@ -76,6 +76,7 @@ ENTRY_DOCS: tuple[str, ...] = (
     "deep_research_harness/README.md",
     "deep_research_harness/docs/README.md",
     "_backlog/README.md",
+    "_backlog/AGENTS.md",
     "_backlog/triggers.md",
     "openspec/README.md",
 )
@@ -101,6 +102,11 @@ DOC_BUDGETS: dict[str, int] = {
     # injected into every OpenSpec instruction path; the ceiling is deliberately
     # tight against the measured size to stop silent growth.
     "openspec/config.yaml": 11436,
+    # Backlog agent doorplate (1195 chars measured at adoption,
+    # make-backlog-process-explicit 2026-10-12): a thin positions/walks/tickets/
+    # vocabulary pointer layer that owns no fact, so the ceiling is pinned to
+    # the measured size to stop silent growth.
+    "_backlog/AGENTS.md": 1195,
 }
 DOC_LAYER_DOCS: tuple[str, ...] = (
     # docs/ top-level markdown documents.
@@ -318,9 +324,16 @@ BACKLOG_NEXT_ID_DECL_RE = re.compile(r"Next available \w+ ID:\s*([A-Z]{3})-(\d{3
 # mis-kill class the borrowing source documented and fixed in 2026-10-08).
 BACKLOG_CARD_HUKOU_LINE_LIMIT = 12
 BACKLOG_STATUS_FIELD_RE = re.compile(r"状态[:：]\s*([^\s｜|，,]+)")
+# Bug-track vocabulary (make-backlog-process-explicit, 2026-10-12): `活跃` is
+# renamed `调查中` (it collided with "活跃区" once multiple active-zone words
+# existed; the gerund restores symmetry with the issues side's `推敲中`) and
+# gains `修就绪` (fix-ready: the flip carries the propose ticket), `已落修`
+# (fix landed, acceptance unproven), and `等人拍板` (shared with issues).
+# `待修` keeps its parked semantics (diagnosed, unscheduled, suspended pool).
+# Zero active bug cards existed at the flip, so no card carried the old word.
 BACKLOG_STATUS_VOCABULARY: dict[str, tuple[str, ...]] = {
     "issues": ("推敲中", "等人拍板"),
-    "bugs": ("活跃", "待修"),
+    "bugs": ("调查中", "修就绪", "已落修", "等人拍板", "待修"),
 }
 BACKLOG_GRADUATION_PASSED_RE = re.compile(r"毕业门[:：]\s*已过")
 BACKLOG_CLOSABLE_RE = re.compile(r"可关闭[:：]\s*是")
@@ -1063,6 +1076,45 @@ def _self_test() -> list[str]:
         hukou_only = [v for v in hukou_problems if "unindexed" not in v]
         if any("2026-10-05-awaiting-human.md" in v for v in hukou_only):
             errors.append("self-test: hukou rule mis-killed awaiting card")
+
+        # Rule 7 continuation (vocabulary flip, make-backlog-process-explicit
+        # 2026-10-12): a post-rename `活跃` bug card is out-of-vocabulary and
+        # must fail loudly; the new active-zone words pass hukou; an arbitrary
+        # out-of-vocabulary word still fails. The fixture roster is empty on
+        # purpose (unindexed problems expected), so the assertions read
+        # hukou-specific problems only.
+        vocab = base / "vocab-repo"
+        vocab_bugs = vocab / "_backlog" / "bugs"
+        vocab_bugs.mkdir(parents=True, exist_ok=True)
+        (vocab_bugs / "README.md").write_text("# Bugs\n\n（空）\n", encoding="utf-8")
+
+        def vocab_bug_card(name: str, status_word: str) -> None:
+            (vocab_bugs / name).write_text(
+                f"# BUG-009: x\n\n> 严重级别: P2 | 发现: 2026-10-12 | 状态: {status_word}\n\n## 症状\ns\n",
+                encoding="utf-8",
+            )
+
+        vocab_bug_card("BUG-009-old-active.md", "活跃")
+        vocab_bug_card("BUG-010-fix-ready.md", "修就绪")
+        vocab_bug_card("BUG-011-bad-word.md", "乱写")
+        vocab_problems = _rule_ledger_consistency(vocab)
+        vocab_hukou_only = [
+            v for v in vocab_problems if "unindexed" not in v and "dangling" not in v
+        ]
+        if not any(
+            "outside declared vocabulary" in v and "BUG-009-old-active.md" in v
+            for v in vocab_hukou_only
+        ):
+            errors.append(
+                "self-test: post-rename 活跃 bug card not detected as out-of-vocabulary"
+            )
+        if not any(
+            "outside declared vocabulary" in v and "BUG-011-bad-word.md" in v
+            for v in vocab_hukou_only
+        ):
+            errors.append("self-test: out-of-vocabulary bug word not detected")
+        if any("BUG-010-fix-ready.md" in v for v in vocab_hukou_only):
+            errors.append("self-test: 修就绪 bug card mis-killed by vocabulary rule")
 
         # Root-count pinning negative: a README status line whose declared
         # counts differ from the computed inventory must fail loudly.
