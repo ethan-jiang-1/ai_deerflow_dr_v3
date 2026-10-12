@@ -31,7 +31,14 @@ _Avoid_: using the bare word for both in one sentence
 
 **Entry Surface**:
 A user-facing or host-facing surface through which a run starts or is observed —
-the closed CLI verb set plus the make lanes (owner: `entry-surface` capability).
+the closed CLI verb set (owner: `entry-surface` capability) plus the make lanes
+(menu mirror owned by `agent-playbook`).
 _Avoid_: an internal module boundary
+
+**Lane**:
+A standing evidence lane — a named command with a declared "proves / does not
+prove" contract. The lane table lives in `docs/testing-and-evaluation.md`; the
+receipt-registry subset lives in the `delivery-lanes` spec (`proof-lanes.toml`).
+_Avoid_: calling a research run or a config ladder a "lane"
 
 > 词汇的权威随 owning spec 落地；本文件只登记承重词，避免第二权威。

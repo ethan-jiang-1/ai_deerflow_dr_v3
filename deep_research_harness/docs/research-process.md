@@ -27,13 +27,13 @@ skill 在本项目里是三个不同的对象，不能混为一谈：
 | 状态列 | 当前值 | 证据 / 入口 |
 | --- | --- | --- |
 | **声明可用** | 框架 native surface 可加载；本地 [SOP 快照](skills/deep-research/README.md) 仅供阅读（含来源 pin/hash） | 快照不是运行时配置，改它不改变行为 |
-| **运行中实际加载** | 目录面已收窄：两梯声明 `available_skills: [deep-research]`，snapshot 实证 prompt 索引恰含 deep-research（prompt 33589→22181 字节）；正文加载与否 agent 决定 | 要证明实际加载，看工具调用记录 + checkpoint 消息 + [snapshot](../src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py)；方法见下节 |
+| **运行中实际加载** | 目录面已收窄：两梯声明 `available_skills: [deep-research]`，snapshot 实证 prompt 索引恰含 deep-research（prompt 收窄约 11KB）；正文加载与否 agent 决定 | 要证明实际加载，看工具调用记录 + checkpoint 消息 + [snapshot](../src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py)；方法见下节 |
 | **质量评估** | 无自动化统计评估（引文真实性、充分性、覆盖度）；每次搜索已物化到 [diagnostics/searches/](run-bundle.md) 可直读复核 | 显式 base 真实梯 + 人工评审（引用核对用 searches/ 文件）；fixture 结果不证明研究质量 |
 
 把 skill 变成强制、可验收的运行时合同是独立的产品/认知策略决策（2026-10-05
 计划 Phase 5），不在当前实现内。
 
-计划闸门以 `<research-plan>` 内容标记为唯一触发信号（无标记诚实降级——研究轮与计划轮在 tool-call 形状上不可区分）。计划确认闸门是 refine 方向文档的 gen-1 对偶：agent 起草研究计划、操作者确认或附加修订意见（三路：确认/跳过/放弃），确认的计划物化为 `request/plan-gen1.md` 并注入线程；模型无视计划框架直接开搜时闸门诚实降级不硬拦。
+计划闸门以 `<research-plan>` 内容标记为唯一触发信号（无标记诚实降级——研究轮与计划轮在 tool-call 形状上不可区分）。计划确认闸门是 refine 方向文档的 gen-1 对偶：agent 起草研究计划、操作者确认/修订/跳过/放弃（四路；headless 自动确认），确认的计划物化为 `request/plan-gen1.md` 并注入线程；模型无视计划框架直接开搜时闸门诚实降级不硬拦。
 反问（clarification）是 agent 自己的判断：它认为问题含糊时用 `ask_clarification`
 工具发问。交互上下文（TTY 或 `DEEP_RESEARCH_INTERACTIVE=1`）里 harness 把问题递给
 操作者现场作答（答案原样续跑，不耗自动应答预算；留空拒答回落自动应答）；headless
@@ -53,7 +53,7 @@ skill 在本项目里是三个不同的对象，不能混为一谈：
 | `thinking_enabled` | `thinking_enabled=True` | [contracts/client_surface](../src/deerflow_deep_research/runtime/adapters/contracts/client_surface.py) `CONSUMED_DEFAULTS` | [mirror](../tests/contract/test_wiring_mirror.py) binding-defaults 断言 |
 | `subagent_enabled` | `subagent_enabled=True` | 同上 | mirror + [posture 守卫](../tests/unit/runtime/test_subagent_posture.py) |
 | `plan_mode` | `plan_mode=False` | 同上 | mirror |
-| `available_skills` | 两梯声明 `[deep-research]`（窄面；缺省声明 = None = 框架全目录默认） | 同上 | mirror + [declaration guard](../tests/contract/test_skill_declaration.py) |
+| `available_skills` | 两梯声明 `[deep-research]`（窄面；`build_client` 缺省 `available_skills=None` = 框架全目录默认，两梯经 assembly 解析后传入窄面） | 同上 | mirror + [declaration guard](../tests/contract/test_skill_declaration.py) |
 | `middlewares` | 空；`snapshot_dir` 给定时注入 assembly-snapshot middleware（第一位） | [adapters/client](../src/deerflow_deep_research/runtime/adapters/client.py) `build_client` | [smoke](../tests/integration/test_wiring_smoke.py)（snapshot 落盘） |
 | `thread_id` | state.json 的 thread；per-call 注入 | [adapters/client](../src/deerflow_deep_research/runtime/adapters/client.py) `make_stream_fn` | mirror 转发断言 |
 | `recursion_limit` | `recursion_limit=1000`（per-call 覆盖；AppConfig 顶层 `300` **不被**嵌入式路径消费——疤痕） | [adapters/client](../src/deerflow_deep_research/runtime/adapters/client.py) `DEEP_RESEARCH_RECURSION_LIMIT` | mirror `CONSUMED_STREAM_KWARGS` + 转发断言 |
@@ -93,7 +93,7 @@ Harness 没有自动把 skill 的“3–5 个角度”等检查变成可阻断�
 ```text
 cli create → runtime/interaction/cli.py
   -> Bundle → runtime/assembly.run_foreground → SQLite checkpointer
-  -> build_client(config, subagent_enabled=True, available_skills=None)
+  -> build_client(config, subagent_enabled=True, available_skills=["deep-research"])
   -> make_stream_fn(thread_id, recursion_limit=1000)
   -> DeerFlow lead agent <-> 模型、工具、按需委派
   -> stream events -> pump -> 状态 / journal / 最后回答准入

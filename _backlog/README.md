@@ -1,8 +1,11 @@
 # _backlog — 问题与缺陷账本（issues / bugs）
 
-> 最后更新: 2026-10-12（make-backlog-process-explicit：「一张 bug 怎么走」缺陷修复流成节 + 铁律
+> 最后更新: 2026-10-12（同日第二轮·fresh-agent 清扫：bug 轨补「等人拍板」出场行、`待修` 出场值
+> 户口注、铁律范围化例外升命名节、授权例外单源化（清单只住第 3 步）、门禁措辞对齐（成熟度）、
+> 指针修复（triggers / specs / _digest）、历史迁出与去重（判出登记迁 triggers 头部、身份/翻案
+> 压缩、触发器与 pipeline 细则单源化、方法表瘦身、门牌摘录面声明）；前史 2026-10-12 make-backlog-process-explicit：「一张 bug 怎么走」缺陷修复流成节 + 铁律
 > 范围化例外 + 状态翻转法则两轨成表 + bug 词表扩集更名（`活跃`→`调查中`，+`修就绪`/`已落修`/
-> `等人拍板`）+ bug 模板「修好判据」节 + agent 门牌 [`AGENTS.md`](AGENTS.md)；前史 2026-10-09
+> `等人拍板`）+ bug 模板「修好判据」节 + agent 门牌 [`AGENTS.md`](AGENTS.md)；再前史 2026-10-09
 > adopt-issue-ledger-governance：plans 退役 issues 立正、`_done/`→`_archived/`、四态表/户口/
 > 触发器/methods/刻意不借登记） |
 > 本目录追踪本仓库的设计推敲、上游分析与缺陷。
@@ -21,7 +24,7 @@
 
 ## 这个仓库是什么
 
-`ai_deerflow_dr_v3` 是对上游 [bytedance/deer-flow](https://github.com/bytedance/deer-flow)（基于 LangGraph 的 AI super-agent 框架）之上，以 OpenSpec spec-driven 规范开发的 **Deep Research 智能体应用**。硬约束：**绝不修改上游源码**（`deerflow/backend/`、`deerflow/frontend/` 是上游镜像，位于 `deerflow/` submodule 内）。Deep Research 智能体开发走 `openspec/`。
+上游 deer-flow submodule 之上的 **Deep Research 智能体应用**（OpenSpec spec-driven）。硬约束：**绝不修改上游源码**。仓库定位、分层与边界铁律的唯一入口：根 [AGENTS.md](../AGENTS.md)。
 
 ## 目录结构
 
@@ -79,36 +82,43 @@ agent 不得自行挂起；回活需要一次显式的新优先级决定。
 2. **弄清问题**：缺事实就查资料、读代码或试原型；短结论写回卡上。事实与建议分开写。
    每一步怎么做，查 [方法导航](methods/README.md)。
 3. **形成结论**：回答做不做、什么时候做、先做什么、哪些不做。决定做的事项先写可执行的验收。
-4. **申请下游处理并交接**：把完整申请（change 名 + 日期）写在卡的「落地关联」，结论被 change
+4. **申请下游处理并交接**：把完整申请（change 名 + 日期与状态）写在卡的「落地关联」，结论被 change
    吸收后按 ritual 关闭。**申请去向必须在卡上可追溯**；卡上的状态与建议不授予实施权限。
 
 ## 一张 bug 怎么走（缺陷修复流）
 
 1. **记录缺陷**：triage——先找已有卡（症状同类即并卡）；当场修掉的缺陷不建卡（与四门第 1 步同款
-   纪律），其横切排查落点写在当轮 change 的 Delivery Record 维护行。写清症状、根因方向、复现。
+   纪律；当场修发生在当轮 change 内——无在飞 change 时，可当场修的小缺陷也先立卡走门），
+   其横切排查落点写在当轮 change 的 Delivery Record 维护行。写清症状、根因方向、复现。
 2. **调查（`调查中`）**：根因假设 → 用证据确认（回执 / git history / 对照实验）；撤回的错误假设
    **留卡上**不抹除（BUG-001「初判修正」先例）。根因未确认，状态不往前翻。
 3. **修就绪（门票即授权）**：根因证据确认 + 修复方案选定 + `## 修好判据` 写就 → 状态翻 `修就绪`。
    - **P1/P2 修复型**：翻转自带**撰写 propose** 的授权——bug 卡就是工作件，免另立 issue RFC；
      拍板仍停在 propose 接受边界（现行法不动）。
-   - **例外（不自授权，连撰写也要 owner 明示方向或走 issue 路）**：P0 缺陷，或修复触及契约 /
-     规范语义 / 不可逆或越界面 / 已记录决定——类别锚定根 [AGENTS.md](../AGENTS.md) 的 REVIEW
-     节制表（2026-10-12 借鉴裁决，make-backlog-process-explicit 落地）。
+   - **例外（不自授权，连撰写也要 owner 明示方向或走 issue 路）**：P0 缺陷，或修复触及契约
+     （= `openspec/specs/` 下的 owning spec，如 run-admission / entry-surface / run-bundle）/
+     规范语义 / 不可逆或越界面 / 已记录决定——类别对齐根 [AGENTS.md](../AGENTS.md) REVIEW
+     节制表的「规范语义 / 不可逆或越界」，另加本仓扩展（P0 / 契约 / 已记录决定）
+     （2026-10-12 借鉴裁决，make-backlog-process-explicit 落地）。
+   - 词表：「修复型」= 修复以该 change 的修复任务身份落线；「已记录决定」的查询面 =
+     `_archived/_settled_issues/` 台账、`openspec/specs/`、本手册「刻意不借」。
 4. **落地（`已落修`）**：修复经 OpenSpec change 入线（唯一实施通道，「一次放行一把」不变）；修复
    落树后翻 `已落修`——**实施不是验收**。
 5. **确认与关闭（`已修`）**：`修好判据` 满足且证据在卡（回执新于最后一次改动）→ `git mv` 进
    `_archived/_fixed_bugs/`（出场词在同一 change 内翻转）；横切排查牵出的新缺陷回写 `bugs/`
    （新 BUG-NNN）。**已修永不重开**——回归是引用旧卡的新卡。
 
-> **铁律范围化例外（2026-10-12，make-backlog-process-explicit）**：四门第 4 步「卡上的状态与建议
-> 不授予实施权限」对 issue 卡与 `修就绪` 之外的 bug 状态维持原样；`修就绪` 的 P1/P2 修复型翻转
-> 自带撰写 propose 的授权（上节第 3 步）。例外写在这里，不让缺陷流暗着违背铁律。
+### 铁律范围化例外（2026-10-12，make-backlog-process-explicit）
+
+四门第 4 步「卡上的状态与建议不授予实施权限」对 issue 卡与 `修就绪` 之外的 bug 状态维持
+原样；`修就绪` 的 P1/P2 修复型翻转自带撰写 propose 的授权（上节第 3 步）。例外写在这里，
+不让缺陷流暗着违背铁律。
 
 ## 关闭条件四态（离场前各留下什么）
 
 | 结论 | 关闭前留下什么 |
 |---|---|
-| **做** | 问题、方案、真实比较过的选择及理由、可执行验收；「落地关联」写明 change 名与状态；毕业门打孔（`毕业门: 已过 → change`）后按 ritual 迁移 |
+| **做** | 问题、方案、真实比较过的选择及理由、可执行验收；「落地关联」写明 change 名 + 日期与状态；毕业门打孔（`毕业门: 已过 → change`）后按 ritual 迁移 |
 | **以后做** | 延后的理由、什么时候再看、到时观察什么。显式暂停的进挂起池；已裁决"该做不现在"且条件会自己撞上的，按 [triggers.md](triggers.md) 规则收一行 |
 | **不做** | 原因和适用范围。属"刻意分歧"的，按根 AGENTS.md 第 4 条就地写明理由并留锁定测试 |
 | **结论已在别处** | 指向已有决定或现行 spec/合同，说明它回答了本卡的什么问题 |
@@ -121,7 +131,7 @@ agent 不得自行挂起；回活需要一次显式的新优先级决定。
 | 区域 | `状态` 词表 | 其他锚定字段 |
 |---|---|---|
 | `issues/` | `推敲中` / `等人拍板` | `毕业门: 未过/已过`、`可关闭: 是/否`、`类型: Feature/Task/未定` |
-| `bugs/` | `调查中` / `修就绪` / `已落修` / `等人拍板` / `待修` | `严重级别: P0/P1/P2`（消费者 = 「一张 bug 怎么走」第 3 步例外边界） |
+| `bugs/` | `调查中` / `修就绪` / `已落修` / `等人拍板` / `待修`（`待修` = 出场值：翻此词即须同 change 内 `git mv` 进挂起池，常驻位不在 bugs/） | `严重级别: P0/P1/P2`（消费者 = 「一张 bug 怎么走」第 3 步例外边界） |
 | 离场时 | issue → `已结`（_settled）或 `叫停`（_suspended）；bug → `已修` 或 `待修` | 其余字段不动 |
 
 **"等人拍板"不是完成词**——等人确认的卡诚实停在活跃区，门禁永不把它误判为毕业（锚字段，不锚正文形容词）。
@@ -139,7 +149,7 @@ agent 不得自行挂起；回活需要一次显式的新优先级决定。
 | 立卡后 | triage 后才立卡 | 推敲中 | agent | 状态行 |
 | 推敲中 | 下一步是 owner 选择 | 等人拍板 | agent | 「下一步」写明问题 |
 | 等人拍板 | owner 明确回答 | 推敲中，或出场 | owner | 行追加 |
-| 推敲中 | 判断落地 + 交接提交 | 已结（同 change 归档） | agent | verdict + 落地关联 + `git mv` |
+| 推敲中 | 判断落地 + 交接提交 | 已结（同 change 归档） | agent | verdict + 落地关联（change 名 + 日期与状态）+ 毕业门打孔 + `可关闭: 是` + `git mv` + 三 README 联动 |
 | 任意活跃值 | owner 叫停（无判断） | 叫停（挂起池） | owner | `git mv` |
 | 叫停 | owner 明确复活 | 推敲中 | owner | 行追加 |
 | 已结 | 永不重开——复发 = 新卡引用本卡 | — | — | 回写律 |
@@ -150,10 +160,11 @@ agent 不得自行挂起；回活需要一次显式的新优先级决定。
 |---|---|---|---|---|
 | 立卡后 | triage 后 | 调查中 | agent | 状态行 |
 | 调查中 | 根因证据确认 + 修复方案选定 + `修好判据` 写就；P1/P2 修复型 | 修就绪 | agent | 翻转即门票**且**授权（「一张 bug 怎么走」第 3 步） |
-| 调查中 | 同等就绪，但命中例外（P0 / 契约 / 规范语义 / 越界 / 已记录决定） | 等人拍板 | agent | 通道问题本身 |
+| 调查中 | 同等就绪，但命中例外（类别清单见「一张 bug 怎么走」第 3 步） | 等人拍板 | agent | 通道问题本身 |
 | 修就绪 | 修复已落树 | 已落修 | agent | 行追加 |
 | 已落修 | 修好判据满足、证据在卡 | 已修（同 change 归档） | agent | verdict 追加 + `git mv` |
 | 调查中/修就绪/已落修 | 下一步是 owner 选择 | 等人拍板 | agent | 「下一步」写明问题 |
+| 等人拍板 | owner 明确回答 | 调查中 / 修就绪（按答案落点），或出场（待修 / 已修） | owner | 行追加 |
 | 修就绪/已落修 | 根因或方案被证伪 | 调查中（向后翻） | agent | 撤回留卡 |
 | 任意活跃值 | owner 停（查明未修、不排期） | 待修（挂起池） | owner | `git mv` |
 | 待修 | owner 明确复活 | 调查中 | owner | 行追加 + `git mv` 回活跃区 |
@@ -165,35 +176,32 @@ agent 不得自行挂起；回活需要一次显式的新优先级决定。
 ## 活触发器索引（[triggers.md](triggers.md)）
 
 延后裁决的触发条件沉在已关闭卡里没人翻，等于没有。索引只收一件事：**不在表上就会把已经
-否掉的做法再做一遍，而且那条条件是工作里自己会撞上的一次观察**。延后不自动加行；
-「用户点名」型不收（点名的动作本身就是触发）；常设指令/常设机制已经在盯的不收第二份。
+否掉的做法再做一遍，而且那条条件是工作里自己会撞上的一次观察**。
 **扫描义务**：change 归档收口时、立新卡前的取代检查时、阶段收口时，扫一眼。
-写行/删行规则见 [triggers.md](triggers.md) 头部。行只是指针，句子留在 owner 卡上。
+准入细则（延后不自动加行、「用户点名」型不收、常设机制在盯的不收第二份）与写行/删行规则
+一律以 [triggers.md](triggers.md) 头部为准。行只是指针，句子留在 owner 卡上。
 
 ### 种子收割回执（2026-10-09，adopt-issue-ledger-governance）
 
-首轮收割扫全部 19 张已关闭卡：收 8 行（见上表）；4 个候选按准入标准判出，在此登记防止下轮再议。
-（2026-10-10 注：其中「行为断言 eval 栈」1 行已被 CLS-020 消费删除，[triggers.md](triggers.md) 现存 7 行；删行规则见其头部。）
-
-| 候选 | 判出理由 |
-|---|---|
-| CLS-010「AGENTS.md 预算治理」 | 已由 `DOC_BUDGETS` 棘轮常设机制在盯——常设机制在盯的不收第二份 |
-| CLS-015 repository-map 维护触发表 | owner 活在应用 docs/README.md「地图维护触发条件」节，编辑动作自然会读到 |
-| CLS-016「编辑器级修订再议」 | 「用户点名」型——点名的动作本身就是触发 |
-| CLS-006「subagent 旋钮暂不需要」 | 同上 |
+首轮收割扫全部 19 张已关闭卡：收 8 行进 [triggers.md](triggers.md)；4 个判出候选的裁定
+已迁 [triggers.md](triggers.md) 头部登记（2026-10-10 注：「行为断言 eval 栈」1 行已被
+CLS-020 消费删除，现存 7 行）。
 
 ## 卡走到哪一步 → 用哪篇方法（[methods/](methods/README.md)）
 
 方法按卡片步骤组织，消化自借鉴源并按本仓语境改写；每篇指向自己的 owner 与外部技能：
 
-| 卡走到哪一步 | 方法（[methods/](methods/README.md)） | 关键 owner |
-|---|---|---|
-| 需求不清、问题太大要拆 | [澄清需求](methods/requirements-elicitation.md) | `CONTEXT-MAP.md`（词汇）；取代检查扫 [triggers.md](triggers.md) |
-| 缺事实、要调研或试原型 | [补充证据](methods/requirements-probes.md) | 卡内留证；长寿命外部分析进 `_research/` |
-| 不知道怎样算完成 | [设计验收标准](methods/validation-design.md) | [车道表](../deep_research_harness/docs/testing-and-evaluation.md) + [test-evidence-policy](../openspec/governance/test-evidence-policy.md) |
-| 信息齐、要比方案定结论 | [整理方案与结论](methods/requirements-synthesis.md) | 本文件关闭条件四态表 |
-| 结论定了、要交接下游 | [申请下游处理](methods/issue-to-change.md) | `openspec/change-guidance/README.md`（Change Focus） |
-| 验证时选证据 / 判结果 | [选择证据](methods/validation-evidence.md) / [判断验收结果](methods/validation-judgment.md) | 回执纪律 + Delivery Record |
+| 卡走到哪一步 | 方法（[methods/](methods/README.md)） |
+|---|---|
+| 需求不清、问题太大要拆 | [澄清需求](methods/requirements-elicitation.md) |
+| 缺事实、要调研或试原型 | [补充证据](methods/requirements-probes.md) |
+| 不知道怎样算完成 | [设计验收标准](methods/validation-design.md) |
+| 信息齐、要比方案定结论 | [整理方案与结论](methods/requirements-synthesis.md) |
+| 结论定了、要交接下游 | [申请下游处理](methods/issue-to-change.md) |
+| 验证时选证据 / 判结果 | [选择证据](methods/validation-evidence.md) / [判断验收结果](methods/validation-judgment.md) |
+
+各方法的结果落点、owner 与外部技能映射统一看 [methods/README.md](methods/README.md)；
+立新卡前的取代检查扫 [triggers.md](triggers.md)。
 
 **方法的维护规则**（依据实际使用、不进技能目录、不维护进度）见 [methods/README.md](methods/README.md)。
 
@@ -210,10 +218,9 @@ agent 不得自行挂起；回活需要一次显式的新优先级决定。
           P1/P2 修复型翻转自带撰写 propose 的授权，例外类别走 owner。
 
 加工 pipeline（唯一实施通道 = OpenSpec change）
-  propose（只写规划工件，停在规划边界，等用户拍板）
-    → apply（红绿先行、证据回执、closeout gate 退出码直测）
-    → archive（gate 全绿 + strict validate）
-    → 知识归位（specs/ 主干、代码、测试）
+  propose → apply → archive → 知识归位（specs/ 主干、代码、测试）
+  （各步细则——拍板边界、红绿先行、回执、closeout gate、strict validate——
+    一律见 openspec/README.md「开发闭环」，此处不复制）
 
 归位与回写（pipeline → 各自的家）
   issue 结论被 change 吸收 → issue 关闭（三处 README 联动）
@@ -246,12 +253,9 @@ agent 不得自行挂起；回活需要一次显式的新优先级决定。
 | 🔒 保留卡纪律 | 根 AGENTS.md 的 REVIEW 节制（用户保留区清单）已覆盖同类边界 |
 | 触发器语义门禁化 | 「触发是否到场」是语义判断，机械门禁只能查行存在性、会逼出凑格式行；先以扫描义务运行，复发再议升格 |
 
-**翻案记录**（原判被驾驭者推翻，日期与去向就地登记；用户指示即翻案触发）：
-
-| 原判 | 翻案（2026-10-09，apply 中指示） | 现状 |
-|---|---|---|
-| 不设 `methods/` 目录（方法 owner 已存在） | 驾驭者裁定 methods 很重要，采纳 | [methods/](methods/README.md) 落地：消化改写 7 篇 + 导航，路由表改经方法导航 |
-| `_done/` 名字保留 | 驾驭者裁定改名 | `_done/` → `_archived/`（含 `.gitignore`、checker、清单、活链接同步） |
+**翻案记录**（原判被驾驭者推翻，日期与去向就地登记；用户指示即翻案触发）：两笔——
+methods 目录落地（消化改写 7 篇 + 导航）、`_done/` → `_archived/`（含 checker/清单/活链接
+同步）；台账见 [CLS-019](_archived/_settled_issues/2026-10-09-backlog-governance-reborrow.md)。
 
 ## 搬迁规矩
 
@@ -303,6 +307,6 @@ git mv issues/<name>.md _archived/_settled_issues/<name>.md
 | `openspec/config.yaml` | OpenSpec 项目上下文 + 4 artifact（proposal/specs/design/tasks）规则 |
 | `openspec/specs/` | 已接受 spec（运行时真相层，与 `_backlog` 各自簿记） |
 | `openspec/changes/` | 活跃 change（完成归档于 `openspec/changes/archive/`） |
-| `deerflow/AGENTS.md`、`deerflow/backend/AGENTS.md` | 框架 submodule 自带的只读指引 |
-| `_backlog/_research/` | 外部系统分析资料（如 DeerFlow v2.1.0 原生 Deep Research 能力盘点），消化后产出 `_backlog/issues/` |
+| `deerflow/AGENTS.md`、`deerflow/backend/AGENTS.md` | 框架 submodule 自带的只读指引（贡献者视角） |
+| `deerflow/_digest/` | submodule 内的源码研究笔记（阅读地图见其 README；与本仓 `_backlog/_research/` 是两套语料，互不隶属） |
 | `deerflow/backend/` `deerflow/frontend/` | 上游镜像（**禁改**，submodule 锁定在 `deerflow/` 内） |

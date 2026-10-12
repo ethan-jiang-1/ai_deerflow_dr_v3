@@ -5,7 +5,7 @@
 | 层 | 是什么 | 怎么对待 |
 |----|--------|---------|
 | `deep_research_harness/` | ★ **你的应用**（`src/deerflow_deep_research`、`tests`、`docs`） | 改代码、写测试、跑它——几乎所有工作在这里 |
-| `deerflow/` | 被 leverage 的框架（submodule 锁 `ceebf97f`（v2.1.0 的前一提交、digest 分支，非 tag）） | **只 import，绝不修改、不为排查翻它内部**；理解框架读它的只读指引 `deerflow/AGENTS.md` 与 `deerflow/backend/AGENTS.md` |
+| `deerflow/` | 被 leverage 的框架（submodule 锁 `ceebf97f`（v2.1.0 的前一提交、digest 分支，非 tag）） | **只 import，绝不修改、不为排查翻它内部**；框架概念读 `deerflow/_digest/README.md`，贡献者指引读 `deerflow/AGENTS.md` |
 | `openspec/` | 设计与准入（specs / changes / governance / change-guidance） | 契约与规范写这里 |
 | `_backlog/` | 任务账本（issues / bugs 两类） | 追踪；搬迁按 ritual |
 
@@ -15,10 +15,10 @@
 |-----------|---------|
 | 设计/准入一个变更（原则、profile、本地绑定、预算） | [`openspec/change-guidance/README.md`](openspec/change-guidance/README.md) |
 | 证据 / 门禁 / 测试资产政策 | [`openspec/governance/`](openspec/governance/)（`test-evidence-policy.md` + 组件 checker） |
-| 账本 ritual（编号、索引、计数三处一致） | [`_backlog/README.md`](_backlog/README.md) |
+| 账本 ritual；bug 修复流与谁可开修 | [`_backlog/README.md`](_backlog/README.md) |
 | 应用目录、研究绑定、测试选择 | [应用指南](deep_research_harness/AGENTS.md) 的 Information Map |
 | 启动某个入口该用哪条命令 | [`deep_research_harness/COMMANDS.md`](deep_research_harness/COMMANDS.md) |
-| 产品方向与快速上手 | [`openspec/product/README.md`](openspec/product/README.md) |
+| 现行契约 / 开发闭环 / 产品方向 | [`openspec/README.md`](openspec/README.md) |
 | 词汇与三个 bounded context（谁拥有哪些词） | [`CONTEXT-MAP.md`](CONTEXT-MAP.md)（→ 各层 `CONTEXT.md`） |
 
 ## 不可谈判的约定（只列不变量；细则在各自 owner）

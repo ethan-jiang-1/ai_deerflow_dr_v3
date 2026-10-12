@@ -20,6 +20,9 @@ responsibility, host integration, and change governance do not blur together.
 - **profile** — 根 `profiles/` 是**本地运行配置**（宿主侧 ladder/profile，暂未注册）；
   `openspec/change-guidance/profiles/` 是**政策 profile**（change-guidance 的规则集）。
   同名异物，按目录归属读。
+- **plan gate** — 运行时「计划确认闸门」（create/gen-1 的 `<research-plan>` 标记确认；
+  owner：run-bundle spec 与 pump）与治理面 `--phase plan`（change admission 检查；
+  owner：governance gate）同词不同物，按目录归属读。
 
 ## Common Misreadings
 

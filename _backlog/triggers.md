@@ -15,6 +15,19 @@
 > 下次扫的时候，如果必须先想起这张表才知道要看什么，这行就不是触发——删行，
 > 句子留在 owner 卡上。
 
+## 判出登记（2026-10-09 首轮收割，自 _backlog/README.md 迁入）
+
+4 个候选按准入标准判出，登记防止下轮再议：
+
+| 候选 | 判出理由 |
+|---|---|
+| CLS-010「AGENTS.md 预算治理」 | 已由 `DOC_BUDGETS` 棘轮常设机制在盯——常设机制在盯的不收第二份 |
+| CLS-015 repository-map 维护触发表 | owner 活在应用 docs/README.md「地图维护触发条件」节，编辑动作自然会读到 |
+| CLS-016「编辑器级修订再议」 | 「用户点名」型——点名的动作本身就是触发 |
+| CLS-006「subagent 旋钮暂不需要」 | 同上 |
+
+---
+
 | 对象 | 裁决 | 触发条件（一次观察，出现在哪） | 家 |
 |---|---|---|---|
 | A5' 技能 review 面（adopt-skill-review-surface） | 降级为触发式，不预造 | 技能定制 change 入线时（该 change 的 proposal 阶段就会撞上） | [CLS-010](_archived/_settled_issues/2026-10-04-test-doctrine-borrows.md) |

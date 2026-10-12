@@ -54,7 +54,7 @@ python3 cli.py create "问题" --config fixture        ← deep_research_harness
 > 两种 loop 并存且职责不重叠：**DeerFlow agent loop** 决定搜什么、何时收束（研究认知）；
 > **Harness run loop**（pump）决定状态、终态与准入（运行控制）。详见[控制地图](deep_research_harness/docs/control-map.md)。
 
-### 三个 lane 的命令（都在 deep_research_harness/ 下执行）
+### 三类命令（都在 deep_research_harness/ 下执行）
 
 ```bash
 # 跑研究（运行态）
@@ -93,7 +93,8 @@ make record-stream PROBLEM="…" CONFIG=base  # 显式录制真实 API 事件流
 - `deerflow/` submodule 需 `git clone --recurse-submodules` 或 `git submodule update --init` 才完整。
 - 提交钩子：`.githooks/pre-commit`（whitespace + doc hygiene）需一次
   `git config core.hooksPath .githooks` 激活，见[治理 README](openspec/governance/README.md)。
-- 框架运行时基座：submodule 锁在 commit `ceebf97f`（ethan digest 分支，ethan-v2.1.0 tag 的前一提交而非 tag 本身；上游 v2.1.0 于 2026-09-24 发布）。
+- 框架运行时基座：submodule 锁在 commit `ceebf97f`（ethan digest 分支，ethan-v2.1.0 tag 的前一提交而非 tag 本身；上游 v2.1.0 于 2026-09-24 发布），
+  源码概念阅读地图在 `deerflow/_digest/README.md`（贡献者视角指引才是 `deerflow/AGENTS.md`）。
   声明锁已在[结构 registry](openspec/governance/project-structure.toml)。
 - 其他根目录居民：`.env`（real 梯凭证，gitignored；框架启动时向上发现并加载，应用自身不读）、
   `profiles/`（本地运行 profile，暂无已注册条目）、`CONTEXT.md` / `CONTEXT-MAP.md`（词汇边界）。

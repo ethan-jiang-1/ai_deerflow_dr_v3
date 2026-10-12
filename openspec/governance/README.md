@@ -15,9 +15,9 @@
 | `check_change_guidance.py` | Change Guidance / policy 路由 / Focus Card（即 proposal 的 `## Change Focus` 记录）是否通过？ | 脚本 docstring |
 | `check_harness_dependency_direction.py` | Harness 是否反向依赖 OpenSpec？验证回执（`verification-receipt.json`，结构识别：非空 `checks` 命令记录）是豁免证据，不是依赖 | 脚本 docstring（`@impl DEP-001`） |
 | `check_ci_governance.py` | CI 工作流与本地 hook 的声明是否漂移（触发器、路径过滤、pinned 工具链、canonical 命令、hook 命令集）？ | 脚本 docstring（`@impl CIG-001`） |
-| `check_doc_hygiene.py` | 文档层（ADR 索引↔目录 / 入口链、docs 层与测试/工具资产文档（`LINKED_ASSET_DOCS`）的相对链接 / 编码换行 / docs 层范围完整性 / `_backlog` 的 `_` 目录命名约定 / **账本面一致性**——活跃名册双向互查、计数与 Next-ID、卡片户口（首 12 行 `状态：` 且词在词表内）与滞留检测（`毕业门：已过`/`可关闭：是` 不得滞留活跃区，锚字段不误杀等人卡） / **入口层字符预算闸**——受管常驻文件的声明上限，超限与缺失响亮报错，只降不升棘轮 / 陈旧叙事标记封闭清单 / 根 README 计数钉死）是否漂移？ | 脚本 docstring（standalone，非 gate 组件、非 `make verify` 目标；已进 CI canonical 序列；`@impl DOB-001`） |
+| `check_doc_hygiene.py` | 文档层（ADR 索引↔目录、docs 层与测试/工具资产文档的相对链接与编码换行、docs 范围完整性、`_backlog` 的 `_` 目录约定与账本面一致性（名册互查 / 计数与 Next-ID / 户口与滞留检测）、入口层字符预算棘轮、陈旧叙事封闭清单、根 README 计数钉死——约十条机械规则）是否漂移？ | 脚本 docstring（standalone，非 gate 组件、非 `make verify` 目标；已进 CI canonical 序列；`@impl DOB-001`） |
 | `check_release_face.py` | 最小发布面是否完整（gitlink 在场且 pin 一致 / 兄弟布局与 `[tool.uv.sources]` 目标都在发布面内 / 随行源码零开发面耦合 / COMMANDS 路由目标存在）？ | 脚本 docstring（standalone，slow cold-start lane 见 playbook；`@impl RLF-001`） |
-| `check_proof_receipts.py` | 选中 change 的回执/证据是否在案（proof receipts）？ | 脚本 docstring（gate 组件，closeout 阶段 enforce） |
+| `check_proof_receipts.py` | 选中 change 的回执/证据是否在案（proof receipts）？ | 脚本 docstring（gate 组件：经 `--mode enforce` 调用，但仅当环境变量 `PROOF_ATTESTATION` 提供 attestation 时才实查，否则报 no selected change 并按 0 通过；回执 producer `make proof` 尚未建立，见 harness `proof-lanes.toml`） |
 | `selected-change-closeout.md` / `.py` | 选中 change 的 closeout 义务清单与执行？ | 文档+脚本（`@impl` 见文件头） |
 | `change_guidance_kernel.py` | change-guidance 规则的共享内核（checker 复用）？ | 脚本 docstring |
 | `portable_change_guidance_export.py` | 指导规则的可移植导出是否最新？ | 脚本 docstring |
@@ -56,9 +56,9 @@ git config core.hooksPath .githooks
 CI 门禁：`.github/workflows/governance.yml` 在 push / pull request（路径过滤
 `openspec/**`、`deep_research_harness/**`、工作流与 hooks 自身）上单 job 运行
 canonical 序列——治理 unittest 套件（`openspec/tests/governance/`，`python3 -m unittest
-discover -s openspec/tests/governance -q`）、聚合 closeout gate、doc hygiene、setup-uv +
-harness `make smoke`（fixture 梯集成 lane）、harness `make verify`、harness `make lint`
-（ruff，2026-10-10 起 promote-lint-to-ci 升入序列）；任何非零退出即失败。声明由
+discover -s openspec/tests/governance -q`）、聚合 closeout gate、doc hygiene、harness
+`make verify`（UV_OFFLINE=1）、setup-uv + harness `make smoke`（fixture 梯集成 lane）、
+harness `make lint`（ruff，2026-10-10 起 promote-lint-to-ci 升入序列）；任何非零退出即失败。声明由
 `check_ci_governance.py` 机器校验。**契约双端触发**是本形态的
 结构事实：单 job 全序列使任一受治理面（应用面 / 框架绑定面 / spec / 治理自身）
 变更都跑完整序列，无需路径分流——这是主仓"契约两侧任一变更都触发回放门禁"
@@ -73,7 +73,9 @@ harness `make smoke`（fixture 梯集成 lane）、harness `make verify`、harne
 
 `openspec/governance/check_project_gate.py`（标准库、零外部依赖、在 repo 根运行）
 只编排并聚合上述六个 component checker 的退出码，不拥有规则语义、
-不复刻任何解析。命令：
+不复刻任何解析。（别名对齐：config.yaml 称 root governance gate、归档惯例称
+closeout gate，皆指本脚本；CI workflow 的 "Governance Gate" 是另含 harness
+lane 的超集序列。）命令：
 
 ```bash
 python3 openspec/governance/check_project_gate.py --phase plan --change <name>
@@ -87,7 +89,8 @@ python3 openspec/governance/check_project_gate.py --phase closeout
   `reservation: <id> (capability)`——reservation 只是只读占号提示，非权威、不写文件；
   正式登记 registry 由 apply 任务完成。
 - `--phase closeout`：运行六个 component checker 并聚合退出码；任一非零即整体非零，
-  并点名失败的 checker。归档 agent workflow 在非零时停止；这是仓内 workflow 的
+  并点名失败的 checker（proof-receipts 组件无 attestation 时休眠通过，见上表）。
+  归档 agent workflow 在非零时停止；这是仓内 workflow 的
   确定性门禁，不阻断、不改变直接调用 native `openspec archive`。
 
 正常校验路径 `0` = PASS，`1` = 有违规。注意：stderr 也可能包含 non-failing warning

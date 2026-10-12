@@ -16,11 +16,12 @@ Technical evidence selection can be agent-led when the behavior is already confi
 
 ## 1. Partition the behavior
 
-Classify every behavior that matters to the user with this repo's seam vocabulary (root
-change-guidance, Change Focus): **deterministic-guardrail** (parsing, state, business rules,
-gates — repeatable code behavior), **cognitive-program** (extraction, generation, judgment,
-dialogue — model-dependent output), **wiring** (harness slots, registration, data flow,
-assembly), or **human-decision** (taste, business value, risk). Do not use one end-to-end demo
+Classify every behavior that matters to the user with this repo's seam vocabulary —
+definitions' owner: [local composition](../../openspec/change-guidance/local/deep-research.md)
+（Context And Seams；与 Change Focus 的 Seam classification 同一封闭词表）:
+**deterministic-guardrail** (repeatable code behavior), **cognitive-program**
+(model-dependent output), **wiring** (composition, registration, data flow), or
+**human-decision** (taste, business value, risk). Do not use one end-to-end demo
 as proof for all classes. A plan may have no cognitive surface; do not create an eval just
 because this is an agent product.
 

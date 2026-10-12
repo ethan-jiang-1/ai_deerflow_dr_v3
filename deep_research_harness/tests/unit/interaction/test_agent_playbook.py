@@ -12,13 +12,13 @@ HARNESS = Path(__file__).resolve().parents[3]
 COMMANDS = HARNESS / "COMMANDS.md"
 PLAYBOOK = HARNESS / "docs" / "playbook"
 
-SIX_VERBS = ("create", "status", "watch", "cancel", "refine", "inspect")
+CLOSED_VERBS = ("create", "status", "watch", "cancel", "refine", "inspect", "diagnose")
 
 
 class MenuCoversTheClosedSurfaceTest(unittest.TestCase):
     def test_every_cli_verb_appears_in_the_menu(self) -> None:
         text = COMMANDS.read_text(encoding="utf-8")
-        for verb in SIX_VERBS:
+        for verb in CLOSED_VERBS:
             self.assertIn(f"cli.py {verb}", text, f"menu omits cli verb: {verb}")
 
     def test_every_make_target_appears_in_the_menu(self) -> None:
@@ -58,7 +58,7 @@ class PlaybookContentDisciplineTest(unittest.TestCase):
     def test_playbook_commands_reference_the_menu_not_duplicates(self) -> None:
         text = (PLAYBOOK / "run-research.md").read_text(encoding="utf-8")
         self.assertIn("../../COMMANDS.md", text)
-        for verb in SIX_VERBS:
+        for verb in CLOSED_VERBS:
             self.assertIn(verb, text, f"playbook never exercises verb: {verb}")
 
 

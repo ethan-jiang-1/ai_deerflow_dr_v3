@@ -16,7 +16,8 @@ status 发现 active 但 owner 已死：转 failed-resume
 ```
 
 - 路径合同：`runs/d_YYYYMMDD/<bundle-id>/`（日期桶按 **UTC** 分组——本地时区晚间
-  创建的 run 会落在"昨天"的桶里，找新 bundle 用 mtime 或 status 的 thread id），
+  创建的 run 会落在"昨天"的桶里；找新 bundle 用 create 输出的 id，丢失时按 mtime
+  找 `runs/d_*/` 最新目录），
   根是**仓库根的 `runs/`**（应用子树
   之外，`deep_research_harness/` 内不存运行数据）；`runs/` 被 gitignore，不提交。
   环境变量 `DEEP_RESEARCH_RUNS_ROOT` 可重定向根（测试/工具/非默认 checkout）。
@@ -85,12 +86,15 @@ state.json（thread_id、composition、pin、终态）
 
 ## 观察命令的分工
 
+> 动词语义与七动词全表的唯一持有处在[控制地图 §5](control-map.md)；本表只保留 Bundle
+> 数据视角的补充（看什么 / 不看什么）。
+
 | 命令 | 看什么 | 不看什么 |
 | --- | --- | --- |
 | `status` | state 摘要、近期 journal、owner PID 存活 | 不重放事件 |
 | `watch` | journal 投影直播，terminal 退出 | 不驱动研究 |
 | `inspect` | journal 时间线、已接纳产物统计、装配快照 | 是投影，不补出缺失内容 |
-| `diagnose` | 终态分类（七类互斥）、断点环节、证据文件指针 | 只读投影，不改任何工件；分类不是生命周期权威 |
+| `diagnose` | 终态分类（封闭十类：七失败类 + delivered/running/ambiguous；权威 = `DIAGNOSIS_CLASSES`）、断点环节、证据文件指针 | 只读投影，不改任何工件；分类不是生命周期权威 |
 
 命令语义权威：[COMMANDS](../COMMANDS.md)；操作旅程：[playbook](playbook/run-research.md)。
 测试：Bundle 落盘 → [test_bundle_runtime](../tests/unit/runtime/test_bundle_runtime.py)；

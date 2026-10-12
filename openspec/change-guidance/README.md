@@ -13,13 +13,17 @@ application does not link back to this development framework.
 
 ## Policy Route
 
-| Trigger | Canonical policy | Owner |
-| --- | --- | --- |
-| State, recovery, human decision, outcome, or control placement | rules in `workflow-control.md` | [workflow-control](profiles/workflow-control/workflow-control.md) |
-| LLM role, tool posture, candidate admission, repair, or classification | rules in `node-agent.md` | [node-agent](profiles/node-agent/node-agent.md) |
-| DeerFlow public interface, gitlink, or upstream compatibility | rules in `deerflow-downstream.md` | [deerflow-downstream](profiles/deerflow-downstream/deerflow-downstream.md) |
-| Local module/seam, Program, operation, or information-map rule | rules in `deep-research.md` | [local composition](local/deep-research.md) |
-| Fact owner versus projection and change admission | rules in `change-practice.md` | [core](core/change-practice.md) |
+| Trigger | Canonical policy | Canonical policy names | Owner |
+| --- | --- | --- | --- |
+| State, recovery, human decision, outcome, or control placement | rules in `workflow-control.md` | participant-outcomes, human-interaction-integrity, control-and-recovery, workflow-outcome-review, control-placement | [workflow-control](profiles/workflow-control/workflow-control.md) |
+| LLM role, tool posture, candidate admission, repair, or classification | rules in `node-agent.md` | node-agent-workflow-integrity | [node-agent](profiles/node-agent/node-agent.md) |
+| DeerFlow public interface, gitlink, or upstream compatibility | rules in `deerflow-downstream.md` | deerflow-downstream-boundary | [deerflow-downstream](profiles/deerflow-downstream/deerflow-downstream.md) |
+| Local module/seam, Program, operation, or information-map rule | rules in `deep-research.md` | local-context, agent-information-map | [local composition](local/deep-research.md) |
+| Fact owner versus projection and change admission | rules in `change-practice.md` | change-admission, authority-and-projections | [core](core/change-practice.md) |
+
+Trigger cells are summaries; the full trigger vocabulary lives in each canonical
+document's header `trigger` line. The names column is the complete machine-checked
+vocabulary a Focus Card may select.
 
 Canonical documents: [core/change-practice.md](core/change-practice.md),
 [profiles/workflow-control/workflow-control.md](profiles/workflow-control/workflow-control.md),

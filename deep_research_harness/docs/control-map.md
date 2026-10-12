@@ -128,7 +128,7 @@ OpenSpec 开发工作区（规范、准入与治理 checker）、`_backlog/`（�
 | `cancel` | **只记录**取消请求 | 由运行泵在下个检查点协作终止 |
 | `refine` | 创建下一代并**前台跑完该代**（消息 = 该代方向文档，梯 = bundle 自声明延续） | 不是后台提交；耗时与 create 同级 |
 | `inspect` | journal 时间线、已接纳产物、装配快照 | 是诊断投影，不是第二事实源 |
-| `diagnose` | 终态分类（七类互斥）+ 断点环节 + 证据文件指针 | 只读投影，不改任何 Bundle 工件；不是生命周期权威 |
+| `diagnose` | 终态分类（封闭十类：七失败类 + delivered/running/ambiguous；集合权威 = [diagnosis](../src/deerflow_deep_research/domain/diagnosis.py) 的 `DIAGNOSIS_CLASSES`）+ 断点环节 + 证据文件指针 | 只读投影，不改任何 Bundle 工件；不是生命周期权威 |
 
 ## 6. 配置两梯
 

@@ -66,7 +66,11 @@ reader roles and line budgets here, while current facts and behavior remain in o
 
 ## Line Budgets
 
-The checker uses line count as an attention signal, not a word-count quota.
+`check_change_guidance.py` uses line count as an attention signal, not a word-count
+quota, for the five surfaces below. The resident-injection layer is separately
+char-budgeted by `check_doc_hygiene.py`'s `DOC_BUDGETS` ratchet (the
+`AGENTS.md`/`CLAUDE.md` doorplates and `openspec/config.yaml`) — two tracks over
+overlapping files, both effectively shrink-only.
 
 | Surface | Warning | Hard failure |
 | --- | ---: | ---: |
@@ -74,3 +78,4 @@ The checker uses line count as an attention signal, not a word-count quota.
 | `deep_research_harness/CLAUDE.md` | 10 lines | more than 12 lines |
 | `openspec/config.yaml` | 140 lines | more than 180 lines |
 | `openspec/product/README.md` | 60 lines | more than 80 lines |
+| `deep_research_harness/README.md` | 200 lines | warn-only |

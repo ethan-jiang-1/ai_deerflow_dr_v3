@@ -2,7 +2,7 @@
 
 > 人与 agent 的入口菜单：这里只回答「能处理多少事情」，不写过程——每个需要过程的
 > 条目给出指向 playbook 的路由，细节一律在路由目标里。动词语义与封闭命令集的 owner
-> 是 entry-surface 能力；治理门禁属于仓库根治理目录。
+> 是 `entry-surface` 能力（同名 spec 在仓库根 OpenSpec 层）；治理门禁属于仓库根治理目录。
 
 ## 研究 run（`cd deep_research_harness`）
 
@@ -13,7 +13,7 @@ python3 cli.py watch <bundle_id>    # journal 投影，终态即退出
 python3 cli.py status <bundle_id>   # 状态 + journal 摘要 + owner PID 活性
 python3 cli.py cancel <bundle_id>   # 记录取消请求（泵协作终止）
 python3 cli.py refine <bundle_id> "方向文本"   # 创建 generation+1 并前台跑完该代（延续 composition 梯）
-python3 cli.py inspect <bundle_id>  # journal 时间线 + 已采证据 + 装配快照
+python3 cli.py inspect <bundle_id>  # journal 时间线 + 已接纳产物（admitted evidence）+ 装配快照
 python3 cli.py diagnose <bundle_id> # 终态分类诊断（只读投影）：类别 + 断点环节 + 证据文件
 ```
 

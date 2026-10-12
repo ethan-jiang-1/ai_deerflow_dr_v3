@@ -66,7 +66,16 @@ unique rationale, alternative, consequence, and verification gap from the record
 replaces. Archived records are frozen snapshots — cite them as history, never as
 current authority.
 
+This section is the process-layer home of the Alternatives and supersession rule;
+`openspec/config.yaml` restates it for the machine-checked authoring path — reconcile
+edits here first.
+
 ## Delivery Evidence
+
+A change's `tasks.md` carries two standing sections the gate checks structurally:
+`## Deviation Register` (each entry with its ruling basis and landing place, or
+`none: <rationale>` explicitly) and `## Delivery Record` with the four field
+labels 外部行为 / 影响面 / 实际跑了什么 / 未执行的检查.
 
 Evidence is only as good as its freshness: once the line, file, or surface changes,
 earlier evidence is stale and proves nothing about the version being delivered.

@@ -14,7 +14,8 @@ proves and does not prove.
 This method owns no evidence of its own; the owners are
 [testing-and-evaluation](../../deep_research_harness/docs/testing-and-evaluation.md)（车道
 表 + 各 lane 的"不证明什么"列）and
-[test-evidence-policy](../../openspec/governance/test-evidence-policy.md). Rules:
+[test-evidence-policy](../../openspec/governance/test-evidence-policy.md). Rules 3–5
+restate root `AGENTS.md` invariants 2–3; those invariants own the wording:
 
 1. **Start at the cheapest lane that can fail.** Offline unit/contract mirror → assembly
    smoke → real-ladder observation (explicit opt-in) → cold-start release. One lane passing

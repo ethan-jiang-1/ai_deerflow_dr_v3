@@ -30,12 +30,17 @@
    python3 cli.py status <bundle_id>
    python3 cli.py watch <bundle_id>        # 终态 run：渲染历史后退出
    python3 cli.py inspect <bundle_id>
+   python3 cli.py diagnose <bundle_id>     # 终态分类诊断（只读投影；按需）
    python3 cli.py refine <bundle_id> "补充方向"   # 创建 generation+1 并前台跑完该代（按需）
    python3 cli.py cancel <bundle_id>       # 协作终止（按需）
    ```
 
    完成判据：exit 0；status 打印状态与 journal 摘要；watch 对已终态 run 渲染历史后
-   退出；inspect 打印 journal 时间线与已采证据计数；refine 创建新 generation 并当场跑完该代，落到类型化终态。
+   退出；inspect 打印 journal 时间线与已接纳产物（admitted evidence）计数；diagnose
+   打印终态分类与断点环节（只读）；refine 创建新 generation 并当场跑完该代，落到类型化终态。
+
+   产物落点：报告在 bundle 的 `final/report-genN.md`、证据在 `evidence/`、搜索记录在
+   `diagnostics/searches/`（artifact 权属表见 [Run Bundle 地图](../run-bundle.md)）。
 
 4. **交回回执**：命令 + 退出码 + 终态行。只报本会话实际执行过的 run——没跑过的命令
    不得当作结果报告。
@@ -106,6 +111,11 @@ make create PROBLEM="发布面冷启动证明"
 
 ### 最近回执
 
+- 2026-10-12（fresh-agent 清扫第二轮·文档面收口）：`UV_OFFLINE=1 make verify` exit 0（251
+  tests）· `make lint` exit 0 · 治理 8 checker 全 0 · 治理 unittest 套件全绿 · `make smoke`
+  本会话 UNVERIFIED（沙箱对 venv 解释器进程 SIGKILL，exit 137，非代码原因；上一全绿回执
+  2026-10-10 在案，本轮改动未触及集成 lane 覆盖的产品行为——文档、两处单测守卫注释面与
+  yaml 注释）。
 - 2026-10-10（fresh-agent 全库清扫轮收口）：`UV_OFFLINE=1 make verify` exit 0（251 tests,
   1.1s）· `make smoke` exit 0（30 tests, 23.5s；smoke/record 直连 client 已 pin，
   `deep_research_harness/.deer-flow` 删除后不再再生——pin-framework-home-secondary-callers

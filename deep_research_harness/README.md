@@ -18,7 +18,7 @@ cli.py（稳定启动入口）
 链条的组合关系由 [锁链契约测试](tests/contract/test_entry_chain.py) 机械锁定（离线、
 AST 级、零产品 import）：任何一环被替换、绕过或改名漏切，`make verify` 即红。
 
-交互上下文（TTY 或 `DEEP_RESEARCH_INTERACTIVE=1`）中 `create` 先经**计划确认闸门**（agent 交计划 → 操作者确认/修订/跳过 → 注入续跑，确认计划物化于 `request/plan-gen1.md`）；模型判断含糊时可先反问（答案原样续跑）。状态、checkpoint、journal 和已接纳产物持久保存在各自 Bundle 中，没有额外的集中式运行状态库。删除一个 Bundle 会永久失去该运行，其余运行仍可使用。`completed` 还需结合准入结果和报告文件判断产物是否交付；validator 检查产物合同，不验证研究事实质量。
+交互上下文（TTY 或 `DEEP_RESEARCH_INTERACTIVE=1`）中 `create` 先经**计划确认闸门**（agent 交计划 → 操作者确认/修订/跳过/放弃 四路，headless 上下文自动确认；确认计划物化于 `request/plan-gen1.md`）；模型判断含糊时可先反问（答案原样续跑）。状态、checkpoint、journal 和已接纳产物持久保存在各自 Bundle 中，没有额外的集中式运行状态库。删除一个 Bundle 会永久失去该运行，其余运行仍可使用。交付判断查 state 的 `delivery` 行（admitted/rejected/no-answer；未记录时以 journal disposition + `final/` 文件 belt 判断，协议见 [run-bundle](docs/run-bundle.md)）；validator 检查产物合同，不验证研究事实质量。
 
 ## Reading Map
 
@@ -52,7 +52,9 @@ python3 cli.py inspect <bundle_id>        # 时间线、已采证据、装配快
 
 `cancel` 只记录取消请求，由运行泵协作终止。`refine` 创建下一代并**前台跑完该代**（方向文本即该代方向文档）。完整命令见 [COMMANDS](COMMANDS.md)，操作旅程见 [playbook](docs/playbook/run-research.md)。
 
-框架运行态（memory 库、skill 投影、用户数据）由 binding 钉在仓库根 `.deer-flow/`（gitignored，应用子树外）：create/refine 前台路径与 smoke/record 的直连 client 都已 pin（AST contract 锁在 [test_framework_home](tests/contract/test_framework_home.py)，pin 后于 build_client）。fixture 配置加载 [runtime scripted providers](src/deerflow_deep_research/runtime/scripted/__init__.py)，base 记录 `all_real`，fixture 记录 `fixture`；`mixed` 是尚未接线的枚举。provider 代码随当前 Python package 打包，wheel 仍不包含完整 CLI/config/兄弟布局，发布面是源码 checkout + 锁定 submodule。
+框架运行态（memory 库、skill 投影、用户数据）由 binding 钉在仓库根 `.deer-flow/`（gitignored，应用子树外）：create/refine 前台路径与 smoke/record 的直连 client 都已 pin（AST contract 锁在 [test_framework_home](tests/contract/test_framework_home.py)，pin 后于 build_client）。
+
+fixture 配置加载 [runtime scripted providers](src/deerflow_deep_research/runtime/scripted/__init__.py)，base 记录 `all_real`，fixture 记录 `fixture`；`mixed` 是尚未接线的枚举。发布面是源码 checkout + 锁定 submodule（wheel 不含完整 CLI/config/兄弟布局；发布形态与未实现清单见[控制地图](docs/control-map.md) §9）。
 
 ## 改一处，先证明哪一层
 

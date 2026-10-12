@@ -3,6 +3,8 @@
 > 找测试文件、接口、样本来源与最小红绿命令，先读 [测试资产地图](../tests/README.md)。本文是车道策略参考。
 >
 > 车道纪律参照已消化的测试战略分析；本文不以测试数或目录位置代替行为证据。
+> 车道语义的 owning spec：`test-evidence`；authority 声明在仓库根治理目录的
+> test-evidence-policy.md。
 
 ## 一句话策略
 

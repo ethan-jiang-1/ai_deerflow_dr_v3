@@ -17,13 +17,16 @@
 
 一笔变更从意图到归位按序六步；本页只路由，正文留在各 owner：
 
-1. **意图** — 分析与设计推敲进 [_backlog 账本](../_backlog/README.md)；「决策/方案」
-   与「落地关联」填实即毕业（能写出一张 [Change Focus](change-guidance/core/change-practice.md)）。
+1. **意图** — 分析与设计推敲进 [_backlog 账本](../_backlog/README.md)；「方案与取舍」
+   与「落地关联」填实即毕业（能写出一张 [Change Focus](config.yaml)——字段语法在其
+   Start A Local Change 一节）。
 2. **权威归属** — 按 [Policy Route](change-guidance/README.md) 选齐触发的 canonical
    policy；应用面 owner 看 [app 指南 Information Map](../deep_research_harness/AGENTS.md)；
    精确路径只认 project-structure manifest。
-3. **slice 交付** — propose 停在拍板边界（规范语义由人裁决）；红绿测试先行；
-   实现与文档随 owning slice 同落。
+3. **slice 交付** — propose 停在拍板边界（规范语义由人裁决；规划工件骨架用 openspec
+   CLI 生成，`.agents/skills/` 有等价技能）；工件落好后先过
+   `python3 openspec/governance/check_project_gate.py --phase plan --change <名>`
+   （只读 admission 检查，退出码直测）；红绿测试先行；实现与文档随 owning slice 同落。
 4. **证据分层** — 按问题选最小车道，别从最贵的证据起步；见下节"四件不同的事"。
 5. **验证形态** — `make verify`（应用单元门禁）/ `make smoke`（集成，需 `uv sync`）/
    [治理 checker 序列](governance/README.md)；退出码一律直测——管道会吞掉真实结果。

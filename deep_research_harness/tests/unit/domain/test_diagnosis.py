@@ -1,4 +1,5 @@
-"""Diagnosis classifier contract: seven terminal classes, mutually exclusive.
+"""Diagnosis classifier contract: ten terminal classes (seven failure classes plus
+delivered/running/ambiguous), mutually exclusive.
 
 @impl DIAG-001"""
 

@@ -10,7 +10,7 @@
 | [`run-bundle.md`](run-bundle.md) | ✅ Run Bundle 持久化合同与 artifact 权属表 |
 | [`research-process.md`](research-process.md) | ✅ Deep Research skill、lead agent、绑定与运行证据入口 |
 | [研究 SOP 本地入口](skills/deep-research/README.md) | ✅ 中文阅读路由、完整 skill 快照、来源与未来调整边界 |
-| [`local-operations.md`](local-operations.md) | ✅ 本地命令与环境的坑 |
+| [`local-operations.md`](local-operations.md) | ✅ 本地环境注意点（坑清单唯一持有处在 playbook） |
 | [操作旅程 playbook](playbook/run-research.md) | ✅ 跑研究的步骤、完成判据与坑（COMMANDS 的路由目标） |
 | [`../tests/README.md`](../tests/README.md) | ✅ 测试资产、接口、样本来源、放置规则与最小红绿路径 |
 | [`testing-and-evaluation.md`](testing-and-evaluation.md) | ✅ lane 划分、替身阶梯与最小车道选择 |
@@ -34,6 +34,7 @@
 | 新增/删除测试或改变收集方式 | [测试资产地图](../tests/README.md)、车道声明与实际 runner 一致；collection guard 同步 |
 | 新录制/更新 fixture | 消费者、来源、配置/pin/revision、敏感数据审查与局限（fixtures README） |
 | 发布形态改变 | 控制地图、[命令菜单](../COMMANDS.md)/playbook；以新鲜执行回执为准 |
+| 封闭集合（诊断类 / 终态 / composition 枚举）或动词一行的语义变化 | [控制地图](control-map.md) §5、[Run Bundle 地图](run-bundle.md) 观察表、[测试资产地图](../tests/README.md) 对应行——计数与措辞同轮对齐代码权威（如 `DIAGNOSIS_CLASSES`、cli 动词注释） |
 | 新增文档 | 本索引、治理 required-paths、doc scope；入口预算不因堆细节上调 |
 
 产品方向缺口（skill 强制、服务化、真实质量评估）均已由 Phase 5 裁决挂号
