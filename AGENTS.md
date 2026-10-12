@@ -46,9 +46,7 @@
 ## 运行
 
 ```bash
-cd deep_research_harness
-make install              # 有意 no-op（运行依赖由 uv sync 准备）
-make verify               # 单元门禁：stdlib unittest，任一失败非零退出
+cd deep_research_harness && make verify   # 单元门禁；命令菜单唯一入口：COMMANDS.md
 ```
 
 ## 边界铁律

@@ -1,9 +1,7 @@
 # _backlog — 问题与缺陷账本（issues / bugs）
 
-> 最后更新: 2026-10-12（同日第二轮·fresh-agent 清扫：bug 轨补「等人拍板」出场行、`待修` 出场值
-> 户口注、铁律范围化例外升命名节、授权例外单源化（清单只住第 3 步）、门禁措辞对齐（成熟度）、
-> 指针修复（triggers / specs / _digest）、历史迁出与去重（判出登记迁 triggers 头部、身份/翻案
-> 压缩、触发器与 pipeline 细则单源化、方法表瘦身、门牌摘录面声明）；前史 2026-10-12 make-backlog-process-explicit：「一张 bug 怎么走」缺陷修复流成节 + 铁律
+> 最后更新: 2026-10-12（同日第二轮·fresh-agent 清扫：状态机补全与户口注、授权例外单源化、
+> 门禁措辞对齐、历史迁出去重、指针修复——产物清单见同日提交 7e98fd2 与各节；前史 2026-10-12 make-backlog-process-explicit：「一张 bug 怎么走」缺陷修复流成节 + 铁律
 > 范围化例外 + 状态翻转法则两轨成表 + bug 词表扩集更名（`活跃`→`调查中`，+`修就绪`/`已落修`/
 > `等人拍板`）+ bug 模板「修好判据」节 + agent 门牌 [`AGENTS.md`](AGENTS.md)；再前史 2026-10-09
 > adopt-issue-ledger-governance：plans 退役 issues 立正、`_done/`→`_archived/`、四态表/户口/

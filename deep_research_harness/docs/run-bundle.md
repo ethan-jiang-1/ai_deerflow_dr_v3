@@ -86,15 +86,11 @@ state.json（thread_id、composition、pin、终态）
 
 ## 观察命令的分工
 
-> 动词语义与七动词全表的唯一持有处在[控制地图 §5](control-map.md)；本表只保留 Bundle
-> 数据视角的补充（看什么 / 不看什么）。
-
-| 命令 | 看什么 | 不看什么 |
-| --- | --- | --- |
-| `status` | state 摘要、近期 journal、owner PID 存活 | 不重放事件 |
-| `watch` | journal 投影直播，terminal 退出 | 不驱动研究 |
-| `inspect` | journal 时间线、已接纳产物统计、装配快照 | 是投影，不补出缺失内容 |
-| `diagnose` | 终态分类（封闭十类：七失败类 + delivered/running/ambiguous；权威 = `DIAGNOSIS_CLASSES`）、断点环节、证据文件指针 | 只读投影，不改任何工件；分类不是生命周期权威 |
+观察动词的唯一语义持有处是[控制地图 §5](control-map.md)（七动词全表）。从 Bundle 数据
+视角看：`status` 读 state 摘要与 `delivery` 行（含 owner PID 存活）；`watch` / `inspect`
+投影 journal——`inspect` 另含已接纳产物统计与装配快照；`diagnose` 给终态分类（封闭十类，
+权威 = `DIAGNOSIS_CLASSES`）+ 断点环节 + 证据文件指针。它们都是投影：不重放事件、
+不驱动研究、不补出缺失内容、不改任何工件。
 
 命令语义权威：[COMMANDS](../COMMANDS.md)；操作旅程：[playbook](playbook/run-research.md)。
 测试：Bundle 落盘 → [test_bundle_runtime](../tests/unit/runtime/test_bundle_runtime.py)；

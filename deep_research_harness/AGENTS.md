@@ -52,16 +52,6 @@ diverge; this file wins here.
    ledger, gate, and other owners that admit legal effects and choose observable
    behavior.
 
-## Where These Decisions Live
-
-| Question | Application-owned first read |
-| --- | --- |
-| What may a bounded cognitive role think about and return? | The owning contract in `src/deerflow_deep_research/agents/`（空层；契约随 owning code 落地） |
-| What proves composition/admission? | The closest unit/contract test for that owner |
-| Who admits state, routes, and effects? | The `engine/` and `runtime/` owners behind it |
-
-Bounded-role contracts land with owning code; this table invents no paths.
-
 ## Non-Model Work
 
 For deterministic, human-decision, or wiring work without a causal model-bearing

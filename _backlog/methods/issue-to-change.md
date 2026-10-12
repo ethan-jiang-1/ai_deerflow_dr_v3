@@ -22,20 +22,15 @@ is approved, implemented or complete.
 
 ## 1. Prepare the materials
 
-Use the [backlog closure criteria](../README.md) (four-way table). State the applicable
-conclusion:
+State the applicable conclusion with the per-state material list owned by
+[requirements-synthesis](requirements-synthesis.md) §3（四态枚举的 methods 层唯一持有处；
+canonical 表是 [backlog closure criteria](../README.md)）. Two handoff-specific deltas:
 
-- **Do it:** the observable problem, intended result, scope and exclusions, chosen approach,
-  actual alternatives and their costs, and executable acceptance criteria. If completion
-  cannot be judged, return to [acceptance design](validation-design.md).
-- **Do it later:** why it is deferred, the condition for reconsidering it, and where that
-  condition can be observed. A qualifying condition may add one row to
-  [triggers.md](../triggers.md) under its admit bar. Leave future design unresolved when it is
-  unnecessary for this decision.
-- **Do not do it:** why, and the scope in which that reason applies.
-- **An existing conclusion already answers it:** link the existing decision (settled card,
-  spec, trigger row) and explain which question it settles. If no further processing is
-  needed, the card can close under the backlog rules without a downstream request.
+- For a **do-it** conclusion, assemble scope, alternatives and executable acceptance
+  criteria; if completion cannot be judged, return to [acceptance
+  design](validation-design.md).
+- For **an existing conclusion** that needs no further processing, the card can close
+  under the backlog rules without a downstream request.
 
 Separate confirmed facts from recommendations. A human choice that is still pending keeps the
 dependent conclusion open (`状态: 等人拍板`); record the exact question and next step.
