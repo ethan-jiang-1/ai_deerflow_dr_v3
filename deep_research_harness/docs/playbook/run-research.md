@@ -111,6 +111,10 @@ make create PROBLEM="发布面冷启动证明"
 
 ### 最近回执
 
+- 2026-10-12（7e98fd2 远端观测补录）：Governance Gate run 38188533604 全步骤绿（57s）——
+  治理 unittest 套件 · aggregate closeout gate · doc hygiene · harness verify ·
+  harness smoke（fixture lane，零凭证）· harness lint；上一行本地 UNVERIFIED 的 smoke
+  由远端 runner 闭合（SIGKILL 限制仅限本地沙箱会话）。
 - 2026-10-12（fresh-agent 清扫第二轮·文档面收口）：`UV_OFFLINE=1 make verify` exit 0（251
   tests）· `make lint` exit 0 · 治理 8 checker 全 0 · 治理 unittest 套件全绿 · `make smoke`
   本会话 UNVERIFIED（沙箱对 venv 解释器进程 SIGKILL，exit 137，非代码原因；上一全绿回执
