@@ -13,7 +13,7 @@
 - [x] 2.1 Map the 31 tests in `test_run_engine.py` onto four behaviour families (pump baseline, clarification, plan gate, terminal) and record the mapping in the change's delivery record; verify the mapping covers all 31 tests exactly once  ✓ 映射表 31 条见 Delivery Record；四个族各 6/8/7/10 个，合计 31，无重复无遗漏。
 - [x] 2.2 Create `test_pump.py` (the public entry and terminal baseline), `test_pump_clarification.py`, `test_pump_plan_gate.py` and `test_pump_terminal.py`, moving each test body verbatim and importing the shared fixtures; verify each new file runs green on its own  ✓ 四个文件 + 共享 pump_case.py；30/31 个测试体与原文逐字相同，唯一差异见偏差 2。
 - [x] 2.3 Delete the old `test_run_engine.py`; verify `make verify` exits 0 with the same case count and that the only ID differences are the four-way rename covered by the mapping table  ✓ 静态 AST 对账成立（baseline 281 → now 282；missing 43 = 12+31；added 44 = 12+31+1）。**方法学修正见 Delivery Record**：原 -v 文本基线有损（242/251）。
-- [ ] 2.4 Verify the id reconciliation explicitly: diff the post-change ID set against `/tmp/phase5-before/verify-test-ids.txt`, confirm every difference is a rename listed in the mapping, and record the command and its output
+- [x] 2.4 Verify the id reconciliation explicitly — **归档后修正**：本项此前因我的标记清单遗漏而未勾（并非判断为不做）。其实质已由更严格的方法完成：字面要求「对 `/tmp/phase5-before/verify-test-ids.txt` 做 diff」，而那份 -v 文本基线被证明有损（242 条 vs 当时 `Ran 251`，见偏差 3）；实际对账改用**静态 AST 枚举 + `git worktree` 检出 897daa0 取完整基线**，命令与输出见 Delivery Record。每处差异都对应映射表里的一条改名，未解释差异为零。
 
 ## 3. Rename to match the subject and prove the guard can fail
 
@@ -33,6 +33,27 @@
 
 - **外部行为**: 产品零行为变化——`git diff --stat origin/master..HEAD -- deep_research_harness/src/` 输出为空，本 change 改动面只落在 `tests/`、登记与文档 · `make verify` exit 0（Ran 252 = 基线 251 + 第 12 轮的 guard 控制）· `make smoke` exit 0（Ran 30）· ruff lint exit 0 · 架构 checker / 体积闸 / doc-hygiene / closeout gate 全 0。
 - **影响面**: 新增 `tests/support.py`（五类共享夹具）· `test_run_engine.py`（674 行 / 31 测试 / 1 类）拆为 `pump_case.py` + 四个按行为族命名的文件 · `test_entry_composition.py` → `test_assembly.py` · `test_collection_guard.py` 补已知违规负例 · `required-paths.toml`（登记 `tests/support.py`；runtime 测试只有目录级条目，无需逐文件增删）· 文档四处同步（`tests/README.md`、`docs/control-map.md`、`docs/research-process.md`、`CONTEXT-MAP.md`）· `pyproject.toml` 增 `tests/**/*.py` 的 `E402`/`F401` 豁免（测试根按名导入夹具是 runner 既定形态）。
+- **ID 对账的可复现命令与输出**（2.4）: 基线用 `git worktree` 从阶段 5 之前的版本取，两棵树用**同一个** AST 收集器枚举 `test_` 方法（无损；`unittest -v` 的文本过滤会漏条，见偏差 3）:
+
+  ```
+  git worktree add --detach /tmp/base-tree 897daa0      # 阶段 5 之前的树
+  python3 collect_test_ids.py /tmp/base-tree/deep_research_harness > before.txt
+  python3 collect_test_ids.py deep_research_harness                > after.txt
+  # collect_test_ids.py: ast.parse 每个 tests/**/*.py，输出「模块.类.方法」（遍历全部嵌套类）
+  ```
+
+  输出（对账结果）:
+
+  ```
+  baseline 281 -> now 282
+    missing 43 = 文件改名 12（test_entry_composition -> test_assembly）+ 拆分 31
+    added   44 = 12 + 31 + 第 12 轮的 guard 控制 1
+    未解释的 missing: 无
+    未解释的 added  : 无
+  结论: 成立（零丢失、零重复、每处差异都有映射）
+  ```
+
+  逐条映射表（43 条 old -> new）在归档前的 `/tmp/phase5-before/rename-mapping.txt`；映射规则本身是机械的（同方法名、模块换族），可由上面的命令重放验证。
 - **实际跑了什么**: `make verify` exit 0（252）· `make smoke` exit 0（30）· `ruff check src tests tools cli.py` exit 0 · `check_project_architecture.py` exit 0（含**变红实测**：移走 `tests/support.py` → `ERROR [path.missing]` exit 1 → 恢复 exit 0）· `check_code_budgets.py` exit 0 · `check_doc_hygiene.py` exit 0 · `check_project_gate.py --phase plan/closeout` exit 0 · **guard 负例的变异检查**：去掉 planted 的 `integration/__init__.py` → 控制失败 exit 1 → 恢复 exit 0 · **ID 对账**：静态 AST 枚举（`git worktree` 检出 897daa0 取完整基线）baseline 281 → now 282，missing 43 = 文件改名 12 + 拆分 31，added 44 = 12 + 31 + guard 控制 1，**未解释差异为零** · **逐字搬移证明**：31 个测试体中 30 个与原文逐字相同，4 个共享方法全部逐字相同。
 - **未执行的检查**: 任务 1.4 的**其余文件接线未做**（见偏差 1）——重复夹具的数字没有下降 · 真实模型梯未跑（本 change 是测试资产重组，窄证据政策下不整跑）· `make smoke` 只覆盖脚本模型车道。
 
