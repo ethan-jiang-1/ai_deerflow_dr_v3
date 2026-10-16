@@ -40,6 +40,11 @@ class FileBudget:
 # Every number below is the measured value at adoption (establish-code-budgets,
 # 2026-10-16), i.e. the file exactly fills its budget: this gate starts green and
 # only ever gets tighter on its own.
+#
+# Measure AFTER the last edit to a file, never before. Adoption measured
+# check_ci_governance.py at 189 lines and then the same change added three
+# declaration lines to it (192) -- the gate caught exactly that drift on its own
+# first real run, which is the behaviour it exists for.
 # ---------------------------------------------------------------------------
 CODE_BUDGETS: dict[str, FileBudget] = {
     "check_doc_hygiene.py": FileBudget(max_lines=895, max_long_functions=1),
@@ -55,7 +60,7 @@ CODE_BUDGETS: dict[str, FileBudget] = {
     "check_proof_receipts.py": FileBudget(max_lines=232, max_long_functions=1),
     "change_guidance_check/constants.py": FileBudget(max_lines=197, max_long_functions=0),
     "project_architecture_check/inspect_tree.py": FileBudget(max_lines=191, max_long_functions=1),
-    "check_ci_governance.py": FileBudget(max_lines=189, max_long_functions=1),
+    "check_ci_governance.py": FileBudget(max_lines=192, max_long_functions=1),
 }
 
 

@@ -16,6 +16,7 @@
 | `check_harness_dependency_direction.py` | Harness 是否反向依赖 OpenSpec？验证回执（`verification-receipt.json`，结构识别：非空 `checks` 命令记录）是豁免证据，不是依赖 | 脚本 docstring（`@impl DEP-001`） |
 | `check_ci_governance.py` | CI 工作流与本地 hook 的声明是否漂移（触发器、路径过滤、pinned 工具链、canonical 命令、hook 命令集）？ | 脚本 docstring（`@impl CIG-001`） |
 | `check_doc_hygiene.py` | 文档层（ADR 索引↔目录、docs 层与测试/工具资产文档的相对链接与编码换行、docs 范围完整性、`_backlog` 的 `_` 目录约定与账本面一致性（名册互查 / 计数与 Next-ID / 户口与滞留检测）、入口层字符预算棘轮、陈旧叙事封闭清单、根 README 计数钉死——约十条机械规则）是否漂移？ | 脚本 docstring（standalone，非 gate 组件、非 `make verify` 目标；已进 CI canonical 序列；`@impl DOB-001`） |
+| `check_code_budgets.py` | 治理脚本自身的体积是否越界（声明式行数上限 + 超长函数个数上限；只降不升的棘轮；自带种植负例）？ | 脚本 docstring（standalone，非 gate 组件；已进 CI canonical 序列与 pre-commit；`@impl DOB-001`） |
 | `check_release_face.py` | 最小发布面是否完整（gitlink 在场且 pin 一致 / 兄弟布局与 `[tool.uv.sources]` 目标都在发布面内 / 随行源码零开发面耦合 / COMMANDS 路由目标存在）？ | 脚本 docstring（standalone，slow cold-start lane 见 playbook；`@impl RLF-001`） |
 | `check_proof_receipts.py` | 选中 change 的回执/证据是否在案（proof receipts）？ | 脚本 docstring（gate 组件：经 `--mode enforce` 调用，但仅当环境变量 `PROOF_ATTESTATION` 提供 attestation 时才实查，否则报 no selected change 并按 0 通过；回执 producer `make proof` 尚未建立，见 harness `proof-lanes.toml`） |
 | `selected-change-closeout.md` / `.py` | 选中 change 的 closeout 义务清单与执行？ | 文档+脚本（`@impl` 见文件头） |
@@ -72,6 +73,12 @@ harness `make lint`（ruff，2026-10-10 起 promote-lint-to-ci 升入序列）�
 9 条绿色控制），并由治理套件 `openspec/tests/governance/test_doc_hygiene.py`
 逐例跑成独立用例——`--self-test` 只是同一注册表的薄委托入口，命令、stdout 与
 退出码不变。
+代码体积另有独立 checker（同样不属于六 component 聚合）：
+`python3 openspec/governance/check_code_budgets.py`——声明式上限表只管治理脚本自身，
+上限取采纳时实测值、只降不升；超限点名文件、实测值、上限与违规函数，并自带
+`--self-test` 种植负例。它已进 CI 与 pre-commit（由 ci-governance 的声明表钉住）。
+共享基础设施住同目录顶层：`gitio.py`（统一的 git subprocess 调用）与 `roots.py`
+（统一的根解析规则）。
 
 ## Canonical aggregate gate
 

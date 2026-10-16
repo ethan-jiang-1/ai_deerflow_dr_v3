@@ -33,21 +33,24 @@
 
 ## 6. Wiring, registration and closeout evidence
 
-- [ ] 6.1 Wire the new gate into the acceptance path: add the checker step to `.github/workflows/governance.yml`, the same command line to `.githooks/pre-commit`, and synchronise `check_ci_governance.py`'s required-marker and allowed-hook-line declarations; verify `check_ci_governance.py` exits 0 and that removing the workflow step makes it red (then restore)
-- [ ] 6.2 Register the new paths in `openspec/governance/required-paths.toml` (checker, test, and the two shared modules) and add the checker row to `openspec/governance/README.md`; verify the architecture checker exits 0 and fails loudly when a registered module is briefly moved away
-- [ ] 6.3 Sync the capability count: update the root `README.md` status line from 13 to 14 capabilities; verify `check_doc_hygiene.py` exits 0 with the new count and would fail with the old one
-- [ ] 6.4 Prove the new gate can go red on the real tree: temporarily inflate one managed file past its ceiling, verify the checker exits non-zero naming that file and its measured value, then restore and verify exit 0
-- [ ] 6.5 Run the full gate set from the repository root (governance suite, both doc-hygiene modes, the new budget checker and its self-test, the closeout gate, the architecture checker, strict validation) and re-run the success-path and failure-path captures; verify every exit code is 0 read directly and that all captures are unchanged from `/tmp/dedup-before*/`
-- [ ] 6.6 Confirm the untouched surfaces: verify `git diff --stat` shows no changes under `deep_research_harness/` and that the `deerflow/` gitlink is untouched; record the result
-- [ ] 6.7 Fill this change's `## Delivery Record` with the four required labels and the raw receipt lines produced by the runner above
+- [x] 6.1 Wire the new gate into the acceptance path: add the checker step to `.github/workflows/governance.yml`, the same command line to `.githooks/pre-commit`, and synchronise `check_ci_governance.py`'s required-marker and allowed-hook-line declarations; verify `check_ci_governance.py` exits 0 and that removing the workflow step makes it red (then restore)
+- [x] 6.2 Register the new paths in `openspec/governance/required-paths.toml` (checker, test, and the two shared modules) and add the checker row to `openspec/governance/README.md`; verify the architecture checker exits 0 and fails loudly when a registered module is briefly moved away
+- [ ] 6.3 Sync the capability count **with the archive step** (the count rule enumerates main-spec directories under `openspec/specs/`; the new capability only lands there when the archive syncs the delta, so updating it earlier makes doc-hygiene red): update the root `README.md` status line from 13 to 14 capabilities; verify `check_doc_hygiene.py` exits 0 with the new count and that the old count then fails
+- [x] 6.4 Prove the new gate can go red on the real tree: temporarily inflate one managed file past its ceiling, verify the checker exits non-zero naming that file and its measured value, then restore and verify exit 0
+- [x] 6.5 Run the full gate set from the repository root (governance suite, both doc-hygiene modes, the new budget checker and its self-test, the closeout gate, the architecture checker, strict validation) and re-run the success-path and failure-path captures; verify every exit code is 0 read directly and that all captures are unchanged from `/tmp/dedup-before*/`
+- [x] 6.6 Confirm the untouched surfaces: verify `git diff --stat` shows no changes under `deep_research_harness/` and that the `deerflow/` gitlink is untouched; record the result
+- [x] 6.7 Fill this change's `## Delivery Record` with the four required labels and the raw receipt lines produced by the runner above
 
 ## Deviation Register
 
-- none: 本 change 的边界是"共享底层 + 清偿死码 + 新增体积闸"，三者都不改既有判定语义；若 apply 期间发现某处去重必须改变失败路径才能共享（例如两处包装的错误语义无法在不改行为的前提下共存），按 core 原则记入本表并写明裁决依据与落点，而不是在实现文件里静默决定。
+- 偏差 1（apply 于步骤 1.3 设计）：失败路径捕获器的输出含临时树绝对路径，随机临时目录会让两次捕获因无关原因不同。**落点**：捕获器改用固定路径 `/tmp/dedup-defect-tree/repo`（每次重建），并先自证"连跑两次逐字相同"才用作判据。
+- 偏差 2（apply 于步骤 5.1/6.4 抓到，计数口径）：体积表上限"取采纳时实测值"，但测量发生在同步接入面（6.1）**之前**，而 6.1 给 `check_ci_governance.py` 加了三行声明（189 → 192）——守卫首次真实运行就把这个漂移抓了出来。**裁决依据**：棘轮约束的是"文件变小后再涨回去"；此处文件在采纳测量后确实长过，上限应取最终实测值，否则守卫以一条假规则开场。**落点**：上限改为 192，并把"必须在文件最后一次编辑之后测量"写进表注释。**验证**：真实树 exit 0。
+- 偏差 3（apply 于步骤 6.3 发现，时序约束）：任务书要求"根 README 计数 13 → 14"，但 doc-hygiene 的计数规则枚举主干 `openspec/specs/` 目录——新 capability 现在只在 change 的 delta 里，**归档同步时**才成为主干；提前改会让 doc-hygiene 红（实测 `declared 14 ... computed 13`）。**落点**：计数改为与归档同批执行，任务行重写并标注约束；本记录如实记为"暂留 13"。
+- 偏差 4（apply 期过程记录）：`load_manifest` 三段式的拼接脚本两次出错——"前缀+尾部"拼接让旧函数桩与新函数体重叠，第二次还误删了新解析函数的体。**落点**：第三次改为单次块替换（精确取 `def load_manifest` 至文件末尾整块换掉）一次成功；教训写入提交信息。另有 `dataclass` 导入遗漏与两次自检夹具路径口径不一致，均由 `py_compile`、导入检查与自检当场抓红。
+- none: 除上述四项外无其他设计偏离。ci-governance 声明面与 `test_ci_governance` 夹具的同步属 proposal 已登记的相邻契约，不另记。
 
 ## Delivery Record
-
-- **外部行为**: 待 apply 填写（预期：六个既有 checker 的成功路径与失败路径 stdout/退出码逐字不变；治理套件用例数不减；新增体积闸按实测值全绿且能被证明会红）
-- **影响面**: 待 apply 填写（预期：新增 `gitio.py`/`roots.py`/`check_code_budgets.py`/其测试/`specs/code-budgets`；改 kernel 删死码、`manifest.py` 三段式、6 处 git 调用点、5 处根解析、workflow 一步、hook 一行、ci-governance 三处声明、required-paths、governance README、根 README 计数；无 harness 改动、无 spec 语义改动）
-- **实际跑了什么**: 待 apply 填写（runner 写下命令、退出码、revision）
-- **未执行的检查**: 待 apply 填写
+- **外部行为**: 六个既有 checker 的成功路径与失败路径 stdout/退出码**逐字不变**（各六条捕获，`diff` 全等）· 治理套件 145 → 157 用例且全绿 · **新增**一个体积闸：`check_code_budgets.py` 在真实树 exit 0、`--self-test` exit 0，且能被证明会红 · CI canonical 序列与 pre-commit 各增一步/一行（由 ci-governance 的声明面钉住）· 内核死码 99 行删除后无行为变化 · `load_manifest` 三段式后错误码与文本不变 · 根 README 能力计数暂留 13（新 capability 归档时才进主干，见 6.3）。
+- **影响面**: 新增 `check_code_budgets.py` 与其 12 项测试、`gitio.py`、`roots.py`、`specs/code-budgets/spec.md`（归档时成为主干）；改 6 处 git 调用点、5 处根解析点、`change_guidance_kernel.py`（214 → 107）、`project_architecture_check/manifest.py`（356 → 433，`load_manifest` 171 → 4）、`.github/workflows/governance.yml`、`.githooks/pre-commit`、`check_ci_governance.py`（三处声明）、`test_ci_governance.py` 夹具、`required-paths.toml`、`openspec/governance/README.md`；**harness 与 `deerflow/` gitlink 零改动**。
+- **实际跑了什么**: 六 checker 成功路径逐字 diff 全等、exit 全 0；六 checker 失败路径（固定路径树上各植一缺陷）逐字 diff 全等、exit 全 1 · 治理套件 exit 0（157 用例）· doc-hygiene plain 与 `--self-test` exit 0 · `check_code_budgets.py` plain 与 `--self-test` exit 0 · closeout gate exit 0 · `check_project_architecture.py` exit 0 · `check_ci_governance.py` exit 0 · `openspec validate establish-code-budgets --strict` exit 0 · 体积闸真实树变红实测：把 `check_project_gate.py` 撑到 267 行 → exit 1 且点名该文件与实测值 → 恢复 exit 0 · ci-governance 变红实测：移走 workflow 中的体积步 → exit 1 点名缺该 marker → 恢复 exit 0 · 登记变红实测：移走已登记的 `gitio.py` → 架构 checker exit 1 → 恢复 exit 0 · 三阶段种植缺陷各自失败且错误码正确 · `git diff --stat -- deep_research_harness/` 为空。
+- **未执行的检查**: 远端 CI Governance Gate 未跑（本地领先远端 6 个提交，待阶段 3 归档后一并推送复核）· `make smoke` 未跑（不触 harness 组合面）· 守卫的 hook 实际拦截延迟未单独测量（仅静态声明同步 + 静态检查通过）· 归档后能力计数同步（6.3）与归档动作本身属下一步，不在本记录内。

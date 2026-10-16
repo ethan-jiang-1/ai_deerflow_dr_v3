@@ -60,6 +60,7 @@ jobs:
       - run: python3 -m unittest discover -s openspec/tests/governance -q
       - run: python3 openspec/governance/check_project_gate.py --phase closeout
       - run: python3 openspec/governance/check_doc_hygiene.py
+      - run: python3 openspec/governance/check_code_budgets.py
       - run: UV_OFFLINE=1 make verify
       - uses: astral-sh/setup-uv@v7
       - run: make smoke
@@ -76,6 +77,7 @@ set -e
 cd "$(git rev-parse --show-toplevel)"
 git diff --cached --check
 python3 openspec/governance/check_doc_hygiene.py
+python3 openspec/governance/check_code_budgets.py
 """
 
 

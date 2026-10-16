@@ -41,6 +41,7 @@ WORKFLOW_REQUIRED_MARKERS: tuple[str, ...] = (
     "python3 -m unittest discover -s openspec/tests/governance -q",
     "python3 openspec/governance/check_project_gate.py --phase closeout",
     "python3 openspec/governance/check_doc_hygiene.py",
+    "python3 openspec/governance/check_code_budgets.py",
     "UV_OFFLINE=1 make verify",
     "astral-sh/setup-uv@v7",
     "make smoke",
@@ -72,12 +73,14 @@ ALLOWED_HOOK_LINES: frozenset[str] = frozenset(
         'cd "$(git rev-parse --show-toplevel)"',
         "git diff --cached --check",
         "python3 openspec/governance/check_doc_hygiene.py",
+        "python3 openspec/governance/check_code_budgets.py",
     }
 )
 
 HOOK_REQUIRED_MARKERS: tuple[str, ...] = (
     "git diff --cached --check",
     "python3 openspec/governance/check_doc_hygiene.py",
+    "python3 openspec/governance/check_code_budgets.py",
 )
 
 

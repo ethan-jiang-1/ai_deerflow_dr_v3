@@ -52,6 +52,8 @@ jobs:
         run: python3 openspec/governance/check_project_gate.py --phase closeout
       - name: Document hygiene
         run: python3 openspec/governance/check_doc_hygiene.py
+      - name: Governance code budgets
+        run: python3 openspec/governance/check_code_budgets.py
       - name: Harness verify
         run: UV_OFFLINE=1 make verify
         working-directory: deep_research_harness

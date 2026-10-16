@@ -8,3 +8,4 @@ set -e
 cd "$(git rev-parse --show-toplevel)"
 git diff --cached --check
 python3 openspec/governance/check_doc_hygiene.py
+python3 openspec/governance/check_code_budgets.py
