@@ -35,6 +35,13 @@ target-version = "py312"
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "ASYNC"]
 
+[tool.ruff.lint.per-file-ignores]
+# `tests/support.py` is imported by name, not by package path: the test root is
+# placed on sys.path by the suite runner, so `import support` is the working form
+# and isort cannot see the usage.
+# any test module importing the shared fixtures by name
+"tests/**/*.py" = ["E402", "F401"]
+
 [tool.uv]
 index-url = "https://pypi.org/simple"
 

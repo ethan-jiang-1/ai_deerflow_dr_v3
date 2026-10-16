@@ -13,9 +13,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import support  # tests/ is on sys.path under the suite runner
+
 from deerflow_deep_research.engine import traceability
 from deerflow_deep_research.runtime import pump
-import support  # noqa: E402 — tests/ is on the path for the suite
 
 FIXTURE = Path(__file__).resolve().parents[2] / "fixtures" / "replay" / "real-small-stream.json"
 
