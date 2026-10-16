@@ -1,0 +1,6 @@
+schema: spec-driven
+created: 2026-10-16
+# Test-only refactor: no product behavior, no gate command, and no spec-level
+# requirement changes. The suite's identifiers are the contract this change
+# preserves and reconciles.
+skip_specs: true
