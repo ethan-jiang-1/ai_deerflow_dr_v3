@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-10-16
+# Test-only change: direct unit coverage for an existing tool's decision logic.
+# No behavior, contract, or requirement changes.
+skip_specs: true
