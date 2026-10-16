@@ -166,48 +166,72 @@ class VerifyBoundaryRejectionTest(TempCase):
         self.assertIn("condition", record)
 
 
-class FencedCheckboxDefectTest(TempCase):
-    """RECORDED DEFECT — locked, deliberately not repaired here.
+class FencedCodeBlockTest(TempCase):
+    """A checkbox inside a fenced code block is an example, not a task (BUG-003).
 
-    ``_unchecked_task_labels`` matches line by line, so a checkbox-shaped line inside a
-    fenced code block is collected as a real unchecked task. The consequence reaches
-    ``_validate_review``: a review may cite a label that exists only as an example
-    inside a fence, and the tool will accept it as a genuine unchecked task — the
-    evidence then attests to something that is not a task.
-
-    This change's mandate is to add coverage, not to change the tool: a wrong decision
-    is recorded and handed to its owner, never silently repaired. This test therefore
-    locks today's behaviour, so the eventual fix has a failing-first point to invert.
+    These tests are the inversion of the two that locked the defect: they used to assert
+    the fenced line WAS collected, and named the way to invert them. The parser is now
+    fence-aware (CommonMark 4.5), so the assertions read the other way round.
     """
 
-    def test_a_fenced_checkbox_is_currently_collected_as_a_task(self) -> None:
+    def labels(self, text: str) -> set[str]:
         root = self.temp_dir()
-        (root / "tasks.md").write_text(
-            "# Tasks\n\n- [ ] real task\n\n```\n- [ ] example inside a fence\n```\n",
-            encoding="utf-8",
-        )
-        labels = TOOL._unchecked_task_labels(root)
-        self.assertIn("real task", labels)
-        self.assertIn(
-            "example inside a fence",
-            labels,
-            "if this fails the defect is fixed: delete this test and assert the "
-            "fenced example is NOT collected",
-        )
+        (root / "tasks.md").write_text(text, encoding="utf-8")
+        return TOOL._unchecked_task_labels(root)
 
-    def test_the_defect_reaches_review_validation(self) -> None:
+    def test_a_fenced_checkbox_is_not_a_task(self) -> None:
+        labels = self.labels(
+            "# Tasks\n\n- [ ] real task\n\n```\n- [ ] example inside a fence\n```\n"
+        )
+        self.assertEqual(labels, {"real task"})
+
+    def test_text_after_a_closing_fence_is_scanned_again(self) -> None:
+        labels = self.labels("- [ ] before\n```\n- [ ] fenced\n```\n- [ ] after\n")
+        self.assertEqual(labels, {"before", "after"})
+
+    def test_a_tilde_fence_is_a_fence_too(self) -> None:
+        labels = self.labels("- [ ] before\n~~~\n- [ ] fenced\n~~~\n- [ ] after\n")
+        self.assertEqual(labels, {"before", "after"})
+
+    def test_a_longer_closing_fence_closes(self) -> None:
+        labels = self.labels("- [ ] before\n````\n- [ ] fenced\n`````\n- [ ] after\n")
+        self.assertEqual(labels, {"before", "after"})
+
+    def test_a_shorter_closing_fence_does_not_close(self) -> None:
+        labels = self.labels("- [ ] before\n````\n- [ ] fenced\n```\n- [ ] still fenced\n")
+        self.assertEqual(labels, {"before"})
+
+    def test_an_opening_fence_may_carry_an_info_string(self) -> None:
+        labels = self.labels("- [ ] before\n```python\n- [ ] fenced\n```\n- [ ] after\n")
+        self.assertEqual(labels, {"before", "after"})
+
+    def test_a_closing_fence_with_trailing_text_does_not_close(self) -> None:
+        labels = self.labels(
+            "- [ ] before\n```\n- [ ] fenced\n``` not a close\n- [ ] after\n"
+        )
+        self.assertEqual(labels, {"before"})
+
+    def test_an_unclosed_fence_runs_to_the_end(self) -> None:
+        labels = self.labels("- [ ] before\n```\n- [ ] fenced\n- [ ] also fenced\n")
+        self.assertEqual(labels, {"before"})
+
+    def test_an_indented_four_space_fence_is_indented_code_not_a_fence(self) -> None:
+        # Documented scoping decision: tasks.md legitimately nests task items four
+        # spaces deep, so only fences are skipped, never indented code.
+        labels = self.labels("    ```\n- [ ] a deeply nested task\n")
+        self.assertEqual(labels, {"a deeply nested task"})
+
+    def test_the_defect_no_longer_reaches_review_validation(self) -> None:
         root = self.temp_dir()
         (root / "closeout-evidence").mkdir(parents=True)
-        (root / "tasks.md").write_text(
-            "```\n- [ ] fenced example\n```\n", encoding="utf-8"
-        )
+        (root / "tasks.md").write_text("```\n- [ ] fenced example\n```\n", encoding="utf-8")
         payload, problem = TOOL._validate_review(
             {"disposition": "review-required", "task_references": ["fenced example"]},
             root,
             root / "closeout-evidence" / "review.json",
         )
-        self.assertIsNone(problem, "the fenced-only label is currently accepted")
-        self.assertEqual(payload["task_references"], ["fenced example"])
+        self.assertIsNone(payload)
+        self.assertEqual(problem["condition"], "unknown-unchecked-task")
 
 
 class UncheckedTaskLabelsTest(TempCase):

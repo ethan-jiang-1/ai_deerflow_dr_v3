@@ -12,6 +12,7 @@ import hashlib
 import json
 import re
 import sys
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -154,6 +155,44 @@ def _verify_boundary(attestation: Attestation) -> tuple[dict[str, object], Path 
 
 
 UNCHECKED_TASK_LINE = re.compile(r"^\s*(?:[-*+])\s+\[ \]\s+(.+?)\s*$")
+# A code fence line: up to three spaces, then three or more backticks or tildes, then
+# whatever follows (an info string when opening, only whitespace when closing).
+FENCE_LINE = re.compile(r"^ {0,3}(?P<fence>`{3,}|~{3,})(?P<rest>.*)$")
+
+
+def _iter_outside_code_fences(lines: list[str]) -> Iterator[str]:
+    """Yield the lines that are not inside a fenced code block (CommonMark 4.5).
+
+    A fence opens with at least three backticks or tildes, indented up to three
+    spaces, optionally followed by an info string; a backtick fence's info string may
+    not itself contain a backtick. It closes on the **same character** repeated **at
+    least as many times**, followed only by spaces or tabs. An unclosed fence runs to
+    the end of the document — which is why this walks the lines once instead of
+    searching for a partner line.
+
+    Four spaces of indentation is an indented code block, not a fence; task lists in
+    ``tasks.md`` legitimately nest items that deep, so indented code is deliberately
+    not skipped here (only fences are).
+    """
+    open_fence: str | None = None
+    for line in lines:
+        match = FENCE_LINE.match(line)
+        if open_fence is None:
+            opening = match is not None and not (
+                match.group("fence").startswith("`") and "`" in match.group("rest")
+            )
+            if opening:
+                open_fence = match.group("fence")
+                continue
+            yield line
+            continue
+        if (
+            match is not None
+            and match.group("fence")[0] == open_fence[0]
+            and len(match.group("fence")) >= len(open_fence)
+            and not match.group("rest").strip()
+        ):
+            open_fence = None
 
 
 def _unchecked_task_labels(change_root: Path) -> set[str]:
@@ -164,7 +203,7 @@ def _unchecked_task_labels(change_root: Path) -> set[str]:
         return set()
     return {
         match.group(1).strip()
-        for line in task_lines
+        for line in _iter_outside_code_fences(task_lines)
         if (match := UNCHECKED_TASK_LINE.match(line)) and match.group(1).strip()
     }
 

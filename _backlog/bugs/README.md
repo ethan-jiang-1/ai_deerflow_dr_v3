@@ -26,7 +26,8 @@
 
 | Bug | 标题 | 发现 | 状态 |
 |-----|------|------|------|
-| [BUG-003](BUG-003-closeout-tool-fenced-checkbox-as-task.md) | closeout 工具把围栏代码块里的 checkbox 当成真任务 | 2026-10-16 | 等人拍板 |
+
+（当前无活跃卡。）
 
 **Next available bug ID: BUG-004**
 
