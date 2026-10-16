@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 
 from .contract import ContractViolation
+from .cycles import validate_no_import_cycles
 from .gitlink import _validate_upstream_gitlink
 from .imports import validate_imports
 from .inspect_tree import (
@@ -28,6 +29,7 @@ def validate_project(root: Path, manifest: StructureManifest) -> None:
     _validate_ignored_paths(root, manifest)
     _validate_single_source_root(root, manifest)
     validate_imports(root, manifest)
+    validate_no_import_cycles(root)
     _validate_upstream_gitlink(root, manifest)
 
 
@@ -38,6 +40,7 @@ def check_project(root: Path, *, imports_only: bool = False) -> None:
     manifest = load_manifest(root)
     if imports_only:
         validate_imports(root, manifest)
+        validate_no_import_cycles(root)
     else:
         validate_project(root, manifest)
 

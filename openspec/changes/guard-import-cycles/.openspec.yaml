@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-10-17
+# A new architecture rule (no top-level import cycles inside a module directory).
+# It adds a guard; it changes no requirement, contract, or existing rule.
+skip_specs: true

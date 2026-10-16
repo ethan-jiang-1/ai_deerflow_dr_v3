@@ -103,6 +103,7 @@ files = [
   "openspec/governance/check_project_architecture.py",
   "openspec/governance/project_architecture_check/__init__.py",
   "openspec/governance/project_architecture_check/contract.py",
+  "openspec/governance/project_architecture_check/cycles.py",
   "openspec/governance/project_architecture_check/facade.py",
   "openspec/governance/project_architecture_check/gitlink.py",
   "openspec/governance/project_architecture_check/imports.py",
