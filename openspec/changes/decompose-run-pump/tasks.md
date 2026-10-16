@@ -5,8 +5,8 @@
 - [x] 1.1 Record the baseline: from `deep_research_harness/`, run `UV_OFFLINE=1 make verify` and `make smoke`; verify both exit 0 and record the case counts; from the repository root verify `git status --porcelain=v1 --untracked-files=all` is empty
 - [x] 1.2 Capture the pre-change journal event sequence for one driven run (reuse the existing unit fixture that drives `pump.run_research` with scripted events) into `/tmp/pump-before/journal-events.txt`; verify the capture is non-empty and lists event names in order
 - [x] 1.3 Capture the pre-change public surface: `python3 -c "from deerflow_deep_research.runtime import pump; print(sorted(n for n in dir(pump) if not n.startswith('__')))"` plus the two registry value sets (`bundle.COMPOSITIONS`, `client.CONFIG_NAMES`) and the CLI `--config` choices into `/tmp/pump-before/`; verify each capture is non-empty
-- [ ] 1.4 Add `runtime/pump_parts/__init__.py` and `runtime/pump_parts/turn.py` with a frozen `TurnOutcome` dataclass (tool_calls, answered, stop_reason, fallback_error_type, final_text) and move `_consume_turn` into it, returning `TurnOutcome`; verify `make verify` still exits 0 (the call site adapts in the same step)
-- [ ] 1.5 Verify the turn module preserves behaviour: re-capture the journal event sequence through the same fixture and diff it against `/tmp/pump-before/journal-events.txt`; verify identical, and verify `make smoke` exits 0
+- [x] 1.4 Add `runtime/pump_parts/__init__.py` and `runtime/pump_parts/turn.py` with a frozen `TurnOutcome` dataclass (tool_calls, answered, stop_reason, fallback_error_type, final_text) and move `_consume_turn` into it, returning `TurnOutcome`; verify `make verify` still exits 0 (the call site adapts in the same step)
+- [x] 1.5 Verify the turn module preserves behaviour: re-capture the journal event sequence through the same fixture and diff it against `/tmp/pump-before/journal-events.txt`; verify identical, and verify `make smoke` exits 0
 
 ## 2. Gate steps out of the drive loop
 
