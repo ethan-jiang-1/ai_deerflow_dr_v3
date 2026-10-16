@@ -105,7 +105,7 @@ APPLY_GUIDANCE = "Review control-placement only when the selected proposal decla
 ARCHIVE_GUIDANCE = "Before archive, review control-placement only when the selected proposal declares it; guidance is advisory."
 OPERATION_GUIDANCE_ADVISORY_BOUNDARY = "does not execute commands, create or complete tasks, or block native operations"
 CLOSEOUT_EVIDENCE_GUIDANCE = (
-    "openspec/governance/selected-change-closeout.py verifies only caller-declared committed ranges"
+    "openspec/governance/selected_change_closeout.py verifies only caller-declared committed ranges"
 )
 CONTROL_PLACEMENT_REVIEW_COLUMNS = (
     "Changed decision or fact",

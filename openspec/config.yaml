@@ -88,7 +88,7 @@ operations:
     guidance:
       - "Review control-placement only when the selected proposal declares it; guidance is advisory."
       - "Before a target edit or resumed apply, re-read the selected review, policy, tasks, and relevant historical counterexample; add every actionable finding as an unchecked ordinary task."
-      - "For a selected control-placement change, openspec/governance/selected-change-closeout.py verifies only caller-declared committed ranges; its evidence is non-authoritative and does not change native archive authority."
+      - "For a selected control-placement change, openspec/governance/selected_change_closeout.py verifies only caller-declared committed ranges; its evidence is non-authoritative and does not change native archive authority."
       - "Guidance does not execute commands, create or complete tasks, or block native operations."
   archive:
     guidance:

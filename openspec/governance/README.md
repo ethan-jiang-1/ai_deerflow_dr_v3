@@ -19,7 +19,7 @@
 | `check_code_budgets.py` | 治理脚本自身的体积是否越界（声明式行数上限 + 超长函数个数上限；只降不升的棘轮；自带种植负例）？ | 脚本 docstring（standalone，非 gate 组件；已进 CI canonical 序列与 pre-commit；`@impl DOB-001`） |
 | `check_release_face.py` | 最小发布面是否完整（gitlink 在场且 pin 一致 / 兄弟布局与 `[tool.uv.sources]` 目标都在发布面内 / 随行源码零开发面耦合 / COMMANDS 路由目标存在）？ | 脚本 docstring（standalone，slow cold-start lane 见 playbook；`@impl RLF-001`） |
 | `check_proof_receipts.py` | 选中 change 的回执/证据是否在案（proof receipts）？ | 脚本 docstring（gate 组件：经 `--mode enforce` 调用，但仅当环境变量 `PROOF_ATTESTATION` 提供 attestation 时才实查，否则报 no selected change 并按 0 通过；回执 producer `make proof` 尚未建立，见 harness `proof-lanes.toml`） |
-| `selected-change-closeout.md` / `.py` | 选中 change 的 closeout 义务清单与执行？ | 文档+脚本（`@impl` 见文件头） |
+| `selected-change-closeout.md` / `selected_change_closeout.py` | 选中 change 的 closeout 义务清单与执行？ | 文档+脚本（`@impl` 见文件头） |
 | `change_guidance_kernel.py` | change-guidance 规则的共享内核（checker 复用）？ | 脚本 docstring |
 | `portable_change_guidance_export.py` | 指导规则的可移植导出是否最新？ | 脚本 docstring |
 | `test-evidence-policy.md` | 测试证据的 authority、lifecycle、synchronized-change？ | [test-evidence-policy.md](test-evidence-policy.md)；批准语义由测试证据的 owning main spec 拥有（随 v3 首批治理 change 建立） |

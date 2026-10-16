@@ -55,7 +55,7 @@ CODE_BUDGETS: dict[str, FileBudget] = {
     "change_guidance_check/guidance.py": FileBudget(max_lines=405, max_long_functions=2),
     "project_architecture_check/imports.py": FileBudget(max_lines=332, max_long_functions=0),
     "check_project_gate.py": FileBudget(max_lines=261, max_long_functions=0),
-    "selected-change-closeout.py": FileBudget(max_lines=256, max_long_functions=1),
+    "selected_change_closeout.py": FileBudget(max_lines=256, max_long_functions=1),
     "change_guidance_check/reviews.py": FileBudget(max_lines=243, max_long_functions=1),
     "check_proof_receipts.py": FileBudget(max_lines=232, max_long_functions=1),
     "change_guidance_check/constants.py": FileBudget(max_lines=197, max_long_functions=0),

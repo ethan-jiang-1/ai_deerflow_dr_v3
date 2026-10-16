@@ -1,6 +1,6 @@
 # Selected Change Closeout Evidence
 
-`selected-change-closeout.py` records limited, local evidence for an explicitly
+`selected_change_closeout.py` records limited, local evidence for an explicitly
 declared selected OpenSpec change. It is a standard-library command, not an OpenSpec
 operation hook, archive wrapper, semantic reviewer, task writer, or runtime control.
 
@@ -20,7 +20,7 @@ Both operations require an attestation JSON file with non-empty fields:
 Run commands from the planning home as your current working directory:
 
 ```sh
-python3 openspec/governance/selected-change-closeout.py verify-boundary \
+python3 openspec/governance/selected_change_closeout.py verify-boundary \
   --attestation /path/to/attestation.json
 ```
 
@@ -36,7 +36,7 @@ an explicit output under the selected change's dedicated `closeout-evidence/`
 subdirectory:
 
 ```sh
-python3 openspec/governance/selected-change-closeout.py record-review \
+python3 openspec/governance/selected_change_closeout.py record-review \
   --attestation /path/to/attestation.json \
   --review /path/to/review.json \
   --output openspec/changes/example-change/closeout-evidence/review.json

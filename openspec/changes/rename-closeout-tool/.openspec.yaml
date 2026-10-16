@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-10-16
+# Name-only change: one file moves from a hyphenated name to an importable one and
+# every reference follows. No behavior, vocabulary, or schema change.
+skip_specs: true
