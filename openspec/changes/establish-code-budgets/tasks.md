@@ -15,8 +15,8 @@
 
 ## 3. Dead-code removal in the guidance kernel
 
-- [ ] 3.1 Delete the eight zero-reference definitions from `change_guidance_kernel.py` (`CompositionSchema`, `ProfileSchema`, `ReviewSchema`, `missing_fields`, `neutrality_issues`, `profile_completeness_issues`, `selected_policies`, `validate_review_table`) and any now-unused imports; verify the module still imports, the governance suite exits 0, and the six checker captures are unchanged
-- [ ] 3.2 Record the measured reduction: verify `change_guidance_kernel.py` shrank by at least 80 lines and that `grep -c` for each deleted name over `openspec/governance openspec/tests` returns 0
+- [x] 3.1 Delete the eight zero-reference definitions from `change_guidance_kernel.py` (`CompositionSchema`, `ProfileSchema`, `ReviewSchema`, `missing_fields`, `neutrality_issues`, `profile_completeness_issues`, `selected_policies`, `validate_review_table`) and any now-unused imports; verify the module still imports, the governance suite exits 0, and the six checker captures are unchanged
+- [x] 3.2 Record the measured reduction: verify `change_guidance_kernel.py` shrank by at least 80 lines and that `grep -c` for each deleted name over `openspec/governance openspec/tests` returns 0
 
 ## 4. Three-part manifest loading
 
