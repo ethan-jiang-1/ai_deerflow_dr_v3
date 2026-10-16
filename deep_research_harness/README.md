@@ -62,7 +62,7 @@ fixture 配置加载 [runtime scripted providers](src/deerflow_deep_research/run
 | --- | --- | --- |
 | 纯规则 / 准入 / 本地落盘 / stream 适配 | tests/unit 中对应 owner 文件 | `make verify` |
 | 配置 / 接口镜像 / thread 与递归上限转发 | `tests.contract.test_wiring_mirror` | `make verify`，真实绑定加 smoke |
-| CLI / client / checkpoint 接线 | `tests.unit.test_entry_composition` 或对应 integration 文件 | `make smoke`（脚本模型 + 真框架） |
+| CLI / client / checkpoint 接线 | `tests.unit.interaction.test_assembly` 或对应 integration 文件 | `make smoke`（脚本模型 + 真框架） |
 | 真实研究策略与质量 | 明确认知 owner 和评审标准 | 显式 base 运行；不进入默认 CI |
 
 不要把端到端当唯一定位手段。逐文件选择见 [测试资产地图](tests/README.md)，主链、两种 loop、发布形态及未实现清单见 [控制地图](docs/control-map.md)。Coding Agent 从 [AGENTS](AGENTS.md) 选择 owner，其余参考见 [文档索引](docs/README.md)。

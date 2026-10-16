@@ -58,7 +58,7 @@ Bundle 规则合同在 [test_bundle_domain](unit/domain/test_bundle_domain.py)�
 | run_research 的续答、终态、fallback、取消与最终报告 | [test_run_engine.py](unit/runtime/test_run_engine.py) | 真实 Bundle/journal/admission；手写 stream_fn 事件，非真实 agent loop |
 | 文档旋钮表与代码常量对账（research-process binding 表漂移即红） | [test_binding_doc_guard.py](unit/runtime/test_binding_doc_guard.py) | 读文档与代码常量对账；无 I/O |
 | 每次搜索/抓取物化为 diagnostics/searches/ 可直读文件（call_id 去重） | [test_search_log.py](unit/runtime/test_search_log.py) | 真实临时落盘；双源/孤儿/内容断言，无模型 |
-| 前台装配、create 顺序/缺依赖 remedy、Bundle 查找、pin 失败、无框架 help/观察错误 | [test_entry_composition.py](unit/interaction/test_entry_composition.py) | 真入口/临时落盘/依赖阻断子进程与负例；client/saver/pump 协议替身，不执行模型 |
+| 前台装配、create 顺序/缺依赖 remedy、Bundle 查找、pin 失败、无框架 help/观察错误 | [test_assembly.py](unit/interaction/test_assembly.py) | 真入口/临时落盘/依赖阻断子进程与负例；client/saver/pump 协议替身，不执行模型 |
 | 文案、直播事件 callback、journal tail、golden 渲染 | [test_entry_surface.py](unit/interaction/test_entry_surface.py) | 真实 render/pump/临时文件；人工事件与 golden 样本，不执行 CLI |
 | 真实 flat 事件形状进入 pump、工具名进入 journal | [test_event_stream_replay.py](unit/runtime/test_event_stream_replay.py) | 固定记录流 + 真实 pump/落盘；不重跑模型、搜索和框架图 |
 | 配置解析、本地 client mirror、thread/递归上限转发 | [test_wiring_mirror.py](contract/test_wiring_mirror.py) | 本地代码/配置；FakeClient 记录调用，不 import 真 client |
