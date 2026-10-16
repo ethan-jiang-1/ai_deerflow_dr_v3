@@ -26,7 +26,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 
-from check_doc_hygiene import (
+from doc_hygiene_check import (
     ADR_INDEX,
     BACKLOG_ROOT,
     BACKLOG_UNDERSCORE_DIRS,

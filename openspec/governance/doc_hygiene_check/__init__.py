@@ -1,0 +1,143 @@
+"""The doc-hygiene guard's implementation, one module per concern.
+
+The entry (`check_doc_hygiene.py`) and the control battery (`_battery.py`) both import
+from here, so neither has to import the other — the top-level cycle the two files used
+to form is gone.
+
+@impl DEW-001"""
+
+from __future__ import annotations
+
+from .constants import (
+    ADR_DIR,
+    DOCS_TREE,
+    ADR_INDEX,
+    BACKLOG_ROOT,
+    BACKLOG_UNDERSCORE_DIRS,
+    ENTRY_DOCS,
+    DOC_BUDGETS,
+    DOC_LAYER_DOCS,
+    LINKED_ASSET_DOCS,
+    ADR_FILE_RE,
+    INDEX_ROW_RE,
+    MARKDOWN_LINK_RE,
+    BACKLOG_ACTIVE_SURFACES,
+    BACKLOG_ARCHIVE_SURFACES,
+    BACKLOG_COUNTERS_FILE,
+    BACKLOG_NEXT_ID_RE,
+    BACKLOG_ARCHIVE_TO_ACTIVE,
+    BACKLOG_NUMBERED_SURFACES,
+    BACKLOG_NUMBERED_PREFIXES,
+    BACKLOG_NEXT_ID_DECL_RE,
+    BACKLOG_CARD_HUKOU_LINE_LIMIT,
+    BACKLOG_STATUS_FIELD_RE,
+    BACKLOG_STATUS_VOCABULARY,
+    BACKLOG_GRADUATION_PASSED_RE,
+    BACKLOG_CLOSABLE_RE,
+    STALE_MARKERS,
+    STALE_MARKER_FILES,
+    MARKER_ALLOWLIST,
+    SCOPE_PATHS,
+    SCOPE_LIMITS,
+    SCOPE_REGEXES,
+    SCOPE_SURFACES,
+    _COUNT_SPECS_RE,
+    _COUNT_ARCHIVE_RE,
+)
+
+from .scope import (
+    Scope,
+)
+
+from .ledger import (
+    _adr_ids,
+    _indexed_ids,
+    _read_utf8,
+    _card_hukou_problems,
+    _ledger_surface_dir,
+    _ledger_work_files,
+    _allocated_numbers,
+    _ledger_roster_problems,
+    _ledger_counter_problems,
+    _ledger_placement_problems,
+)
+
+from .rules import (
+    _rule_adr_index,
+    _rule_links,
+    _rule_encoding_newline,
+    _rule_docs_scope,
+    _rule_backlog_underscore,
+    _rule_doc_budgets,
+    _rule_ledger_consistency,
+    _rule_root_counts,
+    _rule_stale_markers,
+    RULES,
+    violations,
+)
+
+from .cli import (
+    _self_test,
+    main,
+)
+
+__all__ = [
+    "ADR_DIR",
+    "DOCS_TREE",
+    "ADR_INDEX",
+    "BACKLOG_ROOT",
+    "BACKLOG_UNDERSCORE_DIRS",
+    "ENTRY_DOCS",
+    "DOC_BUDGETS",
+    "DOC_LAYER_DOCS",
+    "LINKED_ASSET_DOCS",
+    "ADR_FILE_RE",
+    "INDEX_ROW_RE",
+    "MARKDOWN_LINK_RE",
+    "BACKLOG_ACTIVE_SURFACES",
+    "BACKLOG_ARCHIVE_SURFACES",
+    "BACKLOG_COUNTERS_FILE",
+    "BACKLOG_NEXT_ID_RE",
+    "BACKLOG_ARCHIVE_TO_ACTIVE",
+    "BACKLOG_NUMBERED_SURFACES",
+    "BACKLOG_NUMBERED_PREFIXES",
+    "BACKLOG_NEXT_ID_DECL_RE",
+    "BACKLOG_CARD_HUKOU_LINE_LIMIT",
+    "BACKLOG_STATUS_FIELD_RE",
+    "BACKLOG_STATUS_VOCABULARY",
+    "BACKLOG_GRADUATION_PASSED_RE",
+    "BACKLOG_CLOSABLE_RE",
+    "STALE_MARKERS",
+    "STALE_MARKER_FILES",
+    "MARKER_ALLOWLIST",
+    "SCOPE_PATHS",
+    "SCOPE_LIMITS",
+    "SCOPE_REGEXES",
+    "SCOPE_SURFACES",
+    "_COUNT_SPECS_RE",
+    "_COUNT_ARCHIVE_RE",
+    "Scope",
+    "_adr_ids",
+    "_indexed_ids",
+    "_read_utf8",
+    "_card_hukou_problems",
+    "_ledger_surface_dir",
+    "_ledger_work_files",
+    "_allocated_numbers",
+    "_ledger_roster_problems",
+    "_ledger_counter_problems",
+    "_ledger_placement_problems",
+    "_rule_adr_index",
+    "_rule_links",
+    "_rule_encoding_newline",
+    "_rule_docs_scope",
+    "_rule_backlog_underscore",
+    "_rule_doc_budgets",
+    "_rule_ledger_consistency",
+    "_rule_root_counts",
+    "_rule_stale_markers",
+    "RULES",
+    "violations",
+    "_self_test",
+    "main",
+]
