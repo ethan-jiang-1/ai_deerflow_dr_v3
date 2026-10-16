@@ -55,7 +55,10 @@ import re as _re
 import re
 import sys
 import tempfile
+from collections.abc import Callable, Mapping
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 ADR_DIR = Path("deep_research_harness/docs/adr")
 DOCS_TREE = Path("deep_research_harness/docs")
@@ -160,15 +163,72 @@ def _indexed_ids(index: Path) -> set[str]:
     }
 
 
-def _rule_adr_index(root: Path) -> list[str]:
-    if not (root / ADR_DIR).is_dir():
+@dataclass(frozen=True)
+class Scope:
+    """Frozen input surface for the doc-hygiene rules.
+
+    The declarations (managed document lists, budgets, ledger vocabularies,
+    marker tables) stay module constants and remain the human-facing declaring
+    tables; ``from_defaults`` is the single place that binds them to one run.
+    Nothing downstream reads those constants directly, so a test can build a
+    scope with different declarations without touching module state.
+    """
+
+    root: Path
+    entry_docs: tuple[str, ...]
+    doc_layer_docs: tuple[str, ...]
+    linked_asset_docs: tuple[str, ...]
+    doc_budgets: Mapping[str, int]
+    backlog_underscore_dirs: tuple[str, ...]
+    backlog_status_vocabulary: Mapping[str, tuple[str, ...]]
+    stale_marker_files: tuple[str, ...]
+    stale_markers: tuple[str, ...]
+    marker_allowlist: Mapping[tuple[str, str], str]
+    backlog_archive_to_active: Mapping[str, str]
+    backlog_numbered_prefixes: Mapping[str, tuple[str, str]]
+    docs: Mapping[str, Path]
+    limits: Mapping[str, int]
+    regexes: Mapping[str, Any]
+    surfaces: Mapping[str, tuple[str, ...]]
+
+    @classmethod
+    def from_defaults(cls, root: Path) -> "Scope":
+        """Bind the declared tables to one run root.
+
+        The mutable tables are copied, so a caller can never alias module state
+        by accident. A case that must vary a declaration (the battery's unjustified
+        allowlist entry is the only one today) builds its own scope from here and
+        replaces that one field, instead of editing the shipped table.
+        """
+        return cls(
+            root=root,
+            entry_docs=ENTRY_DOCS,
+            doc_layer_docs=DOC_LAYER_DOCS,
+            linked_asset_docs=LINKED_ASSET_DOCS,
+            doc_budgets=dict(DOC_BUDGETS),
+            backlog_underscore_dirs=BACKLOG_UNDERSCORE_DIRS,
+            backlog_status_vocabulary=dict(BACKLOG_STATUS_VOCABULARY),
+            stale_marker_files=STALE_MARKER_FILES,
+            stale_markers=STALE_MARKERS,
+            marker_allowlist=dict(MARKER_ALLOWLIST),
+            backlog_archive_to_active=dict(BACKLOG_ARCHIVE_TO_ACTIVE),
+            backlog_numbered_prefixes=dict(BACKLOG_NUMBERED_PREFIXES),
+            docs=dict(SCOPE_PATHS),
+            limits=dict(SCOPE_LIMITS),
+            regexes=dict(SCOPE_REGEXES),
+            surfaces=dict(SCOPE_SURFACES),
+        )
+
+
+def _rule_adr_index(scope: Scope) -> list[str]:
+    if not (scope.root / scope.docs["adr_dir"]).is_dir():
         # v3 skeleton: the ADR layer does not exist yet; the rule engages as
         # soon as docs/adr/ is created (with or without its index).
         return []
-    index = root / ADR_INDEX
+    index = scope.root / scope.docs["adr_index"]
     if not index.is_file():
-        return [f"ADR index missing: {ADR_INDEX.as_posix()}"]
-    present = _adr_ids(root / ADR_DIR)
+        return [f"ADR index missing: {scope.docs['adr_index'].as_posix()}"]
+    present = _adr_ids(scope.root / scope.docs["adr_dir"])
     indexed = _indexed_ids(index)
     problems: list[str] = []
     missing = sorted(present - indexed)
@@ -188,15 +248,15 @@ def _read_utf8(doc: Path) -> tuple[str | None, str | None]:
         return None, "not UTF-8 decodable"
 
 
-def _rule_links(root: Path) -> list[str]:
+def _rule_links(scope: Scope) -> list[str]:
     problems: list[str] = []
     for kind, rels in (
-        ("entry-chain", ENTRY_DOCS),
-        ("docs-layer", DOC_LAYER_DOCS),
-        ("asset-doc", LINKED_ASSET_DOCS),
+        ("entry-chain", scope.entry_docs),
+        ("docs-layer", scope.doc_layer_docs),
+        ("asset-doc", scope.linked_asset_docs),
     ):
         for rel in rels:
-            doc = root / rel
+            doc = scope.root / rel
             if not doc.is_file():
                 problems.append(f"{kind} document missing: {rel}")
                 continue
@@ -217,15 +277,15 @@ def _rule_links(root: Path) -> list[str]:
     return problems
 
 
-def _rule_encoding_newline(root: Path) -> list[str]:
+def _rule_encoding_newline(scope: Scope) -> list[str]:
     problems: list[str] = []
     for kind, rels in (
-        ("entry-chain", ENTRY_DOCS),
-        ("docs-layer", DOC_LAYER_DOCS),
-        ("asset-doc", LINKED_ASSET_DOCS),
+        ("entry-chain", scope.entry_docs),
+        ("docs-layer", scope.doc_layer_docs),
+        ("asset-doc", scope.linked_asset_docs),
     ):
         for rel in rels:
-            doc = root / rel
+            doc = scope.root / rel
             if not doc.is_file():
                 continue  # missing doc already reported by the link rule
             text, decode_problem = _read_utf8(doc)
@@ -237,21 +297,21 @@ def _rule_encoding_newline(root: Path) -> list[str]:
     return problems
 
 
-def _rule_docs_scope(root: Path) -> list[str]:
+def _rule_docs_scope(scope: Scope) -> list[str]:
     """Reject present docs-tree markdown that the registered scope omits."""
-    tree = root / DOCS_TREE
+    tree = scope.root / scope.docs["docs_tree"]
     if not tree.is_dir():
         return []
-    registered = set(DOC_LAYER_DOCS)
+    registered = set(scope.doc_layer_docs)
     problems: list[str] = []
     for path in sorted(tree.rglob("*.md")):
-        rel = path.relative_to(root).as_posix()
+        rel = path.relative_to(scope.root).as_posix()
         if rel not in registered:
             problems.append(f"docs-layer markdown not in registered scope: {rel}")
     return problems
 
 
-def _rule_backlog_underscore(root: Path) -> list[str]:
+def _rule_backlog_underscore(scope: Scope) -> list[str]:
     """Retained `_`-prefixed backlog directories must be declared and documented.
 
     A `_` prefix means "retained collection, not the active work queue". Every
@@ -260,11 +320,11 @@ def _rule_backlog_underscore(root: Path) -> list[str]:
     declared name must appear in ``_backlog/README.md`` so the machine list and
     the human index cannot drift apart.
     """
-    backlog = root / BACKLOG_ROOT
+    backlog = scope.root / scope.docs["backlog_root"]
     if not backlog.is_dir():
         return []
     problems: list[str] = []
-    declared = set(BACKLOG_UNDERSCORE_DIRS)
+    declared = set(scope.backlog_underscore_dirs)
     present = {
         path.name
         for path in backlog.iterdir()
@@ -272,14 +332,14 @@ def _rule_backlog_underscore(root: Path) -> list[str]:
     }
     for name in sorted(present - declared):
         problems.append(f"undeclared _-prefixed backlog directory: {name}")
-    for name in BACKLOG_UNDERSCORE_DIRS:
+    for name in scope.backlog_underscore_dirs:
         if name not in present:
             problems.append(f"declared backlog directory missing on disk: {name}")
     readme = backlog / "README.md"
     if readme.is_file():
         text, _ = _read_utf8(readme)
         if text is not None:
-            for name in BACKLOG_UNDERSCORE_DIRS:
+            for name in scope.backlog_underscore_dirs:
                 if name not in text:
                     problems.append(f"backlog README does not document retained directory: {name}")
     return problems
@@ -379,7 +439,33 @@ MARKER_ALLOWLIST: dict[tuple[str, str], str] = {
         "(audit plan _backlog/_archived/_settled_issues/2026-10-04-fresh-agent-doc-cleanup.md, not-in-scope item)",
 }
 
-def _rule_doc_budgets(root: Path) -> list[str]:
+# The per-run input surface of the rules. Rules never read module globals
+# directly: the frozen ``Scope`` carries the declaration tables and the derived
+# collections, so a rule is a function of its scope alone and a test can drive
+# it without mutating module state (change: extract-doc-hygiene-test-battery).
+SCOPE_PATHS: tuple[tuple[str, Path], ...] = (
+    ("adr_dir", ADR_DIR),
+    ("docs_tree", DOCS_TREE),
+    ("adr_index", ADR_INDEX),
+    ("backlog_root", BACKLOG_ROOT),
+    ("counters_file", Path(BACKLOG_COUNTERS_FILE)),
+)
+SCOPE_LIMITS: tuple[tuple[str, int], ...] = (
+    ("card_hukou_line_limit", BACKLOG_CARD_HUKOU_LINE_LIMIT),
+)
+SCOPE_REGEXES: tuple[tuple[str, "re.Pattern[str]"], ...] = (
+    ("next_id", BACKLOG_NEXT_ID_RE),
+    ("next_id_decl", BACKLOG_NEXT_ID_DECL_RE),
+    ("archive_to_active", re.compile(r"^_(?:fixed_bugs|settled_issues)$")),
+)
+SCOPE_SURFACES: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("active", BACKLOG_ACTIVE_SURFACES),
+    ("archive", BACKLOG_ARCHIVE_SURFACES),
+    ("numbered", BACKLOG_NUMBERED_SURFACES),
+)
+
+
+def _rule_doc_budgets(scope: Scope) -> list[str]:
     """Resident documents listed in ``DOC_BUDGETS`` must fit their ceilings.
 
     The resident layer is what an agent host loads every session; its size is
@@ -391,8 +477,8 @@ def _rule_doc_budgets(root: Path) -> list[str]:
     gap where deleting a managed file produced no violation).
     """
     problems: list[str] = []
-    for rel, ceiling in DOC_BUDGETS.items():
-        doc = root / rel
+    for rel, ceiling in scope.doc_budgets.items():
+        doc = scope.root / rel
         if not doc.is_file():
             problems.append(f"missing managed budget path: {rel}")
             continue
@@ -411,7 +497,7 @@ def _rule_doc_budgets(root: Path) -> list[str]:
 
 
 
-def _card_hukou_problems(surface: str, card: Path) -> list[str]:
+def _card_hukou_problems(scope: Scope, surface: str, card: Path) -> list[str]:
     """Active-card hukou and residency (rule 7 continuation).
 
     Every active card carries a ``状态`` field in its first 12 lines whose
@@ -423,14 +509,14 @@ def _card_hukou_problems(surface: str, card: Path) -> list[str]:
     text, decode_problem = _read_utf8(card)
     if text is None:
         return [f"non-UTF-8 active card, hukou not checked: {surface}/{card.name}"]
-    head = "\n".join(text.splitlines()[:BACKLOG_CARD_HUKOU_LINE_LIMIT])
+    head = "\n".join(text.splitlines()[:scope.limits["card_hukou_line_limit"]])
     problems: list[str] = []
     status = BACKLOG_STATUS_FIELD_RE.search(head)
-    vocabulary = BACKLOG_STATUS_VOCABULARY.get(surface, ())
+    vocabulary = scope.backlog_status_vocabulary.get(surface, ())
     if status is None:
         problems.append(
             f"active card missing 状态 hukou in first "
-            f"{BACKLOG_CARD_HUKOU_LINE_LIMIT} lines: {surface}/{card.name}"
+            f"{scope.limits['card_hukou_line_limit']} lines: {surface}/{card.name}"
         )
     elif status.group(1).strip() not in vocabulary:
         problems.append(
@@ -450,7 +536,7 @@ def _card_hukou_problems(surface: str, card: Path) -> list[str]:
 
 
 
-def _rule_ledger_consistency(root: Path) -> list[str]:
+def _rule_ledger_consistency(scope: Scope) -> list[str]:
     """Ledger bookkeeping surfaces must be mechanically consistent (rule 7).
 
     The `_backlog` ritual states "编号、索引、计数三处一致"; this rule makes
@@ -461,12 +547,15 @@ def _rule_ledger_consistency(root: Path) -> list[str]:
     violation (graduated/closable cards must have left the active zone).
     """
     problems: list[str] = []
-    backlog = root / "_backlog"
+    backlog = scope.root / scope.docs["backlog_root"]
     if not backlog.is_dir():
         return problems
 
     def _surface_dir(surface: str) -> Path:
-        return backlog / surface if surface in BACKLOG_ACTIVE_SURFACES else backlog / "_archived" / surface
+        # Zone split is data-driven: an archive surface is the `_`-prefixed one.
+        if scope.regexes["archive_to_active"].match(surface):
+            return backlog / "_archived" / surface
+        return backlog / surface
 
     def _work_files(surface: str) -> list[Path]:
         surface_dir = _surface_dir(surface)
@@ -485,19 +574,19 @@ def _rule_ledger_consistency(root: Path) -> list[str]:
             for line in (body or "").splitlines():
                 if not line.lstrip().startswith("|"):
                     continue  # skip the Next-ID declaration line itself
-                for id_match in BACKLOG_NEXT_ID_RE.finditer(line):
+                for id_match in scope.regexes["next_id"].finditer(line):
                     if id_match.group(1) == prefix:
                         allocated.append(int(id_match.group(2)))
         work_files = list(_work_files(archive_surface))
         if active_surface:
             work_files.extend(_work_files(active_surface))
         for work in work_files:
-            for id_match in BACKLOG_NEXT_ID_RE.finditer(work.name):
+            for id_match in scope.regexes["next_id"].finditer(work.name):
                 if id_match.group(1) == prefix:
                     allocated.append(int(id_match.group(2)))
         return allocated
 
-    for surface in (*BACKLOG_ACTIVE_SURFACES, *BACKLOG_ARCHIVE_SURFACES):
+    for surface in (*scope.surfaces["active"], *scope.surfaces["archive"]):
         surface_dir = _surface_dir(surface)
         index = surface_dir / "README.md"
         if not surface_dir.is_dir():
@@ -517,9 +606,9 @@ def _rule_ledger_consistency(root: Path) -> list[str]:
                 problems.append(
                     f"active ledger surface has an unindexed work item: {surface}/{work.name}"
                 )
-        if surface in BACKLOG_ACTIVE_SURFACES:
+        if surface in scope.surfaces["active"]:
             for work in work_files:
-                problems.extend(_card_hukou_problems(surface, work))
+                problems.extend(_card_hukou_problems(scope, surface, work))
         for link in MARKDOWN_LINK_RE.findall(index_text):
             target = link.split("#", 1)[0].strip()
             if not target.endswith(".md"):
@@ -564,7 +653,7 @@ def _rule_ledger_consistency(root: Path) -> list[str]:
                     "table rows separated from their header block"
                 )
 
-    counters = backlog / BACKLOG_COUNTERS_FILE
+    counters = backlog / scope.docs["counters_file"]
     if counters.is_file():
         counters_text, decode_problem = _read_utf8(counters)
         if counters_text is not None:
@@ -576,18 +665,18 @@ def _rule_ledger_consistency(root: Path) -> list[str]:
                 disk_count = len(_work_files(surface))
                 if declared_count != disk_count:
                     problems.append(
-                        f"counter mismatch in {BACKLOG_COUNTERS_FILE}: {surface} declares "
+                        f"counter mismatch in {scope.docs['counters_file']}: {surface} declares "
                         f"{declared_count} but disk holds {disk_count}"
                     )
-                next_match = BACKLOG_NEXT_ID_RE.search(declared_next)
+                next_match = scope.regexes["next_id"].search(declared_next)
                 if not next_match:
                     continue
                 prefix, number = next_match.group(1), int(next_match.group(2))
-                allocated = _allocated_numbers(surface, BACKLOG_ARCHIVE_TO_ACTIVE.get(surface), prefix)
+                allocated = _allocated_numbers(surface, scope.backlog_archive_to_active.get(surface), prefix)
                 expected_next = (max(allocated) + 1) if allocated else 1
                 if number != expected_next:
                     problems.append(
-                        f"next-ID mismatch in {BACKLOG_COUNTERS_FILE}: {surface} declares "
+                        f"next-ID mismatch in {scope.docs['counters_file']}: {surface} declares "
                         f"{prefix}-{number:03d} but allocation implies {prefix}-{expected_next:03d}"
                     )
 
@@ -595,7 +684,7 @@ def _rule_ledger_consistency(root: Path) -> list[str]:
     # and prefix, and the value must equal the ∪-derived next ID (BUG-002: a
     # duplicated stale declaration passed while the counters table alone stayed
     # consistent).
-    for surface in BACKLOG_NUMBERED_SURFACES:
+    for surface in scope.surfaces["numbered"]:
         surface_dir = _surface_dir(surface)
         index = surface_dir / "README.md"
         if not index.is_file():
@@ -605,7 +694,7 @@ def _rule_ledger_consistency(root: Path) -> list[str]:
             continue
         declarations: dict[str, list[tuple[int, str]]] = {}
         for line_no, line in enumerate(index_text.splitlines(), 1):
-            decl_match = BACKLOG_NEXT_ID_DECL_RE.search(line)
+            decl_match = scope.regexes["next_id_decl"].search(line)
             if decl_match:
                 declarations.setdefault(decl_match.group(1), []).append(
                     (int(decl_match.group(2)), f"line {line_no}")
@@ -617,7 +706,7 @@ def _rule_ledger_consistency(root: Path) -> list[str]:
                     f"duplicate next-ID declaration in {surface}/README.md: prefix {prefix} declared "
                     f"{len(entries)} times ({', '.join(f'{value:03d} at {where}' for value, where in entries)})"
                 )
-            prefix_pair = BACKLOG_NUMBERED_PREFIXES.get(prefix)
+            prefix_pair = scope.backlog_numbered_prefixes.get(prefix)
             if not prefix_pair:
                 continue
             declared_allocated = _allocated_numbers(prefix_pair[0], prefix_pair[1], prefix)
@@ -635,7 +724,7 @@ _COUNT_SPECS_RE = _re.compile(r"(\d+)\s*个\s*能力")
 _COUNT_ARCHIVE_RE = _re.compile(r"(\d+)\s*个\s*changes\s*归档")
 
 
-def _rule_root_counts(root: Path) -> list[str]:
+def _rule_root_counts(scope: Scope) -> list[str]:
     """Root README inventory counts must match the machine-computed values.
 
     The checker computes the capability-spec and archived-change counts from
@@ -644,9 +733,9 @@ def _rule_root_counts(root: Path) -> list[str]:
     may not drift (every archive silently ages a hand-written count).
     """
     problems: list[str] = []
-    specs_dir = root / "openspec" / "specs"
-    archive_dir = root / "openspec" / "changes" / "archive"
-    readme = root / "README.md"
+    specs_dir = scope.root / "openspec" / "specs"
+    archive_dir = scope.root / "openspec" / "changes" / "archive"
+    readme = scope.root / "README.md"
     if not (specs_dir.is_dir() and archive_dir.is_dir() and readme.is_file()):
         return problems
     text, decode_problem = _read_utf8(readme)
@@ -675,7 +764,7 @@ def _rule_root_counts(root: Path) -> list[str]:
     return problems
 
 
-def _rule_stale_markers(root: Path) -> list[str]:
+def _rule_stale_markers(scope: Scope) -> list[str]:
     """Declared files must not contain declared skeleton-era markers (rule 8).
 
     A `(file, marker)` pair outside the justification allowlist fails with
@@ -683,8 +772,8 @@ def _rule_stale_markers(root: Path) -> list[str]:
     so the allowlist cannot become a silent dumping ground.
     """
     problems: list[str] = []
-    for rel in STALE_MARKER_FILES:
-        doc = root / rel
+    for rel in scope.stale_marker_files:
+        doc = scope.root / rel
         if not doc.is_file():
             problems.append(f"missing stale-marker managed path: {rel}")
             continue
@@ -693,16 +782,16 @@ def _rule_stale_markers(root: Path) -> list[str]:
             problems.append(f"non-UTF-8 managed file, marker scan skipped: {rel}")
             continue
         for line_number, line in enumerate(text.splitlines(), start=1):
-            for marker in STALE_MARKERS:
-                if marker in line and (rel, marker) not in MARKER_ALLOWLIST:
+            for marker in scope.stale_markers:
+                if marker in line and (rel, marker) not in scope.marker_allowlist:
                     problems.append(f"stale narrative marker {marker!r} at {rel}:{line_number}")
-    for (rel, marker), justification in MARKER_ALLOWLIST.items():
+    for (rel, marker), justification in scope.marker_allowlist.items():
         if not justification.strip():
             problems.append(f"allowlist entry without justification: ({rel}, {marker!r})")
-        if rel not in STALE_MARKER_FILES:
+        if rel not in scope.stale_marker_files:
             problems.append(f"allowlist entry for unmanaged file: {rel}")
             continue
-        doc = root / rel
+        doc = scope.root / rel
         if doc.is_file():
             text, _ = _read_utf8(doc)
             if text is not None and marker not in text:
@@ -710,462 +799,41 @@ def _rule_stale_markers(root: Path) -> list[str]:
     return problems
 
 
+# Rule registration: declaration order is the reporting order, so this tuple
+# is the dispatch (adding a rule is one function plus one entry here).
+RULES: tuple[tuple[str, Callable[[Scope], list[str]]], ...] = (
+    ("adr_index", _rule_adr_index),
+    ("links", _rule_links),
+    ("encoding_newline", _rule_encoding_newline),
+    ("docs_scope", _rule_docs_scope),
+    ("backlog_underscore", _rule_backlog_underscore),
+    ("doc_budgets", _rule_doc_budgets),
+    ("ledger_consistency", _rule_ledger_consistency),
+    ("stale_markers", _rule_stale_markers),
+    ("root_counts", _rule_root_counts),
+)
+
+
 def violations(root: Path) -> list[str]:
+    scope = Scope.from_defaults(root)
     found: list[str] = []
-    found.extend(_rule_adr_index(root))
-    found.extend(_rule_links(root))
-    found.extend(_rule_encoding_newline(root))
-    found.extend(_rule_docs_scope(root))
-    found.extend(_rule_backlog_underscore(root))
-    found.extend(_rule_doc_budgets(root))
-    found.extend(_rule_ledger_consistency(root))
-    found.extend(_rule_stale_markers(root))
-    found.extend(_rule_root_counts(root))
+    for _name, rule in RULES:
+        found.extend(rule(scope))
     return found
 
 
 def _self_test() -> list[str]:
-    errors: list[str] = []
-    with tempfile.TemporaryDirectory() as tmp:
-        base = Path(tmp)
+    """Run the negative-control battery and return the failing case identities.
 
-        def write_doc(rel: str, content: str) -> None:
-            doc = base / rel
-            doc.parent.mkdir(parents=True, exist_ok=True)
-            doc.write_text(content, encoding="utf-8")
+    Thin delegate by design: the cases and their assertion identities live in
+    ``_battery.py`` (one home), and the governance unittest battery
+    (``tests/governance/test_doc_hygiene.py``) drives the same registry. This
+    module keeps the CLI contract — command, stdout, exit codes — not a second
+    copy of the assertions.
+    """
+    import _battery
 
-        # Clean fixture: every registered document exists with a valid self link,
-        # and the ADR index lists every registered ADR id. Derived from the
-        # constants so the fixture follows future scope changes.
-        for rel in ENTRY_DOCS:
-            write_doc(rel, f"# T\n\n[self]({rel.rsplit('/', 1)[-1]})\n")
-        adr_ids: list[str] = []
-        for rel in DOC_LAYER_DOCS:
-            name = rel.rsplit("/", 1)[-1]
-            write_doc(rel, f"# T\n\n[self]({name})\n")
-            if ADR_FILE_RE.match(name):
-                adr_ids.append(name[:4])
-        for rel in LINKED_ASSET_DOCS:
-            name = rel.rsplit("/", 1)[-1]
-            write_doc(rel, f"# T\n\n[self]({name})\n")
-        # The clean fixture builds the ADR layer only when the registered scope
-        # declares it; with no ``docs/adr/`` entry the directory stays absent and
-        # ``_rule_adr_index`` is dormant by its dir-existence guard.
-
-        # Backlog fixture: every declared `_` directory exists and is named in
-        # the backlog README, so the clean fixture satisfies the backlog rule.
-        backlog = base / BACKLOG_ROOT
-        backlog_readme_body = "# T\n\n[self](README.md)\n" + "".join(
-            f"- {name}\n" for name in BACKLOG_UNDERSCORE_DIRS
-        )
-        write_doc((BACKLOG_ROOT / "README.md").as_posix(), backlog_readme_body)
-        for name in BACKLOG_UNDERSCORE_DIRS:
-            (backlog / name).mkdir(parents=True, exist_ok=True)
-
-        # Budget-managed and marker-managed files not on the entry chain get
-        # minimal stubs so the clean fixture satisfies those rules (missing
-        # managed paths fail loudly by design).
-        for rel in (*DOC_BUDGETS, *STALE_MARKER_FILES):
-            if not (base / rel).is_file():
-                # An allowlisted marker must stay present in its stub, or the
-                # allowlist honestly reports dangling.
-                content = "# T\n"
-                if any(rel == allowed_rel for allowed_rel, _ in MARKER_ALLOWLIST):
-                    content = '"""stub (skeleton)."""\n'
-                write_doc(rel, content)
-
-        if violations(base):
-            errors.append("self-test: clean fixture must have zero violations")
-
-        # Rule 1 negative: orphan index entry (lists an absent ADR id).
-        # Fabricate a minimal ADR layer to engage the dir-existence guard.
-        write_doc(
-            ADR_INDEX.as_posix(),
-            "# ADR Index\n\n| 编号 | 一句话 | 生命周期 |\n|---|---|---|\n",
-        )
-        index = base / ADR_INDEX
-        index.write_text(index.read_text(encoding="utf-8") + "| 9999 | b | current |\n", encoding="utf-8")
-        if not any("9999" in v for v in _rule_adr_index(base)):
-            errors.append("self-test: ADR index orphan not detected")
-
-        # Rule 2 negative (entry-chain): broken relative link.
-        write_doc("deep_research_harness/README.md", "# T\n\nsee [gone.md](gone.md)\n")
-        if not any("gone.md" in v for v in _rule_links(base)):
-            errors.append("self-test: broken link not detected")
-
-        # Rule 2 negative (entry-chain): trigger index with a dangling home
-        # link — every trigger row must resolve to its owner record.
-        write_doc("_backlog/triggers.md", "# triggers\n\n[owner](no-such-owner.md)\n")
-        if not any(
-            "_backlog/triggers.md" in v and "no-such-owner.md" in v
-            for v in _rule_links(base)
-        ):
-            errors.append("self-test: dangling trigger-index home link not detected")
-        write_doc("_backlog/triggers.md", "# T\n\n[self](triggers.md)\n")
-
-        # Rule 3 negative (entry-chain): missing trailing newline.
-        write_doc("openspec/README.md", "# no newline")
-        if not any("trailing newline" in v for v in _rule_encoding_newline(base)):
-            errors.append("self-test: missing trailing newline not detected")
-
-        # Rule 2 negative (docs-layer): broken relative link.
-        write_doc(
-            "deep_research_harness/docs/local-operations.md",
-            "# T\n\nsee [gone.md](gone.md)\n",
-        )
-        if not any("gone.md" in v for v in _rule_links(base)):
-            errors.append("self-test: docs-layer broken link not detected")
-
-        # Rule 2 negative (asset docs): broken relative link in a test/tools
-        # asset document — the 2026-10-10 audit found 18 live dead links there
-        # because these surfaces sat outside the link rule's scope.
-        write_doc(
-            "deep_research_harness/tests/README.md",
-            "# tests\n\nsee [gone.md](gone.md)\n",
-        )
-        if not any(
-            "tests/README.md" in v and "gone.md" in v for v in _rule_links(base)
-        ):
-            errors.append("self-test: asset-doc broken link not detected")
-        write_doc("deep_research_harness/tests/README.md", "# T\n\n[self](README.md)\n")
-        if any("tests/README.md" in v for v in _rule_links(base)):
-            errors.append("self-test: asset-doc resolvable link flagged")
-
-        # Rule 3 negative (docs-layer): missing trailing newline.
-        write_doc("deep_research_harness/docs/testing-and-evaluation.md", "# no newline")
-        if not any(
-            "docs-layer document missing trailing newline" in v
-            for v in _rule_encoding_newline(base)
-        ):
-            errors.append("self-test: docs-layer missing trailing newline not detected")
-
-        # Rule 3 negative (docs-layer): non-UTF-8 bytes.
-        bad = base / "deep_research_harness/docs/control-map.md"
-        bad.write_bytes(b"\xff\xfe binary")
-        if not any(
-            "non-UTF-8 docs-layer document" in v
-            for v in _rule_encoding_newline(base)
-        ):
-            errors.append("self-test: docs-layer non-UTF-8 not detected")
-
-        # Rule 4 negative: present docs markdown missing from the registered scope.
-        write_doc("deep_research_harness/docs/zz-unregistered.md", "# extra\n")
-        if not any("zz-unregistered.md" in v for v in _rule_docs_scope(base)):
-            errors.append("self-test: unregistered docs-layer markdown not detected")
-
-        # Rule 5 negative: undeclared `_`-prefixed backlog directory.
-        (backlog / "_zz-undeclared").mkdir(parents=True, exist_ok=True)
-        if not any("_zz-undeclared" in v for v in _rule_backlog_underscore(base)):
-            errors.append("self-test: undeclared backlog directory not detected")
-
-        # Rule 5 negative: declared directory absent from the backlog README.
-        write_doc((BACKLOG_ROOT / "README.md").as_posix(), "# T\n\n[self](README.md)\n")
-        if not any(
-            "does not document retained directory" in v
-            for v in _rule_backlog_underscore(base)
-        ):
-            errors.append("self-test: undocumented backlog directory not detected")
-
-        # Rule 6 negative: resident document over its character ceiling.
-        write_doc("AGENTS.md", "# T\n\n" + "x" * (DOC_BUDGETS["AGENTS.md"] + 1) + "\n")
-        if not any("over character budget" in v for v in _rule_doc_budgets(base)):
-            errors.append("self-test: over-budget resident document not detected")
-        write_doc("AGENTS.md", "# T\n\n[self](AGENTS.md)\n")
-
-        # Rule 6 negative: managed budget path goes missing (deleted managed
-        # file must fail loudly — the inherited skip let it pass silently).
-        (base / "CLAUDE.md").unlink()
-        if not any("missing managed budget path" in v for v in _rule_doc_budgets(base)):
-            errors.append("self-test: missing managed budget path not detected")
-        write_doc("CLAUDE.md", "# T\n")
-
-        # Rule 7 negatives: ledger index/counter drift must fail loudly.
-        ledger = base / "ledger-repo"
-        for surface in ("issues", "_archived/_settled_issues"):
-            surface_dir = ledger / "_backlog" / surface
-            surface_dir.mkdir(parents=True, exist_ok=True)
-        (ledger / "_backlog" / "issues" / "2026-10-01-demo.md").write_text("# issue\n", encoding="utf-8")
-        (ledger / "_backlog" / "issues" / "README.md").write_text("# Issues\n\n（空）\n", encoding="utf-8")
-        (ledger / "_backlog" / "_archived" / "_settled_issues" / "README.md").write_text(
-            "# Settled\n\n| ID | Date | File | Summary |\n|---|---|---|---|\n"
-            "| CLS-001 | 2026-10-01 | [2026-10-01-gone.md](2026-10-01-gone.md) | x |\n\n"
-            "**Next available issue ID: CLS-002**\n",
-            encoding="utf-8",
-        )
-        (ledger / "_backlog" / "_archived" ).mkdir(parents=True, exist_ok=True)
-        (ledger / "_backlog" / "_archived" / "README.md").write_text(
-            "| 归档目录 | 数量 | Next ID |\n|---|---|---|\n"
-            "| `_fixed_bugs/` | 0 | BUG-001 |\n| `_settled_issues/` | 1 | CLS-002 |\n",
-            encoding="utf-8",
-        )
-        ledger_problems = _rule_ledger_consistency(ledger)
-        for needle in (
-            "active ledger surface",
-            "dangling index row",
-            "counter mismatch",
-        ):
-            if not any(needle in v for v in ledger_problems):
-                errors.append(f"self-test: ledger rule did not detect: {needle}")
-
-        # Rule 7 negative: Next-ID allocation ignoring the active zone. A filed
-        # active card reserves its number (ledger rule: 已修复目录 ∪ 活跃目录),
-        # so a counters row declaring the archive-only next ID must fail loudly,
-        # and the ∪-consistent declaration must stay green (BUG-002, 2026-10-10).
-        allocation_repo = base / "allocation-repo"
-        active_bugs = allocation_repo / "_backlog" / "bugs"
-        fixed_dir = allocation_repo / "_backlog" / "_archived" / "_fixed_bugs"
-        active_bugs.mkdir(parents=True, exist_ok=True)
-        fixed_dir.mkdir(parents=True, exist_ok=True)
-        (active_bugs / "BUG-002-active-hold.md").write_text(
-            "# BUG-002: x\n\n> 严重级别: P2 | 发现: 2026-10-10 | 状态: 活跃\n\n## 症状\ns\n",
-            encoding="utf-8",
-        )
-        (active_bugs / "README.md").write_text(
-            "# Active bugs\n\n| Bug | 标题 | 发现 | 状态 |\n|---|---|---|---|\n"
-            "| [BUG-002-active-hold.md](BUG-002-active-hold.md) | x | 2026-10-10 | 活跃 |\n",
-            encoding="utf-8",
-        )
-        (fixed_dir / "BUG-001-fixed.md").write_text("# BUG-001: x\n", encoding="utf-8")
-        (fixed_dir / "README.md").write_text(
-            "# Fixed\n\n| ID | Date | Title |\n|---|---|---|\n"
-            "| BUG-001 | 2026-10-09 | [BUG-001-fixed.md](BUG-001-fixed.md) | x |\n\n"
-            "**Next available bug ID: BUG-002**\n",
-            encoding="utf-8",
-        )
-        counters_path = allocation_repo / "_backlog" / "_archived" / "README.md"
-        counters_path.write_text(
-            "| 归档目录 | 数量 | Next ID |\n|---|---|---|\n"
-            "| `_fixed_bugs/` | 1 | BUG-002 |\n",
-            encoding="utf-8",
-        )
-        allocation_problems = _rule_ledger_consistency(allocation_repo)
-        if not any("next-ID mismatch" in v and "_fixed_bugs" in v for v in allocation_problems):
-            errors.append("self-test: archive-only Next-ID allocation not detected")
-        counters_path.write_text(
-            "| 归档目录 | 数量 | Next ID |\n|---|---|---|\n"
-            "| `_fixed_bugs/` | 1 | BUG-003 |\n",
-            encoding="utf-8",
-        )
-        if any(
-            "next-ID mismatch" in v and "_fixed_bugs" in v
-            for v in _rule_ledger_consistency(allocation_repo)
-        ):
-            errors.append("self-test: union-consistent Next-ID declaration flagged")
-
-        # Rule 7 negative: next-ID declarations in the ledger READMEs. A README
-        # carrying TWO declarations for one prefix (one stale) must fail loudly,
-        # and a single declaration whose value disagrees with the ∪-derived next
-        # ID must fail even when the counters table alone stays consistent
-        # (BUG-002: the stale header line passed while green).
-        decl_repo = base / "decl-repo"
-        decl_bugs = decl_repo / "_backlog" / "bugs"
-        decl_fixed = decl_repo / "_backlog" / "_archived" / "_fixed_bugs"
-        decl_arch = decl_repo / "_backlog" / "_archived"
-        decl_bugs.mkdir(parents=True, exist_ok=True)
-        decl_fixed.mkdir(parents=True, exist_ok=True)
-        (decl_bugs / "BUG-002-active-hold.md").write_text(
-            "# BUG-002: x\n\n> 严重级别: P2 | 发现: 2026-10-10 | 状态: 活跃\n\n## 症状\ns\n",
-            encoding="utf-8",
-        )
-        (decl_bugs / "README.md").write_text(
-            "# Active bugs\n\n| Bug | 标题 | 发现 | 状态 |\n|---|---|---|---|\n"
-            "| [BUG-002-active-hold.md](BUG-002-active-hold.md) | x | 2026-10-10 | 活跃 |\n"
-            "\n**Next available bug ID: BUG-003**\n",
-            encoding="utf-8",
-        )
-        (decl_fixed / "BUG-001-fixed.md").write_text("# BUG-001: x\n", encoding="utf-8")
-        (decl_fixed / "README.md").write_text(
-            "# Fixed\n\n| ID | Date | Title |\n|---|---|---|\n"
-            "| BUG-001 | 2026-10-09 | [BUG-001-fixed.md](BUG-001-fixed.md) | x |\n"
-            "\n**Next available bug ID: BUG-002**\n**Next available bug ID: BUG-003**\n",
-            encoding="utf-8",
-        )
-        (decl_arch / "README.md").write_text(
-            "| 归档目录 | 数量 | Next ID |\n|---|---|---|\n"
-            "| `_fixed_bugs/` | 1 | BUG-003 |\n",
-            encoding="utf-8",
-        )
-        decl_problems = _rule_ledger_consistency(decl_repo)
-        if not any(
-            "duplicate next-ID declaration in _fixed_bugs/README.md" in v for v in decl_problems
-        ):
-            errors.append("self-test: duplicate next-ID declaration not detected")
-        if not any(
-            "next-ID declaration disagrees in _fixed_bugs/README.md" in v for v in decl_problems
-        ):
-            errors.append("self-test: disagreeing next-ID declaration not detected")
-        if any("duplicate next-ID declaration in bugs/README.md" in v for v in decl_problems):
-            errors.append("self-test: consistent single declaration flagged as duplicate")
-
-        # Rule 7 negative (placement): a work-item row separated from its table
-        # header block by a blank line and a fence must fail loudly. Uses a
-        # fresh ledger tree; the row references a file that exists on disk so
-        # only the placement defect is exercised.
-        placed = base / "placement-repo"
-        closed = placed / "_backlog" / "_archived" / "_settled_issues"
-        closed.mkdir(parents=True, exist_ok=True)
-        (closed / "2026-10-01-here.md").write_text("# plan\n", encoding="utf-8")
-        (closed / "README.md").write_text(
-            "# Closed\n\n"
-            "```markdown\n"
-            "| Plan | 一句话 |\n"
-            "|------|--------|\n"
-            "```\n"
-            "| CLS-001 | 2026-10-01 | [2026-10-01-here.md](2026-10-01-here.md) | ok |\n\n"
-            "**Next available issue ID: CLS-002**\n",
-            encoding="utf-8",
-        )
-        placed_problems = _rule_ledger_consistency(placed)
-        if not any("placement" in v for v in placed_problems):
-            errors.append("self-test: ledger row placement defect not detected")
-        contiguous = placed / "_backlog" / "_archived" / "_contiguous_issues"
-        contiguous.mkdir(parents=True, exist_ok=True)
-        (contiguous / "2026-10-01-here.md").write_text("# plan\n", encoding="utf-8")
-        (contiguous / "README.md").write_text(
-            "# Closed\n\n"
-            "| ID | Date | File | Summary |\n"
-            "|---|---|---|---|\n"
-            "| CLS-001 | 2026-10-01 | [2026-10-01-here.md](2026-10-01-here.md) | ok |\n",
-            encoding="utf-8",
-        )
-        if any("placement" in v for v in _rule_ledger_consistency(contiguous)):
-            errors.append("self-test: contiguous table flagged as misplaced")
-
-        # Rule 7 continuation (hukou/residency): an active card without a
-        # 状态 field, with an out-of-vocabulary word, declaring 毕业门：已过 or
-        # 可关闭：是 must each fail loudly; an awaiting-human card carrying
-        # delivery language in its body must stay green (the mis-kill
-        # negative — anchoring is on the declared fields, never on prose).
-        hukou = base / "hukou-repo"
-        issues = hukou / "_backlog" / "issues"
-        issues.mkdir(parents=True, exist_ok=True)
-        (issues / "README.md").write_text("# Issues\n\n（空）\n", encoding="utf-8")
-
-        def hukou_card(name: str, head: str, body: str = "") -> None:
-            (issues / name).write_text(f"{head}\n{body}", encoding="utf-8")
-
-        hukou_card("2026-10-01-no-hukou.md", "# Issue: no hukou")
-        hukou_card(
-            "2026-10-02-bad-word.md",
-            "> 立卡: 2026-10-02 ｜ 状态: 已结 ｜ 毕业门: 未过 ｜ 可关闭: 否",
-        )
-        hukou_card(
-            "2026-10-03-graduated.md",
-            "> 立卡: 2026-10-03 ｜ 状态: 推敲中 ｜ 毕业门: 已过 ｜ 可关闭: 否",
-        )
-        hukou_card(
-            "2026-10-04-closable.md",
-            "> 立卡: 2026-10-04 ｜ 状态: 等人拍板 ｜ 毕业门: 未过 ｜ 可关闭: 是",
-        )
-        hukou_card(
-            "2026-10-05-awaiting-human.md",
-            "> 立卡: 2026-10-05 ｜ 状态: 等人拍板 ｜ 毕业门: 未过 ｜ 可关闭: 否",
-            body="\n## 落地关联\n\nS1+S2 已交付，全链路绿。\n",
-        )
-        hukou_problems = _rule_ledger_consistency(hukou)
-        for needle in (
-            "missing 状态 hukou",
-            "outside declared vocabulary",
-            "毕业门：已过",
-            "可关闭：是",
-        ):
-            if not any(needle in v for v in hukou_problems):
-                errors.append(f"self-test: card hukou rule did not detect: {needle}")
-        # The fixture roster is empty on purpose, so unindexed-card problems
-        # are expected; the mis-kill check reads hukou-specific problems only.
-        hukou_only = [v for v in hukou_problems if "unindexed" not in v]
-        if any("2026-10-05-awaiting-human.md" in v for v in hukou_only):
-            errors.append("self-test: hukou rule mis-killed awaiting card")
-
-        # Rule 7 continuation (vocabulary flip, make-backlog-process-explicit
-        # 2026-10-12): a post-rename `活跃` bug card is out-of-vocabulary and
-        # must fail loudly; the new active-zone words pass hukou; an arbitrary
-        # out-of-vocabulary word still fails. The fixture roster is empty on
-        # purpose (unindexed problems expected), so the assertions read
-        # hukou-specific problems only.
-        vocab = base / "vocab-repo"
-        vocab_bugs = vocab / "_backlog" / "bugs"
-        vocab_bugs.mkdir(parents=True, exist_ok=True)
-        (vocab_bugs / "README.md").write_text("# Bugs\n\n（空）\n", encoding="utf-8")
-
-        def vocab_bug_card(name: str, status_word: str) -> None:
-            (vocab_bugs / name).write_text(
-                f"# BUG-009: x\n\n> 严重级别: P2 | 发现: 2026-10-12 | 状态: {status_word}\n\n## 症状\ns\n",
-                encoding="utf-8",
-            )
-
-        vocab_bug_card("BUG-009-old-active.md", "活跃")
-        vocab_bug_card("BUG-010-fix-ready.md", "修就绪")
-        vocab_bug_card("BUG-011-bad-word.md", "乱写")
-        vocab_problems = _rule_ledger_consistency(vocab)
-        vocab_hukou_only = [
-            v for v in vocab_problems if "unindexed" not in v and "dangling" not in v
-        ]
-        if not any(
-            "outside declared vocabulary" in v and "BUG-009-old-active.md" in v
-            for v in vocab_hukou_only
-        ):
-            errors.append(
-                "self-test: post-rename 活跃 bug card not detected as out-of-vocabulary"
-            )
-        if not any(
-            "outside declared vocabulary" in v and "BUG-011-bad-word.md" in v
-            for v in vocab_hukou_only
-        ):
-            errors.append("self-test: out-of-vocabulary bug word not detected")
-        if any("BUG-010-fix-ready.md" in v for v in vocab_hukou_only):
-            errors.append("self-test: 修就绪 bug card mis-killed by vocabulary rule")
-
-        # Root-count pinning negative: a README status line whose declared
-        # counts differ from the computed inventory must fail loudly.
-        counted = base / "counts-repo"
-        (counted / "openspec/specs/alpha").mkdir(parents=True, exist_ok=True)
-        (counted / "openspec/specs/beta").mkdir(parents=True, exist_ok=True)
-        (counted / "openspec/changes/archive/2026-01-01-one").mkdir(parents=True, exist_ok=True)
-        readme = counted / "README.md"
-        readme.write_text(
-            "> specs 主干 5 个能力落地、7 个 changes 归档。\n", encoding="utf-8"
-        )
-        count_problems = _rule_root_counts(counted)
-        if not any("5" in v and "7" in v for v in count_problems):
-            errors.append("self-test: drifted root-README count not detected")
-        readme.write_text(
-            "> specs 主干 2 个能力落地、1 个 changes 归档。\n", encoding="utf-8"
-        )
-        if _rule_root_counts(counted):
-            errors.append("self-test: matching counts flagged as drifted")
-        readme.write_text("> 没有声明计数的行。\n", encoding="utf-8")
-        if not any("unpinned" in v for v in _rule_root_counts(counted)):
-            errors.append("self-test: missing count declaration not detected")
-
-        # Rule 8 negatives: a re-introduced marker fails; an unjustified or
-        # dangling allowlist entry fails.
-        marker_root = base / "marker-repo"
-        marker_doc = marker_root / "AGENTS.md"
-        marker_doc.parent.mkdir(parents=True, exist_ok=True)
-        for rel in STALE_MARKER_FILES:
-            (marker_root / rel).parent.mkdir(parents=True, exist_ok=True)
-            content = "# T\n"
-            if any(rel == allowed_rel for allowed_rel, _ in MARKER_ALLOWLIST):
-                content = '"""stub (skeleton)."""\n'
-            (marker_root / rel).write_text(content, encoding="utf-8")
-        marker_doc.write_text("# T\n\n当前状态：骨架占位。\n", encoding="utf-8")
-        marker_problems = _rule_stale_markers(marker_root)
-        if not any("骨架占位" in v and "AGENTS.md:3" in v for v in marker_problems):
-            errors.append("self-test: stale marker not detected with file:line")
-        marker_doc.write_text("# T\n", encoding="utf-8")
-        if _rule_stale_markers(marker_root):
-            errors.append("self-test: clean file flagged by marker rule")
-        original_allowlist = dict(MARKER_ALLOWLIST)
-        MARKER_ALLOWLIST.clear()
-        MARKER_ALLOWLIST[(marker_doc.relative_to(marker_root).as_posix(), "(skeleton)")] = ""
-        unjustified = _rule_stale_markers(marker_root)
-        MARKER_ALLOWLIST.clear()
-        MARKER_ALLOWLIST.update(original_allowlist)
-        if not any("allowlist entry without justification" in v for v in unjustified):
-            errors.append("self-test: unjustified allowlist entry not detected")
-
-    return errors
+    return _battery.failing_controls()
 
 
 def main() -> int:

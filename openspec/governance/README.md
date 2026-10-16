@@ -68,6 +68,10 @@ harness `make lint`（ruff，2026-10-10 起 promote-lint-to-ci 升入序列）�
 文档层卫生另有独立 checker（不属于六 component 聚合、不进 `make verify`）：
 `python3 openspec/governance/check_doc_hygiene.py`（含 `--self-test` 负例控制）；
 它同时校验 `_backlog/` 的 `_` 前缀目录命名约定（磁盘、声明、README 三者一致）。
+负例电池本身住在 `openspec/governance/_battery.py`（单一事实家：30 条负例控制 +
+9 条绿色控制），并由治理套件 `openspec/tests/governance/test_doc_hygiene.py`
+逐例跑成独立用例——`--self-test` 只是同一注册表的薄委托入口，命令、stdout 与
+退出码不变。
 
 ## Canonical aggregate gate
 

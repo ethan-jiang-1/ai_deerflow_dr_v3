@@ -1,6 +1,6 @@
 # Settled Issues Index — 已结 issue 归档
 
-> 最后更新: 2026-10-12（CLS-024 入账：make-backlog-process-explicit） | `_backlog/_archived/_settled_issues/` — 已结 issue 的归档目录。
+> 最后更新: 2026-10-16（CLS-025 入账：code-health-refactor 阶段 1 = extract-doc-hygiene-test-battery） | `_backlog/_archived/_settled_issues/` — 已结 issue 的归档目录。
 > 接收来自 [`../../issues/`](../../issues/) 的卡。`_` 前缀 = coding agent 默认忽略。
 >
 > **卡结后文件名不变，位置即状态。** 移入时分配 `CLS-NNN` 序号，按完成时间递增。
@@ -43,5 +43,6 @@ issue 关闭后从 `_backlog/issues/` 通过 `git mv` 移入本目录：
 | CLS-022 | 2026-10-10 | [2026-10-10-lint-lane-establishment.md](2026-10-10-lint-lane-establishment.md) | lint lane 缺位收口（establish-lint-lane）：全树 ruff 108 → 0 violations（分级四批、每批 verify 红绿、AST 锁链全程绿；PLAN_MARKER 常量真用化取代 noqa）+ `make lint` 命令位 + 红演示（2→0）+ COMMANDS 行 + change-practice "run lint and tests" 措辞恢复；基线取证入卡附录（revision 868d4f0 可复现）；红基线由 count-pin checker 抓 change① 归档漂移当场实证 |
 | CLS-023 | 2026-10-10 | [2026-10-10-delta-sync-guard.md](2026-10-10-delta-sync-guard.md) | delta-sync 完整性守卫（enforce-delta-sync）：check_project_specs 默认模式新增规则——归档 delta 的 ADDED requirement 钉进主 spec，漏 sync 当场红（点名 change/capability/标题）；豁免面封闭（后续 REMOVED/RENAMED 正式退役 + 带理由 allowlist，首条 = 868d4f0 的 Six verbs out-of-band 改名）；治理套件五例矩阵红绿在案；真树 86 条 ADDED 对账 = 84 在场 + 1 退役豁免 + 1 allowlist 豁免；起因 = 本轮审计抓到两处归档漏 sync（ca82507 人工补齐）+ 根因实锤（archive 确认被跳过）；规范归属 doc-truthfulness ADDED requirement 随归档 sync——规则为自身规范归属当第一个服务对象 |
 | CLS-024 | 2026-10-12 | [2026-10-12-backlog-process-made-explicit.md](2026-10-12-backlog-process-made-explicit.md) | backlog 制度显性化（借鉴 loop_advisor 2026-10-12 卡，谱系第四波）：「一张 bug 怎么走」缺陷修复流成节（修就绪门票=根因证据+方案+修好判据；P1/P2 自带撰写 propose 授权，P0/契约/规范语义/越界/已记录决定走 owner）+ 铁律范围化例外 + 状态翻转法则两轨成表 + bug 词表扩集更名（活跃→调查中，+修就绪/已落修/等人拍板）+ bug 模板「修好判据」节 + agent 门牌 _backlog/AGENTS.md（ENTRY_DOCS + DOC_BUDGETS 1195）；make-backlog-process-explicit 全绿归档（skip_specs：机器面全在既有机制内的声明值变更，零新失败类；prove-it-red 在案） |
+| CLS-025 | 2026-10-16 | [2026-10-13-code-health-refactor.md](2026-10-13-code-health-refactor.md) | 代码健康度收敛主卡（三路审计 + 六阶段计划 + D1–D3 裁决）：阶段 1 落地并归档 `extract-doc-hygiene-test-battery`——`check_doc_hygiene.py` 1196→863 行（内联 450 行负例电池移出、`Scope` 冻结值对象 + `RULES` 注册表取代 30 个模块全局量与手列调度）；电池落 `_battery.py`（39 条控制 = 30 负例 + 9 绿控制，计数由变异法实测而非推断）并由治理套件逐例跑成独立用例（99→145）；`--self-test` 薄委托、命令/stdout/退出码逐字不变；9 条规则新旧产出逐规则 IDENTICAL、守卫变红实测在案；阶段 2–5 未开工，阶段表与裁决可直接沿用 |
 
-**Next available issue ID: CLS-025**
+**Next available issue ID: CLS-026**
