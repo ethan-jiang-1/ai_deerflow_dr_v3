@@ -61,6 +61,7 @@ files = [
   "deep_research_harness/src/deerflow_deep_research/runtime/adapters/__init__.py",
   "deep_research_harness/src/deerflow_deep_research/runtime/bundle/__init__.py",
   "deep_research_harness/tests/README.md",
+  "deep_research_harness/tests/support.py",
   "openspec/config.yaml",
   "openspec/CONTEXT.md",
   "openspec/README.md",
