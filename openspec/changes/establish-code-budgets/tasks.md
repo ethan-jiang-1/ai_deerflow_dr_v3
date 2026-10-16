@@ -20,9 +20,9 @@
 
 ## 4. Three-part manifest loading
 
-- [ ] 4.1 Introduce a private frozen `_ManifestParts` value object and split `load_manifest` into `_parse_manifest_document` (TOML document + top-level schema), `_validate_manifest_contract` (all declared-set and cross-field checks, filling the parts object) and `_build_manifest` (assemble `StructureManifest`); verify `load_manifest` drops below 40 lines and the architecture checker exits 0 on the real tree
-- [ ] 4.2 Plant one defect per validation phase (a bad top-level schema value, an unknown ownership layer, and a missing required path) and verify each still fails with the same violation code and detail text as before the split; restore after each and verify the checker returns to exit 0
-- [ ] 4.3 Verify the six success-path captures and the architecture checker's planted failure capture are unchanged after the split
+- [x] 4.1 Introduce a private frozen `_ManifestParts` value object and split `load_manifest` into `_parse_manifest_document` (TOML document + top-level schema), `_validate_manifest_contract` (all declared-set and cross-field checks, filling the parts object) and `_build_manifest` (assemble `StructureManifest`); verify `load_manifest` drops below 40 lines and the architecture checker exits 0 on the real tree
+- [x] 4.2 Plant one defect per validation phase (a bad top-level schema value, an unknown ownership layer, and a missing required path) and verify each still fails with the same violation code and detail text as before the split; restore after each and verify the checker returns to exit 0
+- [x] 4.3 Verify the six success-path captures and the architecture checker's planted failure capture are unchanged after the split
 
 ## 5. The code-budget gate
 

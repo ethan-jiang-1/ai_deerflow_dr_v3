@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import tomllib
+from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 
 from .contract import (
@@ -183,7 +184,41 @@ def _parse_inventory(
     return required_paths
 
 
-def load_manifest(root: Path) -> StructureManifest:
+@dataclass(frozen=True)
+class _ManifestParts:
+    """Every value the contract validation derived, before assembly.
+
+    Internal to this module: it lets validation produce its results without also
+    constructing the final object, so each of the three phases answers on its own.
+    """
+
+    upstream_gitlink: UpstreamGitlink
+    source_root: PurePosixPath
+    fixture_root: PurePosixPath | None
+    fixture_package: str | None
+    fixture_production_contracts: tuple[str, ...]
+    fixture_external_namespaces: tuple[str, ...]
+    fixture_recipe_class: str | None
+    fixture_recipe_factories: tuple[str, ...]
+    test_root: PurePosixPath
+    ownership_layers: tuple[str, ...]
+    forbidden_source_roots: tuple[PurePosixPath, ...]
+    forbidden_shared_modules: tuple[str, ...]
+    ignored_path: PurePosixPath
+    ignored_entries: tuple[str, ...]
+    imports: dict[str, tuple[str, ...]]
+    guide_path: PurePosixPath
+    begin_marker: str
+    end_marker: str
+    required_paths: tuple[RequiredPath, ...]
+
+
+def _parse_manifest_document(root: Path) -> dict:
+    """Read and parse the structure registry; the document-level schema gate.
+
+    Phase one: file presence, decoding, TOML parsing, and the two document-level
+    schema fields every later phase relies on.
+    """
     path = root / MANIFEST_RELATIVE
     if not path.is_file():
         raise ContractViolation("manifest.missing", f"structure registry is missing: {MANIFEST_RELATIVE}")
@@ -197,6 +232,15 @@ def load_manifest(root: Path) -> StructureManifest:
     if data.get("contract") != "project-structure":
         raise ContractViolation("manifest.schema", "contract must be 'project-structure'")
 
+    return data
+
+
+def _validate_manifest_contract(root: Path, data: dict) -> _ManifestParts:
+    """Validate every declared set and cross-field rule; derive the parts.
+
+    Phase two. Owns the inventory file's presence, schema and cross-checks, and
+    fills every field of the returned parts object.
+    """
     upstream_gitlink_raw = data.get("upstream_gitlink")
     if not isinstance(upstream_gitlink_raw, dict):
         raise ContractViolation("gitlink.schema", "upstream_gitlink must be a TOML table")
@@ -280,7 +324,6 @@ def load_manifest(root: Path) -> StructureManifest:
     if not isinstance(inventory_raw, dict):
         raise ContractViolation("inventory.schema", "inventory must be a TOML table")
     inventory_path = _relative_path(inventory_raw.get("path"), "inventory.path")
-    inventory_path = _relative_path(inventory_raw.get("path"), "inventory.path")
     if inventory_path != INVENTORY_RELATIVE:
         raise ContractViolation(
             "inventory.path",
@@ -333,10 +376,7 @@ def load_manifest(root: Path) -> StructureManifest:
     if guide_path != expected_guide_path:
         raise ContractViolation("manifest.schema", f"guide.path must be {expected_guide_path.as_posix()}")
 
-    return StructureManifest(
-        guide_path=guide_path,
-        begin_marker=begin_marker,
-        end_marker=end_marker,
+    return _ManifestParts(
         upstream_gitlink=upstream_gitlink,
         source_root=source_root,
         fixture_root=fixture_root,
@@ -351,6 +391,43 @@ def load_manifest(root: Path) -> StructureManifest:
         forbidden_shared_modules=forbidden_shared_modules,
         ignored_path=ignored_path,
         ignored_entries=ignored_entries,
-        required_paths=tuple(required_paths),
         imports=imports,
+        guide_path=guide_path,
+        begin_marker=begin_marker,
+        end_marker=end_marker,
+        required_paths=required_paths,
     )
+
+
+def _build_manifest(parts: _ManifestParts) -> StructureManifest:
+    """Assemble the final manifest from validated parts.
+
+    Phase three: pure assembly — no validation, no I/O.
+    """
+    return StructureManifest(
+        guide_path=parts.guide_path,
+        begin_marker=parts.begin_marker,
+        end_marker=parts.end_marker,
+        upstream_gitlink=parts.upstream_gitlink,
+        source_root=parts.source_root,
+        fixture_root=parts.fixture_root,
+        fixture_package=parts.fixture_package,
+        fixture_production_contracts=parts.fixture_production_contracts,
+        fixture_external_namespaces=parts.fixture_external_namespaces,
+        fixture_recipe_class=parts.fixture_recipe_class,
+        fixture_recipe_factories=parts.fixture_recipe_factories,
+        test_root=parts.test_root,
+        ownership_layers=parts.ownership_layers,
+        forbidden_source_roots=parts.forbidden_source_roots,
+        forbidden_shared_modules=parts.forbidden_shared_modules,
+        ignored_path=parts.ignored_path,
+        ignored_entries=parts.ignored_entries,
+        required_paths=parts.required_paths,
+        imports=parts.imports,
+    )
+
+
+def load_manifest(root: Path) -> StructureManifest:
+    """Load, validate and assemble the structure registry (three phases)."""
+    data = _parse_manifest_document(root)
+    return _build_manifest(_validate_manifest_contract(root, data))
