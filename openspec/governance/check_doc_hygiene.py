@@ -536,62 +536,57 @@ def _card_hukou_problems(scope: Scope, surface: str, card: Path) -> list[str]:
 
 
 
-def _rule_ledger_consistency(scope: Scope) -> list[str]:
-    """Ledger bookkeeping surfaces must be mechanically consistent (rule 7).
+def _ledger_surface_dir(scope: Scope, backlog: Path, surface: str) -> Path:
+    # Zone split is data-driven: an archive surface is the `_`-prefixed one.
+    if scope.regexes["archive_to_active"].match(surface):
+        return backlog / "_archived" / surface
+    return backlog / surface
 
-    The `_backlog` ritual states "编号、索引、计数三处一致"; this rule makes
-    the stated ritual a checked invariant: every active/archive work-item file
-    is indexed by its surface README, every index row resolves to disk, the
-    `_archived/README.md` counters and Next-ID declarations match disk, and every
-    active card carries a vocabulary-checked hukou without a residency
-    violation (graduated/closable cards must have left the active zone).
-    """
-    problems: list[str] = []
-    backlog = scope.root / scope.docs["backlog_root"]
-    if not backlog.is_dir():
-        return problems
 
-    def _surface_dir(surface: str) -> Path:
-        # Zone split is data-driven: an archive surface is the `_`-prefixed one.
-        if scope.regexes["archive_to_active"].match(surface):
-            return backlog / "_archived" / surface
-        return backlog / surface
+def _ledger_work_files(scope: Scope, backlog: Path, surface: str) -> list[Path]:
+    surface_dir = _ledger_surface_dir(scope, backlog, surface)
+    if not surface_dir.is_dir():
+        return []
+    return sorted(p for p in surface_dir.glob("*.md") if p.name != "README.md")
 
-    def _work_files(surface: str) -> list[Path]:
-        surface_dir = _surface_dir(surface)
-        if not surface_dir.is_dir():
-            return []
-        return sorted(p for p in surface_dir.glob("*.md") if p.name != "README.md")
 
-    def _allocated_numbers(archive_surface: str, active_surface: str | None, prefix: str) -> list[int]:
-        """Allocated numbers for one prefix across the archive zone and the
-        active zone (the ledger rule: 已修复目录 ∪ 活跃目录). Single source for
-        the counters check and the README declaration check."""
-        allocated: list[int] = []
-        index_file = backlog / "_archived" / archive_surface / "README.md"
-        if index_file.is_file():
-            body, _ = _read_utf8(index_file)
-            for line in (body or "").splitlines():
-                if not line.lstrip().startswith("|"):
-                    continue  # skip the Next-ID declaration line itself
-                for id_match in scope.regexes["next_id"].finditer(line):
-                    if id_match.group(1) == prefix:
-                        allocated.append(int(id_match.group(2)))
-        work_files = list(_work_files(archive_surface))
-        if active_surface:
-            work_files.extend(_work_files(active_surface))
-        for work in work_files:
-            for id_match in scope.regexes["next_id"].finditer(work.name):
+def _allocated_numbers(
+    scope: Scope, backlog: Path, archive_surface: str, active_surface: str | None, prefix: str
+) -> list[int]:
+    """Allocated numbers for one prefix across the archive zone and the
+    active zone (the ledger rule: 已修复目录 ∪ 活跃目录). Single source for
+    the counters check and the README declaration check."""
+    allocated: list[int] = []
+    index_file = backlog / "_archived" / archive_surface / "README.md"
+    if index_file.is_file():
+        body, _ = _read_utf8(index_file)
+        for line in (body or "").splitlines():
+            if not line.lstrip().startswith("|"):
+                continue  # skip the Next-ID declaration line itself
+            for id_match in scope.regexes["next_id"].finditer(line):
                 if id_match.group(1) == prefix:
                     allocated.append(int(id_match.group(2)))
-        return allocated
+    work_files = list(_ledger_work_files(scope, backlog, archive_surface))
+    if active_surface:
+        work_files.extend(_ledger_work_files(scope, backlog, active_surface))
+    for work in work_files:
+        for id_match in scope.regexes["next_id"].finditer(work.name):
+            if id_match.group(1) == prefix:
+                allocated.append(int(id_match.group(2)))
+    return allocated
 
+
+def _ledger_roster_problems(scope: Scope, backlog: Path) -> list[str]:
+    """Every work item is indexed, every index row resolves, and every active card
+    carries a valid hukou and residency.
+    """
+    problems: list[str] = []
     for surface in (*scope.surfaces["active"], *scope.surfaces["archive"]):
-        surface_dir = _surface_dir(surface)
+        surface_dir = _ledger_surface_dir(scope, backlog, surface)
         index = surface_dir / "README.md"
         if not surface_dir.is_dir():
             continue
-        work_files = _work_files(surface)
+        work_files = _ledger_work_files(scope, backlog, surface)
         if work_files and not index.is_file():
             problems.append(f"ledger surface with work items missing its README index: {surface}")
             continue
@@ -653,6 +648,13 @@ def _rule_ledger_consistency(scope: Scope) -> list[str]:
                     "table rows separated from their header block"
                 )
 
+    return problems
+
+
+def _ledger_counter_problems(scope: Scope, backlog: Path) -> list[str]:
+    """The archived counters table matches the disk roster and the union-derived next ID.
+    """
+    problems: list[str] = []
     counters = backlog / scope.docs["counters_file"]
     if counters.is_file():
         counters_text, decode_problem = _read_utf8(counters)
@@ -662,7 +664,7 @@ def _rule_ledger_consistency(scope: Scope) -> list[str]:
                 if not row:
                     continue
                 surface, declared_count, declared_next = row.group(1), int(row.group(2)), row.group(3).strip()
-                disk_count = len(_work_files(surface))
+                disk_count = len(_ledger_work_files(scope, backlog, surface))
                 if declared_count != disk_count:
                     problems.append(
                         f"counter mismatch in {scope.docs['counters_file']}: {surface} declares "
@@ -672,7 +674,7 @@ def _rule_ledger_consistency(scope: Scope) -> list[str]:
                 if not next_match:
                     continue
                 prefix, number = next_match.group(1), int(next_match.group(2))
-                allocated = _allocated_numbers(surface, scope.backlog_archive_to_active.get(surface), prefix)
+                allocated = _allocated_numbers(scope, backlog, surface, scope.backlog_archive_to_active.get(surface), prefix)
                 expected_next = (max(allocated) + 1) if allocated else 1
                 if number != expected_next:
                     problems.append(
@@ -683,9 +685,16 @@ def _rule_ledger_consistency(scope: Scope) -> list[str]:
     # Next-ID declarations in the numbered ledger READMEs: at most one per file
     # and prefix, and the value must equal the ∪-derived next ID (BUG-002: a
     # duplicated stale declaration passed while the counters table alone stayed
-    # consistent).
+    return problems
+
+
+def _ledger_placement_problems(scope: Scope, backlog: Path) -> list[str]:
+    """Table rows sit inside a real table block and next-ID declarations are unique and
+    agreement-checked.
+    """
+    problems: list[str] = []
     for surface in scope.surfaces["numbered"]:
-        surface_dir = _surface_dir(surface)
+        surface_dir = _ledger_surface_dir(scope, backlog, surface)
         index = surface_dir / "README.md"
         if not index.is_file():
             continue
@@ -709,7 +718,7 @@ def _rule_ledger_consistency(scope: Scope) -> list[str]:
             prefix_pair = scope.backlog_numbered_prefixes.get(prefix)
             if not prefix_pair:
                 continue
-            declared_allocated = _allocated_numbers(prefix_pair[0], prefix_pair[1], prefix)
+            declared_allocated = _allocated_numbers(scope, backlog, prefix_pair[0], prefix_pair[1], prefix)
             derived_next = (max(declared_allocated) + 1) if declared_allocated else 1
             for value, where in entries:
                 if value != derived_next:
@@ -718,6 +727,28 @@ def _rule_ledger_consistency(scope: Scope) -> list[str]:
                         f"but allocation implies {prefix}-{derived_next:03d}"
                     )
     return problems
+
+
+def _rule_ledger_consistency(scope: Scope) -> list[str]:
+    """Ledger bookkeeping surfaces must be mechanically consistent (rule 7).
+
+    The `_backlog` ritual states "编号、索引、计数三处一致"; this rule makes
+    the stated ritual a checked invariant: every active/archive work-item file
+    is indexed by its surface README, every index row resolves to disk, the
+    `_archived/README.md` counters and Next-ID declarations match disk, and every
+    active card carries a vocabulary-checked hukou without a residency
+    violation (graduated/closable cards must have left the active zone).
+    """
+    backlog = scope.root / scope.docs["backlog_root"]
+    if not backlog.is_dir():
+        return []
+    # Three named sub-rules, concatenated in their original order: the
+    # violation order is part of the rule's observable output.
+    return (
+        _ledger_roster_problems(scope, backlog)
+        + _ledger_counter_problems(scope, backlog)
+        + _ledger_placement_problems(scope, backlog)
+    )
 
 
 _COUNT_SPECS_RE = _re.compile(r"(\d+)\s*个\s*能力")

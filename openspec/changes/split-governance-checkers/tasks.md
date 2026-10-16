@@ -19,9 +19,9 @@
 
 ## 3. Function-level decomposition of the doc-hygiene ledger rule
 
-- [ ] 3.1 Decompose the 182-line `_rule_ledger_consistency` into named sub-rule functions (roster and index, counters and Next-ID, declaration consistency, row placement, card hukou and residency) called by the rule in the same order; verify the plain-mode violation text on a planted-violation tree is identical before and after by re-running the change's green-field comparison
-- [ ] 3.2 Verify the whole battery still holds after the decomposition: `python3 openspec/governance/check_doc_hygiene.py --self-test` exits 0 and the governance suite still reports at least 145 tests
-- [ ] 3.3 Confirm no rule logic leaked into the entry points: verify each of the three touched entry points stays within a declared line ceiling and contains no rule body, by measuring their line counts and reviewing their contents
+- [x] 3.1 Decompose the 182-line `_rule_ledger_consistency` into named sub-rule functions (roster and index, counters and Next-ID, declaration consistency, row placement, card hukou and residency) called by the rule in the same order; verify the plain-mode violation text on a planted-violation tree is identical before and after by re-running the change's green-field comparison
+- [x] 3.2 Verify the whole battery still holds after the decomposition: `python3 openspec/governance/check_doc_hygiene.py --self-test` exits 0 and the governance suite still reports at least 145 tests
+- [x] 3.3 Confirm no rule logic leaked into the entry points: verify each of the three touched entry points stays within a declared line ceiling and contains no rule body, by measuring their line counts and reviewing their contents
 
 ## 4. Closeout evidence and receipt
 
@@ -39,7 +39,8 @@
 - 偏差 4（apply 于步骤 1.5 抓到的真 bug，非设计偏离而是必须记录的缺陷）：搬移时 `facade.py` 漏了 `import sys`，正常路径不触发、**只有失败路径打印违规时炸**，而"stdout 逐字比对"永远走不到那里。**落点**：补 `import sys`；教训写入下方"未执行的检查"——**拆包必须验证失败路径，正常路径逐字绿不构成证据**。
 - 偏差 5（apply 于步骤 2.4 完成）：`_validate_selected_policy_reviews` 的三个并行 if 块换成注册表 `_REVIEW_RECORDS`（policy → 标题/错误码后缀/校验器）加统一适配器——三个原校验器签名不一（只有 control-placement 收 triggered_policies），故用薄适配器对齐，而非改其签名。**验证**：三条策略各做一次种植变红（`focus.control_placement_review_missing` / `focus.node_agent_review_missing` / `focus.workflow_outcome_review_missing`）＋ 两条反向控制（无触发策略不索要记录、满足的记录放行）＋ CLI 逐字不变。
 - 偏差 6（apply 于步骤 2.3 的测试面同步）：`test_project_gate.py` 的 `RealChangeGuidancePlantedNegativeTest` 按路径把入口与 kernel **复制**进临时树再执行，拆包后复制品找不到子包。**裁决依据**：proposal 已把该夹具的可达性写为相邻契约（"入口必须自足、kernel 位置不变"），夹具源码清单随文件结构同步属结构同步而非行为变更。**落点**：`_FIXTURE_SOURCES` 增加子包目录（`shutil.copytree` 原生支持目录项），并附注释说明理由；测试断言与断言文本零改动。
-- none: 除上述六项外无其他设计偏离；若后续步骤再发现须偏离，按 core 原则追加条目并写明裁决依据与落点。
+- 偏差 7（apply 于步骤 3.1 执行）：design 说"分解 `_rule_ledger_consistency`"，实现时发现该规则原有三个嵌套助手（`_surface_dir`/`_work_files`/`_allocated_numbers`）依赖闭包变量 `scope`/`backlog`；提为模块级必须把这两个变量改为显式参数，属**签名变更**而非纯文本搬移——但它只影响模块内部调用点（`Scope`/注册表契约不变，`RULES` 入口不变，无外部消费者）。**落点**：三个助手更名为 `_ledger_surface_dir`/`_ledger_work_files`/`_allocated_numbers`（后者保留原名）并接收 `scope, backlog`；三个子规则函数 `_ledger_roster_problems`(73) / `_ledger_counter_problems`(35) / `_ledger_placement_problems`(39) 各返回自己的问题列表，主规则按**原累加顺序**串接。**验证**：8 条违规的绿地对照 9/9 IDENTICAL（含 ledger_consistency 自身的 4 条）、合并对照 18 == 18、`--self-test` exit 0、套件 145 全绿；`_rule_ledger_consistency` 182 → 20 行。
+- none: 除上述七项外无其他设计偏离；若后续步骤再发现须偏离，按 core 原则追加条目并写明裁决依据与落点。
 
 ## Delivery Record
 
