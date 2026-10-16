@@ -55,7 +55,7 @@ Bundle 规则合同在 [test_bundle_domain](unit/domain/test_bundle_domain.py)�
 | 报告 URL 对本 run 搜索语料的可计算支撑（证支撑、不证为真） | [test_traceability.py](unit/engine/test_traceability.py) | 真实纯函数；fixture 钉样 + 空/篡改语料负例，无 I/O |
 | 真实 journal 的行为画像（工具选择/事件构成/时长；观察非准入、token 不断言） | [test_behavior_profile.py](unit/engine/test_behavior_profile.py) | 真实 journal fixture 钉样；篡改/退化研究/未知工具负例，不执行模型 |
 | reject 不落内容、admit/replay、账本篡改、报告路径 | [test_admission_runtime.py](unit/runtime/test_admission_runtime.py) | 真实 validator/临时落盘/hash 链；人工产物 |
-| run_research 的续答、终态、fallback、取消与最终报告 | [test_run_engine.py](unit/runtime/test_run_engine.py) | 真实 Bundle/journal/admission；手写 stream_fn 事件，非真实 agent loop |
+| pump 的入口与工具事件、澄清与自动续跑、计划闸、终态与交付 | `test_pump.py` / `test_pump_clarification.py` / `test_pump_plan_gate.py` / `test_pump_terminal.py`（共享 [pump_case.py](unit/runtime/pump_case.py)） | 真实 Bundle/journal/admission；手写 stream_fn 事件，非真实 agent loop |
 | 文档旋钮表与代码常量对账（research-process binding 表漂移即红） | [test_binding_doc_guard.py](unit/runtime/test_binding_doc_guard.py) | 读文档与代码常量对账；无 I/O |
 | 每次搜索/抓取物化为 diagnostics/searches/ 可直读文件（call_id 去重） | [test_search_log.py](unit/runtime/test_search_log.py) | 真实临时落盘；双源/孤儿/内容断言，无模型 |
 | 前台装配、create 顺序/缺依赖 remedy、Bundle 查找、pin 失败、无框架 help/观察错误 | [test_assembly.py](unit/interaction/test_assembly.py) | 真入口/临时落盘/依赖阻断子进程与负例；client/saver/pump 协议替身，不执行模型 |
@@ -132,7 +132,7 @@ CLI 旅程的 refine 断言第二代跑完且报告 admit；cancel 在旅程中�
 
 ```bash
 # 单个离线文件
-PYTHONPATH=src python3 -m unittest tests.unit.runtime.test_run_engine -v
+PYTHONPATH=src python3 -m unittest tests.unit.runtime.test_pump -v
 # 单个合同文件
 PYTHONPATH=src python3 -m unittest tests.contract.test_wiring_mirror -v
 # 单个测试（下面是现存例子）
