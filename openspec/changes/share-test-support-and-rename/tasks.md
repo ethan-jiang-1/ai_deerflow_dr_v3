@@ -4,8 +4,8 @@
 
 - [x] 1.1 Record the baseline: from `deep_research_harness/` run `UV_OFFLINE=1 make verify`, `make smoke` and the ruff lint lane; verify all three exit 0 and record the case counts (expected verify 251, smoke 30)
 - [x] 1.2 Re-capture the test ID sets into `/tmp/phase5-before/` (verify and smoke lanes) with the same collector used for the earlier capture; verify the counts match the recorded baseline (verify 242 ids, smoke 13 ids) and that the files are non-empty
-- [ ] 1.3 Add `tests/support.py` with the five shared fixtures (temporary run-bundle builder, fixed clock and pin constants, event constructors, journal reader) and no test functions of its own; verify it imports cleanly and that `python3 -m unittest discover -s tests` still reports the baseline case count
-- [ ] 1.4 Switch the test files onto `tests/support.py` one group at a time (runtime, interaction, domain/engine, contract), removing each file's local copies of the moved fixtures; after each group verify `make verify` exits 0 and the ID set is unchanged
+- [x] 1.3 Add `tests/support.py` with the five shared fixtures (temporary run-bundle builder, fixed clock and pin constants, event constructors, journal reader) and no test functions of its own; verify it imports cleanly and that `python3 -m unittest discover -s tests` still reports the baseline case count
+- [ ] 1.4   ⚠ 进行中：engine 组（`test_traceability.py`）已切换，其余三组待做。Switch the test files onto `tests/support.py` one group at a time (runtime, interaction, domain/engine, contract), removing each file's local copies of the moved fixtures; after each group verify `make verify` exits 0 and the ID set is unchanged
 - [ ] 1.5 Verify the whole suite after the switch: `make verify` exit 0, `make smoke` exit 0, the lint lane exit 0, and the ID sets identical to `/tmp/phase5-before/`
 
 ## 2. Split the run-engine grab-bag

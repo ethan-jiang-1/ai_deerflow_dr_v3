@@ -11,12 +11,11 @@ from __future__ import annotations
 import json
 import tempfile
 import unittest
-from datetime import UTC, datetime
 from pathlib import Path
 
 from deerflow_deep_research.engine import traceability
 from deerflow_deep_research.runtime import pump
-from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
+import support  # noqa: E402 — tests/ is on the path for the suite
 
 FIXTURE = Path(__file__).resolve().parents[2] / "fixtures" / "replay" / "real-small-stream.json"
 
@@ -25,11 +24,7 @@ def _replay_report_and_corpus(tmp: str) -> tuple[str, str]:
     """Drive the recorded stream through the real pump; return (report, corpus)."""
     recorded = json.loads(FIXTURE.read_text(encoding="utf-8"))
     runs = Path(tmp) / "runs"
-    state = bundle_actions.start(
-        runs, problem_text=recorded["problem"], composition="all_real",
-        deerflow_pin="c" * 40, now=datetime(2026, 10, 3, 12, 0, tzinfo=UTC),
-    )
-    handle = bundle_state.BundleHandle.open(runs / "d_20261003" / state.thread_id)
+    _state, handle = support.build_run_bundle(runs, problem=recorded["problem"])
     events = iter(recorded["events"])
 
     class SimpleEvent:
