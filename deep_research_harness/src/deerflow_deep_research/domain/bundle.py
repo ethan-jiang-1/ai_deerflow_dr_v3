@@ -7,6 +7,8 @@ path declaration may exist (project-structure discipline).
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import re
 from pathlib import PurePosixPath
 
@@ -32,8 +34,32 @@ _BUNDLE_ID_RE = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 )
 
+@dataclass(frozen=True)
+class CompositionLadder:
+    """One composition and the config ladder that runs it.
+
+    ``config_name`` is the config file's stem; ``wired`` records whether a ladder
+    actually exists for it. `mixed` is declared but unwired on purpose: naming it
+    must fail loudly at the assembly boundary rather than silently pick a ladder.
+    """
+
+    config_name: str
+    wired: bool = True
+
+
 # Explicit composition recorded at start; anything else is rejected at the boundary.
-COMPOSITIONS: tuple[str, ...] = ("fixture", "mixed", "all_real")
+# This is the single declaration of the composition vocabulary: the config names and
+# the CLI's `--config` choices are derived from it, so the three can no longer drift
+# apart the way four hand-kept tables could.
+COMPOSITION_LADDERS: tuple[tuple[str, CompositionLadder], ...] = (
+    ("fixture", CompositionLadder(config_name="fixture")),
+    ("mixed", CompositionLadder(config_name="mixed", wired=False)),
+    ("all_real", CompositionLadder(config_name="base")),
+)
+COMPOSITIONS: tuple[str, ...] = tuple(name for name, _ in COMPOSITION_LADDERS)
+COMPOSITION_CONFIG_NAMES: tuple[str, ...] = tuple(
+    ladder.config_name for _, ladder in COMPOSITION_LADDERS
+)
 
 
 def is_valid_bucket(name: str) -> bool:

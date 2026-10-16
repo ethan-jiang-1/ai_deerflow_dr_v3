@@ -68,7 +68,11 @@ def config_name_for_composition(composition: str) -> str:
     no wired ladder (the declared-but-unwired `mixed`) fail loudly naming the value.
     """
 
-    mapping = {"fixture": "fixture", "all_real": "base"}
+    mapping = {
+        name: ladder.config_name
+        for name, ladder in bundle.COMPOSITION_LADDERS
+        if ladder.wired
+    }
     if composition not in mapping:
         raise ValueError(
             f"composition {composition!r} has no wired config ladder; "

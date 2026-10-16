@@ -13,7 +13,22 @@ from pathlib import Path
 from ...domain import bundle
 from .contracts import client_surface
 
-CONFIG_NAMES: tuple[str, ...] = ("base", "fixture", "record")
+# The composition ladders declare their config names; `record` is the tooling
+# ladder that no composition uses, so it is appended here rather than declared
+# as a composition.
+# Sorted: this tuple is a set of legal config names, and a stable order keeps the
+# CLI's `--config` help and any captured surface from churning when the
+# composition declaration is reordered.
+CONFIG_NAMES: tuple[str, ...] = tuple(
+    sorted(
+        dict.fromkeys(
+            (
+                *(ladder.config_name for _, ladder in bundle.COMPOSITION_LADDERS if ladder.wired),
+                "record",
+            )
+        )
+    )
+)
 
 # The embedded stream's recursion limit is a PER-CALL override (upstream
 # deerflow/backend/packages/harness/deerflow/client.py:293) — the

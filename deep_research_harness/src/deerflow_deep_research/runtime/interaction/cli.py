@@ -17,6 +17,7 @@ import time
 from ...domain import bundle, outcomes
 from ...domain import diagnosis as diagnosis_mod
 from .. import assembly, pump
+from ..adapters import client
 from ..bundle import bundle_actions, bundle_state
 from . import render
 
@@ -122,7 +123,16 @@ def _live_renderer():
 
 
 def cmd_create(args) -> None:
-    composition = "fixture" if args.config == "fixture" else "all_real"
+    # The declared ladders own the composition vocabulary; the CLI only maps the
+    # chosen config back onto the composition it runs.
+    composition = next(
+        (
+            name
+            for name, ladder in bundle.COMPOSITION_LADDERS
+            if ladder.wired and ladder.config_name == args.config
+        ),
+        "all_real",
+    )
     state = bundle_actions.start(
         assembly.runs_root(), problem_text=args.problem, composition=composition, deerflow_pin=assembly.read_pin()
     )
@@ -273,7 +283,7 @@ def main(argv=None) -> int:
 
     create = sub.add_parser("create", help="start a bundle and run in the foreground")
     create.add_argument("problem")
-    create.add_argument("--config", choices=["fixture", "base", "record"], default="fixture")
+    create.add_argument("--config", choices=list(client.CONFIG_NAMES), default="fixture")
     create.set_defaults(func=cmd_create)
 
     for name, func, help_text in (
