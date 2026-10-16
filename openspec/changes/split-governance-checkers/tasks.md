@@ -11,11 +11,11 @@
 
 ## 2. Split of the change-guidance checker
 
-- [ ] 2.1 Create the `openspec/governance/change_guidance_check/` package and move the rule bodies into it by responsibility (guidance tree and product context, focus card and proposals, budgets and information map, policy and profile registry, the three review-table validators), leaving only the CLI and re-exports in `check_change_guidance.py`; verify stdout matches the `/tmp/split-before/` capture byte for byte and the exit code is 0
-- [ ] 2.2 Re-export the migration-period surface the tests address directly (`ContractViolation`, `_validate_change_tasks`) from the entry point, with a docstring note that these names are the compatibility surface; verify `python3 -m unittest openspec.tests.governance.test_change_authority` style discovery through the suite passes unchanged
-- [ ] 2.3 Keep `change_guidance_kernel.py` at its top-level path and file name, with the package importing it by module name; verify the planted-negative fixture test in `test_project_gate.py` passes (it copies the checker and the kernel by path into an isolated tree)
-- [ ] 2.4 Replace the three parallel review-policy if-blocks with one registry-driven dispatch table inside the package, preserving the order and the violation text of each; verify each of the three review policies still fails loudly when its required table is removed from a planted proposal (one planted defect per policy, restored after each)
-- [ ] 2.5 Register the new package and its modules in `required-paths.toml`; verify the architecture checker exits 0 and the plan and closeout gates still pass for this change
+- [x] 2.1 Create the `openspec/governance/change_guidance_check/` package and move the rule bodies into it by responsibility (guidance tree and product context, focus card and proposals, budgets and information map, policy and profile registry, the three review-table validators), leaving only the CLI and re-exports in `check_change_guidance.py`; verify stdout matches the `/tmp/split-before/` capture byte for byte and the exit code is 0
+- [x] 2.2 Re-export the migration-period surface the tests address directly (`ContractViolation`, `_validate_change_tasks`) from the entry point, with a docstring note that these names are the compatibility surface; verify `python3 -m unittest openspec.tests.governance.test_change_authority` style discovery through the suite passes unchanged
+- [x] 2.3 Keep `change_guidance_kernel.py` at its top-level path and file name, with the package importing it by module name; verify the planted-negative fixture test in `test_project_gate.py` passes (it copies the checker and the kernel by path into an isolated tree)
+- [x] 2.4 Replace the three parallel review-policy if-blocks with one registry-driven dispatch table inside the package, preserving the order and the violation text of each; verify each of the three review policies still fails loudly when its required table is removed from a planted proposal (one planted defect per policy, restored after each)
+- [x] 2.5 Register the new package and its modules in `required-paths.toml`; verify the architecture checker exits 0 and the plan and closeout gates still pass for this change
 
 ## 3. Function-level decomposition of the doc-hygiene ledger rule
 
@@ -37,7 +37,9 @@
 - 偏差 2（apply 期过程记录，如实留痕）：步骤 1.3/1.4 的搬移由脚本按行范围拼接完成，中途三次拼接边界/缩进出错（把 `package`/`source_root` 赋值搬走、块缩进加减方向弄反、两个新助手缺 return），每次都**由 CLI 逐字比对与套件立即抓红**，未进入任何提交；最终形态经同一对探针验证。教训：按行范围搬运必须先断言切片首行与缩进，再断言助手返回值。
 - 偏差 3（apply 于步骤 1.5 设计）：包内每个模块都被 `facade`/`__init__` import，因此"移走一个已登记模块"总是先炸在 import 上，无法精确命中"登记路径缺失"这条规则。**落点**：新增 `project_architecture_check/notes.py`（已登记、故意不被 import 的说明性模块），使该规则可被移走-恢复动作直接验证；红点实测 `ERROR [path.missing] required file is missing: …/notes.py`。
 - 偏差 4（apply 于步骤 1.5 抓到的真 bug，非设计偏离而是必须记录的缺陷）：搬移时 `facade.py` 漏了 `import sys`，正常路径不触发、**只有失败路径打印违规时炸**，而"stdout 逐字比对"永远走不到那里。**落点**：补 `import sys`；教训写入下方"未执行的检查"——**拆包必须验证失败路径，正常路径逐字绿不构成证据**。
-- none: 除上述四项外无其他设计偏离；若后续步骤再发现须偏离，按 core 原则追加条目并写明裁决依据与落点。
+- 偏差 5（apply 于步骤 2.4 完成）：`_validate_selected_policy_reviews` 的三个并行 if 块换成注册表 `_REVIEW_RECORDS`（policy → 标题/错误码后缀/校验器）加统一适配器——三个原校验器签名不一（只有 control-placement 收 triggered_policies），故用薄适配器对齐，而非改其签名。**验证**：三条策略各做一次种植变红（`focus.control_placement_review_missing` / `focus.node_agent_review_missing` / `focus.workflow_outcome_review_missing`）＋ 两条反向控制（无触发策略不索要记录、满足的记录放行）＋ CLI 逐字不变。
+- 偏差 6（apply 于步骤 2.3 的测试面同步）：`test_project_gate.py` 的 `RealChangeGuidancePlantedNegativeTest` 按路径把入口与 kernel **复制**进临时树再执行，拆包后复制品找不到子包。**裁决依据**：proposal 已把该夹具的可达性写为相邻契约（"入口必须自足、kernel 位置不变"），夹具源码清单随文件结构同步属结构同步而非行为变更。**落点**：`_FIXTURE_SOURCES` 增加子包目录（`shutil.copytree` 原生支持目录项），并附注释说明理由；测试断言与断言文本零改动。
+- none: 除上述六项外无其他设计偏离；若后续步骤再发现须偏离，按 core 原则追加条目并写明裁决依据与落点。
 
 ## Delivery Record
 

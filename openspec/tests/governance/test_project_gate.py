@@ -435,6 +435,12 @@ class RealChangeGuidancePlantedNegativeTest(unittest.TestCase):
             REPO_ROOT / "openspec" / "governance" / "check_change_guidance.py",
             "openspec/governance/check_change_guidance.py",
         ),
+        # The entry point is a thin shell over this package (split-governance-checkers).
+        # A copied entry point resolves its own sibling package, so the copy must carry it.
+        (
+            REPO_ROOT / "openspec" / "governance" / "change_guidance_check",
+            "openspec/governance/change_guidance_check",
+        ),
         (
             REPO_ROOT / "openspec" / "governance" / "change_guidance_kernel.py",
             "openspec/governance/change_guidance_kernel.py",
