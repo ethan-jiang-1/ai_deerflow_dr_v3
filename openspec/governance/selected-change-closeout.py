@@ -11,10 +11,18 @@ import argparse
 import hashlib
 import json
 import re
-import subprocess
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
+_GOVERNANCE_DIR = str(Path(__file__).resolve().parent)
+if _GOVERNANCE_DIR not in sys.path:
+    sys.path.insert(0, _GOVERNANCE_DIR)
+
+from subprocess import CompletedProcess  # noqa: E402
+
+from gitio import run_git  # noqa: E402
 
 SCHEMA_VERSION = "selected-change-closeout/v1"
 REQUIRED_ATTESTATION_FIELDS = (
@@ -77,12 +85,8 @@ def _active_change_root(change_name: str) -> Path | None:
     return change_root.resolve() if change_root.is_dir() else None
 
 
-def _git(repository: Path, *arguments: str) -> subprocess.CompletedProcess[bytes]:
-    return subprocess.run(
-        ["git", "-C", str(repository), *arguments],
-        check=False,
-        capture_output=True,
-    )
+def _git(repository: Path, *arguments: str) -> "CompletedProcess[bytes]":
+    return run_git(["-C", str(repository), *arguments], text=False)
 
 
 def _git_stdout(repository: Path, *arguments: str) -> bytes | None:

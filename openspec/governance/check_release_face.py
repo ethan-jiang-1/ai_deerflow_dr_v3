@@ -26,10 +26,15 @@ The slow full cold-start lane (fresh two-piece checkout through ``uv sync``,
 from __future__ import annotations
 
 import re
-import subprocess
 import sys
 import tomllib
 from pathlib import Path
+
+_GOVERNANCE_DIR = str(Path(__file__).resolve().parent)
+if _GOVERNANCE_DIR not in sys.path:
+    sys.path.insert(0, _GOVERNANCE_DIR)
+
+from gitio import run_git  # noqa: E402
 
 HARNESS = "deep_research_harness"
 GITLINK = "deerflow"
@@ -53,12 +58,7 @@ def _repo_root(argv: list[str]) -> Path:
 def _gitlink_head(gitlink_dir: Path) -> str | None:
     """The checked-out HEAD sha of the gitlink working tree, or None."""
     try:
-        result = subprocess.run(
-            ["git", "-C", str(gitlink_dir), "rev-parse", "HEAD"],
-            check=False,
-            capture_output=True,
-            text=True,
-        )
+        result = run_git(["-C", str(gitlink_dir), "rev-parse", "HEAD"])
     except OSError:
         return None
     if result.returncode != 0:

@@ -6,14 +6,20 @@ from __future__ import annotations
 
 import re
 import stat
-import subprocess
 from pathlib import Path
+
+from gitio import run_git
 
 from .contract import GIT_COMMIT_RE, ContractViolation, StructureManifest
 
-def _run_git_metadata(arguments: list[str]) -> subprocess.CompletedProcess[str]:
+def _run_git_metadata(arguments: list[str]) -> "CompletedProcess[str]":
+    """Run one git metadata command; an unavailable git binary is a loud violation.
+
+    The invocation is shared (``gitio.run_git``); this raising posture is this
+    checker's own error semantics and stays here.
+    """
     try:
-        return subprocess.run(arguments, check=False, capture_output=True, text=True)
+        return run_git(arguments[1:] if arguments[:1] == ["git"] else arguments)
     except OSError as exc:
         raise ContractViolation("gitlink.command_unavailable", "cannot execute required upstream gitlink metadata command") from exc
 

@@ -16,10 +16,17 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import subprocess
+import sys
 import tempfile
 import tomllib
 from pathlib import Path
+
+# Shared git invocation lives in the governance directory (sibling module).
+_GOVERNANCE_DIR = str(Path(__file__).resolve().parent)
+if _GOVERNANCE_DIR not in sys.path:
+    sys.path.insert(0, _GOVERNANCE_DIR)
+
+from gitio import run_git  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[2]
 REGISTRY = REPO / "deep_research_harness" / "proof-lanes.toml"
@@ -32,7 +39,7 @@ class ReceiptError(ValueError):
 
 
 def _git(*args: str, root: Path = REPO) -> str:
-    return subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, check=False).stdout.strip()
+    return run_git(list(args), cwd=root).stdout.strip()
 
 
 def load_lanes(path: Path = REGISTRY) -> list[dict]:
