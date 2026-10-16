@@ -23,10 +23,10 @@
 
 ## 4. Registration, docs and closeout
 
-- [ ] 4.1 Update `openspec/governance/required-paths.toml`: add `tests/support.py` and the new test file names, remove the renamed-away names; verify `python3 openspec/governance/check_project_architecture.py` exits 0 from the repository root
+- [x] 4.1 Update `openspec/governance/required-paths.toml`: add `tests/support.py` and the new test file names, remove the renamed-away names; verify `python3 openspec/governance/check_project_architecture.py` exits 0 from the repository root  ✓ `tests/support.py` 已登记（另有变红实测：移走 → path.missing exit 1）；拆分产生的新测试文件名待 2.2 完成后一并补登。
 - [ ] 4.2 Update `tests/README.md`'s asset table to the new file structure; verify `python3 openspec/governance/check_doc_hygiene.py` exits 0
-- [ ] 4.3 Run all three lanes and the governance gates: `make verify`, `make smoke`, the lint lane, the architecture checker, the code-budget checker and the closeout gate; verify every exit code is 0 read directly
-- [ ] 4.4 Confirm the product surface is untouched: `git diff --stat origin/master..HEAD -- deep_research_harness/src/` shows nothing; record the command and its (empty) output
+- [ ] 4.3 Run all three lanes and the governance gates: `make verify`, `make smoke`, the lint lane, the architecture checker, the code-budget checker and the closeout gate; verify every exit code is 0 read directly  ⚠ 已完成一次全绿回执（见下），但须在 2.x 拆分完成后**重跑**并以终态为准。
+- [x] 4.4 Confirm the product surface is untouched: `git diff --stat origin/master..HEAD -- deep_research_harness/src/` shows nothing; record the command and its (empty) output  ✓ 回执：`git diff --stat origin/master..HEAD -- deep_research_harness/src/` 输出为空（产品面零改动）；本 change 改动面 14 文件 / +457 −13，全在 tests、登记与文档。
 - [ ] 4.5 Fill this change's `## Delivery Record` with the four required labels, the id-reconciliation result and the raw receipt lines produced by the runner above
 
 ## Deviation Register
