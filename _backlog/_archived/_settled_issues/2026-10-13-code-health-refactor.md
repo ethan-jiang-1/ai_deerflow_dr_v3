@@ -223,24 +223,24 @@ Delivery Record 达标且六条门禁不回退。结论被阶段 1 的 change �
   **教训（写给后续阶段）**：本地收口只跑了 verify/smoke，漏跑 `make lint`（ruff）车道，
   33 项违规由远端 CI 抓出（run 38867472817）。**harness 面每次收口必须跑齐
   verify + smoke + lint 三条**。
-- 阶段 5 `share-test-support-and-rename` —— **进行中（本轮断点，交接记录）**。已完成：
-  ① `tests/support.py` 建成（`PIN` / `fixed_now(day)` / `build_run_bundle` / `RunBundle` /
-  `read_journal` / 事件套件），engine 组（`test_traceability.py`）已接线，并登记进
-  `required-paths.toml`（含变红实测）；② `test_collection_guard.py` 补了**已知违规负例**
-  （临时树里造 integration 带包标记 → 同一套发现机制断言泄漏发生），并有变异检查在案
-  （去掉 planted 标记 → 控制失败）；③ `test_entry_composition.py` → `test_assembly.py`
-  改名完成，四处活引用同步，11 条 ID 逐条映射对账成立；④ lint 配置补 `tests/**/*.py` 的
-  `E402`/`F401` 豁免（测试根按名导入夹具是 runner 既定形态）。
-  **未完成（下一位接手处）**：任务 1.4 剩余三组接线（domain → interaction → **runtime 最后**，
-  runtime 是重复夹具大头与 ID 对账风险最高处）；任务 1.5；任务 2.1–2.3 `test_run_engine.py`
-  （674 行 / 31 测试 / 1 个类）先做 31 个测试到四个行为族的**映射表**再拆为
-  `test_pump.py` / `test_pump_clarification.py` / `test_pump_plan_gate.py` /
-  `test_pump_terminal.py`；任务 4.2–4.5（`tests/README.md` 资产表同步、三车道收口、
-  `git diff --stat -- src/` 为空、填 Delivery Record）→ archive → 计数同步 → 推送 → 盯 CI。
-  **对账凭据**：`/tmp/phase5-before/verify-test-ids.txt`（242 个）与 `smoke-test-ids.txt`
-  （13 个）是 ID 不变量的唯一基线，须在改造后逐条对账（改名走映射表，数量相同不算证据）。
-  **两处已探明的差异不要踩**：固定时钟在文件间**不同**（10-03 vs 10-04），只能用
-  `support.fixed_now(day)` 保留差异；真重复的只有 `_PIN`。
+- 阶段 5 `share-test-support-and-rename` —— **已归档（2026-10-16，16/17 任务）**。目标四项交付
+  全部达成：① `tests/support.py`（112 行，五类共享夹具）建成、登记进 `required-paths.toml`
+  并经变红实测，被 6 个文件使用；② `test_run_engine.py`（674 行 / 31 测试 / **1 个类**）拆为
+  四个按行为族命名的文件（pump 120 / clarification 199 / plan_gate 214 / terminal 157 行）+
+  共享 `pump_case.py`（76 行）；③ 测试与主体同名（test_pump 族、`test_assembly.py`）；
+  ④ `test_collection_guard` 补**已知违规负例**（临时树造 integration 带包标记 → 同一套发现
+  机制断言泄漏；变异检查在案：去掉 planted 标记 → 控制失败）。
+  **五项偏差在案**，其中两条值得后续借鉴：
+  - **对账基线必须无损**：第 9 轮用 `unittest -v` 文本过滤捕获的基线有损（242 条 vs 当时
+    `Ran 251`），曾据此误判对账不成立。改用**静态 AST 枚举** + `git worktree` 检出阶段 5 之前
+    的版本取完整基线后成立：baseline 281 → now 282（+1 为 guard 控制），
+    missing 43 = 文件改名 12 + 拆分 31，added 44 = 12 + 31 + 1，**未解释差异为零**。
+    教训：跨版本对账要**用同一工具重新采集**，不要依赖上一轮留在 `/tmp` 的产物。
+  - **未完成项如实留开**：任务 1.4 只接线了 engine 组与 pump 族，其余文件的重复夹具未收敛
+    （`TemporaryDirectory()` 37→40、`bundle_actions.start(` 18→19、`_PIN` 仍 7 处，数字未降）。
+    按阶段 4 的先例带显式偏差收口，未把"部分完成"写成"完成"。
+  **回执**：make verify 252 · make smoke 30 · ruff lint 0 · 架构/体积/doc-hygiene/closeout
+  全 0 · 远端 CI success（run 38872124279）· 产品面零改动（`git diff --stat -- src/` 为空）。
 - 阶段 3 `establish-code-budgets`、阶段 5
   `share-test-support-and-rename` —— 未开工，各自需要独立 change；批准沿用本卡阶段表与
   D1–D3 裁决即可，无需重新推敲。
