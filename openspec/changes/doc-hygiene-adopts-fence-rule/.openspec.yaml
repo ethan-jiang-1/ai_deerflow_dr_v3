@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-10-16
+# The doc-hygiene guard adopts the one shared fence rule (BUG-005). No requirement,
+# command-line, or schema change.
+skip_specs: true

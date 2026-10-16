@@ -81,6 +81,10 @@ ROOT_COUNT_MATCHING = "matching counts flagged as drifted"
 ROOT_COUNT_UNPINNED = "missing count declaration not detected"
 STALE_MARKER_DETECTED = "stale marker not detected with file:line"
 STALE_MARKER_CLEAN = "clean file flagged by marker rule"
+FENCE_INDENTED_OPENER_KEEPS_CHECKING = "an indented fence opener hid a real ledger defect"
+TILDE_FENCED_ROW_NOT_A_LEDGER_ROW = "a tilde-fenced example read as a ledger row"
+FENCED_EXAMPLE_ID_NOT_ALLOCATED = "a fenced example allocated a ledger ID"
+FENCED_MARKER_QUOTE_NOT_STALE = "a fenced marker quote reported as stale"
 ALLOWLIST_UNJUSTIFIED = "unjustified allowlist entry not detected"
 
 
@@ -504,6 +508,40 @@ def _c(
     )
 
 
+# Fence-aware fixtures: the same ledger tree, differing only in how an example is fenced.
+_FENCE_ORPHAN_ROW = "| CLS-777 | 2026-10-01 | [x](x) | orphan row |"
+_FENCE_LEDGER_README = "_backlog/_archived/_settled_issues/README.md"
+
+
+def _append_to_ledger_readme(root: Path, snippet: str) -> None:
+    _ledger_repo(root)
+    target = root / _FENCE_LEDGER_README
+    target.write_text(target.read_text(encoding="utf-8") + "\n" + snippet + "\n", encoding="utf-8")
+
+
+def _fence_indented_opener_keeps_checking(root: Path) -> None:
+    """Four spaces is an indented code block (CommonMark 4.4), not a fence opener.
+
+    The genuine placement defect below it must still be reported: this is the
+    mis-kill direction, where a checker silently stops checking.
+    """
+    _append_to_ledger_readme(root, "    ```\n\n" + _FENCE_ORPHAN_ROW)
+
+
+def _tilde_fenced_row_is_not_a_ledger_row(root: Path) -> None:
+    _append_to_ledger_readme(root, "~~~\n" + _FENCE_ORPHAN_ROW + "\n~~~")
+
+
+def _fenced_example_id_does_not_allocate(root: Path) -> None:
+    _append_to_ledger_readme(root, "~~~\n" + _FENCE_ORPHAN_ROW + "\n~~~")
+
+
+def _fenced_marker_quote_is_not_stale(root: Path) -> None:
+    build_clean_fixture(root)
+    doc = root / "AGENTS.md"
+    doc.write_text(doc.read_text(encoding="utf-8") + "\n~~~\n骨架占位\n~~~\n", encoding="utf-8")
+
+
 # The registry. Declaration order is the CLI's report order and the unittest's
 # case order. Counts are pinned by the battery test: 32 negative controls beside
 # 9 green controls, 41 cases in total.
@@ -619,6 +657,21 @@ NEGATIVE_CASES: tuple[NegativeCase, ...] = (
        scope_overrides={
            "marker_allowlist": {("AGENTS.md", "骨架占位"): "   "},
        }),
+    _c(FENCE_INDENTED_OPENER_KEEPS_CHECKING, "ledger_consistency",
+       _fence_indented_opener_keeps_checking,
+       "a four-space-indented fence opener must not silence the rest of the file",
+       present=("ledger row placement defect",)),
+    _c(TILDE_FENCED_ROW_NOT_A_LEDGER_ROW, "ledger_consistency",
+       _tilde_fenced_row_is_not_a_ledger_row,
+       "a tilde-fenced example is not a ledger row",
+       absent=("ledger row placement defect",)),
+    _c(FENCED_EXAMPLE_ID_NOT_ALLOCATED, "ledger_consistency",
+       _fenced_example_id_does_not_allocate,
+       "an ID inside a fenced example allocates nothing",
+       absent=("allocation implies",)),
+    _c(FENCED_MARKER_QUOTE_NOT_STALE, "stale_markers", _fenced_marker_quote_is_not_stale,
+       "quoting a forbidden marker inside a fence is documentation, not a stale marker",
+       absent=("stale narrative marker",)),
 )
 
 

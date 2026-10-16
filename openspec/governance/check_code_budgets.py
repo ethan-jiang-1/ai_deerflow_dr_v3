@@ -47,8 +47,10 @@ class FileBudget:
 # first real run, which is the behaviour it exists for.
 # ---------------------------------------------------------------------------
 CODE_BUDGETS: dict[str, FileBudget] = {
-    "check_doc_hygiene.py": FileBudget(max_lines=895, max_long_functions=1),
-    "_battery.py": FileBudget(max_lines=671, max_long_functions=0),
+    # 895 -> 901: BUG-005 made three line scans fence-aware (shared markdown_fences).
+    "check_doc_hygiene.py": FileBudget(max_lines=901, max_long_functions=1),
+    # 671 -> 724: four fence-awareness controls (BUG-005) with their fixtures.
+    "_battery.py": FileBudget(max_lines=724, max_long_functions=0),
     # 464 -> 445: its local fence stripper moved to markdown_fences.py.
     "check_project_specs.py": FileBudget(max_lines=445, max_long_functions=2),
     "change_guidance_check/proposals.py": FileBudget(max_lines=460, max_long_functions=3),

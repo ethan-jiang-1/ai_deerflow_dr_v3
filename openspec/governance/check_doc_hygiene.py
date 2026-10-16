@@ -60,6 +60,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+import markdown_fences
+
 ADR_DIR = Path("deep_research_harness/docs/adr")
 DOCS_TREE = Path("deep_research_harness/docs")
 ADR_INDEX = ADR_DIR / "README.md"
@@ -560,7 +562,10 @@ def _allocated_numbers(
     index_file = backlog / "_archived" / archive_surface / "README.md"
     if index_file.is_file():
         body, _ = _read_utf8(index_file)
-        for line in (body or "").splitlines():
+        body_lines = (body or "").splitlines()
+        for line, fenced in zip(body_lines, markdown_fences.fence_flags(body_lines), strict=True):
+            if fenced:
+                continue  # an ID inside a fenced example allocates nothing
             if not line.lstrip().startswith("|"):
                 continue  # skip the Next-ID declaration line itself
             for id_match in scope.regexes["next_id"].finditer(line):
@@ -615,7 +620,6 @@ def _ledger_roster_problems(scope: Scope, backlog: Path) -> list[str]:
         # contiguous with a header separator. Blank lines, prose, or fences
         # between a row and its header shatter the table (observed twice as
         # the B3/B5 recurrence); such blocks fail naming the surface.
-        in_fence = False
         block: list[str] = []
         blocks: list[list[str]] = []
 
@@ -624,13 +628,10 @@ def _ledger_roster_problems(scope: Scope, backlog: Path) -> list[str]:
                 blocks.append(list(block))
                 block.clear()
 
-        for raw in index_text.splitlines():
-            if raw.strip().startswith("```"):
-                _flush()
-                in_fence = not in_fence
-                continue
-            if in_fence:
-                continue
+        index_lines = index_text.splitlines()
+        for raw, fenced in zip(index_lines, markdown_fences.fence_flags(index_lines), strict=True):
+            if fenced:
+                continue  # fenced examples are not ledger rows
             if raw.strip():
                 block.append(raw)
             else:
@@ -812,7 +813,12 @@ def _rule_stale_markers(scope: Scope) -> list[str]:
         if text is None:
             problems.append(f"non-UTF-8 managed file, marker scan skipped: {rel}")
             continue
-        for line_number, line in enumerate(text.splitlines(), start=1):
+        doc_lines = text.splitlines()
+        for line_number, (line, fenced) in enumerate(
+            zip(doc_lines, markdown_fences.fence_flags(doc_lines), strict=True), start=1
+        ):
+            if fenced:
+                continue  # quoting a forbidden marker inside a fence is documentation
             for marker in scope.stale_markers:
                 if marker in line and (rel, marker) not in scope.marker_allowlist:
                     problems.append(f"stale narrative marker {marker!r} at {rel}:{line_number}")
