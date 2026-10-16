@@ -7,9 +7,8 @@ path declaration may exist (project-structure discipline).
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 import re
+from dataclasses import dataclass
 from pathlib import PurePosixPath
 
 # The declared subtree set (v2's synthesis/ and review/ are deliberately absent:

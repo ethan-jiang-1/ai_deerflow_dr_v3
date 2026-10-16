@@ -13,16 +13,26 @@ import json
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from pathlib import Path
+from typing import TYPE_CHECKING
 
 from ...domain import clarification, journal_policy
-from ...domain.plan import (
-    PLAN_MARKER_CLOSE,
-    PLAN_MARKER_OPEN,
-    extract_plan as _extract_plan,
-)
-from ..bundle import search_log
-from ..bundle.journal import append_entry
+from ...domain.plan import PLAN_MARKER_CLOSE, PLAN_MARKER_OPEN
+from ...domain.plan import extract_plan as _extract_plan
 
+# The pump re-exports this module's vocabulary (its constants and the plan
+# extraction seam), so the names are part of this module's declared surface.
+__all__ = [
+    "AUTO_REPLY_PREFIX",
+    "PLAN_CONFIRM_PREFIX",
+    "PLAN_REQUEST_SUFFIX",
+    "PLAN_SKIP_MESSAGE",
+    "TurnOutcome",
+    "_extract_plan",
+    "consume_turn",
+]
+from ..bundle import bundle_state, search_log
+from ..bundle.journal import append_entry
 
 # The non-interactive continuation marker the clarification step prefixes.
 AUTO_REPLY_PREFIX = "[非交互模式·系统自动应答] "
@@ -298,5 +308,22 @@ def consume_turn(
         )
         _journal(handle, "model_tool", "model_tool_call", detail)
     if saw_values or values_calls or values_answered or values_fallback_error_type is not None:
-        return TurnOutcome(values_calls, values_answered, stop_reason, values_fallback_error_type, "".join(values_final_text))
-    return TurnOutcome(tool_calls, answered, stop_reason, values_fallback_error_type, "".join(turn_text))
+        return TurnOutcome(
+            values_calls,
+            values_answered,
+            stop_reason,
+            values_fallback_error_type,
+            "".join(values_final_text),
+        )
+    return TurnOutcome(
+        tool_calls,
+        answered,
+        stop_reason,
+        values_fallback_error_type,
+        "".join(turn_text),
+    )
+
+
+if TYPE_CHECKING:  # pragma: no cover - import-time only; annotations are strings
+    from ...domain.state_machine import BundleState
+    from ..bundle.bundle_state import BundleHandle

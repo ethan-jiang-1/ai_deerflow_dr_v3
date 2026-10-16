@@ -9,23 +9,26 @@ Terminal decisions are the RUB-001 pure rules; this module never re-decides them
 
 from __future__ import annotations
 
-import json
 from collections.abc import Callable
-from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
-from ..domain import bundle, clarification, journal_policy
-from ..domain.plan import PLAN_MARKER_CLOSE, PLAN_MARKER_OPEN
-from ..domain.plan import extract_plan as _extract_plan  # noqa: F401 — domain owns the vocabulary; seam name preserved
-from ..domain.state_machine import BundleState, rule_clarification_step, rule_run_terminal
+from ..domain import bundle, clarification
+from ..domain.state_machine import BundleState, rule_run_terminal
 from .bundle import bundle_state, search_log
+
 # Re-exported for surface parity: this name used to leak through the module-level
 # import of the journal writer. Kept so the module's public surface is unchanged.
-from .bundle.journal import append_entry  # noqa: F401
-from .bundle.journal import tail_journal  # noqa: F401 — re-export (watch tool)
+from .bundle.journal import (
+    append_entry,  # noqa: F401
+    tail_journal,  # noqa: F401 — re-export (watch tool)
+)
 from .pump_parts.deliver import record_delivery as _record_delivery_impl
 from .pump_parts.gates import clarification_step, plan_gate_step
-from .pump_parts.turn import (
+
+# The double-hop re-exports below (turn -> pump) are this module's public surface:
+# nothing in this file calls them, but callers and tests reach them here. F401 is
+# therefore explicitly waived for the whole block rather than per name.
+from .pump_parts.turn import (  # noqa: F401
     AUTO_REPLY_PREFIX,
     PLAN_CONFIRM_PREFIX,
     PLAN_REQUEST_SUFFIX,
@@ -37,15 +40,24 @@ from .pump_parts.turn import (
     _json_arguments,
     _msg_field,
     _now_iso,
+)
+
+# The module's declared surface: the entry points callers import, the vocabulary
+# other layers read, and the migration-period names the tests address.
+__all__ = [
+    "AUTO_REPLY_PREFIX",
+    "PLAN_REQUEST_SUFFIX",
+    "_journal",
+]
+
+from .pump_parts.turn import (
     consume_turn as _consume_turn,
 )
 
 if TYPE_CHECKING:
-    from pathlib import Path
 
     from .bundle.bundle_state import BundleHandle
 
-AUTO_REPLY_PREFIX = "[非交互模式·系统自动应答] "
 
 # ---------------------------------------------------------------------------
 # Contract-locked shells. `tests/contract/test_entry_chain.py` parses THIS file and

@@ -12,13 +12,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from . import outcomes
 from .bundle import (
     CHECKPOINT_FILENAME,
     JOURNAL_RELATIVE,
     STATE_FILENAME,
     UNANSWERED_QUESTIONS_RELATIVE,
 )
-from . import outcomes
 from .journal_policy import JournalEntry
 from .state_machine import BundleState
 
