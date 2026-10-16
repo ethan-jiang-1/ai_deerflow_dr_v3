@@ -26,10 +26,10 @@
 
 ## 5. The code-budget gate
 
-- [ ] 5.1 Measure the current size of every governance script (total lines and count of functions above the declared length threshold) with a script, and write the `CODE_BUDGETS` declaring table in the new checker using the measured values as ceilings, with the ratchet discipline stated in the table comment; verify every measured file lands at or under its declared ceiling
-- [ ] 5.2 Add `openspec/governance/check_code_budgets.py`: read the declaring table, measure each managed file, fail loudly naming the file, measured value, ceiling and offending function when over, fail as a missing managed path when absent, and enforce no budget for undeclared files; verify it exits 0 on the real tree
-- [ ] 5.3 Add the checker's `--self-test`: build a temporary tree with a planted over-limit file and a planted over-length function and verify both are reported; verify the self-test exits 0 on the clean case and that removing either planted defect makes the corresponding assertion fail (planted-negative control)
-- [ ] 5.4 Add `openspec/tests/governance/test_code_budgets.py` driving the checker's declared table, its over-limit path, its missing-file path and its self-test; verify the governance suite count rises above the 145 baseline and still exits 0
+- [x] 5.1 Measure the current size of every governance script (total lines and count of functions above the declared length threshold) with a script, and write the `CODE_BUDGETS` declaring table in the new checker using the measured values as ceilings, with the ratchet discipline stated in the table comment; verify every measured file lands at or under its declared ceiling
+- [x] 5.2 Add `openspec/governance/check_code_budgets.py`: read the declaring table, measure each managed file, fail loudly naming the file, measured value, ceiling and offending function when over, fail as a missing managed path when absent, and enforce no budget for undeclared files; verify it exits 0 on the real tree
+- [x] 5.3 Add the checker's `--self-test`: build a temporary tree with a planted over-limit file and a planted over-length function and verify both are reported; verify the self-test exits 0 on the clean case and that removing either planted defect makes the corresponding assertion fail (planted-negative control)
+- [x] 5.4 Add `openspec/tests/governance/test_code_budgets.py` driving the checker's declared table, its over-limit path, its missing-file path and its self-test; verify the governance suite count rises above the 145 baseline and still exits 0
 
 ## 6. Wiring, registration and closeout evidence
 
