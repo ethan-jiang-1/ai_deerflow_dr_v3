@@ -97,6 +97,17 @@ exit 0；harness `UV_OFFLINE=1 make verify` exit 0（251 tests / 0.748s）。
 
 ### 未决（等待确认，不阻塞阶段 1）
 
+> **2026-10-16 更新：两条未决均已处置。** 第 1 条（specs 13→14 与根 README 计数）随阶段 3
+> `establish-code-budgets` 完成；第 2 条（`selected-change-closeout.py` 去连字符改名）此前被
+> 五个阶段跳过，已于本轮由 `rename-closeout-tool` 完成（归档
+> `openspec/changes/archive/2026-10-16-rename-closeout-tool`）：文件改为
+> `selected_change_closeout.py` 后**可被真 import**（因此可单测，新增
+> `openspec/tests/governance/test_closeout_tool.py` 并用变异检查证明它能红），8 处活引用与
+> "政策 ↔ checker 声明"那一对同步，体积上限键随名更新（原本顶格 256 行，漏改键会让守卫静默失守）。
+> `SCHEMA_VERSION` 与命令行契约刻意不变。
+
+
+
 - 阶段 3 新增 `code-budgets` capability 会把 specs 主干从 13 个提到 14 个，需同步
   根 `README.md:85` 计数钉死与 doc-hygiene 的 root-count 规则靶子（已在此登记，避免
   到阶段 3 才发现）。
@@ -223,6 +234,16 @@ Delivery Record 达标且六条门禁不回退。结论被阶段 1 的 change �
   **教训（写给后续阶段）**：本地收口只跑了 verify/smoke，漏跑 `make lint`（ruff）车道，
   33 项违规由远端 CI 抓出（run 38867472817）。**harness 面每次收口必须跑齐
   verify + smoke + lint 三条**。
+- 残留清偿（两把，2026-10-16）—— **均已归档**，逐条复核 CLS-025"事实 13"与"未决"：
+  - `consolidate-journal-writes`：事实 13 的三类重复各收敛为一份实现。复核发现 `_journal` 的
+    两份**不是重复而是两套契约**（`turn.py` 那份调 `.validate()`，`bundle_actions.py` 那份不调），
+    统一到严格版后**实测零违规**（套件 252 + smoke 30 全绿）⇒ 两条路径获得同等词汇守卫。
+    `write_unanswered_questions` 从零调用者变唯一实现，exhaustion 写入**终于走 atomic**
+    （字节级证据：改前后同 sha256 `e5581fd7d54c45d1`）。重复计数：`now_iso` 3→1 ·
+    `journal_entry` 2→1 · `message_field` 2→1 · 内联 `write_text` 1→0。四项偏差在案。
+  - `rename-closeout-tool`：见上方"未决"更新。
+  - 两把各自的回执：verify 252 · smoke 30 · lint 0 · 七 checker + closeout gate 全 0 ·
+    远端 CI success（`22826a2` 与 `ae1ede7`）。
 - 阶段 5 `share-test-support-and-rename` —— **已归档（2026-10-16，16/17 任务）**。目标四项交付
   全部达成：① `tests/support.py`（112 行，五类共享夹具）建成、登记进 `required-paths.toml`
   并经变红实测，被 6 个文件使用；② `test_run_engine.py`（674 行 / 31 测试 / **1 个类**）拆为
