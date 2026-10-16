@@ -15,8 +15,126 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 
 from ...domain import clarification, journal_policy
+from ...domain.plan import (
+    PLAN_MARKER_CLOSE,
+    PLAN_MARKER_OPEN,
+    extract_plan as _extract_plan,
+)
 from ..bundle import search_log
 from ..bundle.journal import append_entry
+
+
+# The non-interactive continuation marker the clarification step prefixes.
+AUTO_REPLY_PREFIX = "[非交互模式·系统自动应答] "
+
+
+# Plan-gate framing and continuations (stable constants; scripted tests pin them).
+# Markers are the ONLY engagement signal: content structure, never behavioral
+# inference — a research turn ending in a plain-text report is indistinguishable
+# from a plan turn by tool calls alone (the 58b5440e real-ladder regression).
+# The marker literals and the extraction live in domain/plan.py (single owner —
+# the validator's plan-as-report refusal face consumes the same vocabulary).
+PLAN_REQUEST_SUFFIX = (
+    f"\n\n请先给出研究计划（研究角度、查询策略、来源类型），全文用 {PLAN_MARKER_OPEN} 和 "
+    f"{PLAN_MARKER_CLOSE} 标记包裹，然后停止等待确认；不要在此轮执行搜索。"
+    "如需先澄清问题，请直接提问，获得回答后请再次输出带标记的研究计划。"
+    "通道纪律：提问的一轮只携带 ask_clarification 这一个工具调用，不要同轮调用任何其他"
+    "工具（同轮的兄弟调用会被直接丢弃，已做的检索全部白费）；计划确认只通过 "
+    f"{PLAN_MARKER_OPEN} 标记表达，绝不要把确认请求或计划全文塞进 ask_clarification。"
+)
+PLAN_CONFIRM_PREFIX = "研究计划已确认（或经用户修订）。严格按以下计划执行研究并产出最终报告：\n\n"
+PLAN_SKIP_MESSAGE = "跳过计划注入，按你自己的判断研究并产出最终报告。"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def _record_delivery(handle: BundleHandle, terminal: BundleState, final_text: str) -> BundleState:
+    """Submit the final answer, then record the orthogonal delivery fact in state.
+
+    The process fact (terminal) lands first; the delivery fact enriches it through
+    the same revision-CAS path. Mapping: ledger admit/replay -> admitted (replay is
+    reworked content that materialized), reject -> rejected, empty answer ->
+    no-answer. The fine-grained disposition stays in the journal and ledger; state
+    answers only "did this generation deliver?". A crash before the enrichment
+    write leaves delivery unrecorded (None) — honest, never a torn fact.
+    """
+
+    text = (final_text or "").strip()
+    if not text:
+        delivery, artifact = "no-answer", None
+    else:
+        entry = _submit_final_report(handle, terminal.generation, final_text)
+        if entry.disposition in {"admit", "replay"}:
+            delivery, artifact = "admitted", entry.artifact_path
+        else:
+            delivery, artifact = "rejected", None
+
+    from dataclasses import replace
+
+    fresh = bundle_state.read_state(handle)
+    enriched = replace(fresh, delivery=delivery, delivery_artifact=artifact)
+    return bundle_state.write_state(handle, fresh, enriched)
+
+
+def _submit_final_report(handle: BundleHandle, generation: int, final_text: str):
+    """A clean completion's final answer passes the admission hold point as a
+    final_report (models propose, code disposes); an empty answer never submits.
+
+    Returns the ledger entry carrying the fine-grained disposition."""
+
+    text = (final_text or "").strip()
+    if not text:
+        return None
+    from ..engine.validator import ArtifactSubmission
+    from .bundle.admission import submit_artifact
+
+    return submit_artifact(
+        handle,
+        ArtifactSubmission(
+            kind="final_report",
+            filename=f"report-gen{generation}.md",
+            content=text.encode("utf-8"),
+            provenance={"producer": "run-engine"},
+        ),
+    )
+
+
+def tail_journal(journal_path: Path, position: int = 0):
+    """Read new journal entries from ``position`` (character offset).
+
+    Returns ``(entries, reached_terminal, new_position)``: ``reached_terminal`` is True
+    once a ``terminal`` entry has been rendered — the bounded watch exits there."""
+
+    from ..domain.journal_policy import JournalEntry
+
+    entries: list[JournalEntry] = []
+    reached_terminal = False
+    if not journal_path.is_file():
+        return entries, reached_terminal, position
+    text = journal_path.read_text(encoding="utf-8")
+    for line in text[position:].splitlines():
+        if not line.strip():
+            continue
+        try:
+            raw = json.loads(line)
+        except json.JSONDecodeError:
+            continue  # a partially written tail line is re-read on the next poll
+        entry = JournalEntry.from_dict(raw)
+        entries.append(entry)
+        if entry.category == "terminal":
+            reached_terminal = True
+    return entries, reached_terminal, position + len(text[position:])
 
 
 @dataclass(frozen=True)

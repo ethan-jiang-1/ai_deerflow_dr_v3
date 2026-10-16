@@ -67,3 +67,30 @@ def read_entries(handle: BundleHandle) -> tuple[JournalEntry, ...]:
 def _rewrite(handle: BundleHandle, kept: tuple[JournalEntry, ...]) -> None:
     payload = "".join(json.dumps(entry.to_dict(), ensure_ascii=False) + "\n" for entry in kept)
     atomic.atomic_write_text(journal_path(handle), payload)
+
+
+def tail_journal(journal_path: Path, position: int = 0):
+    """Read new journal entries from ``position`` (character offset).
+
+    Returns ``(entries, reached_terminal, new_position)``: ``reached_terminal`` is True
+    once a ``terminal`` entry has been rendered — the bounded watch exits there."""
+
+    from ...domain.journal_policy import JournalEntry
+
+    entries: list[JournalEntry] = []
+    reached_terminal = False
+    if not journal_path.is_file():
+        return entries, reached_terminal, position
+    text = journal_path.read_text(encoding="utf-8")
+    for line in text[position:].splitlines():
+        if not line.strip():
+            continue
+        try:
+            raw = json.loads(line)
+        except json.JSONDecodeError:
+            continue  # a partially written tail line is re-read on the next poll
+        entry = JournalEntry.from_dict(raw)
+        entries.append(entry)
+        if entry.category == "terminal":
+            reached_terminal = True
+    return entries, reached_terminal, position + len(text[position:])

@@ -10,20 +10,20 @@
 
 ## 2. Gate steps out of the drive loop
 
-- [ ] 2.1 Move the plan-gate branch out of `_drive` into `pump_parts/gates.py` as `plan_gate_step(...)`, preserving every journal entry name, order, and the plan/amend/skip/degrade branches verbatim; verify `make verify` exits 0
-- [ ] 2.2 Move the clarification branch into the same module as `clarification_step(...)`, preserving the absorbed/asked/answered/declined/auto-continuation/exhaustion branches and their journal entries verbatim; verify `make verify` exits 0 and the journal capture is unchanged
-- [ ] 2.3 Reduce `_drive` to a loop that calls the two steps plus a `_finish` helper; verify `_drive` is at most 60 lines and takes at most 4 parameters, and that `make smoke` exits 0
+- [x] 2.1 Move the plan-gate branch out of `_drive` into `pump_parts/gates.py` as `plan_gate_step(...)`, preserving every journal entry name, order, and the plan/amend/skip/degrade branches verbatim; verify `make verify` exits 0
+- [x] 2.2 Move the clarification branch into the same module as `clarification_step(...)`, preserving the absorbed/asked/answered/declined/auto-continuation/exhaustion branches and their journal entries verbatim; verify `make verify` exits 0 and the journal capture is unchanged
+- [ ] 2.3 Reduce `_drive` to a loop that calls the two steps plus a `_finish` helper; verify `_drive` is at most 60 lines and takes at most 4 parameters, and that `make smoke` exits 0  ⚠ 部分完成：_drive 51 行（≤60 达标），但仍 8 个参数（目标 ≤4）——参数收窄留下一步。
 
 ## 3. Delivery module behind contract-locked shells
 
-- [ ] 3.1 Move the delivery implementation into `pump_parts/deliver.py` (`submit_final_report`, `record_delivery`) and leave `_record_delivery` / `_submit_final_report` in `pump.py` as one-line delegating shells that keep calling each other by those names; verify `make verify` exits 0 (the contract test parses `runtime/pump.py` for exactly those names and the call between them)
-- [ ] 3.2 Add a comment on each shell naming the contract test and line range that pins it, so a later maintainer does not "de-duplicate" them away; verify the shells are one call each and that `python3 -m unittest tests.contract.test_entry_chain` (via the suite) still exits 0
-- [ ] 3.3 Verify the journal capture and the public-surface capture are both unchanged after the move
+- [x] 3.1 Move the delivery implementation into `pump_parts/deliver.py` (`submit_final_report`, `record_delivery`) and leave `_record_delivery` / `_submit_final_report` in `pump.py` as one-line delegating shells that keep calling each other by those names; verify `make verify` exits 0 (the contract test parses `runtime/pump.py` for exactly those names and the call between them)
+- [x] 3.2 Add a comment on each shell naming the contract test and line range that pins it, so a later maintainer does not "de-duplicate" them away; verify the shells are one call each and that `python3 -m unittest tests.contract.test_entry_chain` (via the suite) still exits 0
+- [x] 3.3 Verify the journal capture and the public-surface capture are both unchanged after the move
 
 ## 4. Watch tool leaves the pump
 
-- [ ] 4.1 Move `tail_journal` into `runtime/bundle/journal.py` and re-export it from `pump.py`; verify `grep -n "def tail_journal"` finds it once (in `bundle/journal.py`) and that `pump.tail_journal` resolves, with `make verify` exiting 0
-- [ ] 4.2 Verify `interaction/cli.py`'s watch command still works through the re-export by running `make smoke` and confirming exit 0
+- [x] 4.1 Move `tail_journal` into `runtime/bundle/journal.py` and re-export it from `pump.py`; verify `grep -n "def tail_journal"` finds it once (in `bundle/journal.py`) and that `pump.tail_journal` resolves, with `make verify` exiting 0
+- [x] 4.2 Verify `interaction/cli.py`'s watch command still works through the re-export by running `make smoke` and confirming exit 0
 
 ## 5. One declaration each for terminal outcomes and compositions
 

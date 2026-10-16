@@ -22,8 +22,16 @@ from .bundle import bundle_state, search_log
 # Re-exported for surface parity: this name used to leak through the module-level
 # import of the journal writer. Kept so the module's public surface is unchanged.
 from .bundle.journal import append_entry  # noqa: F401
+from .bundle.journal import tail_journal  # noqa: F401 — re-export (watch tool)
+from .pump_parts.deliver import record_delivery as _record_delivery_impl
+from .pump_parts.gates import clarification_step, plan_gate_step
 from .pump_parts.turn import (
+    AUTO_REPLY_PREFIX,
+    PLAN_CONFIRM_PREFIX,
+    PLAN_REQUEST_SUFFIX,
+    PLAN_SKIP_MESSAGE,
     TurnOutcome,
+    _extract_plan,
     _is_framework_clarification_echo,
     _journal,
     _json_arguments,
@@ -39,65 +47,12 @@ if TYPE_CHECKING:
 
 AUTO_REPLY_PREFIX = "[非交互模式·系统自动应答] "
 
-# Plan-gate framing and continuations (stable constants; scripted tests pin them).
-# Markers are the ONLY engagement signal: content structure, never behavioral
-# inference — a research turn ending in a plain-text report is indistinguishable
-# from a plan turn by tool calls alone (the 58b5440e real-ladder regression).
-# The marker literals and the extraction live in domain/plan.py (single owner —
-# the validator's plan-as-report refusal face consumes the same vocabulary).
-PLAN_REQUEST_SUFFIX = (
-    f"\n\n请先给出研究计划（研究角度、查询策略、来源类型），全文用 {PLAN_MARKER_OPEN} 和 "
-    f"{PLAN_MARKER_CLOSE} 标记包裹，然后停止等待确认；不要在此轮执行搜索。"
-    "如需先澄清问题，请直接提问，获得回答后请再次输出带标记的研究计划。"
-    "通道纪律：提问的一轮只携带 ask_clarification 这一个工具调用，不要同轮调用任何其他"
-    "工具（同轮的兄弟调用会被直接丢弃，已做的检索全部白费）；计划确认只通过 "
-    f"{PLAN_MARKER_OPEN} 标记表达，绝不要把确认请求或计划全文塞进 ask_clarification。"
-)
-PLAN_CONFIRM_PREFIX = "研究计划已确认（或经用户修订）。严格按以下计划执行研究并产出最终报告：\n\n"
-PLAN_SKIP_MESSAGE = "跳过计划注入，按你自己的判断研究并产出最终报告。"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def _record_delivery(handle: BundleHandle, terminal: BundleState, final_text: str) -> BundleState:
-    """Submit the final answer, then record the orthogonal delivery fact in state.
-
-    The process fact (terminal) lands first; the delivery fact enriches it through
-    the same revision-CAS path. Mapping: ledger admit/replay -> admitted (replay is
-    reworked content that materialized), reject -> rejected, empty answer ->
-    no-answer. The fine-grained disposition stays in the journal and ledger; state
-    answers only "did this generation deliver?". A crash before the enrichment
-    write leaves delivery unrecorded (None) — honest, never a torn fact.
-    """
-
-    text = (final_text or "").strip()
-    if not text:
-        delivery, artifact = "no-answer", None
-    else:
-        entry = _submit_final_report(handle, terminal.generation, final_text)
-        if entry.disposition in {"admit", "replay"}:
-            delivery, artifact = "admitted", entry.artifact_path
-        else:
-            delivery, artifact = "rejected", None
-
-    from dataclasses import replace
-
-    fresh = bundle_state.read_state(handle)
-    enriched = replace(fresh, delivery=delivery, delivery_artifact=artifact)
-    return bundle_state.write_state(handle, fresh, enriched)
-
-
+# ---------------------------------------------------------------------------
+# Contract-locked shells. `tests/contract/test_entry_chain.py` parses THIS file and
+# requires both names here: `_record_delivery` calling `_submit_final_report`, and
+# `_submit_final_report` reaching `submit_artifact` (the admission hold point). The
+# state enrichment lives in `pump_parts/deliver.py`; do not "de-duplicate" these.
+# ---------------------------------------------------------------------------
 def _submit_final_report(handle: BundleHandle, generation: int, final_text: str):
     """A clean completion's final answer passes the admission hold point as a
     final_report (models propose, code disposes); an empty answer never submits.
@@ -121,31 +76,11 @@ def _submit_final_report(handle: BundleHandle, generation: int, final_text: str)
     )
 
 
-def tail_journal(journal_path: Path, position: int = 0):
-    """Read new journal entries from ``position`` (character offset).
-
-    Returns ``(entries, reached_terminal, new_position)``: ``reached_terminal`` is True
-    once a ``terminal`` entry has been rendered — the bounded watch exits there."""
-
-    from ..domain.journal_policy import JournalEntry
-
-    entries: list[JournalEntry] = []
-    reached_terminal = False
-    if not journal_path.is_file():
-        return entries, reached_terminal, position
-    text = journal_path.read_text(encoding="utf-8")
-    for line in text[position:].splitlines():
-        if not line.strip():
-            continue
-        try:
-            raw = json.loads(line)
-        except json.JSONDecodeError:
-            continue  # a partially written tail line is re-read on the next poll
-        entry = JournalEntry.from_dict(raw)
-        entries.append(entry)
-        if entry.category == "terminal":
-            reached_terminal = True
-    return entries, reached_terminal, position + len(text[position:])
+def _record_delivery(handle: BundleHandle, terminal: BundleState, final_text: str) -> BundleState:
+    """Submit the final answer, then record the orthogonal delivery fact in state."""
+    text = (final_text or "").strip()
+    entry = _submit_final_report(handle, terminal.generation, final_text) if text else None
+    return _record_delivery_impl(handle, terminal, final_text, entry=entry)
 
 
 def run_research(
@@ -194,12 +129,12 @@ def run_research(
 def _drive(handle, stream_fn, on_event, on_clarification, on_plan, state, message, recorder):
     awaiting_plan = on_plan is not None and state.generation == 1
     while True:
+        # The bundle is the fact owner; a step that advances it (spending the
+        # clarification bound) must not leave a stale copy in the loop.
+        state = bundle_state.read_state(handle)
         outcome = _consume_turn(handle, stream_fn, message, state.thread_id, on_event, recorder)
         tool_calls = outcome.tool_calls
         answered = outcome.answered
-        stop_reason = outcome.stop_reason
-        fallback_error_type = outcome.fallback_error_type
-        final_text = outcome.final_text
         detected = clarification.unanswered_ask_clarification(
             clarification.TerminalObservation(
                 tool_calls=tuple(tool_calls),
@@ -220,108 +155,74 @@ def _drive(handle, stream_fn, on_event, on_clarification, on_plan, state, messag
                 "question": clarification.question_text(absorbed_call.arguments),
             })
 
-        if not detected:
-            if awaiting_plan:
-                plan_text = _extract_plan(final_text or "")
-                if plan_text is None:
-                    # No plan markers (a report, a chatty answer, or nothing plan-shaped):
-                    # degrade honestly, never force-block, fall through to today's rules.
-                    _journal(handle, "lifecycle", "plan_gate_degraded", {
-                        "reason": "no_plan_markers",
-                    })
-                    awaiting_plan = False
-                else:
-                    _journal(handle, "lifecycle", "plan_proposed", {"plan_preview": plan_text[:200]})
-                    approved = on_plan(plan_text)
-                    if approved is not None and str(approved).strip():
-                        approved = str(approved).strip()
-                        event = "plan_confirmed" if approved == plan_text else "plan_amended"
-                        _journal(handle, "lifecycle", event, {"plan_preview": approved[:200]})
-                        from .bundle.atomic import atomic_write_text
-
-                        atomic_write_text(
-                            handle.root / bundle.plan_request_relative(state.generation),
-                            approved + "\n",
-                        )
-                        message = PLAN_CONFIRM_PREFIX + approved
-                    else:
-                        _journal(handle, "lifecycle", "plan_skipped", {})
-                        message = PLAN_SKIP_MESSAGE
-                    awaiting_plan = False
-                    continue
-            fresh = bundle_state.read_state(handle)
-            if fallback_error_type is not None:
-                # The framework disguised a model-call failure as a normal AI message:
-                # fail loud instead of completing (wiring plan, error-fallback guard).
-                state = rule_run_terminal(fresh, "failed-resume")
-                written = bundle_state.write_state(handle, fresh, state)
-                _journal(
-                    handle,
-                    "terminal",
-                    "llm_error_fallback",
-                    {"reason": "llm_error_fallback", "error_type": fallback_error_type},
-                )
-                return written
-            if fresh.cancel_requested:
-                state = rule_run_terminal(fresh, "cancelled")
-                written = bundle_state.write_state(handle, fresh, state)
-                _journal(handle, "terminal", "run_cancelled", {"generation": written.generation})
-                return written
-            if stop_reason:
-                state = rule_run_terminal(fresh, "failed-resume")
-                written = bundle_state.write_state(handle, fresh, state)
-                _journal(handle, "terminal", "stop_reason", {"reason": stop_reason})
-                return written
-            state = rule_run_terminal(fresh, "completed")
-            written = bundle_state.write_state(handle, fresh, state)
-            _journal(handle, "terminal", "run_completed", {"generation": written.generation})
-            written = _record_delivery(handle, written, final_text)
-            return written
-
-        last_question = tool_calls[-1].arguments if tool_calls else ""
-        if on_clarification is not None:
-            question_text = clarification.question_text(last_question)
-            _journal(handle, "lifecycle", "clarification_asked", {"question": question_text})
-            answer = on_clarification(question_text)
-            if answer is not None and str(answer).strip():
-                # The human's own words continue the run — raw, no provenance prefix.
-                _journal(
-                    handle, "lifecycle", "clarification_answered", {"question": question_text},
-                )
-                message = str(answer).strip()
-                continue
-            # Declined (empty answer): fall back to the bounded automatic reply.
-            _journal(handle, "lifecycle", "clarification_declined", {"question": question_text})
-        if state.auto_proceed_count < state.auto_proceed_bound:
-            state = rule_clarification_step(state, detected=True)
-            state = bundle_state.write_state(handle, bundle_state.read_state(handle), state)
-            _journal(
-                handle,
-                "lifecycle",
-                "auto_continuation",
-                {"count": state.auto_proceed_count, "bound": state.auto_proceed_bound},
+        if detected:
+            cont, message, advanced = clarification_step(
+                handle, on_clarification, state, tool_calls
             )
-            message = AUTO_REPLY_PREFIX + clarification.question_text(last_question)
+            if not cont:
+                return advanced
+            # Spending the auto-continuation bound advanced the state; the loop must
+            # carry it, or the bound would never be reached.
+            state = advanced
             continue
 
-        exhausted = rule_clarification_step(state, detected=True)
-        written = bundle_state.write_state(handle, bundle_state.read_state(handle), exhausted)
-        questions_path = handle.root / bundle.UNANSWERED_QUESTIONS_RELATIVE
-        questions_path.parent.mkdir(parents=True, exist_ok=True)
-        questions_path.write_text(
-            json.dumps(
-                {"questions": [clarification.question_text(last_question)]},
-                ensure_ascii=False,
-                indent=2,
-            )
-            + "\n",
-            encoding="utf-8",
+        cont, message, terminal = _finish(
+            handle, awaiting_plan, on_plan,
+            outcome.final_text, outcome.fallback_error_type, outcome.stop_reason,
         )
+        if not cont:
+            return terminal
+        # The gate has had its turn (produced, amended, skipped or degraded): it must
+        # not re-open on the continuation turn.
+        awaiting_plan = False
+        if message is not None:
+            continue
+
+
+def _finish(handle, awaiting_plan, on_plan, final_text, fallback_error_type, stop_reason):
+    """The plan gate first, then the ordinary terminal rules — original order, verbatim.
+
+    The bundle is the only state carrier read here (the caller's loop variable can be
+    stale after a step advanced the run); a terminal disposition is returned for the
+    caller to hand back.
+
+    ``(True, message, None)``: the plan gate produced the next turn's message.
+    ``(False, None, state)``: a terminal disposition for the caller to return.
+    """
+    state = bundle_state.read_state(handle)
+    if awaiting_plan:
+        produced, message, _ = plan_gate_step(handle, on_plan, state, final_text)
+        if produced:
+            # A plan-shaped turn was gated: the next turn carries the confirmation,
+            # the amendment, or the skip notice.
+            return True, message, None
+        # No plan markers: the gate degraded (journaled) and the ordinary terminal
+        # rules below decide, exactly as they did before the split.
+    fresh = bundle_state.read_state(handle)
+    if fallback_error_type is not None:
+        # The framework disguised a model-call failure as a normal AI message:
+        # fail loud instead of completing (wiring plan, error-fallback guard).
+        state = rule_run_terminal(fresh, "failed-resume")
+        written = bundle_state.write_state(handle, fresh, state)
         _journal(
             handle,
-            "exhaustion",
-            "clarification_bound_exhausted",
-            {"bound": state.auto_proceed_bound},
+            "terminal",
+            "llm_error_fallback",
+            {"reason": "llm_error_fallback", "error_type": fallback_error_type},
         )
-        _journal(handle, "terminal", "run_failed_resume", {"reason": "clarification bound exhausted"})
-        return written
+        return False, None, written
+    if fresh.cancel_requested:
+        state = rule_run_terminal(fresh, "cancelled")
+        written = bundle_state.write_state(handle, fresh, state)
+        _journal(handle, "terminal", "run_cancelled", {"generation": written.generation})
+        return False, None, written
+    if stop_reason:
+        state = rule_run_terminal(fresh, "failed-resume")
+        written = bundle_state.write_state(handle, fresh, state)
+        _journal(handle, "terminal", "stop_reason", {"reason": stop_reason})
+        return False, None, written
+    state = rule_run_terminal(fresh, "completed")
+    written = bundle_state.write_state(handle, fresh, state)
+    _journal(handle, "terminal", "run_completed", {"generation": written.generation})
+    written = _record_delivery(handle, written, final_text)
+    return False, None, written
