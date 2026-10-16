@@ -1,0 +1,6 @@
+schema: spec-driven
+created: 2026-10-16
+# Wiring-only consolidation: one implementation per journal helper, and the
+# exhaustion write routed through the existing atomic writer. No requirement,
+# vocabulary, or observable outcome changes.
+skip_specs: true

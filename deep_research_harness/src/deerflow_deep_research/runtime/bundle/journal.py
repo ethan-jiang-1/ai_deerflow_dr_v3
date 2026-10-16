@@ -11,6 +11,7 @@ materializes it.
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 
 from ...domain import bundle, journal_policy
@@ -22,6 +23,25 @@ from .bundle_state import BundleHandle, check_lease
 JOURNAL_BOUND = journal_policy.JOURNAL_BOUND
 COMPACTION_THRESHOLD = journal_policy.COMPACTION_THRESHOLD
 COMPACTION_TAIL = journal_policy.COMPACTION_TAIL
+
+
+def now_iso() -> str:
+    """The timestamp every journal entry carries (one clock for all writers)."""
+    return datetime.now(UTC).isoformat()
+
+
+def journal_entry(handle: BundleHandle, category: str, event: str, detail: dict) -> None:
+    """Append one validated journal entry.
+
+    The vocabulary check lives here on purpose: the pump path already validated,
+    the bundle path did not, so the same write had two contracts. One strict
+    implementation means an unregistered category fails loudly wherever it is
+    written from.
+    """
+    append_entry(
+        handle,
+        JournalEntry(timestamp=now_iso(), category=category, event=event, detail=detail).validate(),
+    )
 
 
 class JournalCorruption(RuntimeError):

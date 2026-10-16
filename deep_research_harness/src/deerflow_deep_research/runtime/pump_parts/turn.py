@@ -12,11 +12,10 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from ...domain import clarification, journal_policy
+from ...domain import clarification
 from ...domain.plan import PLAN_MARKER_CLOSE, PLAN_MARKER_OPEN
 from ...domain.plan import extract_plan as _extract_plan
 
@@ -31,8 +30,9 @@ __all__ = [
     "_extract_plan",
     "consume_turn",
 ]
+from ..adapters.messages import message_field as _msg_field
 from ..bundle import bundle_state, search_log
-from ..bundle.journal import append_entry
+from ..bundle.journal import journal_entry as _journal
 
 # The non-interactive continuation marker the clarification step prefixes.
 AUTO_REPLY_PREFIX = "[非交互模式·系统自动应答] "
@@ -161,25 +161,6 @@ class TurnOutcome:
     stop_reason: str | None
     fallback_error_type: str | None
     final_text: str
-
-
-def _now_iso() -> str:
-    return datetime.now(UTC).isoformat()
-
-
-def _journal(handle: BundleHandle, category: str, event: str, detail: dict) -> None:
-    append_entry(
-        handle,
-        journal_policy.JournalEntry(
-            timestamp=_now_iso(), category=category, event=event, detail=detail
-        ).validate(),
-    )
-
-
-def _msg_field(message: object, name: str, default=None):  # noqa: ANN001 — dict/object adapter
-    if isinstance(message, dict):
-        return message.get(name, default)
-    return getattr(message, name, default)
 
 
 def _json_arguments(call: dict) -> str:

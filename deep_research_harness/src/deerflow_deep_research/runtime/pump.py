@@ -22,6 +22,9 @@ from .bundle.journal import (
     append_entry,  # noqa: F401
     tail_journal,  # noqa: F401 — re-export (watch tool)
 )
+from .bundle.journal import (
+    now_iso as _now_iso,  # noqa: F401 — re-export (one clock for all writers)
+)
 from .pump_parts.deliver import record_delivery as _record_delivery_impl
 from .pump_parts.gates import clarification_step, plan_gate_step
 
@@ -39,7 +42,6 @@ from .pump_parts.turn import (  # noqa: F401
     _journal,
     _json_arguments,
     _msg_field,
-    _now_iso,
 )
 
 # The module's declared surface: the entry points callers import, the vocabulary
@@ -48,6 +50,7 @@ __all__ = [
     "AUTO_REPLY_PREFIX",
     "PLAN_REQUEST_SUFFIX",
     "_journal",
+    "_now_iso",
 ]
 
 from .pump_parts.turn import (

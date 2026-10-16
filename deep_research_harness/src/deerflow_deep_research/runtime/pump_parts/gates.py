@@ -9,11 +9,9 @@ neither that order nor a single journal entry.
 
 from __future__ import annotations
 
-import json
-
 from ...domain import bundle, clarification
 from ...domain.state_machine import rule_clarification_step
-from ..bundle import bundle_state
+from ..bundle import bundle_actions, bundle_state
 from .turn import (
     AUTO_REPLY_PREFIX,
     PLAN_CONFIRM_PREFIX,
@@ -90,16 +88,10 @@ def clarification_step(handle, on_clarification, state, tool_calls):
 
     exhausted = rule_clarification_step(state, detected=True)
     written = bundle_state.write_state(handle, bundle_state.read_state(handle), exhausted)
-    questions_path = handle.root / bundle.UNANSWERED_QUESTIONS_RELATIVE
-    questions_path.parent.mkdir(parents=True, exist_ok=True)
-    questions_path.write_text(
-        json.dumps(
-            {"questions": [clarification.question_text(last_question)]},
-            ensure_ascii=False,
-            indent=2,
-        )
-        + "\n",
-        encoding="utf-8",
+    # The writer is atomic and was already there (with zero callers); this path used
+    # to hand-roll the same JSON with a bare write_text, bypassing that atomicity.
+    bundle_actions.write_unanswered_questions(
+        handle, [clarification.question_text(last_question)]
     )
     _journal(
         handle,

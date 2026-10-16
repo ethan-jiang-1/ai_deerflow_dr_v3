@@ -11,12 +11,6 @@ from __future__ import annotations
 from ...domain import outcomes
 
 
-def _msg_field(message: object, name: str, default=None):  # noqa: ANN001
-    if isinstance(message, dict):
-        return message.get(name, default)
-    return getattr(message, name, default)
-
-
 def stream_chunk_text(event) -> str | None:  # noqa: ANN001 — streaming mode
     """Inline text for an AI content chunk (the live view prints it without a
     newline); None for everything else (those render as phrase lines)."""

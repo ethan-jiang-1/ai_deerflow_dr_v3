@@ -8,13 +8,12 @@ journals every disposition under the `validation` category.
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
-
 from ...domain.journal_policy import JournalEntry
 from ...engine.validator import AdmissionContext, ArtifactSubmission, validate
 from . import atomic
 from .bundle_state import BundleHandle
 from .journal import append_entry
+from .journal import now_iso as _now_iso
 from .ledger import (  # noqa: F401 — re-exported for the admission call site
     LedgerEntry,
     LedgerTampered,
@@ -32,10 +31,6 @@ __all__ = [
     "VerdictContradiction",
     "VerdictlessCommit",
 ]
-
-
-def _now_iso() -> str:
-    return datetime.now(UTC).isoformat()
 
 
 def _build_context(handle: BundleHandle) -> AdmissionContext:

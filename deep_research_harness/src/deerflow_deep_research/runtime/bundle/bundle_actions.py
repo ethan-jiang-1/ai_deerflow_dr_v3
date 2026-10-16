@@ -16,11 +16,11 @@ from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
 
-from ...domain import bundle, journal_policy, state_machine
+from ...domain import bundle, state_machine
 from ...domain.state_machine import BundleState, RefineRecord
 from . import atomic, bundle_state
 from .bundle_state import BundleHandle, write_state
-from .journal import append_entry
+from .journal import journal_entry as _journal
 
 Liveness = Callable[[int], bool]
 
@@ -33,17 +33,6 @@ def _default_liveness(pid: int) -> bool:
     except PermissionError:
         return True  # the process exists and is not ours to signal
     return True
-
-
-def _now_iso() -> str:
-    return datetime.now(UTC).isoformat()
-
-
-def _journal(handle: BundleHandle, category: str, event: str, detail: dict) -> None:
-    append_entry(
-        handle,
-        journal_policy.JournalEntry(timestamp=_now_iso(), category=category, event=event, detail=detail),
-    )
 
 
 def start(
