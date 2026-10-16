@@ -162,12 +162,20 @@ def check(root: Path) -> list[str]:
     return errors
 
 
+_GOVERNANCE_DIR = str(Path(__file__).resolve().parent)
+if _GOVERNANCE_DIR not in sys.path:
+    sys.path.insert(0, _GOVERNANCE_DIR)
+
+from roots import resolve_root  # noqa: E402
+
 def main(argv: list[str] | None = None) -> int:
     """Run the CI-governance check; print violations and return the exit code."""
     parser = argparse.ArgumentParser(description="Validate the CI governance declarations.")
-    parser.add_argument("project_root", nargs="?", default=Path.cwd(), type=Path)
+    # No default here: the root then falls to this module's own default below,
+    # so the resolution rule lives in one shared place.
+    parser.add_argument("project_root", nargs="?", type=Path)
     args = parser.parse_args(argv)
-    root = args.project_root.resolve()
+    root = resolve_root(args.project_root, default=Path.cwd())
     errors = check(root)
     if errors:
         for error in errors:

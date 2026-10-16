@@ -49,9 +49,20 @@ CHECKER_NAMES: tuple[str, ...] = (
 )
 
 
+_GOVERNANCE_DIR = str(Path(__file__).resolve().parent)
+if _GOVERNANCE_DIR not in sys.path:
+    sys.path.insert(0, _GOVERNANCE_DIR)
+
+from roots import resolve_root  # noqa: E402
+
 def _default_root() -> Path:
     """Repository root derived from this script's location (openspec/governance/)."""
     return Path(__file__).resolve().parent.parent.parent
+
+
+def _resolve_root() -> Path:
+    """Internal seam: the shared rule over this script's own default."""
+    return resolve_root(None, default=_default_root())
 
 
 def _component_script(root: Path, name: str) -> Path:
@@ -237,7 +248,7 @@ def main() -> int:
         help="required for --phase plan: the active change to admit",
     )
     args = parser.parse_args()
-    root = (args.project_root or _default_root()).resolve()
+    root = resolve_root(args.project_root, default=_default_root())
     if args.phase == "plan":
         return run_plan(root, args.change or "")
     if args.change is not None:

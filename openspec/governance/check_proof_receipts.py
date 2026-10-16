@@ -27,8 +27,9 @@ if _GOVERNANCE_DIR not in sys.path:
     sys.path.insert(0, _GOVERNANCE_DIR)
 
 from gitio import run_git  # noqa: E402
+from roots import resolve_root  # noqa: E402
 
-REPO = Path(__file__).resolve().parents[2]
+REPO = resolve_root(None, default=Path(__file__).resolve().parents[2])
 REGISTRY = REPO / "deep_research_harness" / "proof-lanes.toml"
 PROOF = REPO / ".proof"
 MODE_DEFAULT = "warn"

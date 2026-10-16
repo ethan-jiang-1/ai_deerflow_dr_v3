@@ -35,6 +35,7 @@ if _GOVERNANCE_DIR not in sys.path:
     sys.path.insert(0, _GOVERNANCE_DIR)
 
 from gitio import run_git  # noqa: E402
+from roots import resolve_root  # noqa: E402
 
 HARNESS = "deep_research_harness"
 GITLINK = "deerflow"
@@ -50,9 +51,9 @@ ROUTING_RE = re.compile(r"docs/playbook/[\w.-]+\.md")
 
 
 def _repo_root(argv: list[str]) -> Path:
-    if len(argv) > 1:
-        return Path(argv[1]).resolve()
-    return Path(__file__).resolve().parents[2]
+    """argv wins; otherwise this script's own location is the default."""
+    supplied = Path(argv[1]) if len(argv) > 1 else None
+    return resolve_root(supplied, default=Path(__file__).resolve().parents[2])
 
 
 def _gitlink_head(gitlink_dir: Path) -> str | None:

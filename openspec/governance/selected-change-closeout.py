@@ -23,6 +23,7 @@ if _GOVERNANCE_DIR not in sys.path:
 from subprocess import CompletedProcess  # noqa: E402
 
 from gitio import run_git  # noqa: E402
+from roots import resolve_root  # noqa: E402
 
 SCHEMA_VERSION = "selected-change-closeout/v1"
 REQUIRED_ATTESTATION_FIELDS = (
@@ -78,7 +79,7 @@ def _planning_home(start: Path) -> Path | None:
 def _active_change_root(change_name: str) -> Path | None:
     if Path(change_name).name != change_name or change_name in {"", ".", ".."}:
         return None
-    planning_home = _planning_home(Path.cwd().resolve())
+    planning_home = _planning_home(resolve_root(None, default=Path.cwd()))
     if planning_home is None:
         return None
     change_root = planning_home / "openspec/changes" / change_name

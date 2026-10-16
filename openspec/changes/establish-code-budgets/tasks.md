@@ -10,8 +10,8 @@
 
 ## 2. Shared root resolution
 
-- [ ] 2.1 Add `openspec/governance/roots.py` with `resolve_root(argv_value, *, default) -> Path`: argv wins when present, otherwise the caller's default, always resolved; verify with a direct call that a passed value resolves and an absent value returns the supplied default
-- [ ] 2.2 Switch the five root-resolution variants to `roots.resolve_root`, keeping each caller's own default expression (`parents[2]`, `parents[3]`, `Path.cwd()`, argv-first); verify the six success-path and failure-path captures are still identical, and that `check_ci_governance.py` still exits 0 (its declared command set is unchanged)
+- [x] 2.1 Add `openspec/governance/roots.py` with `resolve_root(argv_value, *, default) -> Path`: argv wins when present, otherwise the caller's default, always resolved; verify with a direct call that a passed value resolves and an absent value returns the supplied default
+- [x] 2.2 Switch the five root-resolution variants to `roots.resolve_root`, keeping each caller's own default expression (`parents[2]`, `parents[3]`, `Path.cwd()`, argv-first); verify the six success-path and failure-path captures are still identical, and that `check_ci_governance.py` still exits 0 (its declared command set is unchanged)
 
 ## 3. Dead-code removal in the guidance kernel
 
