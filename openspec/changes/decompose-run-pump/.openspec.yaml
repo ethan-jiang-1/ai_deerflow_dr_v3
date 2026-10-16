@@ -1,0 +1,6 @@
+schema: spec-driven
+created: 2026-10-16
+# Pure wiring refactor: terminal transitions, admission semantics, journal entry
+# fields, and every existing registry value are unchanged. No spec-level behavior
+# changes.
+skip_specs: true
