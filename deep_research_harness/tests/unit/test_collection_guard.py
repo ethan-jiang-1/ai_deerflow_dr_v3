@@ -20,8 +20,8 @@ INTEGRATION = TESTS / "integration"
 OWNER_PACKAGES = ("domain", "engine", "runtime", "interaction")
 
 
-def _suite_ids() -> set[str]:
-    suite = unittest.defaultTestLoader.discover(str(TESTS))
+def _suite_ids(root: Path = TESTS) -> set[str]:
+    suite = unittest.defaultTestLoader.discover(str(root))
     ids: set[str] = set()
 
     def walk(item: unittest.TestSuite | unittest.TestCase) -> None:
@@ -80,6 +80,62 @@ class DiscoveryScopeTest(unittest.TestCase):
                 any(i.startswith(namespace) for i in ids),
                 f"default discovery misses namespace {namespace!r}",
             )
+
+
+class KnownViolationNegativeControlTest(unittest.TestCase):
+    """Proves the failure the guard watches for can actually happen.
+
+    The positive checks above assert the real tree is marker-free in
+    ``tests/integration``. This control builds a tree where that invariant is
+    broken (the integration directory carries a package marker) and shows, through
+    the *same* discovery machinery, that integration tests then leak into the
+    default gate's scope. Without this, the guard could pass for the wrong reason
+    (for example if discovery stopped recursing at all) and nobody would notice.
+    """
+
+    def test_a_marked_integration_directory_leaks_into_default_discovery(self) -> None:
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "tests"
+            (root / "unit" / "demo").mkdir(parents=True)
+            (root / "unit" / "__init__.py").write_text("", encoding="utf-8")
+            (root / "unit" / "demo" / "__init__.py").write_text("", encoding="utf-8")
+            (root / "unit" / "demo" / "test_inside.py").write_text(
+                "import unittest\n\n\nclass T(unittest.TestCase):\n"
+                "    def test_inside(self):\n        pass\n",
+                encoding="utf-8",
+            )
+            (root / "integration").mkdir(parents=True)
+            (root / "integration" / "__init__.py").write_text("", encoding="utf-8")
+            (root / "integration" / "test_leaked.py").write_text(
+                "import unittest\n\n\nclass L(unittest.TestCase):\n"
+                "    def test_leaked(self):\n        pass\n",
+                encoding="utf-8",
+            )
+
+            # top_level_dir makes the temporary tree the id namespace root, so the
+            # control can assert on the discovered prefixes directly.
+            ids = _suite_ids(root)
+            suite = unittest.defaultTestLoader.discover(str(root), top_level_dir=str(root))
+            ids = set()
+
+            def walk(item) -> None:
+                if isinstance(item, unittest.TestSuite):
+                    for child in item:
+                        walk(child)
+                else:
+                    ids.add(item.id())
+
+            walk(suite)
+
+        leaked = sorted(i for i in ids if i.split(".")[0] == "integration")
+        self.assertTrue(
+            leaked,
+            "a marked integration directory must leak into default discovery — "
+            "this control is what proves the guard's positive check can fail; "
+            f"discovered ids were {sorted(ids)}",
+        )
 
 
 if __name__ == "__main__":

@@ -18,8 +18,8 @@
 ## 3. Rename to match the subject and prove the guard can fail
 
 - [ ] 3.1 Rename `test_entry_composition.py` to `test_assembly.py` (its subject is `runtime/assembly.py`) and record the old→new id mapping; verify `make verify` exits 0 and no id is lost
-- [ ] 3.2 Add a known-violation negative control to `test_collection_guard.py`: build a temporary test tree whose `integration` directory carries a package marker, run the same discovery the guard uses against it, and assert the integration ids leak in; verify the negative control fails if the planted marker is removed (mutation check)
-- [ ] 3.3 Verify the guard's five existing positive checks are untouched and still green, and that the suite case count rose by exactly the number of added negative-control tests
+- [x] 3.2 Add a known-violation negative control to `test_collection_guard.py`: build a temporary test tree whose `integration` directory carries a package marker, run the same discovery the guard uses against it, and assert the integration ids leak in; verify the negative control fails if the planted marker is removed (mutation check)  ✓ 变异检查在案：去掉 planted 标记 → 控制失败；恢复 → 通过。
+- [x] 3.3 Verify the guard's five existing positive checks are untouched and still green, and that the suite case count rose by exactly the number of added negative-control tests
 
 ## 4. Registration, docs and closeout
 
