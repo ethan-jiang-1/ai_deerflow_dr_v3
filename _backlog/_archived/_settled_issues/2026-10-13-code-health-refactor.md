@@ -208,9 +208,16 @@ Delivery Record 达标且六条门禁不回退。结论被阶段 1 的 change �
 薄委托，命令/stdout/退出码逐字不变。六条门禁全绿；harness 面零改动；9 条规则新旧产出
 逐规则 IDENTICAL。
 
-**阶段 2–5 未开工**（本卡结论只吸收到阶段 1）：`split-governance-checkers`、
-`establish-code-budgets`、`decompose-run-pump`、`share-test-support-and-rename` 各自
-需要独立 change；批准沿用本卡阶段表与 D1–D3 裁决即可，无需重新推敲。
+**阶段推进记录**（同一卡，逐段追加；本卡为长期收敛主卡，不因单个阶段归档而重开）：
+
+- 阶段 1 `extract-doc-hygiene-test-battery` —— 已归档（2026-10-16）。
+- 阶段 2 `split-governance-checkers` —— **已归档（2026-10-16）**：arch checker 1024 → 39 行
+  （新包 `project_architecture_check/`）、guidance checker 1473 → 36 行（新包
+  `change_guidance_check/`，三审阅策略改注册表驱动）、doc-hygiene 账本规则 182 → 20 行
+  （三个子规则 73/35/39）；六 checker stdout 逐字不变、套件 145 不减、八条偏差在案。
+- 阶段 3 `establish-code-budgets`、阶段 4 `decompose-run-pump`、阶段 5
+  `share-test-support-and-rename` —— 未开工，各自需要独立 change；批准沿用本卡阶段表与
+  D1–D3 裁决即可，无需重新推敲。
 
 **落地关联**：`openspec/changes/archive/2026-10-16-extract-doc-hygiene-test-battery`
 （2026-10-16，已归档）。
