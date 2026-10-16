@@ -49,16 +49,16 @@ class FileBudget:
 CODE_BUDGETS: dict[str, FileBudget] = {
     "check_doc_hygiene.py": FileBudget(max_lines=895, max_long_functions=1),
     "_battery.py": FileBudget(max_lines=671, max_long_functions=0),
-    "check_project_specs.py": FileBudget(max_lines=464, max_long_functions=2),
+    # 464 -> 445: its local fence stripper moved to markdown_fences.py.
+    "check_project_specs.py": FileBudget(max_lines=445, max_long_functions=2),
     "change_guidance_check/proposals.py": FileBudget(max_lines=460, max_long_functions=3),
     "project_architecture_check/manifest.py": FileBudget(max_lines=433, max_long_functions=3),
     "change_guidance_check/guidance.py": FileBudget(max_lines=405, max_long_functions=2),
     "project_architecture_check/imports.py": FileBudget(max_lines=332, max_long_functions=0),
     "check_project_gate.py": FileBudget(max_lines=261, max_long_functions=0),
-    # 256 -> 295: BUG-003 made the task parser fence-aware (CommonMark 4.5); the
-    # ceiling moves with the measured value, as the table's rule requires. Splitting
-    # this file is the recorded follow-up — it became importable on 2026-10-16.
-    "selected_change_closeout.py": FileBudget(max_lines=295, max_long_functions=1),
+    "markdown_fences.py": FileBudget(max_lines=83, max_long_functions=0),
+    # The fence rule moved to markdown_fences.py (295 -> 257); the split follow-up stands.
+    "selected_change_closeout.py": FileBudget(max_lines=257, max_long_functions=1),
     "change_guidance_check/reviews.py": FileBudget(max_lines=243, max_long_functions=1),
     "check_proof_receipts.py": FileBudget(max_lines=232, max_long_functions=1),
     "change_guidance_check/constants.py": FileBudget(max_lines=197, max_long_functions=0),

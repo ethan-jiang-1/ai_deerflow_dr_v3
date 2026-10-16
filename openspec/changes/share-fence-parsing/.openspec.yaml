@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-10-16
+# One shared parser replaces two divergent copies; a gate component's fence rule is
+# corrected to CommonMark. No requirement, command-line, or schema change.
+skip_specs: true

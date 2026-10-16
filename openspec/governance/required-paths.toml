@@ -87,6 +87,7 @@ files = [
   "openspec/governance/check_doc_hygiene.py",
   "openspec/governance/check_code_budgets.py",
   "openspec/governance/gitio.py",
+  "openspec/governance/markdown_fences.py",
   "openspec/governance/roots.py",
   "openspec/governance/check_harness_dependency_direction.py",
   "openspec/governance/check_project_architecture.py",

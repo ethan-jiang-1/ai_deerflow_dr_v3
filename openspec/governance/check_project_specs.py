@@ -29,6 +29,8 @@ import re
 import sys
 from pathlib import Path
 
+import markdown_fences
+
 # Delta headers 只在 openspec/changes/ 合法，不许出现在 openspec/specs/。
 DELTA_HEADER_RE = re.compile(r"^##\s+(ADDED|MODIFIED|REMOVED|RENAMED)\s+Requirements\s*$", re.IGNORECASE | re.MULTILINE)
 COMPOSITION_ALIAS_RULE = "compositionAlias"
@@ -96,7 +98,7 @@ def _delta_section_titles(delta_text: str) -> dict[str, list[str]]:
 
 def _main_requirement_titles(spec_text: str) -> set[str]:
     """收集主 spec 全部 requirement 标题（结构合法性由既有结构规则负责）。"""
-    stripped = strip_fenced_code_blocks(spec_text)
+    stripped = markdown_fences.strip_fenced_code_blocks(spec_text)
     return {
         match.group(1).strip()
         for match in (REQUIREMENT_TITLE_RE.match(line) for line in stripped.splitlines())
@@ -115,7 +117,7 @@ def _delta_sync_violations(root: Path) -> list[dict]:
         for delta in sorted(change_dir.glob("specs/*/spec.md")):
             capability = delta.parent.name
             sections = _delta_section_titles(
-                strip_fenced_code_blocks(delta.read_text(encoding="utf-8"))
+                markdown_fences.strip_fenced_code_blocks(delta.read_text(encoding="utf-8"))
             )
             for title in sections.get("ADDED", []):
                 added.append((capability, title, change_dir.name))
@@ -172,27 +174,6 @@ def _delta_sync_violations(root: Path) -> list[dict]:
             "line": None,
         })
     return violations
-
-
-def strip_fenced_code_blocks(content: str) -> str:
-    """把围栏代码块内容替换成空行，保持行号，避免代码示例里的 ## 头被误判。"""
-    lines = content.replace("\r\n", "\n").replace("\r", "\n").split("\n")
-    output = []
-    active = None
-    for line in lines:
-        m = re.match(r"^\s*(`{3,}|~{3,})(.*)$", line)
-        if active is None:
-            if m:
-                active = (m.group(1)[0], len(m.group(1)))
-                output.append("")
-            else:
-                output.append(line)
-            continue
-        output.append("")
-        closing = re.match(r"^\s*(`{3,}|~{3,})\s*$", line)
-        if closing and closing.group(1)[0] == active[0] and len(closing.group(1)) >= active[1]:
-            active = None
-    return "\n".join(output)
 
 
 def _delta_spec_files(change_dir: Path) -> list[Path]:
@@ -311,7 +292,7 @@ def _validate_main_specs(root: Path) -> int:
     violations = []  # {file, check, detail, line?}
     for file in spec_files:
         content = file.read_text(encoding="utf-8")
-        structural = strip_fenced_code_blocks(content)
+        structural = markdown_fences.strip_fenced_code_blocks(content)
         short = str(file).replace(str(root) + "/", "")
 
         # 1. deltaHeaderInMain

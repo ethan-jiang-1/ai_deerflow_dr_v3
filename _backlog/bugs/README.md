@@ -29,7 +29,7 @@
 
 （当前无活跃卡。）
 
-**Next available bug ID: BUG-004**
+**Next available bug ID: BUG-005**
 
 ---
 
