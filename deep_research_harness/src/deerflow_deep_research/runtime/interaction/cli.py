@@ -14,7 +14,7 @@ import os
 import sys
 import time
 
-from ...domain import bundle
+from ...domain import bundle, outcomes
 from ...domain import diagnosis as diagnosis_mod
 from .. import assembly, pump
 from ..bundle import bundle_actions, bundle_state
@@ -92,9 +92,7 @@ def _terminal_line(state) -> str:
 
     entry = SimpleNamespace(
         category="terminal",
-        event={"completed": "run_completed", "cancelled": "run_cancelled"}.get(
-            state.status, "run_failed_resume"
-        ),
+        event=outcomes.outcome_for_status(state.status),
         detail=(
             {"generation": state.generation, "reason": "see journal timeline"}
             if state.status == "failed-resume" else {"generation": state.generation}

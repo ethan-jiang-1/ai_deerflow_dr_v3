@@ -8,6 +8,8 @@ Deterministic output — the golden replay pins these strings. Volatile values
 
 from __future__ import annotations
 
+from ...domain import outcomes
+
 
 def _msg_field(message: object, name: str, default=None):  # noqa: ANN001
     if isinstance(message, dict):
@@ -67,15 +69,9 @@ def event_line(event) -> str:  # noqa: ANN001 — live view (raw stream event)
 def journal_line(entry) -> str:  # noqa: ANN001 — watch projection (journal entry)
     detail = entry.detail if isinstance(entry.detail, dict) else {}
     if entry.category == "terminal":
-        if entry.event == "run_completed":
-            return f"run completed (generation {detail.get('generation', '?')})"
-        if entry.event == "run_cancelled":
-            return "run cancelled"
-        if entry.event == "stop_reason":
-            return f"run failed-resume (stop reason: {detail.get('reason', '?')})"
-        if entry.event == "run_failed_resume":
-            return f"run failed-resume ({detail.get('reason', '?')})"
-        return f"terminal: {entry.event}"
+        # The outcome vocabulary (names, lines) is declared in domain/outcomes.py;
+        # this projection only prints it.
+        return outcomes.render_terminal_line(entry.event, detail)
     if entry.event == "model_tool_call" and detail.get("calls"):
         return "model calls " + ", ".join(str(name) for name in detail["calls"])
     if entry.event == "model_tool_call":

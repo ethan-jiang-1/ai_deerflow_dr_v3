@@ -27,7 +27,7 @@
 
 ## 5. One declaration each for terminal outcomes and compositions
 
-- [ ] 5.1 Add `domain/outcomes.py` declaring the terminal outcomes once (event name, derived classification, human-readable line) and switch the four consumers — the pump writers, `domain/diagnosis.classify`, `interaction/render`, and the `interaction/cli` status mapping — to read it; verify the journal capture is unchanged, `make verify` exits 0, and `diagnosis.classify`'s branch chain is replaced by a table walk
+- [x] 5.1 Add `domain/outcomes.py` declaring the terminal outcomes once (event name, derived classification, human-readable line) and switch the four consumers — the pump writers, `domain/diagnosis.classify`, `interaction/render`, and the `interaction/cli` status mapping — to read it; verify the journal capture is unchanged, `make verify` exits 0, and `diagnosis.classify`'s branch chain is replaced by a table walk
 - [ ] 5.2 Extend the `domain/bundle.py` declaration into the single composition table (composition -> config name, wired flag) and derive the three consumers (`assembly.config_name_for_composition`, `adapters/client.CONFIG_NAMES`, `cli` argparse choices); verify the three captured value sets are unchanged, that `assembly` still raises for the declared-but-unwired `mixed` with the same message, and that `make verify` exits 0
 - [ ] 5.3 Run `make smoke` and verify exit 0 (real framework assembly plus the scripted full journey)
 - [ ] 5.4 Register the new subpackage and its modules in `openspec/governance/required-paths.toml`; verify `python3 openspec/governance/check_project_architecture.py` exits 0 from the repository root

@@ -18,6 +18,7 @@ from .bundle import (
     STATE_FILENAME,
     UNANSWERED_QUESTIONS_RELATIVE,
 )
+from . import outcomes
 from .journal_policy import JournalEntry
 from .state_machine import BundleState
 
@@ -108,58 +109,39 @@ def classify(
             evidence=tuple(pointers),
             detail=f"completed but delivery is {state.delivery!r}",
         )
-    if distinct_events == ["run_cancelled"]:
-        return Diagnosis(
-            klass="cancelled", stage="operator decision — cancellation recorded",
-            evidence=(str(JOURNAL_RELATIVE), str(STATE_FILENAME)),
-            detail=f"generation {state.generation} cancelled by request",
-        )
-    if distinct_events == ["llm_error_fallback"]:
-        error_type = next(
-            (str(e.detail.get("error_type")) for e in terminal if e.detail.get("error_type")),
-            "unknown",
-        )
-        pointers = list(evidence)
-        if diagnostics.assembly_snapshot:
-            pointers.append(SNAPSHOT_RELPATH)
-        return Diagnosis(
-            klass="model_call_failed",
-            stage="binding — DeerFlow model call (framework error-fallback)",
-            evidence=tuple(pointers),
-            detail=f"model call failed (error_type: {error_type})",
-        )
-    if distinct_events == ["framework_error"]:
-        error_name = next(
-            (str(e.detail.get("error")) for e in terminal if e.detail.get("error")),
-            "unknown",
-        )
-        pointers = list(evidence)
-        if diagnostics.checkpoint:
-            pointers.append(CHECKPOINT_FILENAME)
-        return Diagnosis(
-            klass="framework_crash",
-            stage="host runtime — DeerFlow raised through the stream",
-            evidence=tuple(pointers),
-            detail=f"framework exception: {error_name}",
-        )
-    if distinct_events == ["stop_reason"]:
-        reason = next(
-            (str(e.detail.get("reason")) for e in terminal if e.detail.get("reason")),
-            "unknown",
-        )
-        return Diagnosis(
-            klass="framework_stopped",
-            stage="host runtime — DeerFlow reported a stop reason",
-            evidence=(str(JOURNAL_RELATIVE),),
-            detail=f"framework stop reason: {reason}",
-        )
-    if distinct_events == ["crash_detected"]:
-        return Diagnosis(
-            klass="owner_died",
-            stage="run pump process — owner died (transferred by a status observation)",
-            evidence=(str(JOURNAL_RELATIVE), str(STATE_FILENAME)),
-            detail=f"crash transfer recorded for thread {state.thread_id}",
-        )
+    # The uniform outcomes are declared once in domain/outcomes.py; this loop reads
+    # the declaration instead of carrying a branch per name. `run_completed` and
+    # `run_failed_resume` keep their own branches below because delivery state and
+    # journal history — not the name alone — decide their classification.
+    if len(distinct_events) == 1:
+        row = outcomes.OUTCOMES.get(distinct_events[0])
+        if row is not None and row.klass is not None:
+            pointers = list(evidence)
+            detail_text = ""
+            if row.detail_key is not None:
+                raw = next(
+                    (str(e.detail.get(row.detail_key)) for e in terminal
+                     if e.detail.get(row.detail_key)),
+                    None,
+                )
+                if row.name == outcomes.FRAMEWORK_ERROR and diagnostics.checkpoint:
+                    pointers.append(CHECKPOINT_FILENAME)
+                if row.name == outcomes.LLM_ERROR_FALLBACK and diagnostics.assembly_snapshot:
+                    pointers.append(SNAPSHOT_RELPATH)
+                # One detail phrasing per declared outcome; the classifier owns the
+                # wording because it owns the evidence pointers that go with it.
+                detail_text = {
+                    outcomes.FRAMEWORK_ERROR: f"framework exception: {raw or 'unknown'}",
+                    outcomes.LLM_ERROR_FALLBACK: f"model call failed (error_type: {raw or 'unknown'})",
+                    outcomes.STOP_REASON: f"framework stop reason: {raw or 'unknown'}",
+                }.get(row.name, "")
+            return Diagnosis(
+                klass=row.klass,
+                stage=row.stage or "",
+                evidence=tuple(pointers),
+                detail=detail_text,
+            )
+
     if distinct_events == ["run_failed_resume"]:
         if _exhausted(entries) or state.status == "failed-resume":
             pointers = list(evidence)
