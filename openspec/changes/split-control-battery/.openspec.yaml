@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-10-17
+# Wiring-only split: the 724-line control battery becomes a thin re-export plus a
+# package. No control, fixture, message, or inventory change.
+skip_specs: true

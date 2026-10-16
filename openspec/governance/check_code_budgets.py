@@ -55,8 +55,11 @@ CODE_BUDGETS: dict[str, FileBudget] = {
     "doc_hygiene_check/ledger.py": FileBudget(max_lines=266, max_long_functions=1),
     "doc_hygiene_check/rules.py": FileBudget(max_lines=282, max_long_functions=0),
     "doc_hygiene_check/scope.py": FileBudget(max_lines=67, max_long_functions=0),
-    # 671 -> 724: four fence-awareness controls (BUG-005) with their fixtures.
-    "_battery.py": FileBudget(max_lines=724, max_long_functions=0),
+    # The battery split into doc_hygiene_battery/ (thin re-export as of 2026-10-17).
+    "_battery.py": FileBudget(max_lines=118, max_long_functions=0),
+    "doc_hygiene_battery/__init__.py": FileBudget(max_lines=226, max_long_functions=0),
+    "doc_hygiene_battery/fixtures.py": FileBudget(max_lines=419, max_long_functions=0),
+    "doc_hygiene_battery/registry.py": FileBudget(max_lines=378, max_long_functions=0),
     # 464 -> 445: its local fence stripper moved to markdown_fences.py.
     "check_project_specs.py": FileBudget(max_lines=445, max_long_functions=2),
     "change_guidance_check/proposals.py": FileBudget(max_lines=460, max_long_functions=3),
