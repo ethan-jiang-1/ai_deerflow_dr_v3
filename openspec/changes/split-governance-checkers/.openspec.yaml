@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-10-16
+# Pure refactor: checker rules, CLI surfaces, exit codes, violation text, and the
+# CI/hook command strings are unchanged. No spec-level behavior changes.
+skip_specs: true
