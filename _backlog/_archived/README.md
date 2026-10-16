@@ -24,7 +24,7 @@ _archived/
 
 | 归档目录 | 数量 | Next ID |
 |---------|------|---------|
-| `_fixed_bugs/` | 2 | BUG-003 |
+| `_fixed_bugs/` | 2 | BUG-004 |
 | `_settled_issues/` | 25 | CLS-026 |
 
 ### ⏸ SUSPENDED（明确暂停）
