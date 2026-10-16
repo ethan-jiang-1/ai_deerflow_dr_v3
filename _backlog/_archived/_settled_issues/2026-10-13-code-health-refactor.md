@@ -215,7 +215,15 @@ Delivery Record 达标且六条门禁不回退。结论被阶段 1 的 change �
   （新包 `project_architecture_check/`）、guidance checker 1473 → 36 行（新包
   `change_guidance_check/`，三审阅策略改注册表驱动）、doc-hygiene 账本规则 182 → 20 行
   （三个子规则 73/35/39）；六 checker stdout 逐字不变、套件 145 不减、八条偏差在案。
-- 阶段 3 `establish-code-budgets`、阶段 4 `decompose-run-pump`、阶段 5
+- 阶段 4 `decompose-run-pump` —— **已归档（2026-10-16）**：pump.py 450 → 228 行；四职责各有
+  其模块（turn 302 / gates 111 / deliver 38）；终端结局协议与四张组合注册表各自收敛为一张声明
+  （`domain/outcomes.py`、`bundle.COMPOSITION_LADDERS`）；核心不变量达成——`make verify`（251）
+  与 `make smoke`（30）在 **tests/ 一行未改**的前提下全绿，journal 序列/公共签名/注册表逐字
+  等于基线。唯一未完成项：`_drive` 参数收窄 ≤4（行数 131 → 51 已达标），按偏差 1 显式留开。
+  **教训（写给后续阶段）**：本地收口只跑了 verify/smoke，漏跑 `make lint`（ruff）车道，
+  33 项违规由远端 CI 抓出（run 38867472817）。**harness 面每次收口必须跑齐
+  verify + smoke + lint 三条**。
+- 阶段 3 `establish-code-budgets`、阶段 5
   `share-test-support-and-rename` —— 未开工，各自需要独立 change；批准沿用本卡阶段表与
   D1–D3 裁决即可，无需重新推敲。
 
