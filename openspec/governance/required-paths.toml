@@ -128,6 +128,11 @@ files = [
   "deep_research_harness/config/record.yaml",
   "deep_research_harness/src/deerflow_deep_research/runtime/adapters/client.py",
   "deep_research_harness/src/deerflow_deep_research/runtime/pump.py",
+  "deep_research_harness/src/deerflow_deep_research/domain/outcomes.py",
+  "deep_research_harness/src/deerflow_deep_research/runtime/pump_parts/__init__.py",
+  "deep_research_harness/src/deerflow_deep_research/runtime/pump_parts/deliver.py",
+  "deep_research_harness/src/deerflow_deep_research/runtime/pump_parts/gates.py",
+  "deep_research_harness/src/deerflow_deep_research/runtime/pump_parts/turn.py",
   "deep_research_harness/src/deerflow_deep_research/runtime/adapters/snapshot_middleware.py",
 ]
 directories = [
@@ -194,6 +199,7 @@ directories = [
   "deep_research_harness/src/deerflow_deep_research/domain",
   "deep_research_harness/src/deerflow_deep_research/engine",
   "deep_research_harness/src/deerflow_deep_research/runtime",
+  "deep_research_harness/src/deerflow_deep_research/runtime/pump_parts",
   "deep_research_harness/tests/contract",
   "deep_research_harness/tests/fixtures",
   "deep_research_harness/tests/integration",
