@@ -22,5 +22,6 @@ bug 修完后从 `_backlog/bugs/` 通过 `git mv` 移入本目录：
 | BUG-003 | 2026-10-16 | [BUG-003-closeout-tool-fenced-checkbox-as-task.md](BUG-003-closeout-tool-fenced-checkbox-as-task.md) — 围栏代码块里的 checkbox 被当成真任务（closeout 工具的解析器现具备 CommonMark 4.5 围栏感知） |
 | BUG-004 | 2026-10-16 | [BUG-004-spec-checker-fence-rule-hides-headings.md](BUG-004-spec-checker-fence-rule-hides-headings.md) — specs 门禁的围栏规则偏离 CommonMark，会藏掉真标题（围栏规则现收敛到 markdown_fences.py） |
 | BUG-005 | 2026-10-16 | [BUG-005-doc-hygiene-three-fence-notions.md](BUG-005-doc-hygiene-three-fence-notions.md) — doc-hygiene 的逐行解析有三种围栏概念（可静默失明）；现采用唯一围栏规则 markdown_fences.py |
+| BUG-006 | 2026-10-17 | [BUG-006-guidance-checker-fence-blind-parsing.md](BUG-006-guidance-checker-fence-blind-parsing.md) — change-guidance 门禁的章节解析无围栏感知（会误拒合规 change）；现采用唯一围栏规则 |
 
-**Next available bug ID: BUG-006**
+**Next available bug ID: BUG-007**

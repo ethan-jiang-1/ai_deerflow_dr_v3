@@ -28,6 +28,7 @@ from .helpers import (
     _section_after_heading,
     _single_markdown_table_lines,
     _table_cells,
+    _without_fences,
 )
 
 def _review_section(
@@ -55,7 +56,11 @@ def _validate_workflow_outcome_review(
     *,
     code_prefix: str,
 ) -> None:
-    table_lines = [line for line in section.splitlines() if _table_cells(line) is not None]
+    table_lines = [
+        line
+        for line in _without_fences(section).splitlines()
+        if _table_cells(line) is not None
+    ]
     if len(table_lines) < 3:
         raise ContractViolation(
             _scoped_code(code_prefix, "workflow_outcome_review_shape_invalid"),

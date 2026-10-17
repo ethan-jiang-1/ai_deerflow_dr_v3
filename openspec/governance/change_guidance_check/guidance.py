@@ -47,6 +47,7 @@ from .helpers import (
     _line_count,
     _read_file,
     _require_fragment,
+    _without_fences,
 )
 from .registry import ENABLED_PROFILES, POLICY_REGISTRY, PROFILE_DEFINITIONS
 
@@ -111,7 +112,9 @@ def _validate_product_context(root: Path) -> None:
         )
 
     product_document = _read_file(root, PRODUCT_DOCUMENT_PATH, code="product.document_missing")
-    authority_lines = re.findall(r"^> authority:.*$", product_document, flags=re.MULTILINE)
+    authority_lines = re.findall(
+        r"^> authority:.*$", _without_fences(product_document), flags=re.MULTILINE
+    )
     if len(authority_lines) != 1 or not authority_lines[0].startswith("> authority: navigation only; "):
         raise ContractViolation(
             "product.authority_claim",

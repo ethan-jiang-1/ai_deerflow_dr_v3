@@ -42,6 +42,7 @@ from .helpers import (
     _validate_legacy_triggered_policies_field,
     _validate_required_fields,
     _validate_seam_classification,
+    _without_fences,
 )
 from .registry import POLICY_REGISTRY, WorkstreamFocus
 from .reviews import _validate_selected_policy_reviews
@@ -445,10 +446,11 @@ def _validate_active_changes(root: Path) -> None:
                 f"cannot read active proposal {proposal_path.relative_to(root).as_posix()}: {exc}",
             ) from exc
         relative_proposal_path = proposal_path.relative_to(root)
-        program_count = len(re.findall(r"^## Program Focus\s*$", proposal, flags=re.MULTILINE))
-        workstream_count = len(re.findall(r"^### Workstream Focus:", proposal, flags=re.MULTILINE))
+        unfenced = _without_fences(proposal)
+        program_count = len(re.findall(r"^## Program Focus\s*$", unfenced, flags=re.MULTILINE))
+        workstream_count = len(re.findall(r"^### Workstream Focus:", unfenced, flags=re.MULTILINE))
         if program_count or workstream_count:
-            if program_count != 1 or re.search(r"^## Change Focus\s*$", proposal, flags=re.MULTILINE):
+            if program_count != 1 or re.search(r"^## Change Focus\s*$", unfenced, flags=re.MULTILINE):
                 raise ContractViolation(
                     "program.mode_invalid",
                     "ordinary and program proposal forms are exclusive: "

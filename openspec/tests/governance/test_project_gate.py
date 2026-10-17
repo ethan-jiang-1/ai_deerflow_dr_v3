@@ -445,6 +445,12 @@ class RealChangeGuidancePlantedNegativeTest(unittest.TestCase):
             REPO_ROOT / "openspec" / "governance" / "change_guidance_kernel.py",
             "openspec/governance/change_guidance_kernel.py",
         ),
+        # The package imports the one shared fence rule (BUG-006), so the copy must
+        # carry it too: this list is a hand-maintained dependency closure.
+        (
+            REPO_ROOT / "openspec" / "governance" / "markdown_fences.py",
+            "openspec/governance/markdown_fences.py",
+        ),
         (REPO_ROOT / "deep_research_harness" / "AGENTS.md", "deep_research_harness/AGENTS.md"),
         (REPO_ROOT / "deep_research_harness" / "CLAUDE.md", "deep_research_harness/CLAUDE.md"),
         (REPO_ROOT / "deep_research_harness" / "README.md", "deep_research_harness/README.md"),

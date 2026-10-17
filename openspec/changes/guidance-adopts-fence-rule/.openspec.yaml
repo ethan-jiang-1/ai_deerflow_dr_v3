@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-10-17
+# The change-guidance guard adopts the one shared fence rule (BUG-006). It fixes a
+# false-rejection class; no requirement or contract changes.
+skip_specs: true

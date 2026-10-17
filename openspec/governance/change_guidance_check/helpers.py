@@ -5,6 +5,8 @@
 from __future__ import annotations
 
 import re
+
+import markdown_fences
 from pathlib import Path
 
 from change_guidance_kernel import (
@@ -42,11 +44,34 @@ def _require_fragment(text: str, fragment: str, *, code: str, detail: str) -> No
 def _line_count(text: str) -> int:
     return len(text.splitlines())
 
+def _without_fences(text: str) -> str:
+    """The same text with fenced code blocks blanked out.
+
+    Regex-based parses (heading counts, table-line collection) can then run unchanged:
+    a fenced example can no longer masquerade as structure, and the line count — hence
+    every reported line number — is preserved (BUG-006).
+    """
+    return markdown_fences.strip_fenced_code_blocks(text)
+
+
 def _section_after_heading(proposal: str, match: re.Match[str], *, maximum_level: int) -> str:
+    """The text up to the next heading, ignoring headings inside fenced code blocks.
+
+    The section end used to be found with a bare regex, so a fenced example containing
+    ``## Something`` truncated the section early and every field after it looked
+    missing (BUG-006). This walks the lines instead, so the returned slice still comes
+    from the original text.
+    """
     start = match.end()
-    next_heading = re.search(rf"^#{{1,{maximum_level}}} (?!#)", proposal[start:], flags=re.MULTILINE)
-    end = start + next_heading.start() if next_heading else len(proposal)
-    return proposal[start:end]
+    tail = proposal[start:]
+    heading = re.compile(rf"^#{{1,{maximum_level}}} (?!#)")
+    lines = tail.split("\n")
+    offset = 0
+    for line, fenced in zip(lines, markdown_fences.fence_flags(lines), strict=True):
+        if not fenced and heading.match(line):
+            return tail[:offset]
+        offset += len(line) + 1
+    return tail
 
 
 def _field_value(section: str, field: str) -> str | None:
