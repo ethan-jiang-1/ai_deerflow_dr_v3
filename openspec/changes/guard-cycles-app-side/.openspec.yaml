@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-10-17
+# The cycle rule gains a second scope (the application package). It adds coverage;
+# no requirement, contract, or judgement changes.
+skip_specs: true
