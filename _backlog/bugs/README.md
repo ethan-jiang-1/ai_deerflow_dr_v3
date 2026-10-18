@@ -36,7 +36,7 @@
 
 ---
 
-新建 bug 文件 `BUG-<NNN>-<slug>.md`，`<NNN>` 取 `_archived/_fixed_bugs/README.md` 的 Next available ID：
+新建 bug 文件 `BUG-<NNN>-<slug>.md`，`<NNN>` 取 `_backlog/_archived/README.md` 状态总览表中该前缀的 **Next ID 列**（唯一承载处；2026-10-18 由 `consolidate-next-id` 收敛）：
 
 ```markdown
 # BUG-<NNN>: <一句话标题>

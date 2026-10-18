@@ -283,14 +283,14 @@ git mv issues/<name>.md _archived/_settled_issues/<name>.md
 | 操作 | 怎么改 |
 |------|--------|
 | `bugs/README.md` | 从活跃列表移除该 bug 的行 |
-| `_archived/_fixed_bugs/README.md` | 表格加一行 + 更新 Next available bug ID |
+| `_archived/_fixed_bugs/README.md` | 表格加一行（Next ID 只在 `_archived/README.md` 的状态总览表维护） |
 | `_archived/README.md` | 已修复 bug 计数 +1 |
 
 **📐 Issue 完成：**
 | 操作 | 怎么改 |
 |------|--------|
 | `issues/README.md` | 从活跃列表移除该 issue 的行 |
-| `_archived/_settled_issues/README.md` | 表格加一行 + 更新 Next available issue ID |
+| `_archived/_settled_issues/README.md` | 表格加一行（Next ID 同上，唯一承载处） |
 | `_archived/README.md` | 已关闭 issue 计数 +1 |
 
 ---
