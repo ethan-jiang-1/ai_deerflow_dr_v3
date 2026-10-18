@@ -68,6 +68,7 @@ CODE_BUDGETS: dict[str, FileBudget] = {
     "project_architecture_check/imports.py": FileBudget(max_lines=332, max_long_functions=0),
     "project_architecture_check/cycles.py": FileBudget(max_lines=203, max_long_functions=0),
     "project_architecture_check/markdown_grammar.py": FileBudget(max_lines=119, max_long_functions=0),
+    "project_architecture_check/graduation.py": FileBudget(max_lines=75, max_long_functions=0),
     "check_project_gate.py": FileBudget(max_lines=261, max_long_functions=0),
     "markdown_fences.py": FileBudget(max_lines=83, max_long_functions=0),
     # The fence rule moved to markdown_fences.py (295 -> 257); the split follow-up stands.
