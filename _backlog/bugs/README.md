@@ -27,8 +27,7 @@
 
 | Bug | 标题 | 发现 | 状态 |
 |-----|------|------|------|
-
-（当前无活跃卡。）
+| [BUG-007](BUG-007-cas-idle-spin-in-clarification-step.md) | `gates.py` 两处状态写入把 CAS 的 expected 内联现读 ⇒ 恒真、静默丢失更新（原始审计「事实 12」；CLS-025 裁决 A4 走 bug 轨） | 2026-10-18 | 等人拍板 |
 
 **下一个可用编号不在本文件维护。** 唯一承载处是 [`_backlog/_archived/README.md`](../_archived/README.md)
 的状态总览表（`_fixed_bugs/` 行的 Next ID 列），由 doc-hygiene 的计数规则与磁盘推导值对账。
