@@ -16,7 +16,7 @@
 **Goals:** 把"毕业翻转与实现同一把落地"钉成可执行规则 · 真实历史绿 · "卡独自提交"红 ·
 无历史时沉默跳过 · 既有判定只增不改。
 
-**Non-Goals:** 校验 `修复关联` 点名的 change 是否存在（判据更弱，留 follow-up）· 校验状态**时序** ·
+**Non-Goals:** 校验 `修复关联` 点名的 change 是否存在（判据更弱，留 follow-up——**追记（2026-10-18）：已由 change `machine-readable-fix-reference`（2026-10-18）落地**）· 校验状态**时序** ·
 改任何卡片或索引 · 非 git 场景。
 
 ## Decisions

@@ -24,7 +24,7 @@
   - 检测用**强连通分量**（不是只查两两互导）：三模块环也要抓。
 - **接进既有流水线**：`facade.validate_project()` 追加一步，且 `--imports-only` 也包含它（它本就是
   导入契约）。违规以既有形状报告：`ContractViolation("import.cycle", …)` ⇒ `ERROR [import.cycle] …`。
-- **范围**：`openspec/governance/` 目录树（含两个新包）。扩到 harness 侧是 follow-up——那里的
+- **范围**：`openspec/governance/` 目录树（含两个新包）。扩到 harness 侧是 follow-up——**追记（2026-10-18）：已由 change `guard-cycles-app-side`（2026-10-17）落地**——那里的
   分层矩阵已存在，但环检测同样缺失，只是本把不扩大范围。
 - **体积表按实测重测**（新模块入表）· `required-paths.toml` 登记。
 

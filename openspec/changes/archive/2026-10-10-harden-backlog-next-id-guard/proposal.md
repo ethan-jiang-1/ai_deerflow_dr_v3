@@ -2,7 +2,7 @@
 
 ## Why
 
-BUG-002（`_backlog/bugs/BUG-002-doc-hygiene-next-id-blindspot.md`，2026-10-10 审计）证实：
+BUG-002（`_backlog/bugs/BUG-002-doc-hygiene-next-id-blindspot.md`（该卡已毕业为 **BUG-002**，现位于 `_backlog/_archived/_fixed_bugs/BUG-002-doc-hygiene-next-id-blindspot.md`——路径写于当时，毕业会改目录），2026-10-10 审计）证实：
 `_backlog/issues/README.md` 曾同文件滞留两个 "Next available issue ID" 声明（头注 CLS-021
 已被占用、正文 CLS-022 正确），而 `check_doc_hygiene.py` 全绿通过——其 Next-ID 校验只读
 `_archived/README.md` counters 表与归档 index，活跃/归档 README 里**人读的声明行不在任何

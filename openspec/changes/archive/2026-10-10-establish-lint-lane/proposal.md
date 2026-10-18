@@ -6,7 +6,7 @@
 注释自认 "CI does not enforce it"），`change-practice.md` 曾要求 slice 收口
 "run lint and tests"，但仓库不存在 lint 命令位（Makefile/COMMANDS 均无），基线实测
 **108 违规**——lint 是一条被要求却不可执行的纪律。issue 卡
-`_backlog/issues/2026-10-10-lint-lane-establishment.md` 在案；本次审计为守住"不交付
+`_backlog/issues/2026-10-10-lint-lane-establishment.md`（该卡已毕业为 **CLS-022**，现位于 `_backlog/_archived/_settled_issues/2026-10-10-lint-lane-establishment.md`——路径写于当时，毕业会改目录） 在案；本次审计为守住"不交付
 长红 lane"已把 change-practice 措辞临时对齐为 "run the tests"。
 
 ## What Changes
@@ -54,7 +54,7 @@ make targets" 条款覆盖。）
 - **Necessary adjacent/external contracts:** `test_entry_chain` / `test_binding_doc_guard`
   （answers: AST 锁链与文档守卫在 import 重排后必须保持绿——批次红绿的判据）；
   agent-playbook spec（answers: COMMANDS 菜单与 declared make targets 的镜像条款允许
-  新增行，无需 delta）；`_backlog/issues/2026-10-10-lint-lane-establishment.md`
+  新增行，无需 delta）；`_backlog/issues/2026-10-10-lint-lane-establishment.md`（该卡已毕业为 **CLS-022**，现位于 `_backlog/_archived/_settled_issues/2026-10-10-lint-lane-establishment.md`——路径写于当时，毕业会改目录）
   （answers: 缺陷出处、基线取证与关闭条件）。
 - **Evidence seam:** `make lint` exit 0（全树）+ 每批后 `cd deep_research_harness &&
   UV_OFFLINE=1 make verify` exit 0 + 红演示（临时违例文件使 lint 红、移除后复绿）。

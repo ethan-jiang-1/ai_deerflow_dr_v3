@@ -96,7 +96,7 @@ on record). The trigger row has fired and is consumed by this change's issue car
   level-4 definition "工具选择/token/时长, 显式 opt-in" this change instantiates and its
   honest-limits column); CLS-017 (answers: 裁决③ output-quality endpoint, the E/F/G
   exclusions, and the line-114 owning-spec instruction); the issue card
-  `_backlog/issues/2026-10-09-behavior-assertion-eval-stack.md` (answers: the fired-trigger
+  `_backlog/issues/2026-10-09-behavior-assertion-eval-stack.md`（该卡已毕业为 **CLS-020**，现位于 `_backlog/_archived/_settled_issues/2026-10-09-behavior-assertion-eval-stack.md`——路径写于当时，毕业会改目录） (answers: the fired-trigger
   consumption, the inventory, and the standing apply authorization).
 - **Evidence seam:** red-first unit tests — machine↔register drift (delete the register row
   → red), fixture pinning (change a declared count → red), degenerate negative (zero

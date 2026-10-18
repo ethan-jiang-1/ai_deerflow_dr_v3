@@ -52,7 +52,7 @@
 
 - **选**：只检查 `openspec/governance/`（含其子包）。
 - **为什么**：本会话两处环都在这里；harness 侧有自己的分层矩阵（`imports.py`）但**环检测同样缺失**
-  ——那是 follow-up，不在本把扩大范围（一次放行一把）。
+  ——那是 follow-up，不在本把扩大范围——**追记（2026-10-18）：已由 change `guard-cycles-app-side`（2026-10-17）落地**（一次放行一把）。
 - **换来**：真实树绿的可控性；范围写在模块 docstring 里，后续扩展有明确落点。
 
 ### D-5｜报告形状沿用既有 `ContractViolation`

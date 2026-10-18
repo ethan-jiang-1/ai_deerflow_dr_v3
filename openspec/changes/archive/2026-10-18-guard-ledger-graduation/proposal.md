@@ -59,6 +59,6 @@
 - **Evidence seam:** 先期 git 实测（6/6 合规）· 红例/绿例/两个跳过逐条实测 ·
   真实树绿 · 变异检查 · 七 checker + closeout · 治理套件 250。
 - **Not in scope:** 校验"修复关联点名的 change 是否存在"（**取证显示零检查**，但那需要解析自由文本
-  的 change 名，判据比本条弱；留作 follow-up）· 校验 `已落修`/`已修` 的时序 · 改任何卡片 ·
+  的 change 名，判据比本条弱；留作 follow-up——**追记（2026-10-18）：已由 change `machine-readable-fix-reference`（2026-10-18）落地**）· 校验 `已落修`/`已修` 的时序 · 改任何卡片 ·
   非 Python 或非 git 的场景 · CAS 空转。
 - **Triggered review policies:** local-context, change-admission

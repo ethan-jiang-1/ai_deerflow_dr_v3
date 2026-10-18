@@ -83,7 +83,7 @@ replay (E-3) become possible.
   config-resolution closed set this change extends, and the contract-mirror discipline
   the new provider seam must not disturb); `test-evidence` capability (answers: the
   ladder semantics the level-3 asset must stay honest about — usage/token stays
-  unrecorded); the E issue card `_backlog/issues/2026-10-10-real-model-io-complete-replay.md`
+  unrecorded); the E issue card `_backlog/issues/2026-10-10-real-model-io-complete-replay.md`（该卡已毕业为 **CLS-021**，现位于 `_backlog/_archived/_settled_issues/2026-10-10-real-model-io-complete-replay.md`——路径写于当时，毕业会改目录）
   (answers: the three-slice plan, the cost/desensitization commitments, the human
   final-stamp boundary); `run-admission` capability (answers: composition stays
   `all_real` — no vocabulary change).

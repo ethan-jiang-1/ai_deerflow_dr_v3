@@ -3,7 +3,7 @@
 ## Why
 
 The ledger institution is mostly practiced here but partly unwritten. The issue card
-`_backlog/issues/2026-10-12-backlog-process-made-explicit.md` (a borrowed deliberation from
+`_backlog/issues/2026-10-12-backlog-process-made-explicit.md`（该卡已毕业为 **CLS-024**，现位于 `_backlog/_archived/_settled_issues/2026-10-12-backlog-process-made-explicit.md`——路径写于当时，毕业会改目录） (a borrowed deliberation from
 the same-lineage sibling `ai_dsh_loop_advisor`, 2026-10-12) re-audited this repo against the
 source card's seven gaps and found six holding: the defect fix flow has no written
 authorization/confirmation semantics, the bug template lacks an acceptance field (BUG-001
@@ -86,7 +86,7 @@ registration).
   `openspec/governance/check_doc_hygiene.py` (vocabulary, `ENTRY_DOCS`, `DOC_BUDGETS`,
   self-test negatives — no new script, no new dependency);
   `openspec/governance/required-paths.toml` (one row);
-  `_backlog/issues/2026-10-12-backlog-process-made-explicit.md` (落地关联 line only).
+  `_backlog/issues/2026-10-12-backlog-process-made-explicit.md`（该卡已毕业为 **CLS-024**，现位于 `_backlog/_archived/_settled_issues/2026-10-12-backlog-process-made-explicit.md`——路径写于当时，毕业会改目录） (落地关联 line only).
 - Not touched: the `deerflow/` gitlink (read-only; ordinary downstream work neither
   modifies nor source-browses it and this change claims no boundary ownership);
   `deep_research_harness/` runtime code and tests (no runtime surface; no harness lane
@@ -117,7 +117,7 @@ registration).
   exception-boundary categories the defect-flow clause anchors to); the borrowing source
   `/Users/bowhead/ai_dsh_loop_advisor/_backlog/issues/2026-10-12-backlog-process-made-explicit.md`
   (answers: the upstream rulings and five supplements this change adapts); the issue card
-  `_backlog/issues/2026-10-12-backlog-process-made-explicit.md` (answers: the local
+  `_backlog/issues/2026-10-12-backlog-process-made-explicit.md`（该卡已毕业为 **CLS-024**，现位于 `_backlog/_archived/_settled_issues/2026-10-12-backlog-process-made-explicit.md`——路径写于当时，毕业会改目录） (answers: the local
   re-audit, the recommendation set, and the three defaulted rulings this change lands).
 - **Evidence seam:** red-first self-test negatives inside the doc-hygiene checker (a
   seeded post-rename `活跃` bug card fails vocabulary; `调查中`/`修就绪`/`已落修` pass; an
