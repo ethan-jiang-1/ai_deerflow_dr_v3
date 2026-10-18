@@ -20,7 +20,8 @@
 
 | Issue | 一句话 |
 |------|------|
-| [2026-10-18-governance-apparatus-consolidation.md](2026-10-18-governance-apparatus-consolidation.md) | 治理装置整理：逐条判定必要/不必要，收敛重复（父卡） |
+
+（当前无活跃卡。）
 
 **下一个可用编号不在本文件维护**——唯一承载处是 [`../_archived/README.md`](../_archived/README.md) 的状态总览表
 （2026-10-18 由 `consolidate-next-id` 删除此处副本）。

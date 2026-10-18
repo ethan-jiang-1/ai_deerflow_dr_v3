@@ -1,6 +1,6 @@
 # Issue: 治理装置的整理——必要的留着，不必要的剔除
 
-> 立卡: 2026-10-18 ｜ 状态: 推敲中 ｜ 毕业门: 未过 ｜ 可关闭: 否
+> 立卡: 2026-10-18 ｜ 状态: 已结 ｜ 类型: Task ｜ 毕业门: 已过 → consolidate-next-id · consolidate-battery-pins · retire-portable-export ｜ 可关闭: 是
 
 ## 起因（一句话）
 
