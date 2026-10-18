@@ -23,7 +23,11 @@ lint:
 
 # Integration lane (framework-dependent): requires the synced environment (`uv sync`).
 smoke:
-	UV_CACHE_DIR=$$(pwd)/../.uv-cache uv sync && UV_CACHE_DIR=$$(pwd)/../.uv-cache uv run --no-sync python -m unittest discover -s tests/integration -v
+	UV_CACHE_DIR=$$(pwd)/../.uv-cache uv sync
+	UV_CACHE_DIR=$$(pwd)/../.uv-cache uv run --no-sync python -m unittest discover -s tests/integration -v
+# The contract suite needs the framework too: it compares the declared DeerFlow surface
+# against the real one. The framework-free unit lane skips those cases by design.
+	UV_CACHE_DIR=$$(pwd)/../.uv-cache uv run --no-sync python -m unittest discover -s tests/contract -v
 
 # Stream recording; CONFIG defaults to fixture, real API requires CONFIG=base.
 record-stream:
