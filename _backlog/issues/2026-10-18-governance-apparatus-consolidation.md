@@ -110,6 +110,21 @@ change 的正文）。它的用户是所有 change（与本轮这些"一个用�
 - **我能测的与不能测的**：可以量化"取值是否有差异、是否够长"，**无法从文本判断某个字段是否真的
   改变过任何决定**。对"判断提示型"字段而言后者才是关键问题，而它不在文本里——如实标注为**测不到**。
 
+**交叉验证（③）——它推翻了我对那个字段的读法**：对 98 个 change 的策略声明做**双向**核对：
+- **正向**（声明 ≥3 条策略的 36 个里抽 2 个）：声明 `control-placement, workflow-outcome-review,
+  change-admission` 的 change，正文**真的有** `## Control Placement Review` 与
+  `## Workflow Outcome Review` 两节。
+- **反向**（只声明 `change-admission` 的抽 2 个）：正文**没有**多余 Review 节，无过度声明。
+⇒ **该字段是"开关"**：它决定 proposal 是否必须写出那两节实质审查（`reviews.py` 按它逐个校验对应
+  小节）。**低取值数属设计**（策略选择器，不是散文字段）。**结论修正：`Triggered review policies`
+  不是样板——"机械"不等于"仪式"，当取值驱动校验时它就在工作。** 7/7 字段保留。
+  （另见：该字段还接受 `none: <理由>` 的带理由豁免。）
+
+**代码规模（④）**：`change_guidance_check` 包共 **1,784 行**（9 模块）；其中含 `Focus` 字样的行
+**81 行（5%）**，Focus 校验入口（`_validate_focus_card` / `FOCUS_FIELDS` / `FOCUS_HEADING`）
+共 21 处引用。**它的红证**（本会话实测）：`focus.field_missing`、`focus.heading_missing` 真的因我
+写错而报过；以及 BUG-006——该 checker **因围栏里的示例标题误拒了一个合规 change**（已修）。
+
 ## 落地关联
 
 本卡是**父卡**：每一把子 change 在 archive 后回写此卡的进展。
