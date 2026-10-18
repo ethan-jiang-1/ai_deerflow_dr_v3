@@ -24,6 +24,7 @@ if str(GOVERNANCE_DIR) not in sys.path:
 
 import change_guidance_kernel as kernel  # noqa: E402
 from check_change_guidance import (  # noqa: E402
+    POLICY_REGISTRY,
     ContractViolation,
     _validate_change_tasks,
     _validate_program_proposal,
@@ -133,7 +134,7 @@ class CheckerWiringTests(unittest.TestCase):
 
 
 def _workstream_body(owner: str, candidate_id: str, *, drop: str | None = None,
-                     extra: str = "") -> str:
+                     extra: str = "", policies: str = "none: 只读校验，不触发任何评审") -> str:
     """One Workstream Focus body: the twelve declared fields, with knobs for the red cases."""
     fields = {
         "Primary module / causal owner": owner,
@@ -142,7 +143,7 @@ def _workstream_body(owner: str, candidate_id: str, *, drop: str | None = None,
         "Necessary adjacent/external contracts": "无",
         "Evidence seam": "退出码",
         "Not in scope": "无",
-        "Triggered review policies": "none: 只读校验，不触发任何评审",
+        "Triggered review policies": policies,
         "Candidate / obligation IDs": candidate_id,
         "Target / retirement": "目标",
         "Surface grade": "面",
@@ -210,6 +211,25 @@ class ProgramModeTests(unittest.TestCase):
 
     def _code(self, text: str) -> str:
         return self._raise(text).code
+
+    def _raise_with_documents(self, text: str, policies: tuple[str, ...]) -> ContractViolation:
+        """Raise with the named policies' guidance documents materialized in the temp root.
+
+        Declaring a real policy makes `_triggered_policies` read that policy's document from
+        the root, so the fixture has to carry it — one file per policy, not a whole tree.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            root, path = self._path(tmp)
+            for policy in policies:
+                document = root / POLICY_REGISTRY[policy].path
+                document.parent.mkdir(parents=True, exist_ok=True)
+                document.write_text("x\n", encoding="utf-8")
+            with self.assertRaises(ContractViolation) as ctx:
+                _validate_program_proposal(root, text, path)
+            return ctx.exception
+
+    def _code_with_documents(self, text: str, policies: tuple[str, ...]) -> str:
+        return self._raise_with_documents(text, policies).code
 
     def test_a_compliant_program_proposal_passes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -285,3 +305,63 @@ class ProgramModeTests(unittest.TestCase):
         body = _workstream_body("mod-a", "c2")  # same owner as alpha
         self.assertEqual(self._code(_program_proposal(beta_body=body)),
                          "program.workstream_owner_duplicate")
+
+    # --- The workstream-level review records: three policies, each with a document and a
+    # --- level-4 record. The record heading is level 4 for program workstreams (level 2 for
+    # --- ordinary proposals), which is why these sections live inside the workstream body.
+
+    MALFORMED_RECORD = "\n#### {heading}\n\n| a | b |\n|---|---|\n| x | y |\n"
+
+    def test_a_declared_policy_without_its_document_is_reported(self) -> None:
+        body = _workstream_body("mod-a", "c1", policies="control-placement")
+        self.assertEqual(self._code(_program_proposal(alpha_body=body)),
+                         "program.workstream_triggered_policy_document_missing")
+
+    def test_a_missing_control_placement_record_is_reported(self) -> None:
+        body = _workstream_body("mod-a", "c1", policies="control-placement")
+        self.assertEqual(
+            self._code_with_documents(_program_proposal(alpha_body=body), ("control-placement",)),
+            "program.workstream_control_placement_review_missing",
+        )
+
+    def test_a_malformed_control_placement_record_is_reported(self) -> None:
+        record = self.MALFORMED_RECORD.format(heading="Control Placement Review")
+        body = _workstream_body("mod-a", "c1", policies="control-placement", extra=record)
+        self.assertEqual(
+            self._code_with_documents(_program_proposal(alpha_body=body), ("control-placement",)),
+            "program.workstream_control_placement_review_shape_invalid",
+        )
+
+    def test_a_missing_workflow_outcome_record_is_reported(self) -> None:
+        body = _workstream_body("mod-a", "c1", policies="workflow-outcome-review")
+        self.assertEqual(
+            self._code_with_documents(_program_proposal(alpha_body=body), ("workflow-outcome-review",)),
+            "program.workstream_workflow_outcome_review_missing",
+        )
+
+    def test_a_malformed_workflow_outcome_record_is_reported(self) -> None:
+        record = self.MALFORMED_RECORD.format(heading="Workflow Outcome Review")
+        body = _workstream_body("mod-a", "c1", policies="workflow-outcome-review", extra=record)
+        self.assertEqual(
+            self._code_with_documents(_program_proposal(alpha_body=body), ("workflow-outcome-review",)),
+            "program.workstream_workflow_outcome_review_shape_invalid",
+        )
+
+    def test_a_missing_node_agent_record_is_reported(self) -> None:
+        body = _workstream_body("mod-a", "c1", policies="node-agent-workflow-integrity")
+        self.assertEqual(
+            self._code_with_documents(
+                _program_proposal(alpha_body=body), ("node-agent-workflow-integrity",)
+            ),
+            "program.workstream_node_agent_review_missing",
+        )
+
+    def test_a_malformed_node_agent_record_is_reported(self) -> None:
+        record = self.MALFORMED_RECORD.format(heading="Node Agent Review")
+        body = _workstream_body("mod-a", "c1", policies="node-agent-workflow-integrity", extra=record)
+        self.assertEqual(
+            self._code_with_documents(
+                _program_proposal(alpha_body=body), ("node-agent-workflow-integrity",)
+            ),
+            "program.workstream_node_agent_review_shape_invalid",
+        )
