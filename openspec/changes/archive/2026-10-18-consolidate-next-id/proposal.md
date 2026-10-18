@@ -3,6 +3,7 @@
 ## Why
 
 父卡 `_backlog/issues/2026-10-18-governance-apparatus-consolidation.md` 的裁决 #1，证据最硬的一条：
+（该卡于 2026-10-18 毕业为 **CLS-026**，现位于 `_backlog/_archived/_settled_issues/2026-10-18-governance-apparatus-consolidation.md`——本行路径为提案当时的位置，毕业会改变目录，故补注现址。）
 
 **`Next-ID` 有两个前缀 × 3 个活声明点 = 6 处手工维护，而那个值完全可从磁盘推导。**
 
