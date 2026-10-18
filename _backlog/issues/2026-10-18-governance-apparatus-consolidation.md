@@ -81,3 +81,22 @@
   `violations` 哨兵显式承认）。实测覆盖**当前成立**，且 `adr_index`/`docs_scope` **各仅 1 条**控制
   ——正是最该守的点。两次变异检查各自变红并指名。**控制零退役、规则零改动**：本把换的是判据，
   不是覆盖。取舍（冗余控制的丢失不再被断言）写进 docstring，以免被读成疏漏。
+
+- **裁决 #3（program / workstream 模式）— 更正为「保留」**（2026-10-18）：本卡原先写「全仓仅 2 个文件
+  出现，且**没有任何真实 change 用过**」——**这个判断是错的**。实测：
+  `openspec/changes/archive/2026-10-07-surface-runtime-structure/proposal.md` **真的用过**
+  （`## Program Focus` + **三个** `### Workstream Focus:`：chain-lock / vocabulary-fix / skill-slot）。
+  **错在只数了「标记出现在几个文件」就下结论，没有去看那些文件里它是不是真的被当成 program 用。**
+  按判定程序重判：守护「多工作流 program 必须登记每个工作流」· 属装置但**是唯一**的承载机制 ·
+  **被真实使用过一次** · 代价约 99 行（6 模块）+ config 3 行，且**未使用时零成本**
+  （校验只在 `if program_count or workstream_count:` 时激活）⇒ **1 个真实用户 + 对非用户零成本
+  ⇒ 必要，保留**。模式本身一行未动。
+  - **已知缺口（跟踪项）**：该分支**零电池控制**（`NEGATIVE_CASES` 里没有任何 program/workstream
+    控制）。它是被**保留**的能力，不是待退役对象——补控制属**新增覆盖**，与本轮方向相反，另开一把。
+
+- **裁决 #4（portable export）— 已执行**（change `retire-portable-export`，2026-10-18 归档）：
+  删除 `portable_change_guidance_export.py`（**140 行**）。判据是**「没有调用者」**而非「看起来像借来的」：
+  CI / Makefile / gate / 七个 checker / 任何测试**五处全零引用**；它仅有的引用是自己的
+  `required-paths.toml` 登记、`governance/README.md` 一行描述、本卡、以及一个归档 change 的历史
+  tasks。**一个占着「必需路径」名分、却不为本仓任何检查提供服务的组件**——正是本卡要剔除的形态
+  （它让装置显得比实际更大，并让后来者以为有个导出流程在跑）。登记与文档行同时删除，不留悬挂。

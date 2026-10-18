@@ -115,7 +115,6 @@ files = [
   "openspec/governance/check_project_gate.py",
   "openspec/governance/check_project_specs.py",
   "openspec/governance/check_proof_receipts.py",
-  "openspec/governance/portable_change_guidance_export.py",
   "openspec/governance/project-structure.toml",
   "openspec/governance/required-paths.toml",
   "openspec/governance/selected-change-closeout.md",

@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-10-18
+# Consolidation: a 140-line script nothing invokes is removed, with its registration and
+# its documentation row. The program/workstream mode is judged necessary and kept.
+skip_specs: true
