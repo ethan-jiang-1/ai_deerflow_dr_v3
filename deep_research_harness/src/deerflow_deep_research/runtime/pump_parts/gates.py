@@ -75,9 +75,14 @@ def clarification_step(handle, on_clarification, state, tool_calls):
             return True, str(answer).strip(), state
         # Declined (empty answer): fall back to the bounded automatic reply.
         _journal(handle, "lifecycle", "clarification_declined", {"question": question_text})
-    if state.auto_proceed_count < state.auto_proceed_bound:
-        state = rule_clarification_step(state, detected=True)
-        state = bundle_state.write_state(handle, bundle_state.read_state(handle), state)
+    # One consistent read drives the decision, the derived state, and the CAS expectation
+    # (BUG-007): deriving from the caller's older view while CASing against a revision read
+    # inside the call made the check a tautology, so a concurrent update was silently
+    # overwritten and the revision still looked continuous.
+    fresh = bundle_state.read_state(handle)
+    if fresh.auto_proceed_count < fresh.auto_proceed_bound:
+        state = rule_clarification_step(fresh, detected=True)
+        state = bundle_state.write_state(handle, fresh, state)
         _journal(
             handle,
             "lifecycle",
@@ -86,8 +91,8 @@ def clarification_step(handle, on_clarification, state, tool_calls):
         )
         return True, AUTO_REPLY_PREFIX + clarification.question_text(last_question), state
 
-    exhausted = rule_clarification_step(state, detected=True)
-    written = bundle_state.write_state(handle, bundle_state.read_state(handle), exhausted)
+    exhausted = rule_clarification_step(fresh, detected=True)
+    written = bundle_state.write_state(handle, fresh, exhausted)
     # The writer is atomic and was already there (with zero callers); this path used
     # to hand-roll the same JSON with a bare write_text, bypassing that atomicity.
     bundle_actions.write_unanswered_questions(

@@ -1,6 +1,7 @@
 # BUG-007: gates.py 两处状态写入把 CAS 的 expected 值内联现读——CAS 恒真，静默丢失更新
 
-> 严重级别: P1 | 发现: 2026-10-18（原始审计 2026-10-13，见「来源」） | 状态: 等人拍板
+> 严重级别: P1 | 发现: 2026-10-18（原始审计 2026-10-13，见「来源」） | 状态: 已修
+> 修复: fix-cas-stale-write
 
 ## 症状
 
@@ -68,4 +69,15 @@
 
 ## 修复关联
 
-（待定——拍板后由对应 change 落地，届时补 `> 修复: <change>` 字段并翻转状态。）
+**已修**，由 change `fix-cas-stale-write` 落地：`clarification_step` 的两条路径改为**单次一致读**——
+判定条件、状态推导与 CAS 的 expected 同源于一次 `read_state(handle)`（照同仓 `pump.py:216-240` 的
+已验证形态）。并发下从"静默覆盖"变为"保住别人的更新"；单写者路径行为逐字不变。
+
+**红先实证**（修复前）：
+- 行为负例：在调用方的读之后插入一次外部写入，走完这一步后计数为 **1**（并发更新被覆盖）；
+  修复后为 **2**（1 来自并发写 + 1 来自本步）——`AssertionError: 1 != 2` 先红后绿。
+- 形态负例：`gate writes CAS against an inline read: ['gates.py:90', 'gates.py:80']` 先红后绿。
+
+**未做的决定（owner 保留）**：未引入 `StateRevisionConflict` 的捕获/重试，也未把 expected 改成
+"整轮开始时的 state"——那会改变终态路径的失败语义（生产代码今天无人捕获它）。见 change 的
+design D-3 与差偏 4。

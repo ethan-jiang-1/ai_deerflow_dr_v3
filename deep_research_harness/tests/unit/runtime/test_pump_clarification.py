@@ -22,6 +22,8 @@ from support import event as _event
 from deerflow_deep_research.domain import bundle, state_machine
 from deerflow_deep_research.runtime import pump
 from deerflow_deep_research.runtime.bundle import bundle_actions, bundle_state
+from deerflow_deep_research.runtime.pump_parts import gates
+from deerflow_deep_research.runtime.pump_parts.gates import clarification_step
 from tests.fixture_reports import fixture_report
 
 from .pump_case import PumpCase, journal_mod_entries
@@ -197,3 +199,57 @@ class RunEngineTest(PumpCase):
         self.assertEqual(questions["questions"], ["范围选哪国市场？"])
         entries = journal_mod_entries(self.handle)
         self.assertTrue(any(e.category == "exhaustion" for e in entries))
+
+
+class GateWriteConsistencyTest(PumpCase):
+    """BUG-007: a gate write must CAS against the version it derived its payload from.
+
+    `clarification_step` computed its new state from the caller's (older) view and then CASed
+    against a value read *inside* the call expression, so the revision check could never fail
+    while the payload was stale — a concurrent update was silently overwritten (the revision
+    even looked continuous). These cases pin the property rather than the shape alone.
+    """
+
+    def _tool_calls(self) -> list[SimpleNamespace]:
+        return [SimpleNamespace(arguments=json.dumps({"question": "范围选哪国市场？"}))]
+
+    def test_a_concurrent_update_survives_the_step(self) -> None:
+        caller_state = bundle_state.read_state(self.handle)
+        concurrent = state_machine.rule_clarification_step(caller_state, detected=True)
+        bundle_state.write_state(self.handle, caller_state, concurrent)
+
+        clarification_step(self.handle, None, caller_state, self._tool_calls())
+
+        persisted = bundle_state.read_state(self.handle)
+        self.assertEqual(
+            persisted.auto_proceed_count,
+            2,
+            "the step overwrote a concurrent update instead of building on it",
+        )
+
+    def test_no_gate_write_reads_its_expected_value_inside_the_call(self) -> None:
+        """The defect's signature: `write_state(..., read_state(...), ...)`."""
+        import ast
+
+        offenders: list[str] = []
+        for source in sorted(Path(gates.__file__).parent.glob("*.py")):
+            tree = ast.parse(source.read_text(encoding="utf-8"), filename=str(source))
+            for node in ast.walk(tree):
+                if not isinstance(node, ast.Call):
+                    continue
+                name = node.func.attr if isinstance(node.func, ast.Attribute) else getattr(node.func, "id", "")
+                if name != "write_state":
+                    continue
+                arguments = [*node.args, *[keyword.value for keyword in node.keywords]]
+                for argument in arguments:
+                    for inner in ast.walk(argument):
+                        if not isinstance(inner, ast.Call):
+                            continue
+                        inner_name = (
+                            inner.func.attr
+                            if isinstance(inner.func, ast.Attribute)
+                            else getattr(inner.func, "id", "")
+                        )
+                        if inner_name == "read_state":
+                            offenders.append(f"{source.name}:{node.lineno}")
+        self.assertEqual(offenders, [], f"gate writes CAS against an inline read: {offenders}")

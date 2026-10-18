@@ -23,6 +23,7 @@ bug 修完后从 `_backlog/bugs/` 通过 `git mv` 移入本目录：
 | BUG-004 | 2026-10-16 | [BUG-004-spec-checker-fence-rule-hides-headings.md](BUG-004-spec-checker-fence-rule-hides-headings.md) — specs 门禁的围栏规则偏离 CommonMark，会藏掉真标题（围栏规则现收敛到 markdown_fences.py） |
 | BUG-005 | 2026-10-16 | [BUG-005-doc-hygiene-three-fence-notions.md](BUG-005-doc-hygiene-three-fence-notions.md) — doc-hygiene 的逐行解析有三种围栏概念（可静默失明）；现采用唯一围栏规则 markdown_fences.py |
 | BUG-006 | 2026-10-17 | [BUG-006-guidance-checker-fence-blind-parsing.md](BUG-006-guidance-checker-fence-blind-parsing.md) — change-guidance 门禁的章节解析无围栏感知（会误拒合规 change）；现采用唯一围栏规则 |
+| BUG-007 | 2026-10-18 | [BUG-007-cas-idle-spin-in-clarification-step.md](BUG-007-cas-idle-spin-in-clarification-step.md) — `gates.py` 两处状态写入把 CAS 的 expected 内联现读 ⇒ 恒真 + 静默丢失更新（原始审计「事实 12」）；改为单次一致读，并发更新存活，红先 `1 != 2` 在案 |
 
 **下一个可用编号由 [`../README.md`](../README.md) 的状态总览表唯一承载**（2026-10-18 由
 `consolidate-next-id` 删除此处副本：6 处手写只带来漂移，且表里那一处已被计数规则校验）。
