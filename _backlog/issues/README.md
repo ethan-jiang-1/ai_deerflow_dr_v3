@@ -20,8 +20,7 @@
 
 | Issue | 一句话 |
 |------|------|
-
-（当前无活跃卡。）
+| [2026-10-18-governance-apparatus-consolidation.md](2026-10-18-governance-apparatus-consolidation.md) | 治理装置整理：逐条判定必要/不必要，收敛重复（父卡） |
 
 **Next available issue ID: CLS-026**（移入 `_settled_issues/` 时分配；CLS-019/020/021/022/023/024/025 已分配）
 
