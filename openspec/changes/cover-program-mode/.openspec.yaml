@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-10-18
+# Test-only: the kept program/workstream mode gets its first direct coverage.
+skip_specs: true
