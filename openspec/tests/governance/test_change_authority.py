@@ -132,54 +132,67 @@ class CheckerWiringTests(unittest.TestCase):
             self.assertEqual(ctx.exception.code, "tasks.deviation_register_missing")
 
 
-def _workstream_body(owner: str, candidate_id: str) -> str:
-    return (
-        f"- **Primary module / causal owner:** {owner}\n"
-        "- **Seam classification:** wiring —— 只在闸门处接线；无模型参与。\n"
-        "- **Question:** 这段文字存在吗\n"
-        "- **Necessary adjacent/external contracts:** 无\n"
-        "- **Evidence seam:** 退出码\n"
-        "- **Not in scope:** 无\n"
-        "- **Triggered review policies:** none: 只读校验，不触发任何评审\n"
-        f"- **Candidate / obligation IDs:** {candidate_id}\n"
-        "- **Target / retirement:** 目标\n"
-        "- **Surface grade:** 面\n"
-        "- **Decision authority:** owner\n"
-        "- **Negative path / recovery:** 恢复\n"
-    )
+def _workstream_body(owner: str, candidate_id: str, *, drop: str | None = None,
+                     extra: str = "") -> str:
+    """One Workstream Focus body: the twelve declared fields, with knobs for the red cases."""
+    fields = {
+        "Primary module / causal owner": owner,
+        "Seam classification": "wiring —— 只在闸门处接线；无模型参与。",
+        "Question": "这段文字存在吗",
+        "Necessary adjacent/external contracts": "无",
+        "Evidence seam": "退出码",
+        "Not in scope": "无",
+        "Triggered review policies": "none: 只读校验，不触发任何评审",
+        "Candidate / obligation IDs": candidate_id,
+        "Target / retirement": "目标",
+        "Surface grade": "面",
+        "Decision authority": "owner",
+        "Negative path / recovery": "恢复",
+    }
+    if drop is not None:
+        del fields[drop]
+    return "".join(f"- **{name}:** {value}\n" for name, value in fields.items()) + extra
 
 
-def _program_proposal(order: str = "alpha, beta", *, both: bool = True,
-                      drop_field: bool = False, workstreams_before: bool = False) -> str:
-    """A program-form proposal; the knobs drive the four negative cases."""
-    program = "## Program Focus\n\n" + (
-        "- **Program outcome:** 把一件事做出来\n"
-        "- **Candidate / obligation budget:** c1, c2\n"
-        f"- **Declared workstream order:** {order}\n"
-        + ("" if drop_field else "- **Program decision authority:** owner\n")
-        + "- **Shared archive invariant:** 不变\n"
-        "- **Program failure / recovery:** 恢复\n"
-        "- **Split / expansion rule:** 不拆\n"
-        "- **Not in scope:** 别的\n"
+def _program_proposal(order: str = "alpha, beta", *, budget: str = "c1, c2",
+                      alpha_id: str = "alpha", beta_id: str = "beta", both: bool = True,
+                      drop_program_field: str | None = None, workstreams_before: bool = False,
+                      alpha_body: str | None = None, beta_body: str | None = None) -> str:
+    """A program-form proposal; the knobs drive the negative cases."""
+    program_fields = {
+        "Program outcome": "把一件事做出来",
+        "Candidate / obligation budget": budget,
+        "Declared workstream order": order,
+        "Program decision authority": "owner",
+        "Shared archive invariant": "不变",
+        "Program failure / recovery": "恢复",
+        "Split / expansion rule": "不拆",
+        "Not in scope": "别的",
+    }
+    if drop_program_field is not None:
+        del program_fields[drop_program_field]
+    program = "## Program Focus\n\n" + "".join(
+        f"- **{name}:** {value}\n" for name, value in program_fields.items()
     )
-    alpha = f"### Workstream Focus: alpha\n\n{_workstream_body('mod-a', 'c1')}\n"
-    beta = f"### Workstream Focus: beta\n\n{_workstream_body('mod-b', 'c2')}\n"
+    alpha = f"### Workstream Focus: {alpha_id}\n\n{alpha_body or _workstream_body('mod-a', 'c1')}\n"
+    beta = f"### Workstream Focus: {beta_id}\n\n{beta_body or _workstream_body('mod-b', 'c2')}\n"
     if workstreams_before:
         return alpha + beta + "\n" + program
     return program + "\n" + alpha + "\n" + (beta if both else "")
 
 
 class ProgramModeTests(unittest.TestCase):
-    """The program form's first direct coverage (CLS-026 follow-up).
+    """The program form's direct coverage.
 
-    The mode is kept because it has a real user (2026-10-07-surface-runtime-structure:
-    one `## Program Focus` plus three workstreams) and is the only multi-workstream
-    carrier — but until now nothing exercised its validation: the three mentions of the
-    heading under `openspec/tests/` all construct *fence fixtures* for a different rule.
+    The mode is kept because it has a real user (2026-10-07-surface-runtime-structure: one
+    `## Program Focus` plus three workstreams) and is the only multi-workstream carrier. The
+    first round covered the canonical happy path and four codes; this round closes the rest of
+    the codes that live inside `_validate_program_proposal` — each with one fixture knob and one
+    assertion naming its code.
 
-    These cases call `_validate_program_proposal` directly, matching this file's
-    established style. Scope is that function: the workstream-level review-section
-    validation lives in the caller and is not covered here.
+    These cases call `_validate_program_proposal` directly, matching this file's established
+    style. Scope is that function: the workstream-level review-section validation lives in the
+    caller and is not covered here.
     """
 
     def _path(self, tmp: str) -> tuple[Path, Path]:
@@ -195,27 +208,80 @@ class ProgramModeTests(unittest.TestCase):
                 _validate_program_proposal(root, text, path)
             return ctx.exception
 
+    def _code(self, text: str) -> str:
+        return self._raise(text).code
+
     def test_a_compliant_program_proposal_passes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root, path = self._path(tmp)
             _validate_program_proposal(root, _program_proposal(), path)
 
     def test_a_single_workstream_is_reported(self) -> None:
-        violation = self._raise(_program_proposal(both=False))
-        self.assertEqual(violation.code, "program.workstream_count_invalid")
+        self.assertEqual(self._code(_program_proposal(both=False)), "program.workstream_count_invalid")
 
     def test_workstreams_before_the_program_heading_are_reported(self) -> None:
-        violation = self._raise(_program_proposal(workstreams_before=True))
-        self.assertEqual(violation.code, "program.mode_invalid")
+        self.assertEqual(self._code(_program_proposal(workstreams_before=True)), "program.mode_invalid")
 
     def test_a_missing_program_field_is_reported(self) -> None:
-        violation = self._raise(_program_proposal(drop_field=True))
-        self.assertEqual(violation.code, "program.field_missing")
+        self.assertEqual(
+            self._code(_program_proposal(drop_program_field="Program decision authority")),
+            "program.field_missing",
+        )
 
     def test_a_declared_order_that_disagrees_is_reported(self) -> None:
-        violation = self._raise(_program_proposal(order="beta, alpha"))
-        self.assertEqual(violation.code, "program.workstream_registration_mismatch")
+        self.assertEqual(self._code(_program_proposal(order="beta, alpha")),
+                         "program.workstream_registration_mismatch")
 
+    def test_an_empty_budget_item_is_reported(self) -> None:
+        self.assertEqual(self._code(_program_proposal(budget="c1, , c2")),
+                         "program.candidate_budget_invalid")
 
-if __name__ == "__main__":
-    unittest.main()
+    def test_a_repeated_budget_identifier_is_reported(self) -> None:
+        self.assertEqual(self._code(_program_proposal(budget="c1, c1")),
+                         "program.candidate_budget_duplicate")
+
+    def test_a_budget_that_disagrees_with_the_workstream_union_is_reported(self) -> None:
+        self.assertEqual(self._code(_program_proposal(budget="c1, c2, c3")),
+                         "program.candidate_budget_mismatch")
+
+    def test_an_empty_candidate_id_item_is_reported(self) -> None:
+        body = _workstream_body("mod-a", "c1, , c2")
+        self.assertEqual(self._code(_program_proposal(alpha_body=body)),
+                         "program.candidate_id_invalid")
+
+    def test_a_repeated_candidate_id_is_reported(self) -> None:
+        body = _workstream_body("mod-a", "c1, c1")
+        self.assertEqual(self._code(_program_proposal(alpha_body=body)),
+                         "program.candidate_id_duplicate")
+
+    def test_a_missing_workstream_field_is_reported(self) -> None:
+        body = _workstream_body("mod-a", "c1", drop="Target / retirement")
+        self.assertEqual(self._code(_program_proposal(alpha_body=body)),
+                         "program.workstream_field_missing")
+
+    def test_a_duplicate_workstream_id_is_reported(self) -> None:
+        # The declared order stays valid and unique: the repeat is inside the headings.
+        self.assertEqual(self._code(_program_proposal(beta_id="alpha")),
+                         "program.workstream_id_duplicate")
+
+    def test_an_invalid_workstream_id_is_reported(self) -> None:
+        self.assertEqual(self._code(_program_proposal(alpha_id="Alpha")),
+                         "program.workstream_id_invalid")
+
+    def test_the_legacy_policies_field_in_a_workstream_is_reported(self) -> None:
+        body = _workstream_body("mod-a", "c1", extra="- **Triggered charter policies:** x\n")
+        self.assertEqual(self._code(_program_proposal(alpha_body=body)),
+                         "program.workstream_legacy_triggered_policies_field_present")
+
+    def test_a_duplicate_declared_order_is_reported(self) -> None:
+        self.assertEqual(self._code(_program_proposal(order="alpha, alpha")),
+                         "program.workstream_order_duplicate")
+
+    def test_an_invalid_declared_order_is_reported(self) -> None:
+        self.assertEqual(self._code(_program_proposal(order="alpha, Beta")),
+                         "program.workstream_order_invalid")
+
+    def test_a_duplicate_workstream_owner_is_reported(self) -> None:
+        body = _workstream_body("mod-a", "c2")  # same owner as alpha
+        self.assertEqual(self._code(_program_proposal(beta_body=body)),
+                         "program.workstream_owner_duplicate")

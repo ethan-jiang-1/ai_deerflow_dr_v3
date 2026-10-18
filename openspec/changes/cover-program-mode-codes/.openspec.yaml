@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-10-18
+# Coverage: the remaining program-form violation codes, one fixture knob each.
+skip_specs: true
