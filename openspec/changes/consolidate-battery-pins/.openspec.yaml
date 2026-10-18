@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-10-18
+# Consolidation: the exact-count pins are replaced by the invariant they were standing in
+# for (every rule has at least one control).
+skip_specs: true

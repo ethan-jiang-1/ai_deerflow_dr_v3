@@ -29,6 +29,7 @@ if str(GOVERNANCE) not in sys.path:
     sys.path.insert(0, str(GOVERNANCE))
 
 import _battery  # noqa: E402  (the governance directory is importable above)
+import doc_hygiene_check  # noqa: E402  (the rule registry)
 
 
 def _method_name(case_id: str) -> str:
@@ -79,30 +80,38 @@ for _case in _battery.NEGATIVE_CASES:
 
 
 class BatteryInventoryTests(unittest.TestCase):
-    """The guard's control inventory is pinned: losing controls is a regression."""
+    """The control inventory answers to its invariant: every rule is covered."""
 
-    def test_inventory_counts_are_pinned(self) -> None:
-        """29 negative controls beside 11 green controls — pinned exactly.
+    #: ``run_rule`` accepts this in place of a rule name and runs every rule; a control
+    #: meaning "nothing at all may fire" legitimately targets it.
+    WHOLE_CHECKER = "violations"
 
-        A negative control must fire (``present``); a green control must not
-        mis-report — either a named violation class is absent (``absent``) or the
-        run is entirely clean (``zero_violations``). Counts are pinned so a lost
-        control fails loudly instead of quietly shrinking the guard's proof.
+    def test_every_rule_has_at_least_one_control(self) -> None:
+        """Coverage is the invariant; a count was only ever a proxy for it.
 
-        The count is 30, not the 31 quoted when the change was planned. The number
-        was measured, not inferred: stubbing every rule to return no violations makes
-        the battery report exactly 30 failures, and the inherited inlined battery
-        reports exactly 30 as well. The plan's "31" counted the battery's failure
-        messages, one of which ("clean fixture must have zero violations") is a
-        positive control rather than a negative one — so the negative inventory is 29
-        and the green inventory is 11, 40 controls in total.
+        The inventory used to be pinned by exact counts. That cost three hand-syncs in a
+        single session (three numbers *and* a paragraph each time) and the paragraph ended
+        up contradicting itself about its own figures. What the pin was standing in for is
+        coverage: a rule with no control exercises nothing. That is a live risk rather than
+        a theoretical one — ``adr_index`` and ``docs_scope`` have exactly one control each,
+        so losing either one zeroes a rule's coverage.
+
+        Deliberate trade-off, recorded here so it reads as a choice: losing one of several
+        *redundant* controls no longer fails this test. Such a loss changes nothing about
+        what any rule can be shown to do, and it appears as an explicit deletion in review.
+        The count pin charged a hand-sync for every *addition* to buy that.
         """
-        cases = _battery.NEGATIVE_CASES
-        negative = [c for c in cases if c.present]
-        green = [c for c in cases if c.absent or c.zero_violations]
-        self.assertEqual(len(negative), 29, "the guard lost or gained negative controls")
-        self.assertEqual(len(green), 11, "the guard lost or gained green controls")
-        self.assertEqual(len(cases), 40, "battery size changed")
+        rules = [name for name, _ in doc_hygiene_check.RULES]
+        self.assertTrue(rules, "the rule registry is empty, so coverage would pass vacuously")
+        covered = {case.rule for case in _battery.NEGATIVE_CASES}
+        uncovered = sorted(set(rules) - covered)
+        self.assertEqual(uncovered, [], f"rules with no control at all: {uncovered}")
+
+    def test_no_control_names_an_unknown_rule(self) -> None:
+        """The converse: a control that targets nothing is not a control."""
+        known = {name for name, _ in doc_hygiene_check.RULES} | {self.WHOLE_CHECKER}
+        unknown = sorted({case.rule for case in _battery.NEGATIVE_CASES} - known)
+        self.assertEqual(unknown, [], f"controls targeting rules that do not exist: {unknown}")
 
     def test_every_control_declares_its_polarity(self) -> None:
         for case in _battery.NEGATIVE_CASES:
