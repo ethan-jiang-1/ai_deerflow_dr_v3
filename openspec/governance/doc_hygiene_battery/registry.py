@@ -15,7 +15,7 @@ from doc_hygiene_check import (
     Scope,
     violations,
 )
-from .fixtures import _adr_index_orphan, _allowlist_unjustified, _archive_only_next_id, _broken_asset_doc_link, _broken_docs_layer_link, _broken_entry_chain_link, _consistent_single_decl, _contiguous_table, _dangling_trigger_index_home, _disagreeing_next_id_decl, _docs_layer_missing_newline, _docs_layer_non_utf8, _duplicate_next_id_decl, _fence_indented_opener_keeps_checking, _fenced_example_id_does_not_allocate, _fenced_marker_quote_is_not_stale, _fix_reference_existing_change, _fix_reference_missing_change, _fix_reference_repo, _hukou_bad_word, _hukou_closable, _hukou_graduated, _hukou_miskill_awaiting, _hukou_missing_field, _is_clean_fixture, _ledger_repo, _ledger_row_placement, _missing_managed_budget_path, _missing_newline_entry_chain, _over_budget_resident_doc, _resolvable_asset_doc_link, _root_count_drift, _root_count_matching, _root_count_unpinned, _stale_marker_clean, _stale_marker_detected, _tilde_fenced_row_is_not_a_ledger_row, _undeclared_backlog_dir, _undocumented_backlog_dir, _union_consistent_next_id, _unregistered_docs_markdown, _vocab_bad_word, _vocab_fix_ready_miskill, _vocab_old_active
+from .fixtures import _adr_index_orphan, _allowlist_unjustified, _archive_only_next_id, _broken_asset_doc_link, _broken_docs_layer_link, _broken_entry_chain_link, _consistent_single_decl, _contiguous_table, _dangling_trigger_index_home, _disagreeing_next_id_decl, _docs_layer_missing_newline, _docs_layer_non_utf8, _duplicate_next_id_decl, _fence_indented_opener_keeps_checking, _fenced_example_id_does_not_allocate, _fenced_marker_quote_is_not_stale, _fix_reference_existing_change, _fix_reference_missing_change, _hukou_bad_word, _hukou_closable, _hukou_graduated, _hukou_miskill_awaiting, _hukou_missing_field, _is_clean_fixture, _ledger_repo, _ledger_row_placement, _missing_managed_budget_path, _missing_newline_entry_chain, _over_budget_resident_doc, _resolvable_asset_doc_link, _root_count_drift, _root_count_matching, _root_count_unpinned, _stale_marker_clean, _stale_marker_detected, _tilde_fenced_row_is_not_a_ledger_row, _undeclared_backlog_dir, _undocumented_backlog_dir, _union_consistent_next_id, _unregistered_docs_markdown, _vocab_bad_word, _vocab_fix_ready_miskill, _vocab_old_active
 
 
 CLEAN_FIXTURE = "clean fixture must have zero violations"
@@ -250,22 +250,7 @@ NEGATIVE_CASES: tuple[NegativeCase, ...] = (
        "index row whose linked file does not exist", present=("dangling index row",)),
     _c(LEDGER_COUNTER_MISMATCH, "ledger_consistency", _ledger_repo,
        "archive counters disagreeing with the disk roster", present=("counter mismatch",)),
-    _c(ARCHIVE_ONLY_NEXT_ID, "ledger_consistency", _archive_only_next_id,
-       "next-ID derived from the archive zone only, ignoring a filed active card (BUG-002)",
-       present=("next-ID mismatch", "_fixed_bugs")),
-    _c(UNION_CONSISTENT_NEXT_ID, "ledger_consistency", _union_consistent_next_id,
-       "the union-consistent next ID must stay green (over-fire control)",
-       absent=("next-ID mismatch",)),
-    _c(DUPLICATE_NEXT_ID_DECL, "ledger_consistency", _duplicate_next_id_decl,
-       "two next-ID declarations for one prefix in one README (BUG-002)",
-       present=("duplicate next-ID declaration in _fixed_bugs/README.md",)),
-    _c(DISAGREEING_NEXT_ID_DECL, "ledger_consistency", _disagreeing_next_id_decl,
-       "single declaration disagreeing with the union-derived next ID",
-       present=("next-ID declaration disagrees in _fixed_bugs/README.md",)),
-    _c(CONSISTENT_SINGLE_DECL, "ledger_consistency", _consistent_single_decl,
-       "a consistent single declaration must not be called a duplicate (over-fire control)",
-       absent=("duplicate next-ID declaration in bugs/README.md",)),
-    _c(LEDGER_ROW_PLACEMENT, "ledger_consistency", _ledger_row_placement,
+                        _c(LEDGER_ROW_PLACEMENT, "ledger_consistency", _ledger_row_placement,
        "work-item row separated from its table header block", present=("placement",)),
     _c(CONTIGUOUS_TABLE, "ledger_consistency", _contiguous_table,
        "a contiguous table must not be flagged as misplaced (over-fire control)",

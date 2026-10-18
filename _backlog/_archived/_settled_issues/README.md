@@ -9,7 +9,7 @@
 
 issue 关闭后从 `_backlog/issues/` 通过 `git mv` 移入本目录：
 1. 在本文件表格加一行（CLS-NNN + 日期 + 文件名 + 简述），编号 = 当前最大 + 1
-2. 更新最后的 "Next available issue ID" 行
+2. 回到 [`../README.md`](../README.md) 的状态总览表更新计数（**Next ID 也只在那一处**）
 3. 更新 `../../issues/README.md`（移除该卡的行）
 4. 更新 `../README.md`（计数 +1）
 
@@ -45,4 +45,5 @@ issue 关闭后从 `_backlog/issues/` 通过 `git mv` 移入本目录：
 | CLS-024 | 2026-10-12 | [2026-10-12-backlog-process-made-explicit.md](2026-10-12-backlog-process-made-explicit.md) | backlog 制度显性化（借鉴 loop_advisor 2026-10-12 卡，谱系第四波）：「一张 bug 怎么走」缺陷修复流成节（修就绪门票=根因证据+方案+修好判据；P1/P2 自带撰写 propose 授权，P0/契约/规范语义/越界/已记录决定走 owner）+ 铁律范围化例外 + 状态翻转法则两轨成表 + bug 词表扩集更名（活跃→调查中，+修就绪/已落修/等人拍板）+ bug 模板「修好判据」节 + agent 门牌 _backlog/AGENTS.md（ENTRY_DOCS + DOC_BUDGETS 1195）；make-backlog-process-explicit 全绿归档（skip_specs：机器面全在既有机制内的声明值变更，零新失败类；prove-it-red 在案） |
 | CLS-025 | 2026-10-16 | [2026-10-13-code-health-refactor.md](2026-10-13-code-health-refactor.md) | 代码健康度收敛主卡（三路审计 + 六阶段计划 + D1–D3 裁决）：阶段 1 落地并归档 `extract-doc-hygiene-test-battery`——`check_doc_hygiene.py` 1196→863 行（内联 450 行负例电池移出、`Scope` 冻结值对象 + `RULES` 注册表取代 30 个模块全局量与手列调度）；电池落 `_battery.py`（39 条控制 = 30 负例 + 9 绿控制，计数由变异法实测而非推断）并由治理套件逐例跑成独立用例（99→145）；`--self-test` 薄委托、命令/stdout/退出码逐字不变；9 条规则新旧产出逐规则 IDENTICAL、守卫变红实测在案；阶段 2–5 未开工，阶段表与裁决可直接沿用 |
 
-**Next available issue ID: CLS-026**
+**下一个可用编号由 [`../README.md`](../README.md) 的状态总览表唯一承载**（2026-10-18 由
+`consolidate-next-id` 删除此处副本）。

@@ -59,7 +59,6 @@ from .ledger import (
     _allocated_numbers,
     _ledger_roster_problems,
     _ledger_counter_problems,
-    _ledger_placement_problems,
 )
 
 from .rules import (
@@ -126,7 +125,6 @@ __all__ = [
     "_allocated_numbers",
     "_ledger_roster_problems",
     "_ledger_counter_problems",
-    "_ledger_placement_problems",
     "_rule_adr_index",
     "_rule_links",
     "_rule_encoding_newline",

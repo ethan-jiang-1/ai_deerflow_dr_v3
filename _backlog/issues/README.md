@@ -1,14 +1,14 @@
 # Issues — 活跃 issue 列表（推敲 → 结论 → 交接）
 
 >
-> **CLS 编号权威在 `_archived/_settled_issues/`；新号 = 已分配的最大编号 + 1，移入时分配（本文件不再重复声明 Next-ID，唯一活跃声明见下方活跃列表末行）。本文件只列活跃 issue，活跃卡本身不带编号，文件名即标识。**
+> **CLS 编号权威在 `_backlog/_archived/README.md` 的状态总览表**（`_settled_issues/` 行的 Next ID 列，由计数规则与磁盘推导值对账）；新号 = 已分配的最大编号 + 1，移入时分配。**本文件不维护编号**（2026-10-18 由 `consolidate-next-id` 删除了此前的副本）。活跃卡本身不带编号，文件名即标识。
 >
 > ⚠️ **文件名必须以日期编码开头：`YYYY-MM-DD-<name>.md`。这是强制约定，不是惯例**——无日期前缀的卡无法按时间排序与追溯（历史经验教训，v2 踩过）。
 
 ## 完成一个 issue 的步骤
 
 1. `git mv issues/<name>.md _archived/_settled_issues/<name>.md`
-2. 更新 `_archived/_settled_issues/README.md`（加一行 + 更新 Next available issue ID）
+2. 更新 `_archived/_settled_issues/README.md`（加一行）并回到 `_archived/README.md` 更新状态总览表的计数与 Next ID 列
 3. 更新本文件（删掉该卡）
 4. 更新 `../_archived/README.md`（计数 +1 closed）
 
@@ -22,7 +22,8 @@
 |------|------|
 | [2026-10-18-governance-apparatus-consolidation.md](2026-10-18-governance-apparatus-consolidation.md) | 治理装置整理：逐条判定必要/不必要，收敛重复（父卡） |
 
-**Next available issue ID: CLS-026**（移入 `_settled_issues/` 时分配；CLS-019/020/021/022/023/024/025 已分配）
+**下一个可用编号不在本文件维护**——唯一承载处是 [`../_archived/README.md`](../_archived/README.md) 的状态总览表
+（2026-10-18 由 `consolidate-next-id` 删除此处副本）。
 
 新方向性工作**必须显性立卡**（驾驭者要求，2026-10-07）：先立卡记录决策与取舍，再走 OpenSpec change 实施；完成后按上方 ritual 关闭归档。
 

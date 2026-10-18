@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-10-18
+# Consolidation: four hand-written Next-ID declarations are deleted; the one already
+# validated carrier stays. Five controls that only exercised the deleted copies retire.
+skip_specs: true

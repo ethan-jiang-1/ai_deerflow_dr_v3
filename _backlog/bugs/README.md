@@ -6,7 +6,8 @@
 ## 修完一个 bug 的步骤
 
 1. `git mv bugs/BUG-<NNN>-<slug>.md _archived/_fixed_bugs/BUG-<NNN>-<slug>.md`
-2. 更新 `_archived/_fixed_bugs/README.md`（加表格行 + 更新 Next available bug ID）
+2. 更新 `_archived/_fixed_bugs/README.md`（加表格行；**下一个编号不在这里维护**——它由
+   `_backlog/_archived/README.md` 的状态总览表唯一承载，并与磁盘推导值对账）
 3. 更新本文件（删掉该 bug）
 4. 更新 `../_archived/README.md`（计数 +1）
 
@@ -29,7 +30,9 @@
 
 （当前无活跃卡。）
 
-**Next available bug ID: BUG-007**
+**下一个可用编号不在本文件维护。** 唯一承载处是 [`_backlog/_archived/README.md`](../_archived/README.md)
+的状态总览表（`_fixed_bugs/` 行的 Next ID 列），由 doc-hygiene 的计数规则与磁盘推导值对账。
+（原此处手写一份，2026-10-18 由 `consolidate-next-id` 删除：6 处副本只带来漂移。）
 
 ---
 

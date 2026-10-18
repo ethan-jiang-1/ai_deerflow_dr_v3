@@ -82,7 +82,7 @@ class BatteryInventoryTests(unittest.TestCase):
     """The guard's control inventory is pinned: losing controls is a regression."""
 
     def test_inventory_counts_are_pinned(self) -> None:
-        """32 negative controls beside 13 green controls — pinned exactly.
+        """29 negative controls beside 11 green controls — pinned exactly.
 
         A negative control must fire (``present``); a green control must not
         mis-report — either a named violation class is absent (``absent``) or the
@@ -94,15 +94,15 @@ class BatteryInventoryTests(unittest.TestCase):
         the battery report exactly 30 failures, and the inherited inlined battery
         reports exactly 30 as well. The plan's "31" counted the battery's failure
         messages, one of which ("clean fixture must have zero violations") is a
-        positive control rather than a negative one — so the negative inventory is 32
-        and the green inventory is 13, 45 controls in total.
+        positive control rather than a negative one — so the negative inventory is 29
+        and the green inventory is 11, 40 controls in total.
         """
         cases = _battery.NEGATIVE_CASES
         negative = [c for c in cases if c.present]
         green = [c for c in cases if c.absent or c.zero_violations]
-        self.assertEqual(len(negative), 32, "the guard lost or gained negative controls")
-        self.assertEqual(len(green), 13, "the guard lost or gained green controls")
-        self.assertEqual(len(cases), 45, "battery size changed")
+        self.assertEqual(len(negative), 29, "the guard lost or gained negative controls")
+        self.assertEqual(len(green), 11, "the guard lost or gained green controls")
+        self.assertEqual(len(cases), 40, "battery size changed")
 
     def test_every_control_declares_its_polarity(self) -> None:
         for case in _battery.NEGATIVE_CASES:

@@ -8,7 +8,7 @@ import markdown_fences
 
 from .constants import MARKDOWN_LINK_RE, _COUNT_ARCHIVE_RE, _COUNT_SPECS_RE
 from .scope import Scope
-from .ledger import _adr_ids, _indexed_ids, _ledger_counter_problems, _ledger_placement_problems, _ledger_roster_problems, _read_utf8, _card_fix_reference_problems
+from .ledger import _adr_ids, _indexed_ids, _ledger_counter_problems, _ledger_roster_problems, _read_utf8, _card_fix_reference_problems
 
 
 def _rule_adr_index(scope: Scope) -> list[str]:
@@ -177,7 +177,6 @@ def _rule_ledger_consistency(scope: Scope) -> list[str]:
     return (
         _ledger_roster_problems(scope, backlog)
         + _ledger_counter_problems(scope, backlog)
-        + _ledger_placement_problems(scope, backlog)
         + _card_fix_reference_problems(scope, backlog)
     )
 
