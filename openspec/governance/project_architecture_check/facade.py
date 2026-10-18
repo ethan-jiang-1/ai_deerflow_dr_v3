@@ -10,6 +10,7 @@ from pathlib import Path
 
 from .contract import ContractViolation
 from .cycles import validate_no_import_cycles
+from .markdown_grammar import validate_single_fence_grammar
 from .gitlink import _validate_upstream_gitlink
 from .imports import validate_imports
 from .inspect_tree import (
@@ -30,6 +31,9 @@ def validate_project(root: Path, manifest: StructureManifest) -> None:
     _validate_single_source_root(root, manifest)
     validate_imports(root, manifest)
     validate_no_import_cycles(root)
+    # A source-structure rule, not an import contract: it runs with the full project
+    # validation and deliberately not under --imports-only.
+    validate_single_fence_grammar(root)
     _validate_upstream_gitlink(root, manifest)
 
 
