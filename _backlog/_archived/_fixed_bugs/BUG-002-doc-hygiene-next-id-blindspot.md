@@ -1,6 +1,7 @@
 # BUG-002: check_doc_hygiene 的账本 Next-ID 校验读不到活跃 README 的声明——同一文件两个 Next-ID 漂移全绿通过
 
 > 严重级别: P2 | 发现: 2026-10-10 | 状态: 已修（harden-backlog-next-id-guard，archive 2026-10-10-harden-backlog-next-id-guard：Next-ID 声明唯一性/一致性双门禁 + self-test 负例×2 + ∪ 推导单源化 `_allocated_numbers`；红先回执与门禁退出码见 change Delivery Record）
+> 修复: harden-backlog-next-id-guard
 
 ## 症状
 

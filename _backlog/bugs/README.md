@@ -39,6 +39,8 @@
 # BUG-<NNN>: <一句话标题>
 
 > 严重级别: P0 / P1 / P2 | 发现: 2026-MM-DD | 状态: 调查中
+> 修复: <change-name>    # 状态为「已落修 / 已修」时必填；出现即须指向真实存在的 change
+#   （活跃目录 openspec/changes/<name>，或归档目录 openspec/changes/archive/<日期>-<name>）
 
 ## 症状
 观察到什么错误行为（现场、报错、复现路径）。

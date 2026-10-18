@@ -1,6 +1,7 @@
 # BUG-006: change-guidance 门禁的章节解析无围栏感知（可误拒合法 change、可误判表单模式）
 
 > 严重级别: P1 | 发现: 2026-10-17 | 状态: 已修
+> 修复: guidance-adopts-fence-rule
 
 ## 症状
 

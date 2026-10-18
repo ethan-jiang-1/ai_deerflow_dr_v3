@@ -7,7 +7,7 @@ import markdown_fences
 import re
 import re as _re
 
-from .constants import ADR_FILE_RE, BACKLOG_CLOSABLE_RE, BACKLOG_GRADUATION_PASSED_RE, BACKLOG_STATUS_FIELD_RE, INDEX_ROW_RE, MARKDOWN_LINK_RE
+from .constants import ADR_FILE_RE, BACKLOG_CLOSABLE_RE, BACKLOG_GRADUATION_PASSED_RE, BACKLOG_STATUS_FIELD_RE, INDEX_ROW_RE, MARKDOWN_LINK_RE, BACKLOG_FIX_REFERENCE_REQUIRED_STATUSES
 from .scope import Scope
 
 
@@ -115,6 +115,62 @@ def _allocated_numbers(
             if id_match.group(1) == prefix:
                 allocated.append(int(id_match.group(2)))
     return allocated
+
+
+def _change_directory_names(root: Path) -> set[str]:
+    """Every change name the repository knows: active directories and archived ones.
+
+    Archived changes are renamed with a date prefix (``2026-10-17-<name>``), so a card
+    written after the fact names the bare change and the prefix has to be tolerated.
+    """
+    changes = root / "openspec" / "changes"
+    names = {p.name for p in changes.iterdir() if p.is_dir() and p.name != "archive"} \
+        if changes.is_dir() else set()
+    archive = changes / "archive"
+    if archive.is_dir():
+        names |= {p.name for p in archive.iterdir() if p.is_dir()}
+    return names
+
+
+def _card_fix_reference_problems(scope: Scope, backlog: Path) -> list[str]:
+    """A card's ``> 修复:`` field names the change that fixed it, and that change exists.
+
+    The field is required once the fix has landed (``已落修`` / ``已修``) and validated
+    wherever it appears. No inference is made about the other statuses: a proposed but
+    unlanded change is a normal flow, so neither requiring nor forbidding the field there
+    would express anything true.
+    """
+    problems: list[str] = []
+    known = _change_directory_names(scope.root)
+    for surface in ("bugs", "_fixed_bugs"):
+        for card in _ledger_work_files(scope, backlog, surface):
+            text, decode_problem = _read_utf8(card)
+            if text is None:
+                problems.append(f"non-UTF-8 card, fix reference not checked: {surface}/{card.name}")
+                continue
+            matches = scope.regexes["fix_reference"].findall(text)
+            status = BACKLOG_STATUS_FIELD_RE.search(text)
+            # Older cards wrote the reference inside the status line's parenthesis
+            # ("已修（<change>，archive …）"), which would otherwise hide the state from
+            # this rule. Only this helper narrows the word: the shared field pattern keeps
+            # its behaviour for the hukou check.
+            status_word = _re.split(r"[（(]", status.group(1))[0].strip() if status else ""
+            if not matches:
+                if status_word in BACKLOG_FIX_REFERENCE_REQUIRED_STATUSES:
+                    problems.append(
+                        f"card in state {status_word!r} must declare its fixing change as "
+                        f"'> 修复: <change-name>': {surface}/{card.name}"
+                    )
+                continue
+            if len(matches) > 1:
+                problems.append(f"card declares more than one 修复 reference: {surface}/{card.name}")
+                continue
+            name = matches[0]
+            if not any(entry == name or entry.endswith(f"-{name}") for entry in known):
+                problems.append(
+                    f"card names a fixing change that does not exist: {name!r}: {surface}/{card.name}"
+                )
+    return problems
 
 
 def _ledger_roster_problems(scope: Scope, backlog: Path) -> list[str]:

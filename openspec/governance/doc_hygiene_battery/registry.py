@@ -15,7 +15,7 @@ from doc_hygiene_check import (
     Scope,
     violations,
 )
-from .fixtures import _adr_index_orphan, _allowlist_unjustified, _archive_only_next_id, _broken_asset_doc_link, _broken_docs_layer_link, _broken_entry_chain_link, _consistent_single_decl, _contiguous_table, _dangling_trigger_index_home, _disagreeing_next_id_decl, _docs_layer_missing_newline, _docs_layer_non_utf8, _duplicate_next_id_decl, _fence_indented_opener_keeps_checking, _fenced_example_id_does_not_allocate, _fenced_marker_quote_is_not_stale, _hukou_bad_word, _hukou_closable, _hukou_graduated, _hukou_miskill_awaiting, _hukou_missing_field, _is_clean_fixture, _ledger_repo, _ledger_row_placement, _missing_managed_budget_path, _missing_newline_entry_chain, _over_budget_resident_doc, _resolvable_asset_doc_link, _root_count_drift, _root_count_matching, _root_count_unpinned, _stale_marker_clean, _stale_marker_detected, _tilde_fenced_row_is_not_a_ledger_row, _undeclared_backlog_dir, _undocumented_backlog_dir, _union_consistent_next_id, _unregistered_docs_markdown, _vocab_bad_word, _vocab_fix_ready_miskill, _vocab_old_active
+from .fixtures import _adr_index_orphan, _allowlist_unjustified, _archive_only_next_id, _broken_asset_doc_link, _broken_docs_layer_link, _broken_entry_chain_link, _consistent_single_decl, _contiguous_table, _dangling_trigger_index_home, _disagreeing_next_id_decl, _docs_layer_missing_newline, _docs_layer_non_utf8, _duplicate_next_id_decl, _fence_indented_opener_keeps_checking, _fenced_example_id_does_not_allocate, _fenced_marker_quote_is_not_stale, _fix_reference_existing_change, _fix_reference_missing_change, _fix_reference_repo, _hukou_bad_word, _hukou_closable, _hukou_graduated, _hukou_miskill_awaiting, _hukou_missing_field, _is_clean_fixture, _ledger_repo, _ledger_row_placement, _missing_managed_budget_path, _missing_newline_entry_chain, _over_budget_resident_doc, _resolvable_asset_doc_link, _root_count_drift, _root_count_matching, _root_count_unpinned, _stale_marker_clean, _stale_marker_detected, _tilde_fenced_row_is_not_a_ledger_row, _undeclared_backlog_dir, _undocumented_backlog_dir, _union_consistent_next_id, _unregistered_docs_markdown, _vocab_bad_word, _vocab_fix_ready_miskill, _vocab_old_active
 
 
 CLEAN_FIXTURE = "clean fixture must have zero violations"
@@ -142,6 +142,8 @@ FENCED_EXAMPLE_ID_NOT_ALLOCATED = "a fenced example allocated a ledger ID"
 
 
 FENCED_MARKER_QUOTE_NOT_STALE = "a fenced marker quote reported as stale"
+FIX_REFERENCE_MISSING_CHANGE = "a card named a fixing change that does not exist"
+FIX_REFERENCE_EXISTING_CHANGE = "a card naming an existing change was flagged"
 
 
 ALLOWLIST_UNJUSTIFIED = "unjustified allowlist entry not detected"
@@ -326,6 +328,12 @@ NEGATIVE_CASES: tuple[NegativeCase, ...] = (
     _c(FENCED_MARKER_QUOTE_NOT_STALE, "stale_markers", _fenced_marker_quote_is_not_stale,
        "quoting a forbidden marker inside a fence is documentation, not a stale marker",
        absent=("stale narrative marker",)),
+    _c(FIX_REFERENCE_MISSING_CHANGE, "ledger_consistency", _fix_reference_missing_change,
+       "a card naming a fixing change that exists nowhere is reported",
+       present=("fixing change that does not exist",)),
+    _c(FIX_REFERENCE_EXISTING_CHANGE, "ledger_consistency", _fix_reference_existing_change,
+       "a card naming an existing change is not reported (over-fire control)",
+       absent=("fixing change that does not exist", "must declare its fixing change")),
 )
 
 

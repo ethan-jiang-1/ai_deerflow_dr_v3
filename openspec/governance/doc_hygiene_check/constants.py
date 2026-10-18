@@ -153,6 +153,12 @@ BACKLOG_GRADUATION_PASSED_RE = re.compile(r"毕业门[:：]\s*已过")
 BACKLOG_CLOSABLE_RE = re.compile(r"可关闭[:：]\s*是")
 
 
+# The change that fixed a bug, written as a machine-readable header field (the prose
+# 修复关联 section stays free-form: this line is the authority a guard can read).
+BACKLOG_FIX_REFERENCE_RE = re.compile(r"^> 修复[:：]\s*([a-z0-9][a-z0-9-]*)\s*$", re.MULTILINE)
+BACKLOG_FIX_REFERENCE_REQUIRED_STATUSES: tuple[str, ...] = ("已落修", "已修")
+
+
 STALE_MARKERS: tuple[str, ...] = (
     "骨架占位",
     "骨架期占位",
@@ -214,6 +220,7 @@ SCOPE_REGEXES: tuple[tuple[str, "re.Pattern[str]"], ...] = (
     ("next_id", BACKLOG_NEXT_ID_RE),
     ("next_id_decl", BACKLOG_NEXT_ID_DECL_RE),
     ("archive_to_active", re.compile(r"^_(?:fixed_bugs|settled_issues)$")),
+    ("fix_reference", BACKLOG_FIX_REFERENCE_RE),
 )
 
 

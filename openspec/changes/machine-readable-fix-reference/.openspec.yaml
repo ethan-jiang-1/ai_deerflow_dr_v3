@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-10-18
+# A card-format field plus one ledger rule that validates it. It changes the bug-card
+# header contract (a new required line for landed fixes) and adds a guard.
+skip_specs: true

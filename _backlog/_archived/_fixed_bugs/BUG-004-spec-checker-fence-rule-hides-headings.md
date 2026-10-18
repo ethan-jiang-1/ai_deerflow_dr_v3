@@ -1,6 +1,7 @@
 # BUG-004: specs 门禁的围栏剥离会藏掉真标题（围栏规则偏离 CommonMark）
 
 > 严重级别: P2 | 发现: 2026-10-16 | 状态: 已修
+> 修复: share-fence-parsing
 
 ## 症状
 

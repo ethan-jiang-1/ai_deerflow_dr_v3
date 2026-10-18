@@ -1,6 +1,7 @@
 # BUG-005: doc-hygiene 的逐行解析有三种围栏概念，可误报、且可**静默失明**
 
 > 严重级别: P1 | 发现: 2026-10-16 | 状态: 已修
+> 修复: doc-hygiene-adopts-fence-rule
 
 ## 症状
 

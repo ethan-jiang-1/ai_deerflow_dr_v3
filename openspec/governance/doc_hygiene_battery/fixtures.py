@@ -413,6 +413,35 @@ def _fenced_example_id_does_not_allocate(root: Path) -> None:
     _append_to_ledger_readme(root, "~~~\n" + _FENCE_ORPHAN_ROW + "\n~~~")
 
 
+def _fix_reference_repo(root: Path, change_name: str, *, create_change: bool) -> None:
+    """An archived bug card in a landed state, naming its fixing change.
+
+    ``create_change`` decides whether the archive actually holds that change. The
+    negative fixture must *not* create it: archived directories are date-prefixed, and
+    the rule accepts a directory whose name ends with the referenced change, so a
+    fixture that created one would accidentally make the missing change present.
+    """
+    _write(root, "_backlog/bugs/README.md", "# Bugs\n\n（空）\n")
+    _write(root, "_backlog/_archived/_fixed_bugs/README.md", "# Fixed\n\n（空）\n")
+    _write(
+        root,
+        "_backlog/_archived/_fixed_bugs/BUG-001-demo.md",
+        f"> 严重级别: P2 | 发现: 2026-01-01 | 状态: 已修\n> 修复: {change_name}\n",
+    )
+    if create_change:
+        (root / "openspec" / "changes" / "archive" / f"2026-01-01-{change_name}").mkdir(
+            parents=True, exist_ok=True
+        )
+
+
+def _fix_reference_missing_change(root: Path) -> None:
+    _fix_reference_repo(root, "change-that-never-existed", create_change=False)
+
+
+def _fix_reference_existing_change(root: Path) -> None:
+    _fix_reference_repo(root, "some-real-change", create_change=True)
+
+
 def _fenced_marker_quote_is_not_stale(root: Path) -> None:
     build_clean_fixture(root)
     doc = root / "AGENTS.md"

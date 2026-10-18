@@ -1,6 +1,7 @@
 # BUG-003: closeout 工具把围栏代码块里的 checkbox 当成真任务
 
 > 严重级别: P2 | 发现: 2026-10-16 | 状态: 已修
+> 修复: fix-closeout-fence-awareness
 
 ## 症状
 
