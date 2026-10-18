@@ -139,20 +139,40 @@ def cmd_create(args) -> None:
     handle = assembly.resolve_bundle(assembly.runs_root(), state.thread_id)
     print(f"bundle {state.thread_id} started (config: {args.config}, composition: {state.composition})")
 
-    try:
-        result = assembly.run_foreground(
-            handle, config_root=assembly.CONFIG_ROOT, config_name=args.config,
-            thread_id=state.thread_id, pin=assembly.read_pin(), on_event=_live_renderer(),
-            on_clarification=_clarification_handler(), on_plan=_plan_handler(),
-        )
-    except ImportError as exc:
-        raise SystemExit(
-            f"create requires the deerflow environment (missing module: {exc.name}). "
-            "Remedy: run `uv sync` inside deep_research_harness/, then "
-            "`uv run python3 cli.py create …` (or `make create PROBLEM=…`)."
-        ) from exc
+    result = _run_foreground(
+        "create",
+        remedy="Remedy: run `uv sync` inside deep_research_harness/, then "
+        "`uv run python3 cli.py create …` (or `make create PROBLEM=…`).",
+        handle=handle, config_root=assembly.CONFIG_ROOT, config_name=args.config,
+        thread_id=state.thread_id, pin=assembly.read_pin(), on_event=_live_renderer(),
+        on_clarification=_clarification_handler(), on_plan=_plan_handler(),
+    )
     print(_terminal_line(result))
     print(f"state: {result.status} (generation {result.generation}, revision {result.revision})")
+
+
+def _run_foreground(verb: str, *, remedy: str, **kwargs):
+    """Run one generation in the foreground, failing loud and readably.
+
+    Two operator-visible conditions leave as a message with a remedy instead of a traceback:
+    a missing framework environment (``ImportError``), and a bundle advanced by another writer
+    mid-run (``StateRevisionConflict``). The conflict is deliberately **not** retried here:
+    the CAS refused the write, so nothing was corrupted, and a second driver on one bundle is
+    an anomaly worth surfacing rather than papering over (BUG-007; see the archived change
+    ``harden-cas-conflict-surface`` for why a bounded retry belongs at a higher layer).
+    """
+    try:
+        return assembly.run_foreground(**kwargs)
+    except ImportError as exc:
+        raise SystemExit(
+            f"{verb} requires the deerflow environment (missing module: {exc.name}). {remedy}"
+        ) from exc
+    except bundle_state.StateRevisionConflict as exc:
+        raise SystemExit(
+            f"{verb} refused to write: the bundle was advanced by another writer while this run "
+            f"was live ({exc}). Remedy: make sure only one run drives a bundle at a time, then "
+            "re-read the state and retry the command."
+        ) from exc
 
 
 def cmd_status(args) -> None:
@@ -203,18 +223,14 @@ def cmd_refine(args) -> None:
     # Phase 5 round-2 ruling: the next generation runs now, in the foreground,
     # over its own direction document, continuing the bundle's composition ladder.
     config_name = assembly.config_name_for_composition(refined.composition)
-    try:
-        result = assembly.run_foreground(
-            handle, config_root=assembly.CONFIG_ROOT, config_name=config_name,
-            thread_id=refined.thread_id, pin=assembly.read_pin(), on_event=_live_renderer(),
-            on_clarification=_clarification_handler(),
-        )
-    except ImportError as exc:
-        raise SystemExit(
-            f"refine requires the deerflow environment (missing module: {exc.name}). "
-            "Remedy: run `uv sync` inside deep_research_harness/, then "
-            "`uv run python3 cli.py refine …`."
-        ) from exc
+    result = _run_foreground(
+        "refine",
+        remedy="Remedy: run `uv sync` inside deep_research_harness/, then "
+        "`uv run python3 cli.py refine …`.",
+        handle=handle, config_root=assembly.CONFIG_ROOT, config_name=config_name,
+        thread_id=refined.thread_id, pin=assembly.read_pin(), on_event=_live_renderer(),
+        on_clarification=_clarification_handler(),
+    )
     print(_terminal_line(result))
     print(f"state: {result.status} (generation {result.generation}, revision {result.revision})")
 

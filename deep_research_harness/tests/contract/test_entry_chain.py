@@ -83,30 +83,61 @@ class LauncherDelegationTest(unittest.TestCase):
         )
 
 
+#: The shared helper the verbs route their foreground run through. It owns the two readable
+#: failure channels (missing framework environment, bundle advanced by another writer), which
+#: is why the call no longer sits literally in the verb.
+_FOREGROUND_HELPERS = ("_run_foreground",)
+
+
+def _reaches_foreground_assembly(tree: ast.Module, verb: str) -> bool:
+    """Whether a verb reaches ``assembly.run_foreground`` directly or through the helper.
+
+    The contract this pins is "no verb bypasses bundle actions / foreground assembly" — not
+    the literal call site. A verb that reaches neither the call nor the helper still fails.
+    """
+    calls = _call_names(_function(tree, verb, INTERACTION_CLI))
+    if "run_foreground" in calls:
+        return True
+    for helper in calls.intersection(_FOREGROUND_HELPERS):
+        if "run_foreground" in _call_names(_function(tree, helper, INTERACTION_CLI)):
+            return True
+    return False
+
+
 class VerbRoutingTest(unittest.TestCase):
     """Link 2: create/refine route through bundle actions + foreground assembly."""
 
     def test_create_routes_through_actions_and_assembly(self) -> None:
         tree = _parse(INTERACTION_CLI)
         calls = _call_names(_function(tree, "cmd_create", INTERACTION_CLI))
-        for required in ("start", "resolve_bundle", "run_foreground"):
+        for required in ("start", "resolve_bundle"):
             self.assertIn(
                 required,
                 calls,
                 f"entry-chain link 2 broken: cmd_create no longer calls {required!r} "
                 f"(bundle actions / foreground assembly bypassed); observed calls: {sorted(calls)}",
             )
+        self.assertTrue(
+            _reaches_foreground_assembly(tree, "cmd_create"),
+            f"entry-chain link 2 broken: cmd_create no longer reaches 'run_foreground' "
+            f"(bundle actions / foreground assembly bypassed); observed calls: {sorted(calls)}",
+        )
 
     def test_refine_routes_through_actions_and_assembly(self) -> None:
         tree = _parse(INTERACTION_CLI)
         calls = _call_names(_function(tree, "cmd_refine", INTERACTION_CLI))
-        for required in ("refine", "resolve_bundle", "run_foreground"):
+        for required in ("refine", "resolve_bundle"):
             self.assertIn(
                 required,
                 calls,
                 f"entry-chain link 2 broken: cmd_refine no longer calls {required!r} "
                 f"(bundle actions / foreground assembly bypassed); observed calls: {sorted(calls)}",
             )
+        self.assertTrue(
+            _reaches_foreground_assembly(tree, "cmd_refine"),
+            f"entry-chain link 2 broken: cmd_refine no longer reaches 'run_foreground' "
+            f"(bundle actions / foreground assembly bypassed); observed calls: {sorted(calls)}",
+        )
 
     def test_verbs_never_drive_the_stream_themselves(self) -> None:
         tree = _parse(INTERACTION_CLI)

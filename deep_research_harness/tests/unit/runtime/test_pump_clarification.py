@@ -13,6 +13,7 @@ import unittest
 from datetime import UTC, datetime
 from pathlib import Path
 from types import SimpleNamespace
+from unittest import mock
 
 from support import ai as _ai
 from support import ask_call as _ask_call
@@ -226,6 +227,30 @@ class GateWriteConsistencyTest(PumpCase):
             2,
             "the step overwrote a concurrent update instead of building on it",
         )
+
+    def test_a_conflict_is_raised_rather_than_swallowed(self) -> None:
+        """The CAS refusing the write must surface — a conflict is not retried away.
+
+        BUG-007 criterion 3: the failure channel is a raise (made readable at the CLI
+        boundary), not a silent retry. A writer landing between the gate's own read and the
+        read inside `write_state` must therefore produce `StateRevisionConflict`.
+        """
+        import dataclasses
+
+        caller_state = bundle_state.read_state(self.handle)
+        real_read = bundle_state.read_state
+        calls = {"n": 0}
+
+        def flaky_read(handle):
+            calls["n"] += 1
+            state = real_read(handle)
+            if calls["n"] == 2:  # the read inside write_state, after the gate's own read
+                return dataclasses.replace(state, revision=state.revision + 1)
+            return state
+
+        with mock.patch.object(bundle_state, "read_state", flaky_read):
+            with self.assertRaises(bundle_state.StateRevisionConflict):
+                clarification_step(self.handle, None, caller_state, self._tool_calls())
 
     def test_no_gate_write_reads_its_expected_value_inside_the_call(self) -> None:
         """The defect's signature: `write_state(..., read_state(...), ...)`."""

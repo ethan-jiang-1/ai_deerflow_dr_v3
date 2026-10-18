@@ -81,3 +81,12 @@
 **未做的决定（owner 保留）**：未引入 `StateRevisionConflict` 的捕获/重试，也未把 expected 改成
 "整轮开始时的 state"——那会改变终态路径的失败语义（生产代码今天无人捕获它）。见 change 的
 design D-3 与差偏 4。
+
+> **追记（2026-10-18）**：**判据 3 已落地**，由 change `harden-cas-conflict-surface`。决定为
+> **fail loud（不在终态路径上重试）**——依据：仓内惯用法是带 Remedy 的可读失败；并发写者意味着
+> 同一 bundle 上有两个驱动；且有 CAS 兜底（冲突时什么都没写坏）。落地在调用方边界
+> （`interaction/cli.py` 的 `_run_foreground`）：冲突从**裸 traceback** 变成带 Remedy 的 `SystemExit`，
+> 并有语义用例钉住"**冲突时抛出而非吞掉**"。
+> **备选的有界重试明确不做**（理由：在终态写入那一处重试会让 journal 事件写两次、且分支判定可能
+> 过期——正确层次是整段"判定 + journal + 写"或整个 run，见该 change 的 design D-2）。
+> `pump.py` 终态写入的同形态暴露面**不在该把范围**（已记入其未执行检查）。

@@ -15,6 +15,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
 
+from deerflow_deep_research.runtime.bundle import bundle_state
 from deerflow_deep_research.runtime.interaction import cli
 
 
@@ -121,3 +122,40 @@ class CancelPositiveWiringTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ForegroundFailureChannelTest(unittest.TestCase):
+    """Both operator-visible failures leave as a readable remedy, not a traceback.
+
+    A missing framework environment was already handled this way; BUG-007's criterion 3 adds
+    the second channel: a bundle advanced by another writer mid-run. The CAS refused the write,
+    so nothing is corrupted — the run stops and says what to do.
+    """
+
+    def _run(self, error: Exception):
+        fake_assembly = SimpleNamespace(
+            run_foreground=lambda **kwargs: (_ for _ in ()).throw(error),
+            CONFIG_ROOT=Path("/config"),
+        )
+        with mock.patch.object(cli, "assembly", fake_assembly):
+            return cli._run_foreground("refine", remedy="Remedy: run `uv sync`.", handle="H")
+
+    def test_a_revision_conflict_stops_with_a_remedy(self) -> None:
+        conflict = bundle_state.StateRevisionConflict(
+            "state revision conflict: expected 3, actual 4 (/runs/x) — re-read the state and retry"
+        )
+        with self.assertRaises(SystemExit) as ctx:
+            self._run(conflict)
+        message = str(ctx.exception)
+        self.assertIn("advanced by another writer", message)
+        self.assertIn("Remedy:", message)
+        self.assertIn("expected 3, actual 4", message, "the conflict's own detail must survive")
+
+    def test_a_missing_environment_keeps_its_verb_specific_message(self) -> None:
+        with self.assertRaises(SystemExit) as ctx:
+            self._run(ImportError("No module named 'deerflow'", name="deerflow"))
+        self.assertEqual(
+            str(ctx.exception),
+            "refine requires the deerflow environment (missing module: deerflow). "
+            "Remedy: run `uv sync`.",
+        )
